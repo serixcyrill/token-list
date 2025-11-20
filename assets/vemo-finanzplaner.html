@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vemo.Stil Finanzplaner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #141c2e;
+      --card-strong: #101828;
+      --accent: #10c05b;
+      --accent-2: #76d062;
+      --muted: #c3cadc;
+      --text: #f6f9ff;
+      --danger: #d9534f;
+      --success: #30cc73;
+      --shadow: 0 20px 40px rgba(8, 12, 22, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(120% 110% at 15% 15%, rgba(48, 204, 115, 0.12), transparent),
+        radial-gradient(110% 110% at 85% 0%, rgba(118, 208, 98, 0.08), transparent),
+        radial-gradient(80% 90% at 50% 80%, rgba(17, 25, 40, 0.7), transparent),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .logo .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 12px rgba(48, 204, 115, 0.65);
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(20, 28, 46, 0.95), rgba(16, 24, 40, 0.95));
+      border: 1px solid rgba(48, 204, 115, 0.08);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+      letter-spacing: 0.1px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0f1526;
+      border: 1px solid rgba(48, 204, 115, 0.22);
+      color: var(--text);
+      border-radius: 10px;
+      outline: none;
+      font-size: 0.95rem;
+      transition: border-color 0.2s ease, transform 0.1s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(48, 204, 115, 0.45), transparent);
+      margin: 12px 0 18px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    button {
+      padding: 12px 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #0a121f;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(48, 204, 115, 0.25);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(48, 204, 115, 0.35);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(48, 204, 115, 0.35);
+      box-shadow: none;
+    }
+
+    .summary-card {
+      border: 1px solid rgba(48, 204, 115, 0.35);
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(48, 204, 115, 0.18);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(48, 204, 115, 0.18);
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+
+    .pill.success { background: rgba(48, 204, 115, 0.18); color: #d9ffe9; }
+    .pill.warn { background: rgba(255, 193, 99, 0.18); color: #ffe5bd; }
+    .pill.danger { background: rgba(217, 83, 79, 0.18); color: #ffd4d0; }
+
+    .chart-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(48, 204, 115, 0.16);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chart-bar span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .mono {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      color: #cdd5ff;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+
+    .section-title span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 10px rgba(48, 204, 115, 0.55);
+    }
+
+    .caps { text-transform: uppercase; letter-spacing: 0.6px; font-size: 0.8rem; color: var(--muted); }
+
+    @media (max-width: 720px) {
+      body { padding: 18px; }
+      header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="dot"></div>
+      <div>
+        Vemo.Stil <span class="pill" style="margin-left: 6px;">beta</span>
+      </div>
+    </div>
+    <div class="tagline">Personalisiertes Finanz-Coaching mit Datenklarheit.</div>
+  </header>
+
+  <section class="grid">
+    <div class="card">
+      <h2 class="section-title"><span></span>Profil</h2>
+      <div class="two-col">
+        <div>
+          <label for="name">Name des Kunden</label>
+          <input id="name" type="text" placeholder="Alex Muster" />
+        </div>
+        <div>
+          <label for="age">Alter</label>
+          <input id="age" type="number" min="18" max="100" value="32" />
+        </div>
+      </div>
+      <div class="two-col" style="margin-top: 10px;">
+        <div>
+          <label for="location">Wohnort / Steuerdomizil</label>
+          <input id="location" type="text" placeholder="Zürich, CH" />
+        </div>
+        <div>
+          <label for="risk">Risikoprofil (defensiv → progressiv)</label>
+          <input id="risk" type="range" min="1" max="5" value="3" />
+        </div>
+      </div>
+      <div style="margin-top: 10px;">
+        <label for="notes">Besonderheiten / Prioritäten</label>
+        <textarea id="notes" placeholder="z.B. Nachhaltige Anlagen, Flexibilität, Liquidität"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title"><span></span>Einnahmen</h2>
+      <div class="two-col">
+        <div>
+          <label for="incomeStable">Monatlich sicher</label>
+          <input id="incomeStable" type="number" min="0" value="6200" />
+        </div>
+        <div>
+          <label for="incomeVariable">Monatlich variabel</label>
+          <input id="incomeVariable" type="number" min="0" value="800" />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <h2 class="section-title"><span></span>Fixkosten</h2>
+      <div class="two-col">
+        <div>
+          <label for="housing">Wohnen & Nebenkosten</label>
+          <input id="housing" type="number" min="0" value="1800" />
+        </div>
+        <div>
+          <label for="utilities">Versicherungen</label>
+          <input id="utilities" type="number" min="0" value="420" />
+        </div>
+      </div>
+      <div class="two-col" style="margin-top: 8px;">
+        <div>
+          <label for="transport">Mobilität</label>
+          <input id="transport" type="number" min="0" value="260" />
+        </div>
+        <div>
+          <label for="food">Ernährung</label>
+          <input id="food" type="number" min="0" value="520" />
+        </div>
+      </div>
+      <div style="margin-top: 8px;">
+        <label for="otherFixed">Weitere Fixkosten</label>
+        <input id="otherFixed" type="number" min="0" value="300" />
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title"><span></span>Vermögen & Schulden</h2>
+      <div class="two-col">
+        <div>
+          <label for="cash">Liquidität (Cash)</label>
+          <input id="cash" type="number" min="0" value="12000" />
+        </div>
+        <div>
+          <label for="investments">Investments / ETFs</label>
+          <input id="investments" type="number" min="0" value="18000" />
+        </div>
+      </div>
+      <div class="two-col" style="margin-top: 8px;">
+        <div>
+          <label for="pension">Vorsorge (3a / Pensionskasse)</label>
+          <input id="pension" type="number" min="0" value="42000" />
+        </div>
+        <div>
+          <label for="otherAssets">Weitere Vermögenswerte</label>
+          <input id="otherAssets" type="number" min="0" value="5000" />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="two-col">
+        <div>
+          <label for="debt">Kredite / Leasing gesamt</label>
+          <input id="debt" type="number" min="0" value="15000" />
+        </div>
+        <div>
+          <label for="debtRate">Ø Zinssatz (%)</label>
+          <input id="debtRate" type="number" min="0" step="0.1" value="5.5" />
+        </div>
+      </div>
+      <div style="margin-top: 8px;">
+        <label for="debtPayment">Monatliche Tilgung</label>
+        <input id="debtPayment" type="number" min="0" value="400" />
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title"><span></span>Ziele</h2>
+      <div class="two-col">
+        <div>
+          <label for="emergencyMonths">Notgroschen (Monate)</label>
+          <input id="emergencyMonths" type="number" min="1" value="6" />
+        </div>
+        <div>
+          <label for="retireAge">Ruhestand mit Alter</label>
+          <input id="retireAge" type="number" min="50" max="80" value="63" />
+        </div>
+      </div>
+      <div class="two-col" style="margin-top: 8px;">
+        <div>
+          <label for="bigGoal">Großes Ziel (Betrag)</label>
+          <input id="bigGoal" type="number" min="0" value="45000" />
+        </div>
+        <div>
+          <label for="goalHorizon">Horizont (Jahre)</label>
+          <input id="goalHorizon" type="number" min="1" value="5" />
+        </div>
+      </div>
+      <div style="margin-top: 10px;">
+        <label for="goalDesc">Zielbeschreibung</label>
+        <textarea id="goalDesc" placeholder="z.B. Eigenheim-Anzahlung, Sabbatical, Weiterbildung"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <div class="button-row">
+    <button class="secondary" id="reset">Zurücksetzen</button>
+    <button id="generate">Plan generieren</button>
+  </div>
+
+  <section class="grid" id="output" aria-live="polite"></section>
+
+  <template id="plan-template">
+    <div class="card summary-card">
+      <div class="caps">Finanz-Canvas</div>
+      <h2 class="section-title"><span></span>Zusammenfassung</h2>
+      <div id="summary"></div>
+    </div>
+    <div class="card">
+      <div class="caps">Liquidität & Budget</div>
+      <h2 class="section-title"><span></span>Cashflow</h2>
+      <div id="cashflow"></div>
+    </div>
+    <div class="card">
+      <div class="caps">Vorsorge & Investieren</div>
+      <h2 class="section-title"><span></span>Anlagevorschlag</h2>
+      <div id="invest"></div>
+    </div>
+    <div class="card">
+      <div class="caps">Schulden</div>
+      <h2 class="section-title"><span></span>Tilgungsstrategie</h2>
+      <div id="debt-plan"></div>
+    </div>
+    <div class="card">
+      <div class="caps">Roadmap</div>
+      <h2 class="section-title"><span></span>Prioritäten</h2>
+      <div id="roadmap"></div>
+    </div>
+  </template>
+
+  <script>
+    const inputs = [
+      'name','age','location','risk','notes','incomeStable','incomeVariable','housing','utilities','transport','food','otherFixed','cash','investments','pension','otherAssets','debt','debtRate','debtPayment','emergencyMonths','retireAge','bigGoal','goalHorizon','goalDesc'
+    ];
+
+    const output = document.getElementById('output');
+    const template = document.getElementById('plan-template');
+
+    const number = (id) => Number(document.getElementById(id).value || 0);
+    const text = (id) => document.getElementById(id).value.trim();
+
+    const format = (val) => val.toLocaleString('de-CH', { minimumFractionDigits: 0 });
+
+    const resetBtn = document.getElementById('reset');
+    resetBtn.addEventListener('click', () => {
+      inputs.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el.type === 'text' || el.tagName === 'TEXTAREA') el.value = '';
+      });
+      output.innerHTML = '';
+    });
+
+    function computePlan() {
+      const name = text('name') || 'Kund*in';
+      const age = number('age') || 32;
+      const risk = number('risk');
+      const retireAge = number('retireAge');
+      const yearsToRetire = Math.max(0, retireAge - age);
+
+      const income = number('incomeStable') + number('incomeVariable');
+      const fixedCosts = number('housing') + number('utilities') + number('transport') + number('food') + number('otherFixed');
+      const debtPayment = number('debtPayment');
+      const discretionary = Math.max(0, income - fixedCosts - debtPayment);
+      const cashFlow = income - fixedCosts - debtPayment;
+
+      const assets = number('cash') + number('investments') + number('pension') + number('otherAssets');
+      const debtTotal = number('debt');
+      const debtRate = number('debtRate') / 100;
+
+      const essentials = fixedCosts + debtPayment * 0.3;
+      const emergencyTarget = essentials * (number('emergencyMonths') || 6);
+      const liquidGap = Math.max(0, emergencyTarget - number('cash'));
+      const emergencyMonthly = Math.max(0, Math.round(liquidGap / 12));
+
+      const goalAmount = number('bigGoal');
+      const goalYears = Math.max(1, number('goalHorizon'));
+      const monthlyGoal = Math.round(goalAmount / (goalYears * 12));
+
+      const investable = Math.max(0, discretionary - emergencyMonthly - monthlyGoal);
+      const riskProfiles = {
+        1: { eq: 25, bond: 55, cash: 20 },
+        2: { eq: 40, bond: 45, cash: 15 },
+        3: { eq: 55, bond: 35, cash: 10 },
+        4: { eq: 70, bond: 22, cash: 8 },
+        5: { eq: 85, bond: 10, cash: 5 },
+      };
+      const mix = riskProfiles[risk] || riskProfiles[3];
+
+      const projectedNetWorth = assets - debtTotal + (investable * 12 + debtPayment * 12) * Math.max(1, goalYears);
+      const debtFreeMonths = debtTotal > 0 ? Math.ceil(debtTotal / Math.max(1, debtPayment)) : 0;
+
+      const buffers = [
+        { label: 'Cashflow', value: cashFlow },
+        { label: 'Notgroschen-Gap', value: -liquidGap },
+        { label: 'Investierbar', value: investable },
+      ];
+
+      return {
+        name,
+        age,
+        retireAge,
+        yearsToRetire,
+        risk,
+        income,
+        fixedCosts,
+        debtPayment,
+        discretionary,
+        cashFlow,
+        assets,
+        debtTotal,
+        debtRate,
+        emergencyTarget,
+        liquidGap,
+        emergencyMonthly,
+        goalAmount,
+        goalYears,
+        monthlyGoal,
+        investable,
+        mix,
+        projectedNetWorth,
+        debtFreeMonths,
+        buffers,
+        goalDesc: text('goalDesc'),
+        location: text('location') || '—',
+        notes: text('notes'),
+      };
+    }
+
+    function renderPlan(plan) {
+      output.innerHTML = '';
+      const fragment = template.content.cloneNode(true);
+
+      const summary = fragment.getElementById('summary');
+      summary.innerHTML = `
+        <div class="stat-row"><div>Kunde</div><div class="pill">${plan.name}</div></div>
+        <div class="stat-row"><div>Ort</div><div class="pill">${plan.location}</div></div>
+        <div class="stat-row"><div>Vermögen</div><div class="pill success">CHF ${format(plan.assets)}</div></div>
+        <div class="stat-row"><div>Schulden</div><div class="pill warn">CHF ${format(plan.debtTotal)}</div></div>
+        <div class="stat-row"><div>Netto-Cashflow</div><div class="pill ${plan.cashFlow >= 0 ? 'success' : 'danger'}">CHF ${format(plan.cashFlow)}</div></div>
+        <div class="stat-row"><div>Frei verfügbar</div><div class="pill">CHF ${format(plan.discretionary)}</div></div>
+        <div class="stat-row"><div>Rente</div><div class="pill">in ${plan.yearsToRetire} Jahren (Alter ${plan.retireAge})</div></div>
+        <div class="stat-row"><div>Risikoprofil</div><div class="pill">Stufe ${plan.risk}</div></div>
+      `;
+
+      const cashflow = fragment.getElementById('cashflow');
+      cashflow.innerHTML = `
+        <div class="stat-row"><div>Fixkosten</div><div class="mono">CHF ${format(plan.fixedCosts)}</div></div>
+        <div class="stat-row"><div>Tilgung</div><div class="mono">CHF ${format(plan.debtPayment)}</div></div>
+        <div class="stat-row"><div>Notgroschen-Ziel</div><div class="mono">CHF ${format(plan.emergencyTarget)}</div></div>
+        <div class="stat-row"><div>Gap</div><div class="mono ${plan.liquidGap > 0 ? 'danger' : ''}">CHF ${format(plan.liquidGap)}</div></div>
+        <div class="stat-row"><div>Monatliche Reserve</div><div class="mono">CHF ${format(plan.emergencyMonthly)}</div></div>
+        <div class="stat-row"><div>Ziel-Sparen</div><div class="mono">CHF ${format(plan.monthlyGoal)}</div></div>
+        <div class="stat-row"><div>Investierbar</div><div class="mono">CHF ${format(plan.investable)}</div></div>
+        <div class="divider"></div>
+        <div class="caps">Budget in %</div>
+        ${renderBars([
+          { label: 'Essentials', value: Math.round((plan.fixedCosts / plan.income) * 100) },
+          { label: 'Tilgung', value: Math.round((plan.debtPayment / plan.income) * 100) },
+          { label: 'Sparen/Investieren', value: Math.max(0, Math.round(((plan.emergencyMonthly + plan.monthlyGoal + plan.investable) / plan.income) * 100)) },
+        ])}
+      `;
+
+      const invest = fragment.getElementById('invest');
+      invest.innerHTML = `
+        <div class="stat-row"><div>Empfohlene Quote p.m.</div><div class="mono">CHF ${format(plan.investable)}</div></div>
+        <div class="stat-row"><div>Portfolio-Mix</div><div class="pill">${plan.mix.eq}% Aktien · ${plan.mix.bond}% Anleihen · ${plan.mix.cash}% Cash</div></div>
+        <div class="stat-row"><div>Rente in ${plan.yearsToRetire} J.</div><div class="mono">Kapital-Pfad skizzieren, jährliche Rebalancierung</div></div>
+        <div class="divider"></div>
+        ${renderBars([
+          { label: 'Aktien', value: plan.mix.eq },
+          { label: 'Anleihen', value: plan.mix.bond },
+          { label: 'Cash/LIQ', value: plan.mix.cash },
+        ])}
+        <p style="color: var(--muted); margin-top: 12px; line-height: 1.6;">
+          Fortschrittlichere Simulationen (Inflation, Steuern, Gebühren) können ergänzt werden. Priorität: global diversifizierte ETFs, jährliche Steueroptimierung & ein Rebalancing-Korridor von ±5%.
+        </p>
+      `;
+
+      const debtPlan = fragment.getElementById('debt-plan');
+      const debtStyle = plan.risk <= 2 ? 'Snowball (kleinste Schulden zuerst)' : 'Avalanche (höchster Zins zuerst)';
+      debtPlan.innerHTML = `
+        <div class="stat-row"><div>Strategie</div><div class="pill">${debtStyle}</div></div>
+        <div class="stat-row"><div>Zinslast</div><div class="mono">${(plan.debtRate * 100).toFixed(1)}% p.a.</div></div>
+        <div class="stat-row"><div>Restlaufzeit</div><div class="mono">≈ ${plan.debtFreeMonths} Monate</div></div>
+        <div class="stat-row"><div>Extra-Tilgung</div><div class="mono">CHF ${format(Math.max(0, plan.investable * 0.25))} aus Frei-Mitteln</div></div>
+        <p style="color: var(--muted); margin-top: 12px;">
+          Sobald die monatliche Liquiditätsreserve gefüllt ist, werden 25% der investierbaren Mittel in Sondertilgungen umgeleitet, bis die teuerste Schuld getilgt ist.
+        </p>
+      `;
+
+      const roadmap = fragment.getElementById('roadmap');
+      roadmap.innerHTML = `
+        ${renderRoadmap(plan)}
+      `;
+
+      output.appendChild(fragment);
+    }
+
+    function renderBars(items) {
+      return items
+        .map(
+          (item) => `
+          <div style="margin: 8px 0;">
+            <div class="stat-row" style="border: none; padding: 0;">
+              <div>${item.label}</div>
+              <div class="mono">${item.value}%</div>
+            </div>
+            <div class="chart-bar"><span style="width:${Math.min(100, item.value)}%"></span></div>
+          </div>
+        `
+        )
+        .join('');
+    }
+
+    function renderRoadmap(plan) {
+      const steps = [
+        {
+          title: 'Sicherheitsschicht',
+          detail: `Notgroschen auf CHF ${format(plan.emergencyTarget)} aufbauen (CHF ${format(plan.emergencyMonthly)} monatlich).`,
+        },
+        {
+          title: 'Schulden entschärfen',
+          detail: `Tilgung beibehalten (CHF ${format(plan.debtPayment)}). ${plan.debtFreeMonths} Monate bis schuldenfrei; bei Überschuss Sondertilgung priorisieren.`,
+        },
+        {
+          title: 'Ziel sparen',
+          detail: `Für "${plan.goalDesc || 'Großes Ziel'}" monatlich CHF ${format(plan.monthlyGoal)} über ${plan.goalYears} Jahre in moderates Portfolio (70/20/10) einbezahlen.`,
+        },
+        {
+          title: 'Investierbare Mittel',
+          detail: `CHF ${format(plan.investable)} pro Monat nach Allokation (${plan.mix.eq}/${plan.mix.bond}/${plan.mix.cash}) investieren.`,
+        },
+        {
+          title: 'Review & Steuern',
+          detail: 'Quartalsweise Review, jährliches Rebalancing, Steueroptimierung über Säule 3a / Vorsorgeprodukte und Abzüge prüfen.',
+        },
+      ];
+
+      return steps
+        .map(
+          (step, idx) => `
+            <div class="stat-row" style="align-items:flex-start;">
+              <div class="pill">${idx + 1}</div>
+              <div>
+                <div style="font-weight: 600;">${step.title}</div>
+                <div style="color: var(--muted); margin-top: 4px;">${step.detail}</div>
+              </div>
+            </div>
+          `
+        )
+        .join('');
+    }
+
+    document.getElementById('generate').addEventListener('click', () => {
+      const plan = computePlan();
+      renderPlan(plan);
+    });
+  </script>
+</body>
+</html>
