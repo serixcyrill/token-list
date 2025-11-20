@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Schweizer Budgetrechner – Vemo Style</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+    :root {
+      --vemo-green: #76D062;
+      --vemo-green-soft: #E9F9E4;
+      --vemo-text: #0f172a;
+      --vemo-ring: #d0d7e4;
+      --vemo-muted: #64748b;
+      --vemo-bg: #f5f7fb;
+      --shadow: 0 18px 40px rgba(15,23,42,.10);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--vemo-text);
+    }
+
+    #vemo-budget,
+    #vemo-budget * {
+      box-sizing: border-box;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    #vemo-budget {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f8fafc, #eef2ff);
+    }
+
+    .vb-card {
+      width: 100%;
+      max-width: 1120px;
+      background: #fff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--vemo-ring);
+      box-shadow: var(--shadow);
+      padding: 26px 28px 24px;
+    }
+
+    @media (max-width: 768px) {
+      #vemo-budget { padding: 12px; }
+      .vb-card { padding: 18px 16px 20px; border-radius: 18px; }
+    }
+
+    .vb-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 10px; border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.5);
+      font-size: 11px; color: var(--vemo-muted); background: #f8fafc;
+    }
+
+    .vb-header-main { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; }
+    .vb-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 6px 0 4px; }
+    .vb-subtitle { font-size: 13px; color: var(--vemo-muted); max-width: 620px; line-height: 1.5; }
+    .vb-step-indicator { font-size: 11px; color: var(--vemo-muted); text-align: right; }
+
+    .vb-steps { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 8px; margin-top: 12px; }
+    .vb-step-pill { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 8px; border-radius: 999px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 11px; color: #94a3b8; white-space: nowrap; }
+    .vb-step-pill span { font-weight: 600; color: #64748b; }
+    .vb-step-pill[data-current="true"] { border-color: var(--vemo-green); background: var(--vemo-green-soft); color: #166534; }
+    .vb-step-pill[data-current="true"] span { color: #166534; }
+    .vb-step-pill[data-done="true"] { border-color: #cbd5e1; background: #f1f5f9; color: #64748b; }
+
+    .vb-progress-shell { width: 100%; height: 8px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin: 14px 0 18px; }
+    .vb-progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #a7f3d0, var(--vemo-green)); transition: width .22s ease-out; }
+
+    .vb-live { border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 14px 16px; background: #f8fafc; margin: 8px 0 16px; display: grid; gap: 12px; }
+    .vb-live-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .vb-live-title { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .vb-live-title small { color: var(--vemo-muted); font-weight: 400; }
+    .vb-live-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+    @media (max-width: 900px) { .vb-live-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media (max-width: 640px) { .vb-live-grid { grid-template-columns: minmax(0,1fr); } }
+    .vb-live-card { border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; padding: 10px 12px; display: grid; gap: 4px; }
+    .vb-live-label { font-size: 11px; color: var(--vemo-muted); }
+    .vb-live-value { font-weight: 700; font-size: 15px; }
+    .vb-live-flag { font-size: 11px; color: #15803d; }
+    .vb-live-flag.bad { color: #b91c1c; }
+
+    .vb-layout { display: grid; grid-template-columns: minmax(0,2.3fr) minmax(0,1.6fr); gap: 18px; align-items: flex-start; }
+    @media (max-width: 900px) { .vb-layout { grid-template-columns: minmax(0,1fr); } }
+
+    .vb-panel { border-radius: var(--radius-md); border: 1px solid #e2e8f0; background: #f8fafc; padding: 16px 18px 18px; }
+    .vb-panel h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
+    .vb-panel small { color: var(--vemo-muted); font-size: 11px; }
+
+    .vb-options { margin-top: 14px; display: grid; gap: 8px; }
+    .vb-option { width: 100%; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--vemo-ring); background: #fff; cursor: pointer; font-size: 13px; display: flex; flex-direction: column; gap: 2px; transition: all .15s ease; }
+    .vb-option-main { font-weight: 600; }
+    .vb-option-sub { font-size: 11px; color: var(--vemo-muted); }
+    .vb-option:hover { border-color: var(--vemo-green); box-shadow: 0 10px 20px rgba(118,208,98,.20); }
+    .vb-option[data-active="true"] { border-color: var(--vemo-green); background: var(--vemo-green); color: #fff; box-shadow: 0 12px 26px rgba(118,208,98,.35); }
+    .vb-option[data-active="true"] .vb-option-sub { color: rgba(255,255,255,.9); }
+
+    .vb-badges-row { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .vb-badge-toggle { padding: 8px 11px; border-radius: 999px; border: 1px solid var(--vemo-ring); background: #fff; font-size: 11px; color: #0f172a; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .15s ease; }
+    .vb-badge-toggle[data-active="true"] { background: #e0f2fe; border-color: #38bdf8; color: #0369a1; box-shadow: 0 6px 16px rgba(59,130,246,.22); }
+    .vb-badge-toggle span { font-size: 10px; color: #94a3b8; }
+
+    .vb-field-group { margin-top: 12px; display: grid; gap: 10px; }
+    .vb-field-label { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+    .vb-field-help { font-size: 11px; color: var(--vemo-muted); margin-bottom: 4px; }
+    .vb-input-row { display: flex; align-items: center; gap: 8px; }
+    .vb-input-prefix { font-size: 12px; color: var(--vemo-muted); min-width: 32px; text-align: right; }
+    .vb-input, .vb-select { width: 100%; padding: 10px 11px; border-radius: 12px; border: 1px solid var(--vemo-ring); font-size: 13px; outline: none; background: #fff; transition: all .15s ease; }
+    .vb-input:focus, .vb-select:focus { border-color: var(--vemo-green); box-shadow: 0 0 0 3px rgba(118,208,98,.28); }
+    .vb-input[type="number"]::-webkit-inner-spin-button, .vb-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .vb-input[type="number"] { -moz-appearance: textfield; }
+
+    .vb-grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 14px; }
+    @media (max-width: 768px) { .vb-grid-2 { grid-template-columns: minmax(0,1fr); } }
+
+    .vb-step-footer { margin-top: 18px; display: flex; justify-content: space-between; gap: 10px; align-items:center; flex-wrap: wrap; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+    .vb-step-note { font-size: 11px; color: var(--vemo-muted); }
+    .vb-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .vb-btn { appearance: none; border: 1px solid transparent; border-radius: 999px; padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .15s ease; background: #f1f5f9; color: var(--vemo-text); }
+    .vb-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(148,163,184,.45); }
+    .vb-btn-primary { background: var(--vemo-green); border-color: var(--vemo-green); color: #fff; box-shadow: 0 10px 22px rgba(118,208,98,.35); }
+    .vb-btn-primary:hover { box-shadow: 0 14px 26px rgba(118,208,98,.40); transform: translateY(-1px); }
+    .vb-btn-ghost { background: #fff; border-color: #e2e8f0; }
+    .vb-btn[disabled] { opacity: .55; cursor: default; box-shadow: none; transform: none; }
+
+    .vb-step { display: none; }
+    .vb-step[data-active="true"] { display: block; }
+
+    .vb-summary-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 8px; }
+    @media (max-width: 900px) { .vb-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media (max-width: 640px) { .vb-summary-grid { grid-template-columns: minmax(0,1fr); } }
+
+    .vb-summary-card { border-radius: var(--radius-md); border: 1px solid #e2e8f0; background: #f8fafc; padding: 12px 14px; }
+    .vb-summary-label { font-size: 11px; color: var(--vemo-muted); margin-bottom: 4px; }
+    .vb-summary-value { font-size: 16px; font-weight: 600; }
+    .vb-summary-value.positive { color: #15803d; }
+    .vb-summary-value.negative { color: #b91c1c; }
+    .vb-summary-pill { display: inline-flex; margin-left: 4px; padding: 3px 8px; border-radius: 999px; font-size: 10px; border: 1px solid transparent; }
+    .vb-summary-pill.good { background: #dcfce7; border-color: #86efac; color: #166534; }
+    .vb-summary-pill.ok { background: #fef9c3; border-color: #facc15; color: #854d0e; }
+    .vb-summary-pill.bad { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+
+    .vb-details-toggle { margin-top: 10px; font-size: 11px; color: #0369a1; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .vb-details-toggle span { font-size: 13px; }
+    .vb-details-block { margin-top: 10px; display: none; border-radius: 14px; border: 1px dashed #cbd5e1; padding: 10px 12px; background: #f8fafc; }
+    .vb-details-block[data-open="true"] { display: block; }
+    .vb-details-cols { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; font-size: 11px; }
+    @media (max-width: 900px) { .vb-details-cols { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media (max-width: 640px) { .vb-details-cols { grid-template-columns: minmax(0,1fr); } }
+    .vb-detail-col h4 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; }
+    .vb-detail-row { display: flex; justify-content: space-between; gap: 14px; padding: 3px 0; border-bottom: 1px dotted #e2e8f0; }
+    .vb-detail-label { color: var(--vemo-muted); }
+    .vb-detail-value { font-weight: 500; }
+
+    .vb-tip-list { margin-top: 12px; display: grid; gap: 8px; font-size: 11px; }
+    .vb-tip { border-radius: 12px; padding: 8px 10px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; gap: 8px; }
+    .vb-tip-icon { font-size: 14px; margin-top: 1px; }
+    .vb-tip strong { display: block; margin-bottom: 2px; }
+    .vb-tip.warn { border-color: #fed7aa; background: #fff7ed; }
+    .vb-tip.ok { border-color: #bfdbfe; background: #eff6ff; }
+    .vb-tip.good { border-color: #bbf7d0; background: #ecfdf5; }
+    .vb-tip-sources { margin-top: 10px; font-size: 10px; color: #94a3b8; }
+
+    .requires-children { display: none; }
+    .requires-extra-car { display: none; }
+    .requires-extra-pets { display: none; }
+    .requires-couple { display: none; }
+    .requires-family { display: none; }
+
+    .vb-slider-row { display: flex; flex-direction: column; gap: 6px; }
+    .vb-slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--vemo-muted); }
+    .vb-slider { width: 100%; }
+    .vb-slider input[type="range"] { width: 100%; appearance: none; height: 10px; border-radius: 999px; background: #e2e8f0; outline: none; }
+    .vb-slider input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid var(--vemo-green); box-shadow: 0 2px 6px rgba(15,23,42,.25); }
+    .vb-slider input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid var(--vemo-green); box-shadow: 0 2px 6px rgba(15,23,42,.25); }
+
+    .vb-chip-row { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--vemo-muted); margin-top: 4px; }
+    .vb-chip { padding: 4px 8px; border-radius: 999px; border: 1px solid #e2e8f0; background: #fff; }
+    .vb-checkbox-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--vemo-muted); margin-top: 4px; }
+    .vb-inline-hint { font-size: 11px; color: #0f172a; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 10px; padding: 6px 8px; display: inline-flex; gap: 6px; align-items: center; }
+    .vb-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 10px; background: #ecfeff; border: 1px solid #bae6fd; font-size: 10px; color: #0ea5e9; }
+  </style>
+</head>
+<body>
+<div id="vemo-budget">
+  <div class="vb-card">
+    <div class="vb-header-main">
+      <div>
+        <div class="vb-tag"><span>Schweizer Budgetrechner · Vemo Style</span></div>
+        <div class="vb-title">Budgetrechner</div>
+        <div class="vb-subtitle">Schritt für Schritt zum ehrlichen Haushalts-Budget – mit Schweizer Alltagskosten, Steuern, smarter Vorschau und automatischer Zwischenspeicherung.</div>
+      </div>
+      <div class="vb-step-indicator" id="vbStepInfo">Schritt 1 von 6</div>
+    </div>
+
+    <div class="vb-steps" id="vbStepPills">
+      <div class="vb-step-pill" data-step-pill="1"><span>1</span> Haushalt</div>
+      <div class="vb-step-pill" data-step-pill="2"><span>2</span> Einkommen</div>
+      <div class="vb-step-pill" data-step-pill="3"><span>3</span> Fixkosten</div>
+      <div class="vb-step-pill" data-step-pill="4"><span>4</span> Alltag & Lifestyle</div>
+      <div class="vb-step-pill" data-step-pill="5"><span>5</span> Steuern</div>
+      <div class="vb-step-pill" data-step-pill="6"><span>6</span> Auswertung</div>
+    </div>
+
+    <div class="vb-progress-shell"><div class="vb-progress-fill" id="vbProgress"></div></div>
+
+    <div class="vb-live">
+      <div class="vb-live-head">
+        <div class="vb-live-title"><span>Live-Vorschau</span><small>bleibt während der Eingabe aktuell</small></div>
+        <div class="vb-inline-hint" id="vbSavedInfo">Autosave aktiv</div>
+      </div>
+      <div class="vb-live-grid">
+        <div class="vb-live-card"><div class="vb-live-label">Einnahmen</div><div class="vb-live-value" id="vbLiveIncome">CHF 0</div></div>
+        <div class="vb-live-card"><div class="vb-live-label">Ausgaben (exkl. Steuern)</div><div class="vb-live-value" id="vbLiveSpend">CHF 0</div></div>
+        <div class="vb-live-card"><div class="vb-live-label">Steuern (Schätzung)</div><div class="vb-live-value" id="vbLiveTax">CHF 0</div></div>
+        <div class="vb-live-card"><div class="vb-live-label">Überschuss</div><div class="vb-live-value" id="vbLiveSurplus">CHF 0</div><div class="vb-live-flag" id="vbLiveFlag">Noch zu berechnen</div></div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="vb-step" data-step="1" data-active="true">
+      <div class="vb-layout">
+        <div class="vb-panel">
+          <h3>Haushalt</h3>
+          <small>Wir passen gewisse Felder (Kinder, Essen, Betreuung) automatisch an deinen Haushalt an.</small>
+
+          <div class="vb-field-group" style="margin-top:12px;">
+            <div class="vb-field-label">Haushaltstyp</div>
+            <div class="vb-options">
+              <button class="vb-option" data-household="single">
+                <div class="vb-option-main">Single</div>
+                <div class="vb-option-sub">1 erwachsene Person</div>
+              </button>
+              <button class="vb-option" data-household="couple">
+                <div class="vb-option-main">Paar / WG (2 Erwachsene)</div>
+                <div class="vb-option-sub">2 Erwachsene, ohne Kinder</div>
+              </button>
+              <button class="vb-option" data-household="family">
+                <div class="vb-option-main">Familie (mit Kindern)</div>
+                <div class="vb-option-sub">Haushalt mit mindestens 1 Kind</div>
+              </button>
+            </div>
+          </div>
+
+          <div class="vb-field-group">
+            <div class="vb-field-label">Optionale Extras</div>
+            <div class="vb-field-help">Nur wenn es relevant ist: Auto, Haustiere, zweite Wohnung, Selbstständigkeit.</div>
+            <div class="vb-badges-row">
+              <button class="vb-badge-toggle" data-extra="car">Auto vorhanden <span>Leasing, Versicherung</span></button>
+              <button class="vb-badge-toggle" data-extra="secondHome">Zweitwohnung / Studio</button>
+              <button class="vb-badge-toggle" data-extra="pets">Haustier (Hund / Katze)</button>
+              <button class="vb-badge-toggle" data-extra="selfEmp">Teilweise selbstständig</button>
+            </div>
+          </div>
+
+          <div class="vb-step-note" style="margin-top:12px;">
+            Starte mit deinem Haushaltstyp. Damit passen wir die Eingaben an.
+          </div>
+        </div>
+
+        <div class="vb-panel requires-family">
+          <h3>Kinder im Haushalt</h3>
+          <small>Kinder bis ca. 18 Jahre, für Essen, Kinderzulagen und Betreuung.</small>
+
+          <div class="vb-field-group" style="margin-top:12px;">
+            <label class="vb-field-label" for="childrenCount">Anzahl Kinder</label>
+            <input id="childrenCount" class="vb-input" type="number" min="0" step="1" value="0" />
+          </div>
+
+          <div class="vb-field-group requires-children">
+            <div class="vb-field-label">Kinderrenten / Kinderzulagen total pro Monat</div>
+            <div class="vb-input-row">
+              <div class="vb-input-prefix">CHF</div>
+              <input id="childAllowances" class="vb-input" type="number" min="0" step="1" value="0" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vb-step-footer">
+        <div class="vb-step-note">Du kannst später jederzeit zurück und Angaben anpassen.</div>
+        <div class="vb-btn-row">
+          <button class="vb-btn vb-btn-ghost" id="vbPrev1" disabled>Zurück</button>
+          <button class="vb-btn vb-btn-primary" id="vbNext1">Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Einkommen -->
+    <div class="vb-step" data-step="2">
+      <div class="vb-panel">
+        <h3>Einkommen</h3>
+        <small>Netto-Einkommen pro Monat. Wenn du unsicher bist, nimm den Durchschnitt der letzten Lohnabrechnungen.</small>
+
+        <div class="vb-field-group" style="margin-top:14px;">
+          <div class="vb-grid-2">
+            <div>
+              <div class="vb-field-label">Netto-Lohn Person 1</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-income" data-key="salary1" id="vbSalary1" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div class="requires-couple">
+              <div class="vb-field-label">Netto-Lohn Person 2</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-income" data-key="salary2" id="vbSalary2" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div class="requires-children">
+              <div class="vb-field-label">Kinderrenten / Unterhalt</div>
+              <div class="vb-field-help">Alimente, weitere Kinderbeiträge.</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-income" data-key="childSupport" id="vbChildSupport" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div>
+              <div class="vb-field-label">Weitere regelmässige Einnahmen</div>
+              <div class="vb-field-help">Nebenerwerb, Mieten, Boni (Monatsdurchschnitt).</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-income" data-key="otherIncome" id="vbOtherIncome" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vb-step-footer">
+        <div class="vb-step-note">Je genauer die Netto-Einkommen, desto realistischer das Ergebnis.</div>
+        <div class="vb-btn-row">
+          <button class="vb-btn vb-btn-ghost vb-prev">Zurück</button>
+          <button class="vb-btn vb-btn-primary vb-next">Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Fixkosten -->
+    <div class="vb-step" data-step="3">
+      <div class="vb-panel">
+        <h3>Fixkosten</h3>
+        <small>Miete / Hypothek, Grundversicherungen und andere fixe Verpflichtungen.</small>
+
+        <div class="vb-field-group" style="margin-top:14px;">
+          <div class="vb-grid-2">
+            <div>
+              <div class="vb-field-label">Miete warm / Hypothek total</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-fixed" data-key="rentWarm" id="vbRent" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div>
+              <div class="vb-field-label">Serafe (Radio/TV, Monat)</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-fixed" data-key="serafe" id="vbSerafe" type="number" min="0" step="1" value="30" />
+              </div>
+            </div>
+            <div>
+              <div class="vb-field-label">Krankenkasse Erwachsene gesamt</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-fixed" data-key="kkAdults" id="vbKkAdults" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div class="requires-children">
+              <div class="vb-field-label">Krankenkasse Kinder gesamt</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-fixed" data-key="kkKids" id="vbKkKids" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div>
+              <div class="vb-field-label">Haushalt & Privathaftpflicht</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-fixed" data-key="liability" id="vbLiability" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div class="requires-extra-car">
+              <div class="vb-field-label">Auto: Versicherung & Motorfahrzeugsteuer</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-fixed" data-key="carInsurance" id="vbCarInsurance" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div class="requires-extra-car">
+              <div class="vb-field-label">Auto: Leasing / Kreditrate</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-fixed" data-key="carLease" id="vbCarLease" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+            <div>
+              <div class="vb-field-label">ÖV-Abos (GA, Zonenabo, Monatskarte)</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input vb-fixed" data-key="publicTransport" id="vbPublicTransport" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vb-step-footer">
+        <div class="vb-step-note">Fixkosten sind die Basis deines Budgets – hier steckt oft das grösste Risiko.</div>
+        <div class="vb-btn-row">
+          <button class="vb-btn vb-btn-ghost vb-prev">Zurück</button>
+          <button class="vb-btn vb-btn-primary vb-next">Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Alltag & Lifestyle -->
+    <div class="vb-step" data-step="4">
+      <div class="vb-panel">
+        <h3>Alltag & Lifestyle</h3>
+        <small>Essen, Alltag, Freizeit – hier entscheidet dein Lebensstil.</small>
+
+        <div class="vb-field-group" style="margin-top:14px;">
+          <div class="vb-grid-2">
+            <div>
+              <div class="vb-field-label">Essen zuhause vs. auswärts</div>
+              <div class="vb-field-help">Wir rechnen mit ca. 60 Hauptmahlzeiten pro Monat. Du gibst Kosten pro Mahlzeit an, der Hebel verteilt sie.</div>
+
+              <div class="vb-slider-row">
+                <div class="vb-slider-labels">
+                  <span>Mehr zuhause</span>
+                  <span id="vbFoodLabel">50% zuhause / 50% auswärts</span>
+                  <span>Mehr auswärts</span>
+                </div>
+                <div class="vb-slider">
+                  <input id="vbFoodSlider" type="range" min="0" max="100" step="5" value="50" />
+                </div>
+              </div>
+
+              <div class="vb-grid-2" style="margin-top:8px;">
+                <div>
+                  <div class="vb-field-label">Kosten pro Mahlzeit zuhause</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input id="vbCostHome" class="vb-input" type="number" min="0" step="0.5" value="8" />
+                  </div>
+                </div>
+                <div>
+                  <div class="vb-field-label">Kosten pro Mahlzeit auswärts</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input id="vbCostOut" class="vb-input" type="number" min="0" step="0.5" value="20" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="vb-checkbox-row">
+                <input id="vbBreakfast" type="checkbox" />
+                <label for="vbBreakfast">Frühstück mitrechnen (ca. +15 Mahlzeiten)</label>
+              </div>
+
+              <div class="vb-chip-row">
+                <div class="vb-chip" id="vbFoodHomeEst">Essen zuhause: CHF 0 / Monat</div>
+                <div class="vb-chip" id="vbFoodOutEst">Essen auswärts: CHF 0 / Monat</div>
+              </div>
+
+              <input type="hidden" class="vb-variable" data-key="groceries" id="vbGroceriesHidden" value="0" />
+              <input type="hidden" class="vb-variable" data-key="eatingOut" id="vbEatingOutHidden" value="0" />
+            </div>
+
+            <div>
+              <div class="vb-grid-2">
+                <div>
+                  <div class="vb-field-label">Internet zuhause</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-fixed" data-key="internet" id="vbInternet" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+                <div>
+                  <div class="vb-field-label">Mobile-Abos gesamt</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-fixed" data-key="mobile" id="vbMobile" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+                <div>
+                  <div class="vb-field-label">Streaming & Abos</div>
+                  <div class="vb-field-help">Netflix, Spotify, Cloud, weitere Abos.</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-fixed" data-key="streaming" id="vbStreaming" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+                <div>
+                  <div class="vb-field-label">Drogerie & Haushalt</div>
+                  <div class="vb-field-help">Hygiene, Putzmittel, kleine Anschaffungen.</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-variable" data-key="householdGoods" id="vbHouseholdGoods" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+                <div class="requires-children">
+                  <div class="vb-field-label">Kinderbetreuung / Schule & Hobbys</div>
+                  <div class="vb-field-help">Kita, Hort, Mittagstisch, Lager, Musikschule usw.</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-variable" data-key="childcare" id="vbChildcare" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+                <div class="requires-extra-pets">
+                  <div class="vb-field-label">Haustierkosten</div>
+                  <div class="vb-field-help">Futter, Tierarzt, Versicherung usw.</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-variable" data-key="pets" id="vbPets" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+                <div>
+                  <div class="vb-field-label">Kleidung & Schuhe</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-variable" data-key="clothes" id="vbClothes" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+                <div>
+                  <div class="vb-field-label">Freizeit, Ausgang, Ferien</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-variable" data-key="leisure" id="vbLeisure" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+                <div>
+                  <div class="vb-field-label">Gesundheit (Selbstbehalt, Zahnarzt usw.)</div>
+                  <div class="vb-input-row">
+                    <div class="vb-input-prefix">CHF</div>
+                    <input class="vb-input vb-variable" data-key="health" id="vbHealth" type="number" min="0" step="1" value="0" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="vb-step-footer">
+        <div class="vb-step-note">In diesem Schritt steckt oft das grösste Sparpotenzial – ohne Lebensqualität zu verlieren.</div>
+        <div class="vb-btn-row">
+          <button class="vb-btn vb-btn-ghost vb-prev">Zurück</button>
+          <button class="vb-btn vb-btn-primary vb-next">Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Steuern -->
+    <div class="vb-step" data-step="5">
+      <div class="vb-panel">
+        <h3>Steuern</h3>
+        <small>Grobe Abschätzung – genaue Steuerplanung macht ihr später mit uns oder eurem Treuhänder.</small>
+
+        <div class="vb-field-group" style="margin-top:14px;">
+          <div class="vb-grid-2">
+            <div>
+              <div class="vb-field-label">Wohnkanton</div>
+              <select id="vbCanton" class="vb-select">
+                <option value="ZH">ZH – Zürich</option>
+                <option value="BE">BE – Bern</option>
+                <option value="LU">LU – Luzern</option>
+                <option value="AG">AG – Aargau</option>
+                <option value="SG">SG – St. Gallen</option>
+                <option value="VD">VD – Waadt</option>
+                <option value="GE">GE – Genf</option>
+                <option value="TI">TI – Tessin</option>
+                <option value="BS">BS – Basel-Stadt</option>
+                <option value="BL">BL – Basel-Landschaft</option>
+                <option value="FR">FR – Freiburg</option>
+                <option value="SO">SO – Solothurn</option>
+                <option value="Andere">Andere / Schätzung</option>
+              </select>
+              <div class="vb-field-help">Wir nutzen vereinfachte durchschnittliche Steuersätze pro Kanton.</div>
+            </div>
+
+            <div>
+              <div class="vb-field-label">Steuern (Monatsanteil, optional manuell)</div>
+              <div class="vb-field-help">Wenn leer, schätzen wir ca. 10–18 % vom Einkommen (je nach Kanton).</div>
+              <div class="vb-input-row">
+                <div class="vb-input-prefix">CHF</div>
+                <input class="vb-input" id="vbTaxes" type="number" min="0" step="1" value="0" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vb-step-footer">
+        <div class="vb-step-note">Tipp: Nutze Säule 3a und sinnvolle Investitionen, um deine Steuerlast langfristig zu optimieren.</div>
+        <div class="vb-btn-row">
+          <button class="vb-btn vb-btn-ghost vb-prev">Zurück</button>
+          <button class="vb-btn vb-btn-primary vb-next">Planung starten</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6: Auswertung -->
+    <div class="vb-step" data-step="6">
+      <div class="vb-panel">
+        <h3>Monatsübersicht & Hinweise</h3>
+        <small>Dein aktuelles Budget – inklusive kurzer Einordnung und konkreten Tipps.</small>
+
+        <div class="vb-summary-grid">
+          <div class="vb-summary-card"><div class="vb-summary-label">Einnahmen pro Monat</div><div class="vb-summary-value" id="vbSumIncome">CHF 0</div></div>
+          <div class="vb-summary-card"><div class="vb-summary-label">Fixkosten pro Monat</div><div class="vb-summary-value" id="vbSumFixed">CHF 0</div></div>
+          <div class="vb-summary-card"><div class="vb-summary-label">Alltag & Lifestyle</div><div class="vb-summary-value" id="vbSumVar">CHF 0</div></div>
+          <div class="vb-summary-card"><div class="vb-summary-label">Steuern (Schätzung/Angabe)</div><div class="vb-summary-value" id="vbSumTax">CHF 0</div></div>
+          <div class="vb-summary-card"><div class="vb-summary-label">Total Ausgaben pro Monat</div><div class="vb-summary-value" id="vbSumTotal">CHF 0</div></div>
+          <div class="vb-summary-card"><div class="vb-summary-label">Überschuss / Defizit <span id="vbSurplusBadge" class="vb-summary-pill"></span></div><div class="vb-summary-value" id="vbSurplus">CHF 0</div></div>
+        </div>
+
+        <div class="vb-details-toggle" id="vbToggleDetails"><span>▾</span> Details anzeigen / ausblenden</div>
+
+        <div class="vb-details-block" id="vbDetails">
+          <div class="vb-details-cols">
+            <div class="vb-detail-col">
+              <h4>Einkommen</h4>
+              <div class="vb-detail-row"><span class="vb-detail-label">Person 1</span><span class="vb-detail-value" id="dIncome1">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Person 2</span><span class="vb-detail-value" id="dIncome2">CHF 0</span></div>
+              <div class="vb-detail-row requires-children"><span class="vb-detail-label">Kinderzulagen / Unterhalt</span><span class="vb-detail-value" id="dChildIncome">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Weitere Einnahmen</span><span class="vb-detail-value" id="dOtherIncome">CHF 0</span></div>
+            </div>
+            <div class="vb-detail-col">
+              <h4>Fixkosten</h4>
+              <div class="vb-detail-row"><span class="vb-detail-label">Miete/Hypothek</span><span class="vb-detail-value" id="dRent">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Krankenkasse Erw.</span><span class="vb-detail-value" id="dKkAdults">CHF 0</span></div>
+              <div class="vb-detail-row requires-children"><span class="vb-detail-label">Krankenkasse Kinder</span><span class="vb-detail-value" id="dKkKids">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Serafe</span><span class="vb-detail-value" id="dSerafe">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Haushalt & Haftpflicht</span><span class="vb-detail-value" id="dLiab">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">ÖV / ÖV-Abos</span><span class="vb-detail-value" id="dPT">CHF 0</span></div>
+              <div class="vb-detail-row requires-extra-car"><span class="vb-detail-label">Auto (Vers., Steuer)</span><span class="vb-detail-value" id="dCarIns">CHF 0</span></div>
+              <div class="vb-detail-row requires-extra-car"><span class="vb-detail-label">Auto (Leasing/Kredit)</span><span class="vb-detail-value" id="dCarLease">CHF 0</span></div>
+            </div>
+            <div class="vb-detail-col">
+              <h4>Alltag & Lifestyle</h4>
+              <div class="vb-detail-row"><span class="vb-detail-label">Essen zuhause</span><span class="vb-detail-value" id="dGroceries">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Essen auswärts</span><span class="vb-detail-value" id="dEatingOut">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Internet & Mobile</span><span class="vb-detail-value" id="dNetMobile">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Streaming & Abos</span><span class="vb-detail-value" id="dStreaming">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Haushalt & Drogerie</span><span class="vb-detail-value" id="dHouseholdGoods">CHF 0</span></div>
+              <div class="vb-detail-row requires-children"><span class="vb-detail-label">Kinderbetreuung / Hobbys</span><span class="vb-detail-value" id="dChildcare">CHF 0</span></div>
+              <div class="vb-detail-row requires-extra-pets"><span class="vb-detail-label">Haustierkosten</span><span class="vb-detail-value" id="dPets">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Kleidung</span><span class="vb-detail-value" id="dClothes">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Freizeit & Ferien</span><span class="vb-detail-value" id="dLeisure">CHF 0</span></div>
+              <div class="vb-detail-row"><span class="vb-detail-label">Gesundheit</span><span class="vb-detail-value" id="dHealth">CHF 0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vb-tip-list" id="vbTips"></div>
+        <div class="vb-tip-sources">Hinweise basieren auf typischen Richtwerten von Schweizer Budgetberatungsstellen (z. B. Caritas, Schuldenberatung) und ersetzen keine individuelle Beratung.</div>
+      </div>
+
+      <div class="vb-step-footer">
+        <div class="vb-step-note">Du kannst oben jederzeit zurück in die Schritte, dein Budget anpassen und die Auswertung aktualisieren.</div>
+        <div class="vb-btn-row">
+          <button class="vb-btn vb-btn-ghost vb-prev">Zurück</button>
+          <button class="vb-btn" id="vbReset">Alles zurücksetzen</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var STORAGE_KEY = 'vemoBudgetStateV2';
+  function q(sel){ return document.querySelector(sel); }
+  function qa(sel){ return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+
+  var state = { step: 1, maxStep: 6, household: 'single', extras: { car: false, secondHome: false, pets: false, selfEmp: false } };
+
+  function parseVal(el){ if(!el) return 0; var v = parseFloat(String(el.value || '0').replace(/\s+/g,'').replace("'","")); return isNaN(v) ? 0 : v; }
+  function fmtCHF(val){ var s = Math.round(val).toString(); return 'CHF ' + s.replace(/\B(?=(\d{3})+(?!\d))/g,"'"); }
+
+  function updateStepUI(){
+    var progress = q('#vbProgress');
+    var info = q('#vbStepInfo');
+    var ratio = (state.step / state.maxStep) * 100;
+    if(progress) progress.style.width = ratio.toFixed(1) + '%';
+    if(info) info.textContent = 'Schritt ' + state.step + ' von ' + state.maxStep;
+    qa('.vb-step').forEach(function(stepEl){ var s = parseInt(stepEl.getAttribute('data-step'),10); stepEl.setAttribute('data-active', s === state.step ? 'true' : 'false'); });
+    qa('[data-step-pill]').forEach(function(pill){ var s = parseInt(pill.getAttribute('data-step-pill'),10); pill.setAttribute('data-current', s === state.step ? 'true' : 'false'); pill.setAttribute('data-done', s < state.step ? 'true' : 'false'); });
+  }
+
+  function updateChildrenVisibility(){
+    var isFamily = (state.household === 'family');
+    var childrenInput = q('#childrenCount');
+    var count = 0;
+    if(childrenInput){ count = parseInt(childrenInput.value,10); if(isNaN(count) || count < 0) count = 0; }
+    qa('.requires-family').forEach(function(el){ el.style.display = isFamily ? 'block' : 'none'; });
+    var hasKids = isFamily && count > 0;
+    qa('.requires-children').forEach(function(el){ el.style.display = hasKids ? 'block' : 'none'; });
+  }
+
+  function updateExtrasVisibility(){
+    qa('.requires-extra-car').forEach(function(el){ el.style.display = state.extras.car ? 'block' : 'none'; });
+    qa('.requires-extra-pets').forEach(function(el){ el.style.display = state.extras.pets ? 'block' : 'none'; });
+  }
+
+  function updateFood(){
+    var slider = q('#vbFoodSlider');
+    var costHome = parseVal(q('#vbCostHome'));
+    var costOut  = parseVal(q('#vbCostOut'));
+    var breakfast = q('#vbBreakfast') && q('#vbBreakfast').checked;
+    var shareOut = slider ? parseInt(slider.value,10) : 50; if(isNaN(shareOut)) shareOut = 50;
+    var baseMeals = 60; var extraMeals = breakfast ? 15 : 0; var totalMeals = baseMeals + extraMeals;
+    var mealsOut = totalMeals * (shareOut / 100); var mealsHome = totalMeals - mealsOut;
+    var monthHome = mealsHome * costHome; var monthOut = mealsOut * costOut;
+    var label = q('#vbFoodLabel'); if(label){ var homePct = 100 - shareOut; label.textContent = homePct.toFixed(0) + '% zuhause / ' + shareOut.toFixed(0) + '% auswärts'; }
+    var chipHome = q('#vbFoodHomeEst'); var chipOut = q('#vbFoodOutEst');
+    if(chipHome) chipHome.textContent = 'Essen zuhause: ' + fmtCHF(monthHome) + ' / Monat';
+    if(chipOut) chipOut.textContent   = 'Essen auswärts: ' + fmtCHF(monthOut) + ' / Monat';
+    var hiddenHome = q('#vbGroceriesHidden'); var hiddenOut  = q('#vbEatingOutHidden');
+    if(hiddenHome) hiddenHome.value = Math.round(monthHome);
+    if(hiddenOut)  hiddenOut.value  = Math.round(monthOut);
+  }
+
+  function calculateBudget(){
+    updateFood();
+    var incomeInputs = qa('.vb-income'); var fixedInputs  = qa('.vb-fixed'); var varInputs    = qa('.vb-variable');
+    var income1 = parseVal(document.querySelector('.vb-income[data-key="salary1"]'));
+    var income2 = parseVal(document.querySelector('.vb-income[data-key="salary2"]'));
+    var childIncome = parseVal(document.querySelector('.vb-income[data-key="childSupport"]')) || 0;
+    var allowances = parseVal(q('#childAllowances')) || 0;
+    var otherIncome = parseVal(document.querySelector('.vb-income[data-key="otherIncome"]'));
+    var totalIncome = 0; incomeInputs.forEach(function(el){ totalIncome += parseVal(el); }); totalIncome += allowances;
+    var fixed = 0, variable = 0; fixedInputs.forEach(function(el){ fixed += parseVal(el); }); varInputs.forEach(function(el){ variable += parseVal(el); });
+    var canton = q('#vbCanton').value || 'ZH'; var manualTax = parseVal(q('#vbTaxes'));
+    var taxRateMap = { ZH: 0.14, BE: 0.16, LU: 0.13, AG: 0.15, SG: 0.14, VD: 0.17, GE: 0.18, TI: 0.16, BS: 0.18, BL: 0.16, FR: 0.15, SO: 0.15, Andere: 0.15 };
+    var rate = taxRateMap[canton] || 0.15; var taxes = manualTax > 0 ? manualTax : totalIncome * rate;
+    var totalExpenses = fixed + variable + taxes; var surplus = totalIncome - totalExpenses;
+    return { income1: income1, income2: income2, childIncome: childIncome, allowances: allowances, otherIncome: otherIncome, totalIncome: totalIncome, fixed: fixed, variable: variable, taxes: taxes, totalExpenses: totalExpenses, surplus: surplus, canton: canton, groceries: parseVal(q('#vbGroceriesHidden')), eatingOut: parseVal(q('#vbEatingOutHidden')), housing: parseVal(document.querySelector('.vb-fixed[data-key="rentWarm"]')), childcare: parseVal(document.querySelector('.vb-variable[data-key="childcare"]')), hasKids: (state.household === 'family' && (parseInt(q('#childrenCount') ? q('#childrenCount').value : '0',10) || 0) > 0) };
+  }
+
+  function refreshLivePreview(calc){
+    calc = calc || calculateBudget();
+    q('#vbLiveIncome').textContent = fmtCHF(calc.totalIncome);
+    q('#vbLiveSpend').textContent = fmtCHF(calc.fixed + calc.variable);
+    q('#vbLiveTax').textContent = fmtCHF(calc.taxes);
+    q('#vbLiveSurplus').textContent = fmtCHF(calc.surplus);
+    var flag = q('#vbLiveFlag');
+    if(flag){ flag.classList.remove('bad'); if(calc.totalIncome <= 0){ flag.textContent = 'Bitte Einkommen erfassen'; } else if(calc.surplus < 0){ flag.textContent = 'Defizit – prüfe Fixkosten & Essen auswärts'; flag.classList.add('bad'); } else if(calc.surplus / calc.totalIncome < 0.05){ flag.textContent = 'Sehr knapper Überschuss'; } else { flag.textContent = 'Gesundes Polster vorhanden'; } }
+  }
+
+  function renderSummary(calc){
+    q('#vbSumIncome').textContent = fmtCHF(calc.totalIncome);
+    q('#vbSumFixed').textContent  = fmtCHF(calc.fixed);
+    q('#vbSumVar').textContent    = fmtCHF(calc.variable);
+    q('#vbSumTax').textContent    = fmtCHF(calc.taxes);
+    q('#vbSumTotal').textContent  = fmtCHF(calc.totalExpenses);
+    var surplusEl = q('#vbSurplus');
+    surplusEl.textContent = fmtCHF(calc.surplus);
+    surplusEl.classList.remove('positive','negative');
+    var badge = q('#vbSurplusBadge');
+    badge.className = 'vb-summary-pill';
+    if (calc.surplus > 0) {
+      surplusEl.classList.add('positive');
+      var quota = (calc.surplus / Math.max(calc.totalIncome, 1)) * 100;
+      if (quota >= 20) { badge.classList.add('good'); badge.textContent = 'starke Sparquote (' + quota.toFixed(0) + '%)'; }
+      else if (quota >= 5) { badge.classList.add('ok'); badge.textContent = 'leichter Überschuss (' + quota.toFixed(0) + '%)'; }
+      else { badge.classList.add('ok'); badge.textContent = 'knapp positiv'; }
+    } else if (calc.surplus < 0) {
+      surplusEl.classList.add('negative'); badge.classList.add('bad'); badge.textContent = 'Defizit';
+    } else { badge.textContent = ''; }
+
+    q('#dIncome1').textContent = fmtCHF(calc.income1);
+    q('#dIncome2').textContent = fmtCHF(calc.income2);
+    q('#dChildIncome').textContent = fmtCHF(calc.childIncome + calc.allowances);
+    q('#dOtherIncome').textContent = fmtCHF(calc.otherIncome);
+
+    function setDetail(id, val){ var el = q(id); if(el) el.textContent = fmtCHF(val); }
+    setDetail('#dRent', parseVal(document.querySelector('.vb-fixed[data-key="rentWarm"]')));
+    setDetail('#dKkAdults', parseVal(document.querySelector('.vb-fixed[data-key="kkAdults"]')));
+    setDetail('#dKkKids', parseVal(document.querySelector('.vb-fixed[data-key="kkKids"]')));
+    setDetail('#dSerafe', parseVal(document.querySelector('.vb-fixed[data-key="serafe"]')));
+    setDetail('#dLiab', parseVal(document.querySelector('.vb-fixed[data-key="liability"]')));
+    setDetail('#dPT', parseVal(document.querySelector('.vb-fixed[data-key="publicTransport"]')));
+    setDetail('#dCarIns', parseVal(document.querySelector('.vb-fixed[data-key="carInsurance"]')));
+    setDetail('#dCarLease', parseVal(document.querySelector('.vb-fixed[data-key="carLease"]')));
+
+    var groceries = parseVal(q('#vbGroceriesHidden'));
+    var eatingOut = parseVal(q('#vbEatingOutHidden'));
+    var net = parseVal(document.querySelector('.vb-fixed[data-key="internet"]'));
+    var mobile = parseVal(document.querySelector('.vb-fixed[data-key="mobile"]'));
+    var streaming = parseVal(document.querySelector('.vb-fixed[data-key="streaming"]'));
+    var hhGoods = parseVal(document.querySelector('.vb-variable[data-key="householdGoods"]'));
+    var childcare = parseVal(document.querySelector('.vb-variable[data-key="childcare"]'));
+    var pets = parseVal(document.querySelector('.vb-variable[data-key="pets"]'));
+    var clothes = parseVal(document.querySelector('.vb-variable[data-key="clothes"]'));
+    var leisure = parseVal(document.querySelector('.vb-variable[data-key="leisure"]'));
+    var health = parseVal(document.querySelector('.vb-variable[data-key="health"]'));
+
+    setDetail('#dGroceries', groceries); setDetail('#dEatingOut', eatingOut); setDetail('#dNetMobile', net + mobile);
+    setDetail('#dStreaming', streaming); setDetail('#dHouseholdGoods', hhGoods); setDetail('#dChildcare', childcare);
+    setDetail('#dPets', pets); setDetail('#dClothes', clothes); setDetail('#dLeisure', leisure); setDetail('#dHealth', health);
+
+    renderTips({ income: calc.totalIncome, fixed: calc.fixed, variable: calc.variable, taxes: calc.taxes, surplus: calc.surplus, groceries: groceries, eatingOut: eatingOut, housing: calc.housing, canton: calc.canton, hasKids: calc.hasKids });
+    updateChildrenVisibility(); updateExtrasVisibility();
+  }
+
+  function recalcAndRenderSummary(){ var calc = calculateBudget(); renderSummary(calc); refreshLivePreview(calc); }
+
+  function renderTips(meta){
+    var wrap = q('#vbTips'); if(!wrap) return; wrap.innerHTML = '';
+    function addTip(type, title, text){ var div = document.createElement('div'); div.className = 'vb-tip ' + type; var icon = document.createElement('div'); icon.className = 'vb-tip-icon'; icon.textContent = type === 'good' ? '✅' : (type === 'warn' ? '⚠️' : 'ℹ️'); var body = document.createElement('div'); body.innerHTML = '<strong>' + title + '</strong>' + text; div.appendChild(icon); div.appendChild(body); wrap.appendChild(div); }
+    if(meta.income <= 0) return;
+    var livingRatio = meta.housing / meta.income; var foodRatio = (meta.groceries + meta.eatingOut) / meta.income; var taxRatio = meta.taxes / meta.income;
+    if(meta.surplus < 0){ addTip('warn','Achtung: Dein Budget ist im Minus.', 'Deine Ausgaben liegen aktuell über deinen Einnahmen. Starte bei den flexibelsten Positionen: Freizeit, Ferien und Essen auswärts. Ziel ist, mindestens einen kleinen positiven Überschuss zu erreichen.'); }
+    else if(meta.surplus / meta.income < 0.05){ addTip('ok','Überschuss ist sehr knapp.', 'Du hast einen leicht positiven Überschuss, aber wenig Puffer. Überlege dir, 1–2 fixe Positionen (Handy, Internet, Versicherungen) neu zu verhandeln oder Restaurantbesuche leicht zu reduzieren.'); }
+    else { addTip('good','Solider Überschuss.', 'Du hast einen klar positiven Überschuss. Wichtig: Baue zuerst einen Notgroschen von ca. 3–6 Monatsausgaben auf und lege anschliessend regelmässig in kostengünstige Anlagen (z.B. ETF, Säule 3a) an.'); }
+    if(livingRatio > 0.35){ addTip('warn','Wohnen frisst einen grossen Teil des Einkommens.', 'Deine Wohnkosten liegen deutlich über ca. 30–35 % des Einkommens. Prüfe mittelfristig Alternativen (günstigere Wohnung, WG, Verhandlung bei Hypothek).'); }
+    if(foodRatio > 0.18){ addTip('ok','Essen ist überdurchschnittlich teuer.', 'Dein Budget für Essen (zuhause + auswärts) liegt relativ hoch. Meal-Prep, Wochenplanung und weniger spontane Lieferdienste können hier schnell 100–300 CHF pro Monat einsparen.'); }
+    if(taxRatio > 0.20){ addTip('ok','Steuerquote ist eher hoch.', 'Je nach Situation lohnt sich eine Optimierung mit Säule 3a, Pensionskasseneinkäufen oder Wohnort-/Gemeindevergleich. Lass dir das im Detail durchrechnen.'); }
+    if(meta.hasKids){ addTip('ok','Kinderkosten im Blick behalten.', 'Kinderbetreuung, Freizeit und Hobbys können stark schwanken. Plane einen realistischen Betrag ein und schaue, ob familienunterstützende Angebote (Subventionen, Betreuungsgutscheine) in deinem Kanton zur Verfügung stehen.'); }
+  }
+
+  function gotoStep(target){ if(target < 1) target = 1; if(target > state.maxStep) target = state.maxStep; state.step = target; updateStepUI(); if(target === 6){ recalcAndRenderSummary(); } else { refreshLivePreview(); } }
+
+  function persistState(){
+    try {
+      var payload = { household: state.household, extras: state.extras, values: {}, savedAt: Date.now() };
+      qa('input, select').forEach(function(el){ if(!el.id) return; payload.values[el.id] = (el.type === 'checkbox') ? !!el.checked : el.value; });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      var hint = q('#vbSavedInfo'); if(hint){ var d = new Date(payload.savedAt); hint.textContent = 'Gespeichert: ' + d.toLocaleTimeString(); }
+    } catch(err){}
+  }
+
+  function restoreState(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY); if(!raw) return; var payload = JSON.parse(raw);
+      state.household = payload.household || 'single'; state.extras = Object.assign({car:false, secondHome:false, pets:false, selfEmp:false}, payload.extras || {});
+      qa('input, select').forEach(function(el){ if(!el.id || !(el.id in (payload.values || {}))) return; if(el.type === 'checkbox'){ el.checked = !!payload.values[el.id]; } else { el.value = payload.values[el.id]; } });
+      qa('.vb-option[data-household]').forEach(function(b){ b.setAttribute('data-active', b.getAttribute('data-household') === state.household ? 'true' : 'false'); });
+      qa('.vb-badge-toggle').forEach(function(b){ var key = b.getAttribute('data-extra'); b.setAttribute('data-active', state.extras[key] ? 'true' : 'false'); });
+      var hint = q('#vbSavedInfo'); if(hint && payload.savedAt){ var d = new Date(payload.savedAt); hint.textContent = 'Gespeichert: ' + d.toLocaleTimeString(); }
+    } catch(err){}
+  }
+
+  qa('.vb-option[data-household]').forEach(function(btn){ btn.addEventListener('click', function(){ var val = btn.getAttribute('data-household'); state.household = val; qa('.vb-option[data-household]').forEach(function(b){ b.setAttribute('data-active', b === btn ? 'true' : 'false'); }); var childrenInput = q('#childrenCount'); if(val === 'family'){ if(childrenInput && (parseInt(childrenInput.value,10) || 0) === 0){ childrenInput.value = 1; } } else { if(childrenInput) childrenInput.value = 0; if(q('#childAllowances')) q('#childAllowances').value = 0; var cs = document.querySelector('.vb-income[data-key="childSupport"]'); if(cs) cs.value = 0; var kkChild = document.querySelector('.vb-fixed[data-key="kkKids"]'); if(kkChild) kkChild.value = 0; var cc = document.querySelector('.vb-variable[data-key="childcare"]'); if(cc) cc.value = 0; }
+    updateChildrenVisibility(); var p2 = document.querySelector('.requires-couple'); if(p2){ p2.style.display = (val === 'couple' || val === 'family') ? 'block' : 'none'; } refreshLivePreview(); persistState(); }); });
+
+  state.household = 'single'; var defaultBtn = document.querySelector('.vb-option[data-household="single"]'); if(defaultBtn) defaultBtn.setAttribute('data-active','true');
+  var ccInput = q('#childrenCount'); if(ccInput){ ccInput.addEventListener('input', function(){ var v = parseInt(this.value,10); if(isNaN(v) || v < 0) v = 0; this.value = v; updateChildrenVisibility(); refreshLivePreview(); persistState(); }); }
+
+  qa('.vb-badge-toggle').forEach(function(btn){ btn.addEventListener('click', function(){ var key = btn.getAttribute('data-extra'); var active = btn.getAttribute('data-active') === 'true'; var next = !active; btn.setAttribute('data-active', next ? 'true' : 'false'); if(state.extras.hasOwnProperty(key)) state.extras[key] = next; updateExtrasVisibility(); refreshLivePreview(); persistState(); }); });
+
+  qa('.vb-next').forEach(function(btn){ btn.addEventListener('click', function(){ gotoStep(state.step + 1); persistState(); }); });
+  qa('.vb-prev').forEach(function(btn){ btn.addEventListener('click', function(){ gotoStep(state.step - 1); persistState(); }); });
+  var n1 = q('#vbNext1'); if(n1){ n1.addEventListener('click', function(){ gotoStep(2); persistState(); }); }
+  var p1 = q('#vbPrev1'); if(p1){ p1.addEventListener('click', function(){ gotoStep(1); persistState(); }); }
+
+  function onValueChange(){ refreshLivePreview(); if(state.step === 6){ renderSummary(calculateBudget()); } persistState(); }
+  qa('.vb-income, .vb-fixed, .vb-variable').forEach(function(el){ el.addEventListener('input', onValueChange); });
+  ['#vbTaxes', '#vbCanton'].forEach(function(sel){ var el = q(sel); if(el){ el.addEventListener('input', onValueChange); el.addEventListener('change', onValueChange); } });
+  ['#vbFoodSlider', '#vbCostHome', '#vbCostOut', '#vbBreakfast'].forEach(function(sel){ var el = q(sel); if(el){ el.addEventListener('input', function(){ updateFood(); onValueChange(); }); el.addEventListener('change', function(){ updateFood(); onValueChange(); }); } });
+
+  var toggleDetails = q('#vbToggleDetails'); if(toggleDetails){ toggleDetails.addEventListener('click', function(){ var block = q('#vbDetails'); if(!block) return; var open = block.getAttribute('data-open') === 'true'; block.setAttribute('data-open', open ? 'false' : 'true'); }); }
+
+  var resetBtn = q('#vbReset'); if(resetBtn){ resetBtn.addEventListener('click', function(){ qa('input').forEach(function(el){ if(el.type === 'number'){ el.value = 0; } if(el.type === 'checkbox'){ el.checked = false; } }); state.household = 'single'; qa('.vb-option[data-household]').forEach(function(b){ b.setAttribute('data-active', b.getAttribute('data-household') === 'single' ? 'true' : 'false'); }); qa('.vb-badge-toggle').forEach(function(b){ b.setAttribute('data-active','false'); }); state.extras = {car:false, secondHome:false, pets:false, selfEmp:false}; updateChildrenVisibility(); updateExtrasVisibility(); updateFood(); gotoStep(1); localStorage.removeItem(STORAGE_KEY); var hint = q('#vbSavedInfo'); if(hint) hint.textContent = 'Autosave aktiv'; refreshLivePreview(); }); }
+
+  restoreState(); updateChildrenVisibility(); updateExtrasVisibility(); updateFood(); updateStepUI(); refreshLivePreview();
+})();
+</script>
+</body>
+</html>
