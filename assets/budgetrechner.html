@@ -920,8 +920,7 @@
         <div class="vb-step-note">Du kannst oben jederzeit zurück in die Schritte, dein Budget anpassen und die Auswertung aktualisieren.</div>
         <div class="vb-btn-row">
           <button class="vb-btn vb-btn-ghost vb-prev">Zurück</button>
-          <button class="vb-btn" id="vbExcel">Excel-Export</button>
-          <button class="vb-btn vb-btn-primary" id="vbDownload">PDF / Download</button>
+          <button class="vb-btn vb-btn-primary" id="vbExcel">Excel-Export</button>
           <button class="vb-btn" id="vbReset">Alles zurücksetzen</button>
         </div>
         <div class="vb-pdf-footer" style="margin-top:8px; font-size:10px; color:#475569;">Haftungsausschluss: Die Werte sind Näherungen, ersetzen keine Beratung und basieren auf hinterlegten/online abgerufenen Richtwerten. Für exakte Planung bitte individuelle Prüfung vornehmen.</div>
@@ -1183,46 +1182,70 @@
 
   function recalcAndRenderSummary(){ var calc = calculateBudget(); renderSummary(calc); refreshLivePreview(calc); }
 
-  function downloadPDF(){
-    var fullBlock = q('#vbFullBlock'); if(fullBlock) fullBlock.setAttribute('data-open','true');
-    var detailsBlock = q('#vbDetails'); if(detailsBlock) detailsBlock.setAttribute('data-open','true');
-    window.print();
-  }
-
   function downloadExcel(){
     var calc = calculateBudget();
     renderSummary(calc);
-    function txt(sel){ var el = q(sel); return el ? (el.textContent || '').trim() : ''; }
+
     var now = new Date().toLocaleString('de-CH');
+    var toCHF = function(v){ return "CHF " + Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'"); };
     var rows = [];
-    function addRow(label, value){ rows.push('<tr><td><strong>' + label + '</strong></td><td>' + value + '</td></tr>'); }
-    rows.push('<tr><th colspan="2">Summen</th></tr>');
-    addRow('Einnahmen pro Monat', txt('#vbSumIncome'));
-    addRow('Fixkosten', txt('#vbSumFixed'));
-    addRow('Alltag & Lifestyle', txt('#vbSumVar'));
-    addRow('Steuern', txt('#vbSumTax'));
-    addRow('Total Ausgaben', txt('#vbSumTotal'));
-    addRow('Überschuss / Defizit', txt('#vbSurplus'));
-    rows.push('<tr><th colspan="2">Einnahmen-Details</th></tr>');
-    addRow('Person 1', txt('#bIncome1'));
-    addRow('Person 2', txt('#bIncome2'));
-    addRow('Kinderzulagen / Unterhalt', txt('#bChildIncome'));
-    addRow('Weitere Einnahmen', txt('#bOtherIncome'));
-    rows.push('<tr><th colspan="2">Fixkosten</th></tr>');
-    ['bRent','bKkAdults','bKkKids','bLiability','bPT','bCarIns','bCarLease','bInternet','bMobile','bStreaming'].forEach(function(id){ addRow(id.replace('b','').replace(/([A-Z])/g,' $1').trim(), txt('#'+id)); });
-    rows.push('<tr><th colspan="2">Alltag & Lifestyle</th></tr>');
-    ['bGroceries','bEatingOut','bHousehold','bChildcare','bPets','bClothes','bLeisure','bCarRunning','bHealth'].forEach(function(id){ addRow(id.replace('b','').replace(/([A-Z])/g,' $1').trim(), txt('#'+id)); });
-    rows.push('<tr><th colspan="2">Steuern & Netto</th></tr>');
-    addRow('Steuern (auto)', txt('#bTaxes'));
-    addRow('Total Ausgaben', txt('#bTotalSpend'));
-    addRow('Überschuss / Defizit', txt('#bSurplus'));
-    addRow('Angewandter Steuersatz', txt('#bTaxRate'));
-    rows.push('<tr><th colspan="2">Hinweis</th></tr>');
-    addRow('Berechnungsgrundlage', txt('#vbCalcNote'));
-    var html = '<table border="1" cellspacing="0" cellpadding="6">'
-      + '<tr><th colspan="2">Budgetrechner von Vemo – Export (' + now + ')</th></tr>'
+    function add(section, label, value, info){
+      var display = (typeof value === 'number' && !isNaN(value)) ? toCHF(value) : (value || '');
+      rows.push('<tr>'
+        + '<td style="background:#f1f5f9; font-weight:600;">' + section + '</td>'
+        + '<td>' + label + '</td>'
+        + '<td style="text-align:right; font-weight:600;">' + display + '</td>'
+        + '<td>' + (info || '') + '</td>'
+        + '</tr>');
+    }
+
+    add('Summen', 'Einnahmen total', calc.totalIncome, '');
+    add('Summen', 'Fixkosten', calc.fixed, '');
+    add('Summen', 'Alltag & Lifestyle', calc.variable, '');
+    add('Summen', 'Steuern', calc.taxes, remoteMeta.taxSource || '');
+    add('Summen', 'Ausgaben total', calc.totalExpenses, '');
+    add('Summen', 'Überschuss / Defizit', calc.surplus, '');
+
+    add('Einkommen', 'Person 1', parseVal(document.querySelector('.vb-income[data-key="salary1"]')), '');
+    add('Einkommen', 'Person 2', parseVal(document.querySelector('.vb-income[data-key="salary2"]')), '');
+    add('Einkommen', 'Kinderzulagen / Unterhalt', parseVal(document.querySelector('.vb-income[data-key="childSupport"]')) + parseVal(q('#childAllowances')), 'inkl. Zulagen');
+    add('Einkommen', 'Weitere Einnahmen', parseVal(document.querySelector('.vb-income[data-key="otherIncome"]')), '');
+
+    add('Fixkosten', 'Miete/Hypothek', parseVal(document.querySelector('.vb-fixed[data-key="rentWarm"]')), '');
+    add('Fixkosten', 'Krankenkasse Erwachsene', parseVal(document.querySelector('.vb-fixed[data-key="kkAdults"]')), '');
+    add('Fixkosten', 'Krankenkasse Kinder', parseVal(document.querySelector('.vb-fixed[data-key="kkKids"]')), '');
+    add('Fixkosten', 'Serafe', calc.serafe, remoteMeta.serafeSource || '');
+    add('Fixkosten', 'Haushalt & Haftpflicht', parseVal(document.querySelector('.vb-fixed[data-key="liability"]')), '');
+    add('Fixkosten', 'ÖV-Abos', parseVal(document.querySelector('.vb-fixed[data-key="publicTransport"]')), '');
+    add('Fixkosten', 'Auto Versicherung/Steuer', parseVal(document.querySelector('.vb-fixed[data-key="carInsurance"]')), '');
+    add('Fixkosten', 'Auto Leasing/Kredit', parseVal(document.querySelector('.vb-fixed[data-key="carLease"]')), '');
+    add('Fixkosten', 'Internet', parseVal(document.querySelector('.vb-fixed[data-key="internet"]')), '');
+    add('Fixkosten', 'Mobile', parseVal(document.querySelector('.vb-fixed[data-key="mobile"]')), '');
+    add('Fixkosten', 'Streaming & Abos', parseVal(document.querySelector('.vb-fixed[data-key="streaming"]')), '');
+
+    add('Variabel', 'Essen zuhause', parseVal(q('#vbGroceriesHidden')), '');
+    add('Variabel', 'Essen auswärts', parseVal(q('#vbEatingOutHidden')), '');
+    add('Variabel', 'Haushalt & Drogerie', parseVal(document.querySelector('.vb-variable[data-key="householdGoods"]')), '');
+    add('Variabel', 'Kinderbetreuung / Hobbys', parseVal(document.querySelector('.vb-variable[data-key="childcare"]')), '');
+    add('Variabel', 'Haustierkosten', parseVal(document.querySelector('.vb-variable[data-key="pets"]')), '');
+    add('Variabel', 'Kleidung', parseVal(document.querySelector('.vb-variable[data-key="clothes"]')), '');
+    add('Variabel', 'Freizeit & Ferien', parseVal(document.querySelector('.vb-variable[data-key="leisure"]')), '');
+    add('Variabel', 'Auto Treibstoff/Parken', parseVal(document.querySelector('.vb-variable[data-key="carRunning"]')), '');
+    add('Variabel', 'Gesundheit', parseVal(document.querySelector('.vb-variable[data-key="health"]')), '');
+
+    add('Steuern & Netto', 'Berechneter Steuersatz', (calc.appliedTaxRate * 100).toFixed(1) + ' %', 'in % vom Einkommen');
+    add('Steuern & Netto', 'Steuern (auto/angepasst)', calc.taxes, remoteMeta.taxSource || '');
+    add('Steuern & Netto', 'Ausgaben gesamt', calc.totalExpenses, '');
+    add('Steuern & Netto', 'Überschuss / Defizit', calc.surplus, '');
+
+    add('Notizen', 'Berechnungsgrundlage', '', q('#vbCalcNote') ? q('#vbCalcNote').textContent.trim() : '');
+
+    var html = '<meta charset="UTF-8"><table style="border-collapse:collapse; width:100%;">'
+      + '<tr style="background:#0f172a; color:#fff;"><th colspan="4" style="padding:10px; text-align:left;">Budgetrechner von Vemo – Export (' + now + ')</th></tr>'
+      + '<tr style="background:#e2e8f0; font-weight:700;"><th style="padding:8px; text-align:left;">Bereich</th><th style="padding:8px; text-align:left;">Position</th><th style="padding:8px; text-align:right;">Betrag</th><th style="padding:8px; text-align:left;">Info</th></tr>'
       + rows.join('')
       + '</table>';
+
     var blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -1319,15 +1342,6 @@
 
   var toggleDetails = q('#vbToggleDetails'); if(toggleDetails){ toggleDetails.addEventListener('click', function(){ var block = q('#vbDetails'); if(!block) return; var open = block.getAttribute('data-open') === 'true'; block.setAttribute('data-open', open ? 'false' : 'true'); }); }
   var toggleFull = q('#vbToggleFull'); if(toggleFull){ toggleFull.addEventListener('click', function(){ var block = q('#vbFullBlock'); if(!block) return; var open = block.getAttribute('data-open') === 'true'; block.setAttribute('data-open', open ? 'false' : 'true'); }); }
-
-  var downloadBtn = q('#vbDownload');
-  if(downloadBtn){
-    downloadBtn.addEventListener('click', function(){
-      if(state.step !== 6){ gotoStep(6); }
-      recalcAndRenderSummary();
-      downloadPDF();
-    });
-  }
 
   var excelBtn = q('#vbExcel');
   if(excelBtn){
