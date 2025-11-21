@@ -9,7 +9,7 @@
     :root { --brand-dark:#79d862; --brand-soft:#e9ebf1; --grad-a:#7edc67; --grad-b:#7edc67; --card-radius:24px; }
     * { box-sizing: border-box; }
     body { background:#f6f8fb; color:#282f47; margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-    .wrap { max-width:1100px; margin:0 auto; padding:24px }
+    .wrap { max-width:1100px; margin:0 auto; padding:32px 24px 48px }
     .card { background:#fff; border-radius:var(--card-radius); box-shadow:0 8px 24px rgba(40,47,71,.08) }
     .card-soft { background: var(--brand-soft); color:#282f47 }
     .card-grad { background: linear-gradient(135deg, var(--grad-a), var(--grad-b)); color:#fff }
@@ -57,7 +57,15 @@
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap space-y-6">
+
+    <header class="flex flex-col gap-2">
+      <p class="text-xs uppercase tracking-[0.2rem] text-gray-400 font-semibold">3a-Vergleich</p>
+      <div class="flex flex-col gap-1">
+        <h1 class="text-2xl md:text-[28px] font-black text-[#282f47] leading-tight">Vergleich Alt vs. Neu</h1>
+        <p class="text-sm text-gray-500">Behalte das vertraute Layout, aber mit sanften Akzenten für eine klare Beratung.</p>
+      </div>
+    </header>
 
     <section class="card kachel">
       <div class="k-head">Eingaben</div>
@@ -150,19 +158,12 @@
     </section>
 
     <div class="flex flex-col md:flex-row gap-3 items-center md:justify-center mt-6">
-      <button id="savePngBtn"
+      <button id="downloadPdfBtn"
         class="export-btn"
         style="background:linear-gradient(135deg,#79d862,#a9ef87);
                color:#fff;border:none;border-radius:20px;
                padding:14px 28px;font-weight:800;cursor:pointer;
                box-shadow:0 6px 14px rgba(40,47,71,.15);">
-        PNG speichern
-      </button>
-      <button id="downloadPdfBtn"
-        class="export-btn"
-        style="background:#282f47;color:#fff;border:none;border-radius:20px;
-               padding:14px 24px;font-weight:800;cursor:pointer;
-               box-shadow:0 6px 14px rgba(40,47,71,.2);">
         PDF herunterladen
       </button>
     </div>
@@ -213,14 +214,14 @@
       set('alt_best', alt.best); set('alt_ein_neu', alt.einNeu); set('alt_sum_ein', alt.sumEin); set('alt_cost_prod', alt.prodCost); set('alt_cost_ter', alt.terCost); set('alt_cost_aa', alt.costAA); set('alt_cost_mantel', alt.mantelTotal); set('alt_cost_rueckk', alt.rueckCost); set('alt_cost_fee', alt.fee); set('alt_cost_total', alt.totalCosts); set('alt_payout', alt.payout); set('alt_monatslohn', alt.monatslohn);
       set('neu_best', neu.best); set('neu_ein_neu', neu.einNeu); set('neu_sum_ein', neu.sumEin); set('neu_cost_prod', neu.prodCost); set('neu_cost_ter', neu.terCost); set('neu_cost_aa', neu.costAA); set('neu_cost_mantel', neu.mantelTotal); set('neu_cost_rueckk', neu.rueckCost); set('neu_cost_fee', neu.fee); set('neu_cost_total', neu.totalCosts); set('neu_payout', neu.payout); set('neu_monatslohn', neu.monatslohn);
       const diff = neu.payout - alt.payout; const altTarget = alt.payout; const needRate = solveRateForTarget(neuParams, rueck, years, altTarget); const diffHTML = `<span class="accent">${CHF.format(Math.round(Math.abs(diff)))}</span>`; const rateHTML = `<span class="accent">${CHF.format(Math.round(needRate))}</span>`; let sentence = diff >= 0 ? `Du hast ${diffHTML} mehr Kapital als mit der alten Lösung – oder du zahlst nur noch ${rateHTML} pro Monat ein und würdest auf das gleiche Ergebnis kommen.` : `Du hast ${diffHTML} weniger Kapital als mit der alten Lösung – oder du müsstest ${rateHTML} pro Monat einzahlen, um auf das gleiche Ergebnis zu kommen.`; const s1=$("compare_sentence"); if(s1) s1.innerHTML = sentence;
-      const feeNeu = unformatCurrency($("neu_fee").value); let sentence2 = ''; if (feeNeu > 0 && rate > 0) { const amortMonths = Math.ceil(feeNeu / rate); const monthsHTML = `<span class="accent">${amortMonths} Monate</span>`; sentence2 = `Dein Honorar amortisiert sich in ${monthsHTML} bei der aktuellen monatlichen Rate.`; } else { sentence2 = `Mit deiner aktuellen Rate ergibt sich keine monatliche Amortisation.`; } const s2=$("compare_sentence2"); if(s2) s2.innerHTML = sentence2; }
+      const feeNeu = unformatCurrency($("neu_fee").value); const feeAlt = unformatCurrency($("alt_fee").value); const honorar = feeNeu || feeAlt; let sentence2 = ''; if (honorar > 0 && rate > 0) { const amortMonths = Math.ceil(honorar / rate); const monthsHTML = `<span class="accent">${amortMonths} Monate</span>`; const feeHTML = `<span class="accent">${CHF.format(honorar)}</span>`; const rateHTML2 = `<span class="accent">${CHF.format(rate)}</span>`; sentence2 = `Dein Honorar von ${feeHTML} ist mit einer monatlichen Einzahlung von ${rateHTML2} in ${monthsHTML} amortisiert.`; } else { sentence2 = `Trage oben Honorar und monatliche Rate ein, um die Amortisation zu sehen.`; } const s2=$("compare_sentence2"); if(s2) s2.innerHTML = sentence2; }
 
     const inputIds = ['start','rate','years','rueck','alt_r','alt_ter','alt_prod','alt_aa','alt_rueckk','alt_mantel','alt_fee','neu_r','neu_ter','neu_prod','neu_aa','neu_rueckk','neu_mantel','neu_fee'];
     inputIds.forEach(id => { const el=$(id); if(el) el.addEventListener('input', recalc) });
     window.addEventListener('DOMContentLoaded', () => { ['start','rate','rueck','alt_fee','neu_fee'].forEach(id => { attachCurrencyFormatting(id); const el=$(id); if(el) el.value = formatCurrency0(unformatCurrency(el.value)); }); recalc(); });
   </script>
 
-  <!-- PNG-Export & PDF-Export -->
+  <!-- PDF-Export -->
   <script>
     function loadScript(src){
       return new Promise((resolve,reject)=>{
@@ -261,64 +262,10 @@
     }
 
     document.addEventListener('DOMContentLoaded',()=>{
-      const pngBtn=document.getElementById('savePngBtn');
       const pdfBtn=document.getElementById('downloadPdfBtn');
       const exportBtns=document.querySelectorAll('.export-btn');
       const hideButtons=()=>exportBtns.forEach(btn=>{ btn.dataset.prevDisplay=btn.style.display; btn.style.display='none'; });
       const showButtons=()=>exportBtns.forEach(btn=>{ btn.style.display=btn.dataset.prevDisplay||''; });
-
-      if(pngBtn){
-        pngBtn.addEventListener('click', async ()=>{
-          const root=document.querySelector('.wrap');
-          if(!root) return;
-
-          const originalText=pngBtn.textContent;
-          pngBtn.disabled=true;
-          pngBtn.textContent='Wird gespeichert…';
-          hideButtons();
-
-          try{
-            await ensureHtml2Canvas();
-            await new Promise(r=>setTimeout(r,60));
-            const canvas=await html2canvas(root,{
-              scale:2,
-              backgroundColor:'#ffffff',
-              useCORS:true,
-              allowTaint:true,
-              logging:false,
-              windowWidth:root.scrollWidth,
-              windowHeight:root.scrollHeight
-            });
-
-            const download=(blobOrDataUrl)=>{
-              const a=document.createElement('a');
-              if(blobOrDataUrl instanceof Blob){
-                const url=URL.createObjectURL(blobOrDataUrl);
-                a.href=url; a.download='vemo-ergebnis.png';
-                document.body.appendChild(a); a.click(); a.remove();
-                URL.revokeObjectURL(url);
-              } else {
-                a.href=blobOrDataUrl; a.download='vemo-ergebnis.png';
-                document.body.appendChild(a); a.click(); a.remove();
-              }
-            };
-
-            if(canvas.toBlob){
-              canvas.toBlob(b=>{ if(b) download(b); else download(canvas.toDataURL('image/png')); },'image/png');
-            } else {
-              download(canvas.toDataURL('image/png'));
-            }
-
-          }catch(e){
-            console.error(e);
-            alert('Export nicht verfügbar (html2canvas konnte nicht geladen werden).');
-          }finally{
-            showButtons();
-            pngBtn.disabled=false;
-            pngBtn.textContent=originalText;
-          }
-        });
-      }
 
       if(pdfBtn){
         pdfBtn.addEventListener('click', async ()=>{
@@ -348,11 +295,14 @@
             const pdf = new jsPDF('p','pt','a4');
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
-            const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+            const margin = 24;
+            const maxWidth = pageWidth - margin * 2;
+            const maxHeight = pageHeight - margin * 2;
+            const ratio = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
             const imgWidth = canvas.width * ratio;
             const imgHeight = canvas.height * ratio;
             const offsetX = (pageWidth - imgWidth) / 2;
-            const offsetY = 20;
+            const offsetY = (pageHeight - imgHeight) / 2;
 
             pdf.addImage(imgData, 'PNG', offsetX, offsetY, imgWidth, imgHeight);
             pdf.save('vemo-ergebnis.pdf');
