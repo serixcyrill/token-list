@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zinseszinsrechner – Modernes UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f172a;
+      --card:#0b1222;
+      --muted:#9fb3d0;
+      --accent:#7ed957;
+      --accent-2:#5b7cfa;
+      --ring:rgba(255,255,255,.06);
+      --ring-strong:rgba(126,217,87,.4);
+      --glass:rgba(255,255,255,.02);
+      --radius:18px;
+      --shadow:0 30px 90px rgba(0,0,0,.35);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(126,217,87,.10), transparent 30%),
+        radial-gradient(circle at 82% 18%, rgba(91,124,250,.12), transparent 24%),
+        radial-gradient(circle at 42% 60%, rgba(255,255,255,.08), transparent 32%),
+        linear-gradient(160deg,#0d1323 0%, #0a0f1c 48%, #0e1528 100%);
+      color:#e2e8f0;
+      font-family:'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+      padding:28px 16px 60px;
+    }
+
+    .app{
+      max-width:1080px;
+      margin:0 auto;
+      position:relative;
+    }
+    .orb{
+      position:absolute; inset:0; filter:blur(70px); opacity:.45;
+      background:
+        radial-gradient(circle at 18% 42%, rgba(126,217,87,.28), transparent 25%),
+        radial-gradient(circle at 78% 20%, rgba(91,124,250,.33), transparent 22%);
+      z-index:0;
+    }
+    .shell{
+      position:relative; z-index:1;
+      background:var(--glass);
+      border:1px solid var(--ring);
+      border-radius:26px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      backdrop-filter:blur(14px);
+    }
+
+    header{
+      padding:32px 36px 28px;
+      border-bottom:1px solid var(--ring);
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+      background:linear-gradient(180deg, rgba(255,255,255,.02) 0%, rgba(255,255,255,0) 60%);
+    }
+    .eyebrow{
+      text-transform:uppercase;
+      letter-spacing:3px;
+      font-size:11px;
+      color:var(--muted);
+      font-weight:600;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .dot{ width:10px; height:10px; border-radius:99px; background:var(--accent); box-shadow:0 0 0 6px rgba(126,217,87,.12); }
+    h1{
+      margin:6px 0 4px;
+      font-size:30px;
+      font-family:'Space Grotesk', 'Inter', system-ui;
+      letter-spacing:-0.3px;
+    }
+    p.lead{
+      margin:0;
+      color:#cbd5e1;
+      max-width:720px;
+    }
+
+    main{ padding:32px 32px 38px; }
+    .grid{
+      display:grid;
+      gap:20px;
+    }
+    @media (min-width: 860px){
+      .grid.cols-2{ grid-template-columns:1.05fr 0.95fr; align-items:start; }
+    }
+
+    .panel{
+      background:rgba(255,255,255,.02);
+      border:1px solid var(--ring);
+      border-radius:22px;
+      padding:22px;
+      box-shadow:0 14px 38px rgba(0,0,0,.25);
+    }
+
+    .form-grid{ display:grid; gap:18px; }
+    @media (min-width: 640px){ .form-grid.cols-2{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+    label{
+      font-weight:600;
+      color:#e2e8f0;
+      display:flex;
+      justify-content:space-between;
+      font-size:14px;
+      margin-bottom:6px;
+    }
+    .hint{ color:var(--muted); font-weight:500; font-size:12px; }
+
+    .input, select.input{
+      width:100%;
+      border:1px solid var(--ring);
+      background:rgba(8,12,23,.7);
+      color:#e2e8f0;
+      font-size:15px;
+      padding:14px 16px;
+      border-radius:14px;
+      outline:none;
+      transition: border-color .2s ease, box-shadow .2s ease, transform .08s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .input:focus{ border-color:var(--ring-strong); box-shadow:0 0 0 4px rgba(126,217,87,.15); }
+    .input:active{ transform:translateY(1px); }
+
+    .input-wrap{ position:relative; }
+    .suffix{
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      color:var(--muted); font-size:12px; font-weight:600; letter-spacing:0.1px;
+    }
+    select.input{ appearance:none; cursor:pointer; padding-right:48px; background-image:url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5' stroke='%239fb3d0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; }
+
+    button{
+      border:none;
+      width:100%;
+      margin-top:10px;
+      border-radius:16px;
+      padding:16px;
+      background:linear-gradient(120deg,#86efac,#4ade80);
+      color:#0f172a;
+      font-weight:800;
+      font-size:16px;
+      cursor:pointer;
+      box-shadow:0 18px 40px rgba(75,181,67,.25);
+      transition: transform .08s ease, box-shadow .18s ease, filter .18s ease;
+    }
+    button:hover{ box-shadow:0 22px 50px rgba(75,181,67,.30); filter:brightness(1.03); }
+    button:active{ transform:translateY(1.5px); }
+
+    .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); margin-top:18px; }
+    .kpi{
+      background:rgba(255,255,255,.02);
+      border:1px solid var(--ring);
+      border-radius:14px;
+      padding:14px 16px 12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .kpi:before{ content:''; position:absolute; inset:-8px -8px auto auto; width:120px; height:120px; background:radial-gradient(circle, rgba(126,217,87,.16), transparent 65%); filter:blur(10px); }
+    .kpi-label{ color:var(--muted); font-size:13px; }
+    .kpi-value{ font-size:22px; font-weight:800; letter-spacing:-0.2px; margin-top:4px; }
+
+    .summary{ margin-top:18px; display:grid; gap:8px; }
+    .row{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid var(--ring); border-radius:12px; background:rgba(255,255,255,.01); }
+    .row .l{ color:#d9e3f5; font-weight:600; }
+    .row .r{ font-weight:700; }
+
+    .chart-card{ margin-top:18px; padding:18px; border:1px solid var(--ring); border-radius:14px; background:rgba(255,255,255,.01); }
+    .chart-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    .legend{ display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:600; font-size:12px; }
+    .legend .dot{ width:12px; height:12px; box-shadow:none; }
+    #chart{ width:100%; height:320px; }
+
+    .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="orb"></div>
+    <div class="shell">
+      <header>
+        <div class="eyebrow"><span class="dot"></span> Projektions-Tool</div>
+        <div>
+          <h1>Zinseszinsrechner</h1>
+          <p class="lead">Plane deine Geldanlage mit einem klaren, reduzierten Interface. Wir berechnen Endkapital, Zinsen und zeigen eine Jahresprojektion.</p>
+        </div>
+      </header>
+      <main>
+        <div class="grid cols-2">
+          <section class="panel">
+            <div class="form-grid cols-2">
+              <div>
+                <label for="anfang">Anfangskapital <span class="hint">Einmalige Einzahlung</span></label>
+                <div class="input-wrap">
+                  <input id="anfang" class="input" inputmode="numeric" value="5'000" />
+                  <span class="suffix">CHF</span>
+                </div>
+              </div>
+              <div>
+                <label for="rate">Monatliche Sparrate <span class="hint">Wiederkehrend</span></label>
+                <div class="input-wrap">
+                  <input id="rate" class="input" inputmode="numeric" value="250" />
+                  <span class="suffix">CHF</span>
+                </div>
+              </div>
+              <div>
+                <label for="dauer">Spardauer <span class="hint">in Jahren</span></label>
+                <div class="input-wrap">
+                  <input id="dauer" class="input" inputmode="numeric" value="12" />
+                  <span class="suffix">Jahre</span>
+                </div>
+              </div>
+              <div>
+                <label for="zins">Jährlicher Zinssatz <span class="hint">z.B. 6%</span></label>
+                <div class="input-wrap">
+                  <input id="zins" class="input" inputmode="decimal" value="6" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:14px;">
+              <label for="intervall">Ausschüttungsintervall <span class="hint">Bestimmt, wann Zinsen gutgeschrieben werden</span></label>
+              <select id="intervall" class="input">
+                <option value="jahrlich">jährlich</option>
+                <option value="quartalsweise">quartalsweise</option>
+                <option value="monatlich">monatlich</option>
+              </select>
+            </div>
+            <button id="berechnen">Berechnen</button>
+          </section>
+
+          <section class="panel" id="results-panel">
+            <div class="kpis">
+              <div class="kpi">
+                <div class="kpi-label">Endkapital</div>
+                <div class="kpi-value" id="endkapital">–</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Zinserträge</div>
+                <div class="kpi-value" id="zinsen">–</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Gesamteinzahlungen</div>
+                <div class="kpi-value" id="einzahlungen">–</div>
+              </div>
+            </div>
+
+            <div class="summary" id="summary">
+              <div class="empty">Gib Werte ein und klicke auf „Berechnen“, um eine Projektion zu sehen.</div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-head">
+                <h3 style="margin:0;">Jahres-Chart</h3>
+                <div class="legend">
+                  <span class="dot" style="background:var(--accent);"></span> Zinsen
+                  <span class="dot" style="background:var(--accent-2);"></span> Einzahlungen
+                </div>
+              </div>
+              <svg id="chart" viewBox="0 0 820 320" aria-label="Zinseszins Diagramm"></svg>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const CHF0 = (n)=> new Intl.NumberFormat('de-CH',{style:'currency',currency:'CHF',minimumFractionDigits:0,maximumFractionDigits:0}).format(n||0);
+      const CHF2 = (n)=> new Intl.NumberFormat('de-CH',{style:'currency',currency:'CHF'}).format(n||0);
+      const INT = new Intl.NumberFormat('de-CH');
+
+      const el = {
+        principal: document.getElementById('anfang'),
+        monthly: document.getElementById('rate'),
+        years: document.getElementById('dauer'),
+        rate: document.getElementById('zins'),
+        interval: document.getElementById('intervall'),
+        btn: document.getElementById('berechnen'),
+        end: document.getElementById('endkapital'),
+        interest: document.getElementById('zinsen'),
+        deposits: document.getElementById('einzahlungen'),
+        summary: document.getElementById('summary'),
+        chart: document.getElementById('chart')
+      };
+
+      const sanitizeInt = (value)=> parseInt(String(value).replace(/[^\d]/g,'')) || 0;
+      const sanitizeFloat = (value)=> parseFloat(String(value).replace(/'/g,'').replace(',','.')) || 0;
+      const formatThousands = (input)=> input.value = INT.format(sanitizeInt(input.value));
+
+      [el.principal, el.monthly, el.years].forEach(i=>{
+        formatThousands(i);
+        i.addEventListener('focus', ()=> i.select());
+        i.addEventListener('blur', ()=> formatThousands(i));
+        i.addEventListener('input', ()=> i.value = i.value.replace(/[^\d' ]/g,'').replace(/\s+/g,''));
+      });
+      el.rate.addEventListener('focus', ()=> el.rate.select());
+      el.rate.addEventListener('input', ()=> el.rate.value = el.rate.value.replace(/[^0-9.,]/g,''));
+
+      function calculate(){
+        const principal = sanitizeInt(el.principal.value);
+        const monthly = sanitizeInt(el.monthly.value);
+        const years = Math.max(0, sanitizeInt(el.years.value));
+        const rate = Math.max(0, sanitizeFloat(el.rate.value))/100;
+        const interval = el.interval.value;
+
+        const compoundsPerYear = interval === 'monatlich' ? 12 : interval === 'quartalsweise' ? 4 : 1;
+        const monthsPerCompound = 12 / compoundsPerYear;
+        const totalMonths = years * 12;
+
+        let balance = principal;
+        let pending = 0;
+        let depositsToDate = principal;
+
+        const yearsArr = [], depositArr = [], interestArr = [];
+
+        for(let month=1; month<=totalMonths; month++){
+          pending += monthly;
+          depositsToDate += monthly;
+
+          if(month % monthsPerCompound === 0){
+            balance = balance * (1 + rate/compoundsPerYear) + pending;
+            pending = 0;
+          }
+
+          if(month % 12 === 0){
+            const yr = month/12;
+            yearsArr.push(yr);
+            const interest = Math.max(0, balance - depositsToDate);
+            depositArr.push(depositsToDate);
+            interestArr.push(interest);
+          }
+        }
+
+        const totalDeposits = principal + monthly * totalMonths;
+        const totalInterest = balance - totalDeposits;
+
+        renderKpis(balance, totalDeposits, totalInterest);
+        renderSummary({ principal, monthly, years, rate, interval });
+        renderChart(yearsArr, depositArr, interestArr);
+      }
+
+      function renderKpis(balance, deposits, interest){
+        el.end.textContent = CHF0(balance);
+        el.deposits.textContent = CHF0(deposits);
+        el.interest.textContent = CHF0(interest);
+      }
+
+      function renderSummary({ principal, monthly, years, rate, interval }){
+        const map = {
+          jahrlich: 'jährlich',
+          quartalsweise: 'quartalsweise',
+          monatlich: 'monatlich'
+        };
+        el.summary.innerHTML = `
+          <div class="row"><div class="l">Anfangskapital</div><div class="r">${CHF2(principal)}</div></div>
+          <div class="row"><div class="l">Monatliche Sparrate</div><div class="r">${CHF2(monthly)}</div></div>
+          <div class="row"><div class="l">Spardauer</div><div class="r">${years} Jahre</div></div>
+          <div class="row"><div class="l">Jährlicher Zinssatz</div><div class="r">${(rate*100).toLocaleString('de-CH',{maximumFractionDigits:2})}%</div></div>
+          <div class="row"><div class="l">Ausschüttungsintervall</div><div class="r">${map[interval]}</div></div>
+        `;
+      }
+
+      function renderChart(years, deposits, interest){
+        const svg = el.chart;
+        svg.innerHTML = '';
+
+        const W = 820, H = 320, pad = { l:58, r:22, t:18, b:30 };
+        const iw = W - pad.l - pad.r;
+        const ih = H - pad.t - pad.b;
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+        const totals = deposits.map((d,i)=> d + interest[i]);
+        const maxY = Math.max(...totals, 1) * 1.08;
+        const steps = 5;
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+        g.setAttribute('transform', `translate(${pad.l},${pad.t})`);
+        svg.appendChild(g);
+
+        for(let i=0;i<=steps;i++){
+          const y = ih - (ih/steps)*i;
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1',0); line.setAttribute('y1',y);
+          line.setAttribute('x2',iw); line.setAttribute('y2',y);
+          line.setAttribute('stroke','rgba(255,255,255,.06)');
+          g.appendChild(line);
+
+          const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+          lbl.textContent = INT.format(Math.round(maxY/steps*i));
+          lbl.setAttribute('x', -12);
+          lbl.setAttribute('y', y+4);
+          lbl.setAttribute('fill', '#9fb3d0');
+          lbl.setAttribute('font-size','11');
+          lbl.setAttribute('text-anchor','end');
+          g.appendChild(lbl);
+        }
+
+        const n = years.length;
+        if(n === 0){ return; }
+
+        const gap = 6;
+        const barW = Math.max(4, (iw - gap*(n-1))/n);
+
+        for(let i=0;i<n;i++){
+          const x = i*(barW+gap);
+          const depH = ih * (deposits[i]/maxY);
+          const intH = ih * (interest[i]/maxY);
+
+          const depRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          depRect.setAttribute('x', x);
+          depRect.setAttribute('y', ih - depH);
+          depRect.setAttribute('width', barW);
+          depRect.setAttribute('height', depH);
+          depRect.setAttribute('fill', 'url(#blue)');
+          depRect.setAttribute('rx','3');
+          g.appendChild(depRect);
+
+          const intRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          intRect.setAttribute('x', x);
+          intRect.setAttribute('y', ih - depH - intH);
+          intRect.setAttribute('width', barW);
+          intRect.setAttribute('height', intH);
+          intRect.setAttribute('fill', 'url(#green)');
+          intRect.setAttribute('rx','3');
+          g.appendChild(intRect);
+
+          if((years[i] % 2 === 0) || i === n-1){
+            const tx = document.createElementNS('http://www.w3.org/2000/svg','text');
+            tx.textContent = years[i];
+            tx.setAttribute('x', x + barW/2);
+            tx.setAttribute('y', ih + 18);
+            tx.setAttribute('fill','#9fb3d0');
+            tx.setAttribute('font-size','11');
+            tx.setAttribute('text-anchor','middle');
+            g.appendChild(tx);
+          }
+        }
+
+        const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+        defs.innerHTML = `
+          <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#9ef0a9" />
+            <stop offset="100%" stop-color="#67c55c" />
+          </linearGradient>
+          <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#9db4ff" />
+            <stop offset="100%" stop-color="#5b7cfa" />
+          </linearGradient>`;
+        svg.insertBefore(defs, svg.firstChild);
+
+        const xLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+        xLbl.textContent = 'Jahre';
+        xLbl.setAttribute('x', pad.l + iw/2);
+        xLbl.setAttribute('y', H-8);
+        xLbl.setAttribute('fill','#9fb3d0');
+        xLbl.setAttribute('font-size','12');
+        xLbl.setAttribute('text-anchor','middle');
+        svg.appendChild(xLbl);
+      }
+
+      el.btn.addEventListener('click', calculate);
+      calculate();
+    })();
+  </script>
+</body>
+</html>
