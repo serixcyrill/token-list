@@ -19,6 +19,18 @@
     --radius-md: 16px;
   }
 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(118, 208, 98, 0.12), transparent 32%),
+      radial-gradient(circle at 85% 10%, rgba(125, 211, 252, 0.14), transparent 28%),
+      linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+    font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    color: var(--t);
+    overflow-x: hidden;
+  }
+
   #vemo-3a-kaufkraft,
   #vemo-3a-kaufkraft * {
     box-sizing: border-box;
@@ -29,10 +41,7 @@
 
   #vemo-3a-kaufkraft {
     padding: 32px 20px 42px;
-    background:
-      radial-gradient(circle at 15% 22%, rgba(118, 208, 98, 0.14), transparent 32%),
-      radial-gradient(circle at 82% 14%, rgba(125, 211, 252, 0.16), transparent 30%),
-      linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+    background: transparent;
   }
 
   .wrap {
