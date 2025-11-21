@@ -9,16 +9,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#f6f7fb;
+      --bg:#f7f8fb;
       --card:#ffffff;
       --muted:#6b7280;
+      --muted-2:#94a3b8;
       --accent:#7ed957;
       --accent-2:#5b7cfa;
       --ring:rgba(17,24,39,.08);
       --ring-strong:rgba(126,217,87,.35);
       --glass:rgba(255,255,255,1);
       --radius:18px;
-      --shadow:0 18px 40px rgba(15,23,42,.12);
+      --shadow:0 18px 40px rgba(15,23,42,.10);
     }
 
     *{ box-sizing:border-box; }
@@ -26,9 +27,9 @@
       margin:0;
       min-height:100vh;
       background:
-        radial-gradient(circle at 18% 24%, rgba(126,217,87,.10), transparent 28%),
-        radial-gradient(circle at 82% 12%, rgba(91,124,250,.12), transparent 24%),
-        linear-gradient(180deg,#f9fafb 0%, #eef2ff 100%);
+        radial-gradient(circle at 16% 24%, rgba(126,217,87,.10), transparent 26%),
+        radial-gradient(circle at 86% 16%, rgba(91,124,250,.10), transparent 24%),
+        linear-gradient(180deg,#fbfcff 0%, #eef2ff 100%);
       color:#0f172a;
       font-family:'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
       padding:28px 16px 60px;
@@ -39,13 +40,10 @@
       margin:0 auto;
       position:relative;
     }
-    .orb{
-      position:absolute; inset:0; filter:blur(70px); opacity:.35;
-      background:
-        radial-gradient(circle at 18% 42%, rgba(126,217,87,.20), transparent 25%),
-        radial-gradient(circle at 78% 20%, rgba(91,124,250,.22), transparent 22%);
-      z-index:0;
-    }
+    .orb{ position:absolute; inset:0; filter:blur(90px); opacity:.4; background:
+        radial-gradient(circle at 18% 42%, rgba(126,217,87,.18), transparent 25%),
+        radial-gradient(circle at 78% 20%, rgba(91,124,250,.20), transparent 22%);
+      z-index:0; }
     .shell{
       position:relative; z-index:1;
       background:var(--glass);
@@ -57,13 +55,13 @@
     }
 
     header{
-      padding:32px 36px 24px;
+      padding:30px 34px 22px;
       border-bottom:1px solid var(--ring);
       display:flex;
       flex-wrap:wrap;
       gap:12px;
       align-items:flex-end;
-      background:linear-gradient(180deg, rgba(255,255,255,.85) 0%, rgba(255,255,255,.2) 70%);
+      background:linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.2) 70%);
     }
     .eyebrow{
       text-transform:uppercase;
@@ -75,10 +73,10 @@
       align-items:center;
       gap:6px;
     }
-    .dot{ width:10px; height:10px; border-radius:99px; background:var(--accent); box-shadow:0 0 0 6px rgba(126,217,87,.18); }
+    .dot{ width:10px; height:10px; border-radius:99px; background:var(--accent); box-shadow:0 0 0 8px rgba(126,217,87,.14); }
     h1{
-      margin:6px 0 4px;
-      font-size:30px;
+      margin:6px 0 2px;
+      font-size:32px;
       font-family:'Space Grotesk', 'Inter', system-ui;
       letter-spacing:-0.3px;
       color:#0f172a;
@@ -86,10 +84,10 @@
     p.lead{
       margin:0;
       color:#475569;
-      max-width:720px;
+      max-width:760px;
     }
 
-    main{ padding:32px 32px 38px; }
+    main{ padding:30px 32px 42px; }
     .grid{
       display:grid;
       gap:20px;
@@ -103,7 +101,7 @@
       border:1px solid var(--ring);
       border-radius:22px;
       padding:22px;
-      box-shadow:0 14px 38px rgba(15,23,42,.10);
+      box-shadow:0 14px 32px rgba(15,23,42,.08);
     }
 
     .form-grid{ display:grid; gap:18px; }
@@ -144,10 +142,10 @@
     button{
       border:none;
       width:100%;
-      margin-top:10px;
+      margin-top:14px;
       border-radius:16px;
       padding:16px;
-      background:linear-gradient(120deg,#86efac,#4ade80);
+      background:linear-gradient(120deg,#8df0b4,#4ade80);
       color:#0f172a;
       font-weight:800;
       font-size:16px;
@@ -158,9 +156,9 @@
     button:hover{ box-shadow:0 22px 42px rgba(75,181,67,.24); filter:brightness(1.02); }
     button:active{ transform:translateY(1.5px); }
 
-    .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); margin-top:18px; }
+    .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; }
     .kpi{
-      background:#f8fafc;
+      background:linear-gradient(180deg,#f8fafc 0%, #fff 68%);
       border:1px solid var(--ring);
       border-radius:14px;
       padding:14px 16px 12px;
@@ -172,6 +170,8 @@
     .kpi-value{ font-size:22px; font-weight:800; letter-spacing:-0.2px; margin-top:4px; color:#0f172a; }
 
     .summary{ margin-top:18px; display:grid; gap:8px; }
+    .summary-head{ display:flex; align-items:center; gap:10px; justify-content:space-between; }
+    .summary-pill{ background:#e2e8f0; color:#0f172a; font-weight:700; font-size:12px; padding:8px 10px; border-radius:999px; border:1px solid rgba(15,23,42,.08); }
     .row{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid var(--ring); border-radius:12px; background:#f8fafc; }
     .row .l{ color:#0f172a; font-weight:700; }
     .row .r{ font-weight:700; color:#111827; }
@@ -180,7 +180,21 @@
     .chart-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
     .legend{ display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:600; font-size:12px; }
     .legend .dot{ width:12px; height:12px; box-shadow:none; }
-    #chart{ width:100%; height:320px; }
+    #chart{ width:100%; height:340px; }
+
+    .insight{
+      margin-top:16px;
+      background:linear-gradient(120deg,rgba(91,124,250,.08),rgba(126,217,87,.10));
+      border:1px solid rgba(91,124,250,.22);
+      color:#0f172a;
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .insight small{ display:block; color:var(--muted-2); font-weight:600; }
 
     .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; background:#fff; }
 
@@ -212,7 +226,8 @@
           <h1>Zinseszinsrechner</h1>
           <p class="lead">Plane deine Geldanlage mit einem klaren, reduzierten Interface. Wir berechnen Endkapital, Zinsen und zeigen eine Jahresprojektion.</p>
         </div>
-        <div style="margin-left:auto;">
+        <div style="margin-left:auto; display:flex; align-items:flex-end; gap:10px;">
+          <div class="summary-pill" id="live-badge">Live-Berechnung</div>
           <div class="save-status" id="save-status">Gespeichert</div>
         </div>
       </header>
@@ -258,6 +273,7 @@
               </select>
             </div>
             <button id="berechnen">Berechnen</button>
+            <div class="insight" id="insight" style="display:none;"></div>
           </section>
 
           <section class="panel" id="results-panel">
@@ -277,7 +293,13 @@
             </div>
 
             <div class="summary" id="summary">
-              <div class="empty">Gib Werte ein und klicke auf „Berechnen“, um eine Projektion zu sehen.</div>
+              <div class="summary-head">
+                <h3 style="margin:0;">Zusammenfassung</h3>
+                <div class="summary-pill" id="ratio-pill">–</div>
+              </div>
+              <div id="summary-body">
+                <div class="empty">Gib Werte ein und klicke auf „Berechnen“, um eine Projektion zu sehen.</div>
+              </div>
             </div>
 
             <div class="chart-card">
@@ -313,11 +335,23 @@
         interest: document.getElementById('zinsen'),
         deposits: document.getElementById('einzahlungen'),
         summary: document.getElementById('summary'),
+        summaryBody: document.getElementById('summary-body'),
         chart: document.getElementById('chart'),
-        saved: document.getElementById('save-status')
+        saved: document.getElementById('save-status'),
+        ratio: document.getElementById('ratio-pill'),
+        insight: document.getElementById('insight'),
+        live: document.getElementById('live-badge')
       };
 
       const STORAGE_KEY = 'zinseszinsrechner-state-v1';
+
+      const debounce = (fn, delay=180)=>{
+        let t;
+        return (...args)=>{
+          clearTimeout(t);
+          t = setTimeout(()=> fn(...args), delay);
+        };
+      };
 
       const sanitizeInt = (value)=> parseInt(String(value).replace(/[^\d]/g,'')) || 0;
       const sanitizeFloat = (value)=> parseFloat(String(value).replace(/'/g,'').replace(',','.')) || 0;
@@ -331,9 +365,6 @@
       });
       el.rate.addEventListener('focus', ()=> el.rate.select());
       el.rate.addEventListener('input', ()=> el.rate.value = el.rate.value.replace(/[^0-9.,]/g,''));
-
-      loadState();
-      registerAutosave();
 
       function calculate(){
         const principal = sanitizeInt(el.principal.value);
@@ -375,6 +406,8 @@
 
         renderKpis(balance, totalDeposits, totalInterest);
         renderSummary({ principal, monthly, years, rate, interval });
+        updateRatioPill(totalInterest, totalDeposits);
+        renderInsight(yearsArr, depositArr, interestArr, balance);
         renderChart(yearsArr, depositArr, interestArr);
 
         persistState();
@@ -392,7 +425,7 @@
           quartalsweise: 'quartalsweise',
           monatlich: 'monatlich'
         };
-        el.summary.innerHTML = `
+        el.summaryBody.innerHTML = `
           <div class="row"><div class="l">Anfangskapital</div><div class="r">${CHF2(principal)}</div></div>
           <div class="row"><div class="l">Monatliche Sparrate</div><div class="r">${CHF2(monthly)}</div></div>
           <div class="row"><div class="l">Spardauer</div><div class="r">${years} Jahre</div></div>
@@ -401,14 +434,56 @@
         `;
       }
 
+      function updateRatioPill(interest, deposits){
+        if(!el.ratio) return;
+        const total = Math.max(1, deposits + interest);
+        const ratio = Math.max(0, interest) / total;
+        el.ratio.textContent = `${(ratio*100).toFixed(1)}% Zinsen-Anteil`;
+        el.ratio.style.background = `linear-gradient(120deg, rgba(126,217,87,${0.32 + ratio*0.3}), rgba(91,124,250,${0.16 + ratio*0.2}))`;
+        el.ratio.style.borderColor = 'rgba(15,23,42,.08)';
+      }
+
+      function renderInsight(yearsArr, depositsArr, interestArr, balance){
+        if(!el.insight) return;
+        if(!yearsArr.length){ el.insight.style.display='none'; return; }
+
+        const lastIndex = yearsArr.length - 1;
+        const lastYear = yearsArr[lastIndex];
+        const lastInterest = interestArr[lastIndex] || 0;
+        const prevInterest = lastIndex > 0 ? interestArr[lastIndex-1] : 0;
+        const lastYearGain = Math.max(0, lastInterest - prevInterest);
+        const lastDeposits = depositsArr[lastIndex] || 0;
+        const avgMonthly = lastDeposits / (lastYear * 12 || 1);
+        const interestShare = balance > 0 ? (lastInterest / Math.max(balance,1))*100 : 0;
+
+        el.insight.innerHTML = `<span>🚀</span><div>Nach ${lastYear} Jahren stammen ${(interestShare).toFixed(1)}% deines Kapitals aus Zinsen.<small>${CHF0(lastYearGain)} Zinsen im letzten Jahr | durchschn. monatlich ${CHF0(avgMonthly)}</small></div>`;
+        el.insight.style.display='flex';
+      }
+
       function renderChart(years, deposits, interest){
         const svg = el.chart;
         svg.innerHTML = '';
 
-        const W = 820, H = 320, pad = { l:58, r:22, t:18, b:30 };
+        const W = 840, H = 340, pad = { l:64, r:24, t:18, b:34 };
         const iw = W - pad.l - pad.r;
         const ih = H - pad.t - pad.b;
         svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+        const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+        defs.innerHTML = `
+          <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#a5f3b0" />
+            <stop offset="100%" stop-color="#63c55c" />
+          </linearGradient>
+          <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#b3c6ff" />
+            <stop offset="100%" stop-color="#5b7cfa" />
+          </linearGradient>
+          <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(91,124,250,.25)" />
+            <stop offset="100%" stop-color="rgba(126,217,87,.1)" />
+          </linearGradient>`;
+        svg.appendChild(defs);
 
         const totals = deposits.map((d,i)=> d + interest[i]);
         const maxY = Math.max(...totals, 1) * 1.08;
@@ -418,34 +493,57 @@
         g.setAttribute('transform', `translate(${pad.l},${pad.t})`);
         svg.appendChild(g);
 
+        for(let i=0;i<steps;i++){
+          const y = ih - (ih/steps)*i;
+          const band = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          band.setAttribute('x',0); band.setAttribute('width', iw);
+          band.setAttribute('y', y - ih/steps);
+          band.setAttribute('height', ih/steps);
+          band.setAttribute('fill', i%2===0 ? 'rgba(15,23,42,.014)' : 'rgba(15,23,42,.02)');
+          g.appendChild(band);
+        }
+
         for(let i=0;i<=steps;i++){
           const y = ih - (ih/steps)*i;
           const line = document.createElementNS('http://www.w3.org/2000/svg','line');
           line.setAttribute('x1',0); line.setAttribute('y1',y);
           line.setAttribute('x2',iw); line.setAttribute('y2',y);
-          line.setAttribute('stroke','rgba(255,255,255,.06)');
+          line.setAttribute('stroke','rgba(148,163,184,.32)');
+          line.setAttribute('stroke-dasharray','2 4');
           g.appendChild(line);
 
           const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
           lbl.textContent = INT.format(Math.round(maxY/steps*i));
           lbl.setAttribute('x', -12);
           lbl.setAttribute('y', y+4);
-          lbl.setAttribute('fill', '#9fb3d0');
+          lbl.setAttribute('fill', '#8fa3c0');
           lbl.setAttribute('font-size','11');
           lbl.setAttribute('text-anchor','end');
           g.appendChild(lbl);
         }
 
         const n = years.length;
-        if(n === 0){ return; }
+        if(n === 0){
+          const empty = document.createElementNS('http://www.w3.org/2000/svg','text');
+          empty.textContent = 'Noch keine Daten';
+          empty.setAttribute('x', W/2);
+          empty.setAttribute('y', H/2);
+          empty.setAttribute('fill','#94a3b8');
+          empty.setAttribute('font-size','13');
+          empty.setAttribute('text-anchor','middle');
+          svg.appendChild(empty);
+          return;
+        }
 
         const gap = 6;
         const barW = Math.max(4, (iw - gap*(n-1))/n);
 
+        const points = [];
         for(let i=0;i<n;i++){
           const x = i*(barW+gap);
           const depH = ih * (deposits[i]/maxY);
           const intH = ih * (interest[i]/maxY);
+          const totalH = depH + intH;
 
           const depRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
           depRect.setAttribute('x', x);
@@ -454,46 +552,75 @@
           depRect.setAttribute('height', depH);
           depRect.setAttribute('fill', 'url(#blue)');
           depRect.setAttribute('rx','3');
+          depRect.setAttribute('opacity','0.92');
           g.appendChild(depRect);
 
           const intRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
           intRect.setAttribute('x', x);
-          intRect.setAttribute('y', ih - depH - intH);
+          intRect.setAttribute('y', ih - totalH);
           intRect.setAttribute('width', barW);
           intRect.setAttribute('height', intH);
           intRect.setAttribute('fill', 'url(#green)');
           intRect.setAttribute('rx','3');
           g.appendChild(intRect);
 
+          const px = x + barW/2;
+          const py = ih - totalH;
+          points.push([px, py]);
+
           if((years[i] % 2 === 0) || i === n-1){
             const tx = document.createElementNS('http://www.w3.org/2000/svg','text');
             tx.textContent = years[i];
-            tx.setAttribute('x', x + barW/2);
+            tx.setAttribute('x', px);
             tx.setAttribute('y', ih + 18);
-            tx.setAttribute('fill','#9fb3d0');
+            tx.setAttribute('fill','#8fa3c0');
             tx.setAttribute('font-size','11');
             tx.setAttribute('text-anchor','middle');
             g.appendChild(tx);
           }
         }
 
-        const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
-        defs.innerHTML = `
-          <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#9ef0a9" />
-            <stop offset="100%" stop-color="#67c55c" />
-          </linearGradient>
-          <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#9db4ff" />
-            <stop offset="100%" stop-color="#5b7cfa" />
-          </linearGradient>`;
-        svg.insertBefore(defs, svg.firstChild);
+        const areaPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+        const areaD = `M 0 ${ih} ${points.map(p=>`L ${p[0]} ${p[1]}`).join(' ')} L ${points[points.length-1][0]} ${ih} Z`;
+        areaPath.setAttribute('d', areaD);
+        areaPath.setAttribute('fill','url(#area)');
+        areaPath.setAttribute('opacity','0.5');
+        g.insertBefore(areaPath, g.firstChild);
+
+        const linePath = document.createElementNS('http://www.w3.org/2000/svg','path');
+        linePath.setAttribute('d', `M ${points.map(p=>`${p[0]} ${p[1]}`).join(' L ')}`);
+        linePath.setAttribute('fill','none');
+        linePath.setAttribute('stroke','#1d4ed8');
+        linePath.setAttribute('stroke-width','2');
+        linePath.setAttribute('stroke-linecap','round');
+        linePath.setAttribute('stroke-linejoin','round');
+        g.appendChild(linePath);
+
+        const last = points[points.length-1];
+        const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        dot.setAttribute('cx', last[0]);
+        dot.setAttribute('cy', last[1]);
+        dot.setAttribute('r', 4.5);
+        dot.setAttribute('fill','#1d4ed8');
+        dot.setAttribute('stroke','#fff');
+        dot.setAttribute('stroke-width','1.5');
+        g.appendChild(dot);
+
+        const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+        label.textContent = INT.format(totals[totals.length-1]);
+        label.setAttribute('x', last[0]);
+        label.setAttribute('y', last[1] - 10);
+        label.setAttribute('fill','#0f172a');
+        label.setAttribute('font-size','11');
+        label.setAttribute('font-weight','700');
+        label.setAttribute('text-anchor','middle');
+        g.appendChild(label);
 
         const xLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
         xLbl.textContent = 'Jahre';
         xLbl.setAttribute('x', pad.l + iw/2);
-        xLbl.setAttribute('y', H-8);
-        xLbl.setAttribute('fill','#9fb3d0');
+        xLbl.setAttribute('y', H-6);
+        xLbl.setAttribute('fill','#8fa3c0');
         xLbl.setAttribute('font-size','12');
         xLbl.setAttribute('text-anchor','middle');
         svg.appendChild(xLbl);
@@ -540,12 +667,16 @@
 
       function registerAutosave(){
         [el.principal, el.monthly, el.years, el.rate].forEach(input=>{
-          input.addEventListener('input', ()=> persistState());
-          input.addEventListener('blur', ()=> persistState());
+          input.addEventListener('input', ()=> calculateDebounced());
+          input.addEventListener('blur', ()=> calculate());
         });
-        el.interval.addEventListener('change', persistState);
+        el.interval.addEventListener('change', ()=> calculate());
       }
 
+      const calculateDebounced = debounce(calculate, 200);
+
+      loadState();
+      registerAutosave();
       el.btn.addEventListener('click', calculate);
       calculate();
     })();
