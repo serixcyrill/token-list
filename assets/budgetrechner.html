@@ -24,7 +24,8 @@
 
     body {
       margin: 0;
-      background: transparent;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       color: var(--vemo-text);
     }
@@ -36,11 +37,10 @@
     }
 
     #vemo-budget {
-      padding: 24px;
+      padding: 32px 24px 48px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      background: linear-gradient(135deg, #f8fafc, #eef2ff);
     }
 
     .vb-card {
@@ -65,7 +65,7 @@
       font-size: 11px; color: var(--vemo-muted); background: #f8fafc;
     }
 
-    .vb-header-main { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; }
+    .vb-header-main { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
     .vb-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 6px 0 4px; }
     .vb-subtitle { font-size: 13px; color: var(--vemo-muted); max-width: 620px; line-height: 1.5; }
     .vb-step-indicator { font-size: 11px; color: var(--vemo-muted); text-align: right; }
@@ -77,7 +77,7 @@
     .vb-step-pill[data-current="true"] span { color: #166534; }
     .vb-step-pill[data-done="true"] { border-color: #cbd5e1; background: #f1f5f9; color: #64748b; }
 
-    .vb-progress-shell { width: 100%; height: 8px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin: 14px 0 18px; }
+    .vb-progress-shell { width: 100%; height: 8px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin: 14px 0 20px; position: sticky; top: 10px; }
     .vb-progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #a7f3d0, var(--vemo-green)); transition: width .22s ease-out; }
 
     .vb-live { border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 14px 16px; background: #f8fafc; margin: 8px 0 16px; display: grid; gap: 12px; }
@@ -873,6 +873,16 @@
   qa('.vb-prev').forEach(function(btn){ btn.addEventListener('click', function(){ gotoStep(state.step - 1); persistState(); }); });
   var n1 = q('#vbNext1'); if(n1){ n1.addEventListener('click', function(){ gotoStep(2); persistState(); }); }
   var p1 = q('#vbPrev1'); if(p1){ p1.addEventListener('click', function(){ gotoStep(1); persistState(); }); }
+
+  qa('[data-step-pill]').forEach(function(pill){
+    pill.addEventListener('click', function(){
+      var s = parseInt(pill.getAttribute('data-step-pill'), 10);
+      if(!isNaN(s)){
+        gotoStep(s);
+        persistState();
+      }
+    });
+  });
 
   function onValueChange(){ refreshLivePreview(); if(state.step === 6){ renderSummary(calculateBudget()); } persistState(); }
   qa('.vb-income, .vb-fixed, .vb-variable').forEach(function(el){ el.addEventListener('input', onValueChange); });
