@@ -260,18 +260,21 @@
     .vb-print-note { font-size: 9px; color: #475569; opacity: .75; margin-top: 6px; }
 
     @media print {
-      @page { size: A4; margin: 12mm; }
+      @page { size: A4; margin: 0; }
       :root { --vemo-text: #0f172a; --vemo-muted: #475569; }
-      body { background: #fff; -webkit-print-color-adjust: exact; }
+      body { background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); -webkit-print-color-adjust: exact; }
       #vemo-budget { padding: 0; }
-      .vb-card { box-shadow: none; border: none; background: #fff; padding: 6mm 8mm; max-width: none; page-break-inside: avoid; }
+      .vb-card { box-shadow: none; border: none; background: transparent; padding: 0; max-width: none; page-break-inside: avoid; }
       .vb-steps, .vb-progress-shell, .vb-btn-row, .vb-step-footer, .vb-header-main .vb-step-indicator { display: none !important; }
       .vb-step { display: none !important; }
       .vb-step[data-active="true"] { display: block !important; }
       .vb-details-block, .vb-full-block { display: block !important; border: 1px solid #cbd5e1; }
       .vb-advanced-grid, .vb-summary-grid, .vb-advanced-card, .vb-live, .vb-print-section, .vb-full-card, .vb-print-page { page-break-inside: avoid; break-inside: avoid; }
-      .vb-print-page { page-break-after: always; margin-bottom: 0; box-shadow: none; }
+      .vb-print-page { page-break-after: always; margin: 0; padding: 14mm 16mm 16mm; border: none; border-radius: 0; box-shadow: none; background: linear-gradient(180deg, #f7fafc 0%, #e7f4ff 100%); min-height: 297mm; display: flex; flex-direction: column; gap: 12px; }
+      .vb-print-page::before { margin-bottom: 12px; border-radius: 999px; }
       .vb-print-page:last-of-type { page-break-after: auto; }
+      .vb-summary-grid { gap: 8px; }
+      .vb-summary-card { padding: 9px 10px; }
       .vb-full-toggle, #vbToggleDetails { display: none !important; }
       .vb-pdf-footer { display: block !important; }
     }
