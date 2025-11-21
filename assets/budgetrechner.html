@@ -268,9 +268,9 @@
     .vb-print-note { font-size: 9px; color: #475569; opacity: .75; margin-top: 6px; }
 
     @media print {
-      @page { size: A4 landscape; margin: 15mm; }
+      @page { size: A4 portrait; margin: 16mm; }
       :root { --vemo-text: #0f172a; --vemo-muted: #475569; }
-      body { background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); -webkit-print-color-adjust: exact; }
+      body { background: #f7f9fc; -webkit-print-color-adjust: exact; }
       #vemo-budget { padding: 0; }
       .vb-card { box-shadow: none; border: none; background: transparent; padding: 0; max-width: none; page-break-inside: avoid; }
       .vb-steps, .vb-progress-shell, .vb-btn-row, .vb-step-footer, .vb-header-main .vb-step-indicator { display: none !important; }
@@ -278,13 +278,16 @@
       .vb-step[data-active="true"] { display: block !important; }
       .vb-details-block, .vb-full-block { display: block !important; border: 1px solid #cbd5e1; }
       .vb-advanced-grid, .vb-summary-grid, .vb-advanced-card, .vb-live, .vb-print-section, .vb-full-card, .vb-print-page { page-break-inside: avoid; break-inside: avoid; }
+      .vb-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+      .vb-advanced-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+      .vb-full-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .vb-details-cols { grid-template-columns: repeat(2,minmax(0,1fr)); }
       .vb-print-page {
         page-break-after: always;
-        margin: 6mm auto 10mm;
-        padding: 12mm 14mm;
+        margin: 0 0 14mm;
+        padding: 12mm 12mm 14mm;
         border: 1px solid #d8e2f0;
         border-radius: 12px;
-        box-shadow: 0 10px 26px rgba(15,23,42,.08);
         background: #fff;
         min-height: auto;
         display: flex;
@@ -296,8 +299,8 @@
       .vb-print-page::before {
         content: '';
         position: absolute;
-        inset: -2mm;
-        background: linear-gradient(180deg, rgba(118,208,98,.14), rgba(125,211,252,.12));
+        left: 0; right: 0; top: 0; height: 18mm;
+        background: linear-gradient(90deg, rgba(118,208,98,.18), rgba(125,211,252,.16));
         z-index: 0;
       }
       .vb-print-page > * { position: relative; z-index: 1; }
@@ -305,7 +308,6 @@
       .vb-print-page .vb-summary-card, .vb-print-page .vb-advanced-card, .vb-print-page .vb-full-card, .vb-print-page .vb-details-block { border: 1px solid #e2e8f0; box-shadow: none; }
       #vbToggleFull, #vbToggleDetails { display: none !important; }
       #vbFullBlock, #vbDetails { display: block !important; }
-      .vb-summary-grid { gap: 8px; }
       .vb-summary-card { padding: 9px 10px; }
       .vb-full-toggle, #vbToggleDetails { display: none !important; }
       .vb-pdf-footer { display: block !important; }
@@ -918,6 +920,7 @@
         <div class="vb-step-note">Du kannst oben jederzeit zurück in die Schritte, dein Budget anpassen und die Auswertung aktualisieren.</div>
         <div class="vb-btn-row">
           <button class="vb-btn vb-btn-ghost vb-prev">Zurück</button>
+          <button class="vb-btn" id="vbExcel">Excel-Export</button>
           <button class="vb-btn vb-btn-primary" id="vbDownload">PDF / Download</button>
           <button class="vb-btn" id="vbReset">Alles zurücksetzen</button>
         </div>
@@ -1186,6 +1189,48 @@
     window.print();
   }
 
+  function downloadExcel(){
+    var calc = calculateBudget();
+    renderSummary(calc);
+    function txt(sel){ var el = q(sel); return el ? (el.textContent || '').trim() : ''; }
+    var now = new Date().toLocaleString('de-CH');
+    var rows = [];
+    function addRow(label, value){ rows.push('<tr><td><strong>' + label + '</strong></td><td>' + value + '</td></tr>'); }
+    rows.push('<tr><th colspan="2">Summen</th></tr>');
+    addRow('Einnahmen pro Monat', txt('#vbSumIncome'));
+    addRow('Fixkosten', txt('#vbSumFixed'));
+    addRow('Alltag & Lifestyle', txt('#vbSumVar'));
+    addRow('Steuern', txt('#vbSumTax'));
+    addRow('Total Ausgaben', txt('#vbSumTotal'));
+    addRow('Überschuss / Defizit', txt('#vbSurplus'));
+    rows.push('<tr><th colspan="2">Einnahmen-Details</th></tr>');
+    addRow('Person 1', txt('#bIncome1'));
+    addRow('Person 2', txt('#bIncome2'));
+    addRow('Kinderzulagen / Unterhalt', txt('#bChildIncome'));
+    addRow('Weitere Einnahmen', txt('#bOtherIncome'));
+    rows.push('<tr><th colspan="2">Fixkosten</th></tr>');
+    ['bRent','bKkAdults','bKkKids','bLiability','bPT','bCarIns','bCarLease','bInternet','bMobile','bStreaming'].forEach(function(id){ addRow(id.replace('b','').replace(/([A-Z])/g,' $1').trim(), txt('#'+id)); });
+    rows.push('<tr><th colspan="2">Alltag & Lifestyle</th></tr>');
+    ['bGroceries','bEatingOut','bHousehold','bChildcare','bPets','bClothes','bLeisure','bCarRunning','bHealth'].forEach(function(id){ addRow(id.replace('b','').replace(/([A-Z])/g,' $1').trim(), txt('#'+id)); });
+    rows.push('<tr><th colspan="2">Steuern & Netto</th></tr>');
+    addRow('Steuern (auto)', txt('#bTaxes'));
+    addRow('Total Ausgaben', txt('#bTotalSpend'));
+    addRow('Überschuss / Defizit', txt('#bSurplus'));
+    addRow('Angewandter Steuersatz', txt('#bTaxRate'));
+    rows.push('<tr><th colspan="2">Hinweis</th></tr>');
+    addRow('Berechnungsgrundlage', txt('#vbCalcNote'));
+    var html = '<table border="1" cellspacing="0" cellpadding="6">'
+      + '<tr><th colspan="2">Budgetrechner von Vemo – Export (' + now + ')</th></tr>'
+      + rows.join('')
+      + '</table>';
+    var blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'budgetrechner-vemo.xls';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 800);
+  }
+
   function renderTips(meta){
     var wrap = q('#vbTips'); if(!wrap) return; wrap.innerHTML = '';
     function addTip(type, title, text){ var div = document.createElement('div'); div.className = 'vb-tip ' + type; var icon = document.createElement('div'); icon.className = 'vb-tip-icon'; icon.textContent = type === 'good' ? '✅' : (type === 'warn' ? '⚠️' : 'ℹ️'); var body = document.createElement('div'); body.innerHTML = '<strong>' + title + '</strong>' + text; div.appendChild(icon); div.appendChild(body); wrap.appendChild(div); }
@@ -1281,6 +1326,15 @@
       if(state.step !== 6){ gotoStep(6); }
       recalcAndRenderSummary();
       downloadPDF();
+    });
+  }
+
+  var excelBtn = q('#vbExcel');
+  if(excelBtn){
+    excelBtn.addEventListener('click', function(){
+      if(state.step !== 6){ gotoStep(6); }
+      recalcAndRenderSummary();
+      downloadExcel();
     });
   }
 
