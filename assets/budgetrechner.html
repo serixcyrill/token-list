@@ -268,7 +268,7 @@
     .vb-print-note { font-size: 9px; color: #475569; opacity: .75; margin-top: 6px; }
 
     @media print {
-      @page { size: A4; margin: 16mm 16mm; }
+      @page { size: A4 landscape; margin: 15mm; }
       :root { --vemo-text: #0f172a; --vemo-muted: #475569; }
       body { background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); -webkit-print-color-adjust: exact; }
       #vemo-budget { padding: 0; }
@@ -280,18 +280,27 @@
       .vb-advanced-grid, .vb-summary-grid, .vb-advanced-card, .vb-live, .vb-print-section, .vb-full-card, .vb-print-page { page-break-inside: avoid; break-inside: avoid; }
       .vb-print-page {
         page-break-after: always;
-        margin: 8mm 0;
-        padding: 16mm 18mm;
+        margin: 6mm auto 10mm;
+        padding: 12mm 14mm;
         border: 1px solid #d8e2f0;
-        border-radius: 14px;
-        box-shadow: none;
-        background: linear-gradient(180deg, #f7fafc 0%, #e7f4ff 100%);
+        border-radius: 12px;
+        box-shadow: 0 10px 26px rgba(15,23,42,.08);
+        background: #fff;
         min-height: auto;
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
       }
-      .vb-print-page::before { margin-bottom: 14px; border-radius: 12px; }
+      .vb-print-page::before {
+        content: '';
+        position: absolute;
+        inset: -2mm;
+        background: linear-gradient(180deg, rgba(118,208,98,.14), rgba(125,211,252,.12));
+        z-index: 0;
+      }
+      .vb-print-page > * { position: relative; z-index: 1; }
       .vb-print-page:last-of-type { page-break-after: auto; }
       .vb-print-page .vb-summary-card, .vb-print-page .vb-advanced-card, .vb-print-page .vb-full-card, .vb-print-page .vb-details-block { border: 1px solid #e2e8f0; box-shadow: none; }
       #vbToggleFull, #vbToggleDetails { display: none !important; }
