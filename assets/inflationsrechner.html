@@ -2,29 +2,37 @@
 <div id="vemo-3a-kaufkraft"></div>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+
   :root {
     --g: #76d062;
+    --g-soft: #e9f9e4;
     --g-strong: #63b94f;
-    --t: #1f2937;
-    --muted: #55607a;
-    --ring: #d7deea;
-    --panel: #f6f8fb;
-    --shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+    --t: #0f172a;
+    --muted: #64748b;
+    --ring: #d0d7e4;
+    --panel: #f8fafc;
+    --blue: #7dd3fc;
+    --shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+    --shadow-strong: 0 26px 54px rgba(15, 23, 42, 0.18);
+    --radius-lg: 22px;
+    --radius-md: 16px;
   }
 
   #vemo-3a-kaufkraft,
   #vemo-3a-kaufkraft * {
     box-sizing: border-box;
-    font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     color: var(--t);
     -webkit-tap-highlight-color: transparent;
   }
 
   #vemo-3a-kaufkraft {
-    background: radial-gradient(circle at 20% 20%, rgba(118, 208, 98, 0.08), transparent 30%),
-      radial-gradient(circle at 80% 10%, rgba(118, 208, 98, 0.06), transparent 35%),
-      linear-gradient(180deg, #f9fbff, #eef2f7);
-    padding: 28px 18px 36px;
+    padding: 32px 20px 42px;
+    background:
+      radial-gradient(circle at 15% 22%, rgba(118, 208, 98, 0.14), transparent 32%),
+      radial-gradient(circle at 82% 14%, rgba(125, 211, 252, 0.16), transparent 30%),
+      linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
   }
 
   .wrap {
@@ -33,15 +41,33 @@
   }
 
   .card {
-    background: #fff;
-    border: 1px solid var(--ring);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
+    position: relative;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(208, 215, 228, 0.8);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-strong);
+    backdrop-filter: blur(12px);
     overflow: hidden;
   }
 
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 10% 12%, rgba(118, 208, 98, 0.10), transparent 34%),
+      radial-gradient(circle at 90% 6%, rgba(125, 211, 252, 0.12), transparent 36%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .card > * {
+    position: relative;
+    z-index: 1;
+  }
+
   .hdr {
-    padding: 22px 26px 12px;
+    padding: 24px 28px 12px;
     display: grid;
     gap: 8px;
   }
@@ -69,7 +95,7 @@
   }
 
   .content {
-    padding: 0 26px 8px;
+    padding: 0 28px 10px;
   }
 
   .grid {
@@ -86,12 +112,13 @@
   }
 
   .panel {
-    background: var(--panel);
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
     border: 1px solid var(--ring);
-    border-radius: 16px;
+    border-radius: var(--radius-md);
     padding: 18px 18px 14px;
     display: grid;
     gap: 16px;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
   }
 
   .field {
@@ -185,13 +212,14 @@
   }
 
   .chart-shell {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.98);
     border: 1px solid var(--ring);
-    border-radius: 16px;
+    border-radius: var(--radius-md);
     padding: 14px;
     min-height: 340px;
     display: grid;
     gap: 12px;
+    box-shadow: var(--shadow);
   }
 
   .chart-header {
@@ -243,7 +271,7 @@
   }
 
   .foot {
-    padding: 18px 26px 22px;
+    padding: 20px 28px 24px;
     border-top: 1px solid var(--ring);
     background: #fcfdfd;
   }
@@ -261,11 +289,11 @@
   }
 
   .box {
-    background: var(--g);
+    background: linear-gradient(180deg, #7ee0a7, #5fb758);
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 16px;
     padding: 18px 20px;
-    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
     min-height: 122px;
     display: flex;
     flex-direction: column;
@@ -301,6 +329,14 @@
     margin-top: 8px;
     font-size: 12px;
     opacity: 0.96;
+  }
+
+  .box::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 0%, rgba(255, 255, 255, 0.18), transparent 32%);
+    pointer-events: none;
   }
 
   @media (max-width: 640px) {
