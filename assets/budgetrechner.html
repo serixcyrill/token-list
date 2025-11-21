@@ -206,13 +206,14 @@
     .vb-full-key { color: var(--vemo-muted); }
     .vb-full-val { font-weight: 600; }
 
-    .vb-advanced-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 14px 0 6px; }
+    .vb-advanced-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin: 14px 0 6px; }
     @media (max-width: 900px) { .vb-advanced-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
     @media (max-width: 640px) { .vb-advanced-grid { grid-template-columns: minmax(0,1fr); } }
-    .vb-advanced-card { border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 14px; background: linear-gradient(180deg, #fff, #f8fafc); box-shadow: 0 12px 28px rgba(15,23,42,.08); display: grid; gap: 6px; }
-    .vb-advanced-card h4 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
-    .vb-advanced-value { font-size: 20px; font-weight: 700; }
-    .vb-advanced-sub { font-size: 12px; color: var(--vemo-muted); }
+    .vb-advanced-card { border: 1px dashed #d7e0eb; border-radius: 12px; padding: 10px 12px; background: #f1f5f9; box-shadow: none; display: grid; gap: 4px; }
+    .vb-advanced-card h4 { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0; color: #475569; text-transform: uppercase; }
+    .vb-advanced-value { font-size: 13px; font-weight: 600; color: #0f172a; }
+    .vb-advanced-sub { font-size: 11px; color: #6b7280; line-height: 1.45; }
+    .vb-advanced-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 7px; border-radius: 10px; background: #e0f2fe; border: 1px solid #bae6fd; font-size: 10px; color: #0369a1; }
     .vb-meter { width: 100%; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(15,23,42,.05); }
     .vb-meter-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--vemo-blue), var(--vemo-green)); transition: width .3s ease; }
     .vb-meter-row { display: grid; gap: 6px; margin: 10px 0 6px; }
@@ -251,6 +252,7 @@
     .vb-checkbox-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--vemo-muted); margin-top: 4px; }
     .vb-inline-hint { font-size: 11px; color: #0f172a; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 10px; padding: 6px 8px; display: inline-flex; gap: 6px; align-items: center; }
     .vb-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 10px; background: #ecfeff; border: 1px solid #bae6fd; font-size: 10px; color: #0ea5e9; }
+    .vb-print-avoid { break-inside: avoid; page-break-inside: avoid; }
 
     @media print {
       @page { size: A4; margin: 12mm; }
@@ -262,7 +264,8 @@
       .vb-step { display: none !important; }
       .vb-step[data-active="true"] { display: block !important; }
       .vb-details-block, .vb-full-block { display: block !important; border: 1px solid #cbd5e1; }
-      .vb-advanced-grid, .vb-summary-grid, .vb-advanced-card, .vb-live, .vb-print-section { page-break-inside: avoid; break-inside: avoid; }
+      .vb-advanced-grid, .vb-summary-grid, .vb-advanced-card, .vb-live, .vb-print-section, .vb-full-card { page-break-inside: avoid; break-inside: avoid; }
+      .vb-print-section { page-break-after: auto; margin-bottom: 10mm; }
       .vb-pdf-footer { display: block !important; }
     }
   </style>
@@ -726,17 +729,17 @@
         <div class="vb-advanced-grid vb-print-section">
           <div class="vb-advanced-card">
           <h4>Automatische Steuererkennung</h4>
-          <div class="vb-advanced-value" id="vbAutoTaxLabel">Wird geladen…</div>
+          <div class="vb-advanced-value"><span class="vb-advanced-pill" id="vbAutoTaxLabel">Wird geladen…</span></div>
           <div class="vb-advanced-sub">Basierend auf Kanton, Einkommen & zuletzt abgerufenen Online-Richtwerten.</div>
         </div>
           <div class="vb-advanced-card">
             <h4>Sparquote & Puffer</h4>
-            <div class="vb-advanced-value" id="vbSavingsRate">0%</div>
+            <div class="vb-advanced-value"><span class="vb-advanced-pill" id="vbSavingsRate">0%</span></div>
             <div class="vb-advanced-sub">Zeit bis Notgroschen (3× Ausgaben): <span id="vbRunway">0 Monate</span></div>
           </div>
           <div class="vb-advanced-card">
             <h4>Daily Burn</h4>
-            <div class="vb-advanced-value" id="vbDailyBurn">CHF 0</div>
+            <div class="vb-advanced-value"><span class="vb-advanced-pill" id="vbDailyBurn">CHF 0</span></div>
             <div class="vb-advanced-sub">Pro Tag inkl. Steuern. Netto-Einkommen pro Tag: <span id="vbDailyIncome">CHF 0</span></div>
           </div>
         </div>
