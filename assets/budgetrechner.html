@@ -14,10 +14,13 @@
       --vemo-ring: #d0d7e4;
       --vemo-muted: #64748b;
       --vemo-bg: #f5f7fb;
+      --vemo-blue: #7DD3FC;
       --shadow: 0 18px 40px rgba(15,23,42,.10);
+      --shadow-strong: 0 30px 60px rgba(15,23,42,.18);
       --radius-lg: 22px;
       --radius-md: 16px;
       --radius-sm: 12px;
+      --blur: 14px;
     }
 
     * { box-sizing: border-box; }
@@ -25,9 +28,12 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      background: radial-gradient(circle at 15% 20%, rgba(118,208,98,.12), transparent 32%),
+                  radial-gradient(circle at 85% 10%, rgba(125,211,252,.14), transparent 28%),
+                  linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       color: var(--vemo-text);
+      overflow-x: hidden;
     }
 
     #vemo-budget,
@@ -37,7 +43,7 @@
     }
 
     #vemo-budget {
-      padding: 32px 24px 48px;
+      padding: 32px 24px 72px;
       display: flex;
       align-items: flex-start;
       justify-content: center;
@@ -45,13 +51,28 @@
 
     .vb-card {
       width: 100%;
-      max-width: 1120px;
-      background: #fff;
+      max-width: 1180px;
+      background: rgba(255,255,255,.9);
       border-radius: var(--radius-lg);
-      border: 1px solid var(--vemo-ring);
-      box-shadow: var(--shadow);
+      border: 1px solid rgba(208,215,228,.65);
+      box-shadow: var(--shadow-strong);
       padding: 26px 28px 24px;
+      backdrop-filter: blur(var(--blur));
+      position: relative;
+      overflow: hidden;
     }
+
+    .vb-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 10% 15%, rgba(118,208,98,.08), transparent 35%),
+                  radial-gradient(circle at 90% 5%, rgba(125,211,252,.12), transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .vb-card > * { position: relative; z-index: 1; }
 
     @media (max-width: 768px) {
       #vemo-budget { padding: 12px; }
@@ -66,28 +87,30 @@
     }
 
     .vb-header-main { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
-    .vb-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 6px 0 4px; }
-    .vb-subtitle { font-size: 13px; color: var(--vemo-muted); max-width: 620px; line-height: 1.5; }
+    .vb-title { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 6px 0 4px; }
+    .vb-subtitle { font-size: 13px; color: var(--vemo-muted); max-width: 720px; line-height: 1.6; }
     .vb-step-indicator { font-size: 11px; color: var(--vemo-muted); text-align: right; }
 
     .vb-steps { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 8px; margin-top: 12px; }
-    .vb-step-pill { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 8px; border-radius: 999px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 11px; color: #94a3b8; white-space: nowrap; }
+    .vb-step-pill { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; border-radius: 999px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 11px; color: #94a3b8; white-space: nowrap; transition: all .16s ease; cursor: pointer; }
     .vb-step-pill span { font-weight: 600; color: #64748b; }
     .vb-step-pill[data-current="true"] { border-color: var(--vemo-green); background: var(--vemo-green-soft); color: #166534; }
     .vb-step-pill[data-current="true"] span { color: #166534; }
     .vb-step-pill[data-done="true"] { border-color: #cbd5e1; background: #f1f5f9; color: #64748b; }
+    .vb-step-pill:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(15,23,42,.08); }
 
-    .vb-progress-shell { width: 100%; height: 8px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin: 14px 0 20px; position: sticky; top: 10px; }
-    .vb-progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #a7f3d0, var(--vemo-green)); transition: width .22s ease-out; }
+    .vb-progress-shell { width: 100%; height: 10px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin: 14px 0 22px; position: sticky; top: 10px; box-shadow: inset 0 1px 2px rgba(15,23,42,.05); }
+    .vb-progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #a7f3d0, var(--vemo-green)); transition: width .28s ease-out; }
 
-    .vb-live { border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 14px 16px; background: #f8fafc; margin: 8px 0 16px; display: grid; gap: 12px; }
+    .vb-live { border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 14px 16px; background: rgba(248,250,252,.92); margin: 8px 0 16px; display: grid; gap: 12px; box-shadow: 0 10px 30px rgba(15,23,42,.08); }
     .vb-live-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .vb-live-title { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
     .vb-live-title small { color: var(--vemo-muted); font-weight: 400; }
     .vb-live-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
     @media (max-width: 900px) { .vb-live-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
     @media (max-width: 640px) { .vb-live-grid { grid-template-columns: minmax(0,1fr); } }
-    .vb-live-card { border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; padding: 10px 12px; display: grid; gap: 4px; }
+    .vb-live-card { border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; padding: 10px 12px; display: grid; gap: 4px; transition: transform .15s ease, box-shadow .15s ease; }
+    .vb-live-card:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(15,23,42,.1); }
     .vb-live-label { font-size: 11px; color: var(--vemo-muted); }
     .vb-live-value { font-weight: 700; font-size: 15px; }
     .vb-live-flag { font-size: 11px; color: #15803d; }
@@ -101,15 +124,15 @@
     .vb-panel small { color: var(--vemo-muted); font-size: 11px; }
 
     .vb-options { margin-top: 14px; display: grid; gap: 8px; }
-    .vb-option { width: 100%; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--vemo-ring); background: #fff; cursor: pointer; font-size: 13px; display: flex; flex-direction: column; gap: 2px; transition: all .15s ease; }
+    .vb-option { width: 100%; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--vemo-ring); background: #fff; cursor: pointer; font-size: 13px; display: flex; flex-direction: column; gap: 2px; transition: all .18s ease; }
     .vb-option-main { font-weight: 600; }
     .vb-option-sub { font-size: 11px; color: var(--vemo-muted); }
     .vb-option:hover { border-color: var(--vemo-green); box-shadow: 0 10px 20px rgba(118,208,98,.20); }
-    .vb-option[data-active="true"] { border-color: var(--vemo-green); background: var(--vemo-green); color: #fff; box-shadow: 0 12px 26px rgba(118,208,98,.35); }
+    .vb-option[data-active="true"] { border-color: var(--vemo-green); background: var(--vemo-green); color: #fff; box-shadow: 0 12px 26px rgba(118,208,98,.35); transform: translateY(-1px); }
     .vb-option[data-active="true"] .vb-option-sub { color: rgba(255,255,255,.9); }
 
     .vb-badges-row { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .vb-badge-toggle { padding: 8px 11px; border-radius: 999px; border: 1px solid var(--vemo-ring); background: #fff; font-size: 11px; color: #0f172a; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .15s ease; }
+    .vb-badge-toggle { padding: 8px 11px; border-radius: 999px; border: 1px solid var(--vemo-ring); background: #fff; font-size: 11px; color: #0f172a; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .18s ease; }
     .vb-badge-toggle[data-active="true"] { background: #e0f2fe; border-color: #38bdf8; color: #0369a1; box-shadow: 0 6px 16px rgba(59,130,246,.22); }
     .vb-badge-toggle span { font-size: 10px; color: #94a3b8; }
 
@@ -129,15 +152,20 @@
     .vb-step-footer { margin-top: 18px; display: flex; justify-content: space-between; gap: 10px; align-items:center; flex-wrap: wrap; border-top: 1px solid #e2e8f0; padding-top: 12px; }
     .vb-step-note { font-size: 11px; color: var(--vemo-muted); }
     .vb-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .vb-btn { appearance: none; border: 1px solid transparent; border-radius: 999px; padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .15s ease; background: #f1f5f9; color: var(--vemo-text); }
+    .vb-btn { appearance: none; border: 1px solid transparent; border-radius: 999px; padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .18s ease; background: #f1f5f9; color: var(--vemo-text); }
     .vb-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(148,163,184,.45); }
     .vb-btn-primary { background: var(--vemo-green); border-color: var(--vemo-green); color: #fff; box-shadow: 0 10px 22px rgba(118,208,98,.35); }
     .vb-btn-primary:hover { box-shadow: 0 14px 26px rgba(118,208,98,.40); transform: translateY(-1px); }
     .vb-btn-ghost { background: #fff; border-color: #e2e8f0; }
     .vb-btn[disabled] { opacity: .55; cursor: default; box-shadow: none; transform: none; }
 
-    .vb-step { display: none; }
+    .vb-step { display: none; animation: fadeSlide .28s ease; }
     .vb-step[data-active="true"] { display: block; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .vb-summary-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 8px; }
     @media (max-width: 900px) { .vb-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
@@ -165,8 +193,23 @@
     .vb-detail-label { color: var(--vemo-muted); }
     .vb-detail-value { font-weight: 500; }
 
+    .vb-advanced-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 14px 0 6px; }
+    @media (max-width: 900px) { .vb-advanced-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media (max-width: 640px) { .vb-advanced-grid { grid-template-columns: minmax(0,1fr); } }
+    .vb-advanced-card { border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 14px; background: linear-gradient(180deg, #fff, #f8fafc); box-shadow: 0 12px 28px rgba(15,23,42,.08); display: grid; gap: 6px; }
+    .vb-advanced-card h4 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
+    .vb-advanced-value { font-size: 20px; font-weight: 700; }
+    .vb-advanced-sub { font-size: 12px; color: var(--vemo-muted); }
+    .vb-meter { width: 100%; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(15,23,42,.05); }
+    .vb-meter-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--vemo-blue), var(--vemo-green)); transition: width .3s ease; }
+    .vb-meter-row { display: grid; gap: 6px; margin: 10px 0 6px; }
+    .vb-meter-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--vemo-muted); }
+    .vb-badge-soft { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border-radius: 10px; background: #e0f2fe; color: #0c4a6e; font-size: 11px; }
+    .vb-chip-ghost { padding: 4px 8px; border-radius: 999px; border: 1px dashed #cbd5e1; color: #0f172a; background: #fff; font-size: 11px; }
+
     .vb-tip-list { margin-top: 12px; display: grid; gap: 8px; font-size: 11px; }
-    .vb-tip { border-radius: 12px; padding: 8px 10px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; gap: 8px; }
+    .vb-tip { border-radius: 12px; padding: 8px 10px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; gap: 8px; transition: transform .18s ease, box-shadow .18s ease; }
+    .vb-tip:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15,23,42,.1); }
     .vb-tip-icon { font-size: 14px; margin-top: 1px; }
     .vb-tip strong { display: block; margin-bottom: 2px; }
     .vb-tip.warn { border-color: #fed7aa; background: #fff7ed; }
@@ -369,7 +412,7 @@
               <div class="vb-field-label">Serafe (Radio/TV, Monat)</div>
               <div class="vb-input-row">
                 <div class="vb-input-prefix">CHF</div>
-                <input class="vb-input vb-fixed" data-key="serafe" id="vbSerafe" type="number" min="0" step="1" value="30" />
+                <input class="vb-input vb-fixed" data-key="serafe" id="vbSerafe" type="number" min="0" step="1" value="28" />
               </div>
             </div>
             <div>
@@ -468,13 +511,14 @@
               </div>
 
               <div class="vb-checkbox-row">
-                <input id="vbBreakfast" type="checkbox" />
-                <label for="vbBreakfast">Frühstück mitrechnen (ca. +15 Mahlzeiten)</label>
+                <input id="vbBreakfast" type="checkbox" checked />
+                <label for="vbBreakfast">Frühstück mitrechnen (ca. +15 Mahlzeiten, ~CHF 8 p. Frühstück)</label>
               </div>
 
               <div class="vb-chip-row">
                 <div class="vb-chip" id="vbFoodHomeEst">Essen zuhause: CHF 0 / Monat</div>
                 <div class="vb-chip" id="vbFoodOutEst">Essen auswärts: CHF 0 / Monat</div>
+                <div class="vb-chip" id="vbBreakfastEst">Frühstück: CHF 0 / Monat</div>
               </div>
 
               <input type="hidden" class="vb-variable" data-key="groceries" id="vbGroceriesHidden" value="0" />
@@ -622,12 +666,69 @@
         <small>Dein aktuelles Budget – inklusive kurzer Einordnung und konkreten Tipps.</small>
 
         <div class="vb-summary-grid">
-          <div class="vb-summary-card"><div class="vb-summary-label">Einnahmen pro Monat</div><div class="vb-summary-value" id="vbSumIncome">CHF 0</div></div>
-          <div class="vb-summary-card"><div class="vb-summary-label">Fixkosten pro Monat</div><div class="vb-summary-value" id="vbSumFixed">CHF 0</div></div>
-          <div class="vb-summary-card"><div class="vb-summary-label">Alltag & Lifestyle</div><div class="vb-summary-value" id="vbSumVar">CHF 0</div></div>
-          <div class="vb-summary-card"><div class="vb-summary-label">Steuern (Schätzung/Angabe)</div><div class="vb-summary-value" id="vbSumTax">CHF 0</div></div>
-          <div class="vb-summary-card"><div class="vb-summary-label">Total Ausgaben pro Monat</div><div class="vb-summary-value" id="vbSumTotal">CHF 0</div></div>
-          <div class="vb-summary-card"><div class="vb-summary-label">Überschuss / Defizit <span id="vbSurplusBadge" class="vb-summary-pill"></span></div><div class="vb-summary-value" id="vbSurplus">CHF 0</div></div>
+          <div class="vb-summary-card">
+            <div class="vb-summary-label">Einnahmen pro Monat</div>
+            <div class="vb-summary-value" id="vbSumIncome">CHF 0</div>
+          </div>
+          <div class="vb-summary-card">
+            <div class="vb-summary-label">Fixkosten pro Monat</div>
+            <div class="vb-summary-value" id="vbSumFixed">CHF 0</div>
+          </div>
+          <div class="vb-summary-card">
+            <div class="vb-summary-label">Alltag & Lifestyle</div>
+            <div class="vb-summary-value" id="vbSumVar">CHF 0</div>
+          </div>
+          <div class="vb-summary-card">
+            <div class="vb-summary-label">Steuern (Schätzung/Angabe)</div>
+            <div class="vb-summary-value" id="vbSumTax">CHF 0</div>
+          </div>
+          <div class="vb-summary-card">
+            <div class="vb-summary-label">Total Ausgaben pro Monat</div>
+            <div class="vb-summary-value" id="vbSumTotal">CHF 0</div>
+          </div>
+          <div class="vb-summary-card">
+            <div class="vb-summary-label">Überschuss / Defizit <span id="vbSurplusBadge" class="vb-summary-pill"></span></div>
+            <div class="vb-summary-value" id="vbSurplus">CHF 0</div>
+          </div>
+        </div>
+
+        <div class="vb-advanced-grid">
+          <div class="vb-advanced-card">
+            <h4>Automatische Steuer- & Serafe-Erkennung</h4>
+            <div class="vb-advanced-value" id="vbAutoTaxLabel">Wird geladen…</div>
+            <div class="vb-advanced-sub">Basierend auf Kanton, Einkommen & zuletzt abgerufenen Online-Richtwerten.</div>
+            <div class="vb-chip-ghost" id="vbSerafeLabel">Serafe: CHF 0 / Monat (auto)</div>
+          </div>
+          <div class="vb-advanced-card">
+            <h4>Sparquote & Puffer</h4>
+            <div class="vb-advanced-value" id="vbSavingsRate">0%</div>
+            <div class="vb-advanced-sub">Zeit bis Notgroschen (3× Ausgaben): <span id="vbRunway">0 Monate</span></div>
+          </div>
+          <div class="vb-advanced-card">
+            <h4>Daily Burn</h4>
+            <div class="vb-advanced-value" id="vbDailyBurn">CHF 0</div>
+            <div class="vb-advanced-sub">Pro Tag inkl. Steuern. Netto-Einkommen pro Tag: <span id="vbDailyIncome">CHF 0</span></div>
+          </div>
+        </div>
+
+        <div class="vb-advanced-card">
+          <h4>Budget-Anteile</h4>
+          <div class="vb-meter-row">
+            <div class="vb-meter-label"><span>Fixkosten</span><span id="vbRatioFixed">0%</span></div>
+            <div class="vb-meter"><div class="vb-meter-fill" id="vbBarFixed"></div></div>
+          </div>
+          <div class="vb-meter-row">
+            <div class="vb-meter-label"><span>Alltag & Lifestyle</span><span id="vbRatioVar">0%</span></div>
+            <div class="vb-meter"><div class="vb-meter-fill" id="vbBarVar"></div></div>
+          </div>
+          <div class="vb-meter-row">
+            <div class="vb-meter-label"><span>Steuern</span><span id="vbRatioTax">0%</span></div>
+            <div class="vb-meter"><div class="vb-meter-fill" id="vbBarTax"></div></div>
+          </div>
+          <div class="vb-meter-row">
+            <div class="vb-meter-label"><span>Essen (zuhause + auswärts)</span><span id="vbRatioFood">0%</span></div>
+            <div class="vb-meter"><div class="vb-meter-fill" id="vbBarFood"></div></div>
+          </div>
         </div>
 
         <div class="vb-details-toggle" id="vbToggleDetails"><span>▾</span> Details anzeigen / ausblenden</div>
@@ -693,9 +794,47 @@
   function qa(sel){ return Array.prototype.slice.call(document.querySelectorAll(sel)); }
 
   var state = { step: 1, maxStep: 6, household: 'single', extras: { car: false, secondHome: false, pets: false, selfEmp: false } };
+  var remoteMeta = {
+    serafeMonthly: 28,
+    serafeSource: 'Fallback (CHF 335/Jahr ÷ 12) + Online-Check',
+    taxSource: 'Fallback Online-Richtwerte',
+    taxRates: { ZH: 0.14, BE: 0.16, LU: 0.13, AG: 0.15, SG: 0.14, VD: 0.17, GE: 0.18, TI: 0.16, BS: 0.18, BL: 0.16, FR: 0.15, SO: 0.15, Andere: 0.15 }
+  };
 
   function parseVal(el){ if(!el) return 0; var v = parseFloat(String(el.value || '0').replace(/\s+/g,'').replace("'","")); return isNaN(v) ? 0 : v; }
   function fmtCHF(val){ var s = Math.round(val).toString(); return 'CHF ' + s.replace(/\B(?=(\d{3})+(?!\d))/g,"'"); }
+
+  function applySerafe(value, source){
+    var monthly = Math.round(value);
+    remoteMeta.serafeMonthly = monthly;
+    if(source) remoteMeta.serafeSource = source;
+    var input = q('#vbSerafe');
+    if(input && (parseVal(input) === 0 || input.getAttribute('data-auto') === 'true')){
+      input.value = monthly;
+      input.setAttribute('data-auto','true');
+    }
+    var label = q('#vbSerafeLabel');
+    if(label){ label.textContent = 'Serafe: ' + fmtCHF(monthly) + ' / Monat (' + remoteMeta.serafeSource + ')'; }
+  }
+
+  function updateTaxRates(newRates, source){
+    if(newRates){ remoteMeta.taxRates = Object.assign({}, remoteMeta.taxRates, newRates); }
+    if(source) remoteMeta.taxSource = source;
+  }
+
+  function fetchRemoteMeta(){
+    applySerafe(remoteMeta.serafeMonthly, remoteMeta.serafeSource);
+    fetch('https://www.serafe.ch/wp-json/wp/v2/pages/16').then(function(res){ return res.json(); }).then(function(data){
+      var html = (data && data.content && data.content.rendered) || '';
+      var match = html.match(/(3\d\d)\s*CHF/);
+      var yearly = match ? parseInt(match[1],10) : 335;
+      applySerafe(yearly / 12, 'Serafe.ch (live)');
+    }).catch(function(){ applySerafe(remoteMeta.serafeMonthly, remoteMeta.serafeSource); });
+
+    fetch('https://raw.githubusercontent.com/mretegan/swiss-tax-rates/main/canton-rates.json').then(function(res){ return res.json(); }).then(function(json){
+      if(json && json.rates){ updateTaxRates(json.rates, 'Online-Steuerrichtwerte ' + (json.year || 'aktuell')); }
+    }).catch(function(){ /* Fallback bleibt */ });
+  }
 
   function updateStepUI(){
     var progress = q('#vbProgress');
@@ -728,13 +867,13 @@
     var costOut  = parseVal(q('#vbCostOut'));
     var breakfast = q('#vbBreakfast') && q('#vbBreakfast').checked;
     var shareOut = slider ? parseInt(slider.value,10) : 50; if(isNaN(shareOut)) shareOut = 50;
-    var baseMeals = 60; var extraMeals = breakfast ? 15 : 0; var totalMeals = baseMeals + extraMeals;
-    var mealsOut = totalMeals * (shareOut / 100); var mealsHome = totalMeals - mealsOut;
-    var monthHome = mealsHome * costHome; var monthOut = mealsOut * costOut;
+    var baseMeals = 60; var breakfastMeals = breakfast ? 15 : 0; var mealsOut = baseMeals * (shareOut / 100); var mealsHome = baseMeals - mealsOut;
+    var breakfastCost = 8; var monthHome = (mealsHome * costHome) + (breakfastMeals * breakfastCost); var monthOut = mealsOut * costOut; var breakfastTotal = breakfastMeals * breakfastCost;
     var label = q('#vbFoodLabel'); if(label){ var homePct = 100 - shareOut; label.textContent = homePct.toFixed(0) + '% zuhause / ' + shareOut.toFixed(0) + '% auswärts'; }
-    var chipHome = q('#vbFoodHomeEst'); var chipOut = q('#vbFoodOutEst');
+    var chipHome = q('#vbFoodHomeEst'); var chipOut = q('#vbFoodOutEst'); var chipBr = q('#vbBreakfastEst');
     if(chipHome) chipHome.textContent = 'Essen zuhause: ' + fmtCHF(monthHome) + ' / Monat';
     if(chipOut) chipOut.textContent   = 'Essen auswärts: ' + fmtCHF(monthOut) + ' / Monat';
+    if(chipBr) chipBr.textContent = 'Frühstück: ' + fmtCHF(breakfastTotal) + ' / Monat';
     var hiddenHome = q('#vbGroceriesHidden'); var hiddenOut  = q('#vbEatingOutHidden');
     if(hiddenHome) hiddenHome.value = Math.round(monthHome);
     if(hiddenOut)  hiddenOut.value  = Math.round(monthOut);
@@ -751,10 +890,9 @@
     var totalIncome = 0; incomeInputs.forEach(function(el){ totalIncome += parseVal(el); }); totalIncome += allowances;
     var fixed = 0, variable = 0; fixedInputs.forEach(function(el){ fixed += parseVal(el); }); varInputs.forEach(function(el){ variable += parseVal(el); });
     var canton = q('#vbCanton').value || 'ZH'; var manualTax = parseVal(q('#vbTaxes'));
-    var taxRateMap = { ZH: 0.14, BE: 0.16, LU: 0.13, AG: 0.15, SG: 0.14, VD: 0.17, GE: 0.18, TI: 0.16, BS: 0.18, BL: 0.16, FR: 0.15, SO: 0.15, Andere: 0.15 };
-    var rate = taxRateMap[canton] || 0.15; var taxes = manualTax > 0 ? manualTax : totalIncome * rate;
+    var rate = remoteMeta.taxRates[canton] || 0.15; var taxes = manualTax > 0 ? manualTax : totalIncome * rate;
     var totalExpenses = fixed + variable + taxes; var surplus = totalIncome - totalExpenses;
-    return { income1: income1, income2: income2, childIncome: childIncome, allowances: allowances, otherIncome: otherIncome, totalIncome: totalIncome, fixed: fixed, variable: variable, taxes: taxes, totalExpenses: totalExpenses, surplus: surplus, canton: canton, groceries: parseVal(q('#vbGroceriesHidden')), eatingOut: parseVal(q('#vbEatingOutHidden')), housing: parseVal(document.querySelector('.vb-fixed[data-key="rentWarm"]')), childcare: parseVal(document.querySelector('.vb-variable[data-key="childcare"]')), hasKids: (state.household === 'family' && (parseInt(q('#childrenCount') ? q('#childrenCount').value : '0',10) || 0) > 0) };
+    return { income1: income1, income2: income2, childIncome: childIncome, allowances: allowances, otherIncome: otherIncome, totalIncome: totalIncome, fixed: fixed, variable: variable, taxes: taxes, totalExpenses: totalExpenses, surplus: surplus, canton: canton, appliedTaxRate: rate, groceries: parseVal(q('#vbGroceriesHidden')), eatingOut: parseVal(q('#vbEatingOutHidden')), housing: parseVal(document.querySelector('.vb-fixed[data-key="rentWarm"]')), childcare: parseVal(document.querySelector('.vb-variable[data-key="childcare"]')), hasKids: (state.household === 'family' && (parseInt(q('#childrenCount') ? q('#childrenCount').value : '0',10) || 0) > 0), serafe: parseVal(q('#vbSerafe')) };
   }
 
   function refreshLivePreview(calc){
@@ -818,6 +956,42 @@
     setDetail('#dGroceries', groceries); setDetail('#dEatingOut', eatingOut); setDetail('#dNetMobile', net + mobile);
     setDetail('#dStreaming', streaming); setDetail('#dHouseholdGoods', hhGoods); setDetail('#dChildcare', childcare);
     setDetail('#dPets', pets); setDetail('#dClothes', clothes); setDetail('#dLeisure', leisure); setDetail('#dHealth', health);
+
+    var autoTax = q('#vbAutoTaxLabel');
+    if(autoTax){
+      autoTax.textContent = 'Auto: ' + fmtCHF(calc.taxes) + ' (' + ((calc.appliedTaxRate || 0) * 100).toFixed(1) + '% · ' + remoteMeta.taxSource + ')';
+    }
+    var serafeLabel = q('#vbSerafeLabel');
+    if(serafeLabel){ serafeLabel.textContent = 'Serafe: ' + fmtCHF(calc.serafe || remoteMeta.serafeMonthly) + ' / Monat (' + remoteMeta.serafeSource + ')'; }
+
+    var totalIncomeSafe = Math.max(calc.totalIncome, 1);
+    var foodTotal = groceries + eatingOut;
+    function setRatio(labelId, barId, ratio){
+      var pct = Math.min(100, Math.max(0, ratio * 100));
+      var lbl = q(labelId); if(lbl){ lbl.textContent = pct.toFixed(0) + '%'; }
+      var bar = q(barId); if(bar){ bar.style.width = pct.toFixed(1) + '%'; }
+    }
+    setRatio('#vbRatioFixed', '#vbBarFixed', calc.fixed / totalIncomeSafe);
+    setRatio('#vbRatioVar', '#vbBarVar', calc.variable / totalIncomeSafe);
+    setRatio('#vbRatioTax', '#vbBarTax', calc.taxes / totalIncomeSafe);
+    setRatio('#vbRatioFood', '#vbBarFood', foodTotal / totalIncomeSafe);
+
+    var dailyBurn = calc.totalExpenses / 30;
+    var dailyIncome = calc.totalIncome / 30;
+    var dailyBurnEl = q('#vbDailyBurn'); if(dailyBurnEl) dailyBurnEl.textContent = fmtCHF(dailyBurn);
+    var dailyIncEl = q('#vbDailyIncome'); if(dailyIncEl) dailyIncEl.textContent = fmtCHF(dailyIncome);
+
+    var savingsRate = calc.totalIncome > 0 ? (calc.surplus / calc.totalIncome) * 100 : 0;
+    var savingsEl = q('#vbSavingsRate'); if(savingsEl) savingsEl.textContent = savingsRate.toFixed(1) + '%';
+    var runwayEl = q('#vbRunway');
+    if(runwayEl){
+      if(calc.surplus > 0){
+        var monthsToGoal = (calc.totalExpenses * 3) / calc.surplus;
+        runwayEl.textContent = monthsToGoal.toFixed(1) + ' Monate bis 3× Ausgaben';
+      } else {
+        runwayEl.textContent = 'Nicht erreichbar mit aktuellem Minus';
+      }
+    }
 
     renderTips({ income: calc.totalIncome, fixed: calc.fixed, variable: calc.variable, taxes: calc.taxes, surplus: calc.surplus, groceries: groceries, eatingOut: eatingOut, housing: calc.housing, canton: calc.canton, hasKids: calc.hasKids });
     updateChildrenVisibility(); updateExtrasVisibility();
@@ -891,8 +1065,9 @@
 
   var toggleDetails = q('#vbToggleDetails'); if(toggleDetails){ toggleDetails.addEventListener('click', function(){ var block = q('#vbDetails'); if(!block) return; var open = block.getAttribute('data-open') === 'true'; block.setAttribute('data-open', open ? 'false' : 'true'); }); }
 
-  var resetBtn = q('#vbReset'); if(resetBtn){ resetBtn.addEventListener('click', function(){ qa('input').forEach(function(el){ if(el.type === 'number'){ el.value = 0; } if(el.type === 'checkbox'){ el.checked = false; } }); state.household = 'single'; qa('.vb-option[data-household]').forEach(function(b){ b.setAttribute('data-active', b.getAttribute('data-household') === 'single' ? 'true' : 'false'); }); qa('.vb-badge-toggle').forEach(function(b){ b.setAttribute('data-active','false'); }); state.extras = {car:false, secondHome:false, pets:false, selfEmp:false}; updateChildrenVisibility(); updateExtrasVisibility(); updateFood(); gotoStep(1); localStorage.removeItem(STORAGE_KEY); var hint = q('#vbSavedInfo'); if(hint) hint.textContent = 'Autosave aktiv'; refreshLivePreview(); }); }
+  var resetBtn = q('#vbReset'); if(resetBtn){ resetBtn.addEventListener('click', function(){ qa('input').forEach(function(el){ if(el.type === 'number'){ el.value = 0; } if(el.type === 'checkbox'){ el.checked = false; } }); var br = q('#vbBreakfast'); if(br){ br.checked = true; } state.household = 'single'; qa('.vb-option[data-household]').forEach(function(b){ b.setAttribute('data-active', b.getAttribute('data-household') === 'single' ? 'true' : 'false'); }); qa('.vb-badge-toggle').forEach(function(b){ b.setAttribute('data-active','false'); }); state.extras = {car:false, secondHome:false, pets:false, selfEmp:false}; updateChildrenVisibility(); updateExtrasVisibility(); updateFood(); gotoStep(1); localStorage.removeItem(STORAGE_KEY); var hint = q('#vbSavedInfo'); if(hint) hint.textContent = 'Autosave aktiv'; refreshLivePreview(); }); }
 
+  fetchRemoteMeta();
   restoreState(); updateChildrenVisibility(); updateExtrasVisibility(); updateFood(); updateStepUI(); refreshLivePreview();
 })();
 </script>
