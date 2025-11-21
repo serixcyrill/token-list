@@ -6,87 +6,58 @@
   <title>3a Vergleich – Alt vs. Neu</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-      --brand-dark:#3a445c;
-      --brand-soft:#eef2f7;
-      --grad-a:#7edc67;
-      --grad-b:#b1f28a;
-      --card-radius:22px;
-    }
-
+    :root { --brand-dark:#79d862; --brand-soft:#e9ebf1; --grad-a:#7edc67; --grad-b:#7edc67; --card-radius:24px; }
     * { box-sizing: border-box; }
-    body {
-      background: radial-gradient(circle at 20% 20%, rgba(126,220,103,0.08), transparent 28%),
-                  radial-gradient(circle at 80% 0%, rgba(177,242,138,0.12), transparent 25%),
-                  #f7f9fb;
-      color:#1f2737;
-      margin:0;
-      font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
-      line-height:1.55;
-    }
-
-    .wrap { max-width:1100px; margin:0 auto; padding:28px 18px 44px; }
-    .card { background:#fff; border-radius:var(--card-radius); box-shadow:0 20px 50px rgba(31,39,55,0.08); }
-    .card-soft { background: var(--brand-soft); color:#1f2737; }
-    .card-grad { background: linear-gradient(135deg, var(--grad-a), var(--grad-b)); color:#0c3314; box-shadow:0 24px 50px rgba(126,220,103,0.25); }
-    .card-inner { padding:22px 24px; }
-    .group-title { font-weight:800; letter-spacing:.2px; }
-    .line { display:flex; justify-content:space-between; gap:12px; align-items:center; padding:6px 0 }
+    body { background:#f6f8fb; color:#282f47; margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    .wrap { max-width:1100px; margin:0 auto; padding:24px }
+    .card { background:#fff; border-radius:var(--card-radius); box-shadow:0 8px 24px rgba(40,47,71,.08) }
+    .card-soft { background: var(--brand-soft); color:#282f47 }
+    .card-grad { background: linear-gradient(135deg, var(--grad-a), var(--grad-b)); color:#fff }
+    .card-inner { padding:20px 24px }
+    .group-title { font-weight:800; letter-spacing:.3px }
+    .line { display:flex; justify-content:space-between; gap:16px; align-items:center; padding:4px 0 }
     .money { font-weight:800 }
-    .muted { color:#5f6b7a }
-    .small { font-size:.92rem }
-    .chip { display:inline-flex; align-items:center; gap:8px; background:rgba(31,39,55,0.06); border-radius:999px; padding:8px 12px; font-weight:700; font-size:0.92rem; color:#1f2737; }
+    .muted { color:#60708a }
+    .small { font-size:.85rem }
 
-    label span { font-size:.9rem; color:#4e5668 }
-    .input-clean { width:100%; height:54px; background:#fff; border:1px solid #d8deeb; border-radius:18px; padding:12px 16px; font-size:16px; line-height:1.2; color:#1f2737; text-align:right; outline:none; transition:all .18s ease; box-shadow: inset 0 1px 2px rgba(31,39,55,0.04);}    
-    .input-clean:focus { border-color:#7edc67; box-shadow:0 0 0 3px rgba(126,220,103,0.2), inset 0 1px 2px rgba(31,39,55,0.06); }
+    label span { font-size:.9rem; color:#5b6475 }
+    .input-clean { width:100%; height:50px; background:#fff; border:1px solid #d7dce6; border-radius:20px; padding:12px 20px; font-size:16px; line-height:1.2; color:#282f47; text-align:right; outline:none }
     input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0 }
     input[type=number] { -moz-appearance:textfield; appearance:textfield }
 
-    .line.cost .label { opacity:.6; font-weight:700 }
-    .line.cost .money { opacity:.75; font-weight:800; font-size:.97rem }
+    .line.cost { padding:2px 0 }
+    .line.cost .label { opacity:.5; font-weight:600 }
+    .line.cost .money { opacity:.55; font-weight:700; font-size:.95rem }
 
-    .result-footer { margin-top:18px; padding:24px 22px; border-radius:16px; border:1px solid rgba(31,39,55,0.08); background:rgba(31,39,55,0.03); }
-    .result-footer .line { padding:10px 0 }
-    .result-footer .payout .label { font-weight:800; font-size:1.05rem }
-    .result-footer .payout .money { font-size:1.1rem; font-weight:900 }
+    .result-footer { margin-top:16px; padding:24px 22px; border-radius:16px; border:1px solid rgba(40,47,71,0.08) }
+    .result-footer .line { padding:8px 0 }
+    .result-footer .payout .label { font-weight:800; font-size:1.1rem }
+    .result-footer .payout .money { font-size:1.1rem; font-weight:800 }
 
-    .card-grad .group-title, .card-grad label span, .card-grad .line span, .card-grad .money { color:#0c3314 !important }
-    .card-grad .text-gray-400 { color:rgba(12,51,20,0.78) !important }
-    .card-grad .line.cost .label { opacity:.65 }
-    .card-grad .line.cost .money { opacity:.7; font-size:.95rem }
-    .card-grad .result-footer { background:rgba(255,255,255,0.34); border-color:rgba(255,255,255,0.4) }
+    .card-grad .group-title, .card-grad label span, .card-grad .line span, .card-grad .money { color:#fff !important }
+    .card-grad .text-gray-400 { color:rgba(255,255,255,0.85) !important }
+    .card-grad .line.cost .label { opacity:.6 }
+    .card-grad .line.cost .money { opacity:.65; font-size:.9rem }
+    .card-grad .result-footer { background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.25) }
 
-    .card-soft .result-footer { background:rgba(31,39,55,0.05); border-color:rgba(31,39,55,0.12); color:#1f2737 }
-    .card-soft .result-footer .line span, .card-soft .result-footer .money { color:#1f2737 !important }
+    /* ALT: sehr feines dunkles Innenfeld (nur minimal dunkler als außen) */
+    .card-soft .result-footer { background:rgba(40,47,71,0.06); border-color:rgba(40,47,71,0.15); color:#282f47 }
+    .card-soft .result-footer .line span, .card-soft .result-footer .money { color:#282f47 !important }
 
     .kachel { border-radius: var(--card-radius); overflow: hidden }
-    .k-head { padding:16px 20px; font-weight:800; letter-spacing:.2px; color:#1f2737; background:#fff; border-bottom:1px solid rgba(31,39,55,0.05); }
-    .k-body { padding:18px 20px 20px; }
+    .k-head { padding:16px 20px; font-weight:800 }
+    .k-body { padding:16px 24px 24px }
 
-    .accent { color:#2f9a42; font-weight:800 }
-    .badge { padding:6px 10px; border-radius:10px; background:rgba(126,220,103,0.15); color:#1f2737; font-weight:700; font-size:0.9rem; }
-
-    .export-btn { transition: transform .18s ease, box-shadow .18s ease; }
-    .export-btn:hover { transform: translateY(-1px); box-shadow:0 8px 24px rgba(31,39,55,0.15); }
-    .export-btn:active { transform: translateY(0); }
-
-    input, select, textarea, .input-clean { border-radius:18px !important; -webkit-border-radius:18px !important; -moz-border-radius:18px !important; }
-    .input-clean { border:1px solid #d8deeb !important; background:#fff !important; }
+    .accent { color:#76D062; font-weight:800 }
+      /* --- FORCE ROUNDED INPUTS (override Tailwind Forms/normalize) --- */
+    input, select, textarea, .input-clean { border-radius:20px !important; -webkit-border-radius:20px !important; -moz-border-radius:20px !important; }
+    .input-clean { border:1px solid #d7dce6 !important; background:#fff !important; }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0 }
+    input[type=number] { -moz-appearance:textfield; appearance:textfield }
   </style>
 </head>
 <body>
-  <div class="wrap space-y-7">
-    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <p class="badge inline-flex items-center gap-2">3a Vergleich · Schnellcheck</p>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Alt vs. Neu: dein Vorsorge-Vergleich</h1>
-        <p class="text-slate-600 mt-2 max-w-2xl">Passe die Werte an und sieh sofort, wie sich Rendite, Kosten und Auszahlungen unterscheiden. Alle Beträge werden in Schweizer Franken angezeigt.</p>
-      </div>
-      <div class="flex gap-3">
-        <div class="chip shadow-sm"><span class="text-sm uppercase tracking-wide text-slate-500">Status</span><span>Live-Rechner</span></div>
-      </div>
-    </header>
+  <div class="wrap">
 
     <section class="card kachel">
       <div class="k-head">Eingaben</div>
@@ -98,10 +69,11 @@
       </div>
     </section>
 
-    <section class="grid gap-6 md:grid-cols-2">
+    <section class="grid gap-6 md:grid-cols-2 mt-8">
+
       <div class="card card-soft">
         <div class="card-inner">
-          <div class="group-title text-[18px] mb-3 flex items-center justify-between"><span>3a alt</span><span class="text-xs uppercase tracking-wide text-slate-500">Bestehende Lösung</span></div>
+          <div class="group-title text-[18px] mb-3">3a alt</div>
 
           <div class="grid grid-cols-2 gap-3 mb-3">
             <label class="block space-y-1"><span>Rendite nominal <span class="text-gray-400 text-sm">%</span></span><input class="input-clean" id="alt_r" type="number" step="0.01" value="0"></label>
@@ -113,7 +85,7 @@
             <label class="col-span-2 block space-y-1"><span>Honorar <span class="text-gray-400 text-sm">CHF</span></span><input class="input-clean" id="alt_fee" type="text" step="50" value="0"></label>
           </div>
 
-          <div class="group-title text-[14px] mt-2 mb-2 uppercase tracking-wide text-slate-500">Berechnungen</div>
+          <div class="group-title text-[14px] mt-2 mb-2">Berechnungen</div>
           <div class="space-y-0.5">
             <div class="line cost"><span class="label">Bestehendes Kapital</span><span id="alt_best" class="money">–</span></div>
             <div class="line cost"><span class="label">Neue Einzahlungen</span><span id="alt_ein_neu" class="money">–</span></div>
@@ -135,7 +107,7 @@
 
       <div class="card card-grad">
         <div class="card-inner">
-          <div class="group-title text-[18px] mb-3 flex items-center justify-between"><span>3a Neu</span><span class="text-xs uppercase tracking-wide text-emerald-900">Ziel-Lösung</span></div>
+          <div class="group-title text-[18px] mb-3">3a Neu</div>
           <div class="grid grid-cols-2 gap-3 mb-3">
             <label class="block space-y-1"><span>Rendite nominal <span class="text-gray-200 text-sm">%</span></span><input class="input-clean" id="neu_r" type="number" step="0.01" value="0"></label>
             <label class="block space-y-1"><span>Total Expense Ratio <span class="text-gray-200 text-sm">%</span></span><input class="input-clean" id="neu_ter" type="number" step="0.01" value="0"></label>
@@ -146,7 +118,7 @@
             <label class="col-span-2 block space-y-1"><span>Honorar <span class="text-gray-200 text-sm">CHF</span></span><input class="input-clean" id="neu_fee" type="text" step="50" value="0"></label>
           </div>
 
-          <div class="group-title text-[14px] mt-2 mb-2 uppercase tracking-wide text-emerald-900/80">Berechnungen</div>
+          <div class="group-title text-[14px] mt-2 mb-2">Berechnungen</div>
           <div class="space-y-0.5">
             <div class="line cost"><span class="label">Bestehendes Kapital</span><span id="neu_best" class="money">–</span></div>
             <div class="line cost"><span class="label">Neue Einzahlungen</span><span id="neu_ein_neu" class="money">–</span></div>
@@ -165,23 +137,37 @@
           </div>
         </div>
       </div>
+
     </section>
 
-    <section class="grid gap-6 md:grid-cols-2">
+    <section class="grid gap-6 md:grid-cols-2 mt-8">
       <div class="card card-soft md:col-span-2">
-        <div class="card-inner space-y-2">
-          <div class="line"><span id="compare_sentence" class="money text-lg">–</span></div>
-          <div class="line"><span id="compare_sentence2" class="money text-lg">–</span></div>
+        <div class="card-inner">
+          <div class="line"><span id="compare_sentence" class="money">–</span></div>
+          <div class="line"><span id="compare_sentence2" class="money">–</span></div>
         </div>
       </div>
     </section>
 
-    <div class="flex flex-col md:flex-row gap-3 items-center md:justify-center">
-      <button id="savePngBtn" class="export-btn" style="background:linear-gradient(135deg,#79d862,#a9ef87); color:#0c3314;border:none;border-radius:20px; padding:14px 26px;font-weight:800;cursor:pointer; box-shadow:0 8px 18px rgba(12,51,20,.2);">PNG speichern</button>
-      <button id="downloadPdfBtn" class="export-btn" style="background:#1f2737; color:#fff;border:none;border-radius:20px; padding:14px 24px;font-weight:800;cursor:pointer; box-shadow:0 8px 18px rgba(31,39,55,.2);">PDF herunterladen</button>
+    <div class="flex flex-col md:flex-row gap-3 items-center md:justify-center mt-6">
+      <button id="savePngBtn"
+        class="export-btn"
+        style="background:linear-gradient(135deg,#79d862,#a9ef87);
+               color:#fff;border:none;border-radius:20px;
+               padding:14px 28px;font-weight:800;cursor:pointer;
+               box-shadow:0 6px 14px rgba(40,47,71,.15);">
+        PNG speichern
+      </button>
+      <button id="downloadPdfBtn"
+        class="export-btn"
+        style="background:#282f47;color:#fff;border:none;border-radius:20px;
+               padding:14px 24px;font-weight:800;cursor:pointer;
+               box-shadow:0 6px 14px rgba(40,47,71,.2);">
+        PDF herunterladen
+      </button>
     </div>
 
-    <p class="muted small text-center max-w-3xl mx-auto">Alle Angaben sind unverbindlich und basieren auf Zirka-Werten sowie vereinfachten, linearen Berechnungen. Abweichungen in der tatsächlichen Entwicklung sind möglich.</p>
+    <p class="muted small text-center mt-10">Alle Angaben sind unverbindlich und basieren auf Zirka-Werten sowie vereinfachten, linearen Berechnungen. Abweichungen in der tatsächlichen Entwicklung sind möglich.</p>
   </div>
 
   <script>
@@ -217,64 +203,24 @@
       return { best:start, einNeu:sumEinNeu, sumEin:start+sumEinNeu, terCost, prodCost, costAA, mantelTotal, rueckCost, fee, totalCosts, payout:totalPayout, monatslohn: totalPayout/300 };
     }
 
-    function solveRateForTarget(params, start, years, target){
-      let lo=0, hi=2000;
-      const payout=m=>scenario(params, start, m, years).payout;
-      let tries=0;
-      while(payout(hi)<target && tries<20){ hi*=2; tries++; if(hi>50000) break }
-      for(let i=0;i<40;i++){
-        const mid=(lo+hi)/2;
-        if(payout(mid)>=target) hi=mid; else lo=mid;
-      }
-      return hi;
-    }
+    function solveRateForTarget(params, start, years, target){ let lo=0, hi=2000; const payout=m=>scenario(params, start, m, years).payout; let tries=0; while(payout(hi)<target && tries<20){ hi*=2; tries++; if(hi>50000) break } for(let i=0;i<40;i++){ const mid=(lo+hi)/2; if(payout(mid)>=target) hi=mid; else lo=mid } return hi }
 
-    function recalc(){
-      const start = unformatCurrency($("start").value);
-      const rate = unformatCurrency($("rate").value);
-      const years = Math.max(1, Math.floor(N($("years").value)));
-      const rueck = unformatCurrency($("rueck").value);
-
+    function recalc(){ const start = unformatCurrency($("start").value); const rate = unformatCurrency($("rate").value); const years = Math.max(1, Math.floor(N($("years").value))); const rueck = unformatCurrency($("rueck").value);
       const alt = scenario({ r:N($("alt_r").value), ter:N($("alt_ter").value), prod:N($("alt_prod").value), aa:N($("alt_aa").value), rueckk:N($("alt_rueckk").value), mantel:N($("alt_mantel").value), fee:unformatCurrency($("alt_fee").value) }, start, rate, years);
       const neuParams = { r:N($("neu_r").value), ter:N($("neu_ter").value), prod:N($("neu_prod").value), aa:N($("neu_aa").value), rueckk:N($("neu_rueckk").value), mantel:N($("neu_mantel").value), fee:unformatCurrency($("neu_fee").value) };
       const neu = scenario(neuParams, rueck, rate, years);
-
       const set = (id,val)=>{ const el=$(id); if(el) el.textContent = CHF.format(val) };
       set('alt_best', alt.best); set('alt_ein_neu', alt.einNeu); set('alt_sum_ein', alt.sumEin); set('alt_cost_prod', alt.prodCost); set('alt_cost_ter', alt.terCost); set('alt_cost_aa', alt.costAA); set('alt_cost_mantel', alt.mantelTotal); set('alt_cost_rueckk', alt.rueckCost); set('alt_cost_fee', alt.fee); set('alt_cost_total', alt.totalCosts); set('alt_payout', alt.payout); set('alt_monatslohn', alt.monatslohn);
       set('neu_best', neu.best); set('neu_ein_neu', neu.einNeu); set('neu_sum_ein', neu.sumEin); set('neu_cost_prod', neu.prodCost); set('neu_cost_ter', neu.terCost); set('neu_cost_aa', neu.costAA); set('neu_cost_mantel', neu.mantelTotal); set('neu_cost_rueckk', neu.rueckCost); set('neu_cost_fee', neu.fee); set('neu_cost_total', neu.totalCosts); set('neu_payout', neu.payout); set('neu_monatslohn', neu.monatslohn);
-
-      const diff = neu.payout - alt.payout;
-      const altTarget = alt.payout;
-      const needRate = solveRateForTarget(neuParams, rueck, years, altTarget);
-      const diffHTML = `<span class="accent">${CHF.format(Math.round(Math.abs(diff)))}</span>`;
-      const rateHTML = `<span class="accent">${CHF.format(Math.round(needRate))}</span>`;
-      const sentence = diff >= 0
-        ? `Du hast ${diffHTML} mehr Kapital als mit der alten Lösung – oder du zahlst nur noch ${rateHTML} pro Monat ein und würdest auf das gleiche Ergebnis kommen.`
-        : `Du hast ${diffHTML} weniger Kapital als mit der alten Lösung – oder du müsstest ${rateHTML} pro Monat einzahlen, um auf das gleiche Ergebnis zu kommen.`;
-      const s1=$("compare_sentence"); if(s1) s1.innerHTML = sentence;
-
-      const monthlySave = Math.max(0, rate - needRate);
-      const feeNeu = unformatCurrency($("neu_fee").value);
-      let sentence2 = '';
-      if (monthlySave > 0) {
-        const amortMonths = feeNeu > 0 ? Math.ceil(feeNeu / monthlySave) : 0;
-        const monthsHTML = `<span class="accent">${amortMonths} Monate</span>`;
-        const savePerMonthHTML = `<span class="accent">${CHF.format(Math.round(monthlySave))}</span>`;
-        sentence2 = `Dein Honorar amortisiert sich in ${monthsHTML}; danach sparst du monatlich ${savePerMonthHTML}, die du nicht mehr einzahlen musst.`;
-      } else {
-        sentence2 = `Mit deiner aktuellen Rate ergibt sich keine monatliche Einzahlungsreduktion gegenüber der alten Lösung.`;
-      }
-      const s2=$("compare_sentence2"); if(s2) s2.innerHTML = sentence2;
-    }
+      const diff = neu.payout - alt.payout; const altTarget = alt.payout; const needRate = solveRateForTarget(neuParams, rueck, years, altTarget); const diffHTML = `<span class="accent">${CHF.format(Math.round(Math.abs(diff)))}</span>`; const rateHTML = `<span class="accent">${CHF.format(Math.round(needRate))}</span>`; let sentence = diff >= 0 ? `Du hast ${diffHTML} mehr Kapital als mit der alten Lösung – oder du zahlst nur noch ${rateHTML} pro Monat ein und würdest auf das gleiche Ergebnis kommen.` : `Du hast ${diffHTML} weniger Kapital als mit der alten Lösung – oder du müsstest ${rateHTML} pro Monat einzahlen, um auf das gleiche Ergebnis zu kommen.`; const s1=$("compare_sentence"); if(s1) s1.innerHTML = sentence;
+      const feeNeu = unformatCurrency($("neu_fee").value); let sentence2 = ''; if (feeNeu > 0 && rate > 0) { const amortMonths = Math.ceil(feeNeu / rate); const monthsHTML = `<span class="accent">${amortMonths} Monate</span>`; sentence2 = `Dein Honorar amortisiert sich in ${monthsHTML} bei der aktuellen monatlichen Rate.`; } else { sentence2 = `Mit deiner aktuellen Rate ergibt sich keine monatliche Amortisation.`; } const s2=$("compare_sentence2"); if(s2) s2.innerHTML = sentence2; }
 
     const inputIds = ['start','rate','years','rueck','alt_r','alt_ter','alt_prod','alt_aa','alt_rueckk','alt_mantel','alt_fee','neu_r','neu_ter','neu_prod','neu_aa','neu_rueckk','neu_mantel','neu_fee'];
     inputIds.forEach(id => { const el=$(id); if(el) el.addEventListener('input', recalc) });
-    window.addEventListener('DOMContentLoaded', () => {
-      ['start','rate','rueck','alt_fee','neu_fee'].forEach(id => { attachCurrencyFormatting(id); const el=$(id); if(el) el.value = formatCurrency0(unformatCurrency(el.value)); });
-      recalc();
-    });
+    window.addEventListener('DOMContentLoaded', () => { ['start','rate','rueck','alt_fee','neu_fee'].forEach(id => { attachCurrencyFormatting(id); const el=$(id); if(el) el.value = formatCurrency0(unformatCurrency(el.value)); }); recalc(); });
   </script>
 
+  <!-- PNG-Export & PDF-Export -->
   <script>
     function loadScript(src){
       return new Promise((resolve,reject)=>{
@@ -317,7 +263,7 @@
     document.addEventListener('DOMContentLoaded',()=>{
       const pngBtn=document.getElementById('savePngBtn');
       const pdfBtn=document.getElementById('downloadPdfBtn');
-      const exportBtns = document.querySelectorAll('.export-btn');
+      const exportBtns=document.querySelectorAll('.export-btn');
       const hideButtons=()=>exportBtns.forEach(btn=>{ btn.dataset.prevDisplay=btn.style.display; btn.style.display='none'; });
       const showButtons=()=>exportBtns.forEach(btn=>{ btn.style.display=btn.dataset.prevDisplay||''; });
 
@@ -325,6 +271,7 @@
         pngBtn.addEventListener('click', async ()=>{
           const root=document.querySelector('.wrap');
           if(!root) return;
+
           const originalText=pngBtn.textContent;
           pngBtn.disabled=true;
           pngBtn.textContent='Wird gespeichert…';
@@ -357,7 +304,7 @@
             };
 
             if(canvas.toBlob){
-              canvas.toBlob(b=>{ b ? download(b) : download(canvas.toDataURL('image/png')); },'image/png');
+              canvas.toBlob(b=>{ if(b) download(b); else download(canvas.toDataURL('image/png')); },'image/png');
             } else {
               download(canvas.toDataURL('image/png'));
             }
@@ -377,6 +324,7 @@
         pdfBtn.addEventListener('click', async ()=>{
           const root=document.querySelector('.wrap');
           if(!root) return;
+
           const originalText=pdfBtn.textContent;
           pdfBtn.disabled=true;
           pdfBtn.textContent='PDF wird erstellt…';
