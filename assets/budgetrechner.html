@@ -167,6 +167,20 @@
     .vb-input[type="number"]::-webkit-inner-spin-button, .vb-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     .vb-input[type="number"] { -moz-appearance: textfield; }
 
+    /* Reset possible CMS overrides that make idle fields red or squared off */
+    #vemo-budget input:not([type="range"]):not([type="checkbox"]),
+    #vemo-budget select {
+      border-radius: 12px !important;
+      border: 1px solid var(--vemo-ring) !important;
+      background: #fff !important;
+      color: var(--vemo-text) !important;
+      box-shadow: none !important;
+    }
+    #vemo-budget input:invalid, #vemo-budget select:invalid {
+      box-shadow: none !important;
+      border-color: var(--vemo-ring) !important;
+    }
+
     .vb-grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 14px; align-items: stretch; grid-auto-rows: 1fr; }
     .vb-grid-2 > div { display: flex; flex-direction: column; gap: 6px; justify-content: space-between; }
     @media (max-width: 768px) { .vb-grid-2 { grid-template-columns: minmax(0,1fr); } }
