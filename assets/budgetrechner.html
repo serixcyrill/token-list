@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Schweizer Budgetrechner – Vemo Style</title>
+  <title>Budgetrechner von Vemo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
@@ -229,6 +229,7 @@
     .vb-tip.ok { border-color: #bfdbfe; background: #eff6ff; }
     .vb-tip.good { border-color: #bbf7d0; background: #ecfdf5; }
     .vb-tip-sources { margin-top: 10px; font-size: 10px; color: #94a3b8; }
+    .vb-footnote { margin-top: 10px; font-size: 10px; color: #475569; opacity: .9; }
 
     .requires-children { display: none; }
     .requires-extra-car { display: none; }
@@ -250,13 +251,16 @@
     .vb-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 10px; background: #ecfeff; border: 1px solid #bae6fd; font-size: 10px; color: #0ea5e9; }
 
     @media print {
+      :root { --vemo-text: #0f172a; --vemo-muted: #475569; }
       body { background: #fff; }
       #vemo-budget { padding: 0; }
-      .vb-card { box-shadow: none; border: none; background: #fff; }
+      .vb-card { box-shadow: none; border: none; background: #fff; padding: 12px 18px; }
       .vb-steps, .vb-progress-shell, .vb-btn-row, .vb-step-footer, .vb-header-main .vb-step-indicator { display: none !important; }
       .vb-step { display: none !important; }
       .vb-step[data-active="true"] { display: block !important; }
       .vb-details-block, .vb-full-block { display: block !important; border: 1px solid #cbd5e1; }
+      .vb-advanced-grid, .vb-summary-grid { page-break-inside: avoid; }
+      .vb-pdf-footer { display: block !important; }
     }
   </style>
 </head>
@@ -265,7 +269,7 @@
   <div class="vb-card">
     <div class="vb-header-main">
       <div>
-        <div class="vb-tag"><span>Schweizer Budgetrechner · Vemo Style</span></div>
+        <div class="vb-tag"><span>Budgetrechner von Vemo</span></div>
         <div class="vb-title">Budgetrechner</div>
         <div class="vb-subtitle">Schritt für Schritt zum ehrlichen Haushalts-Budget – mit Schweizer Alltagskosten, Steuern, smarter Vorschau und automatischer Zwischenspeicherung.</div>
       </div>
@@ -778,7 +782,6 @@
                 <div class="vb-full-row"><span class="vb-full-key">ÖV-Abos</span><span class="vb-full-val" id="bPT">CHF 0</span></div>
                 <div class="vb-full-row requires-extra-car"><span class="vb-full-key">Auto (Vers., Steuer)</span><span class="vb-full-val" id="bCarIns">CHF 0</span></div>
                 <div class="vb-full-row requires-extra-car"><span class="vb-full-key">Auto (Leasing)</span><span class="vb-full-val" id="bCarLease">CHF 0</span></div>
-                <div class="vb-full-row requires-extra-car"><span class="vb-full-key">Auto (Treibstoff/Parken)</span><span class="vb-full-val" id="bCarRunning">CHF 0</span></div>
                 <div class="vb-full-row"><span class="vb-full-key">Internet</span><span class="vb-full-val" id="bInternet">CHF 0</span></div>
                 <div class="vb-full-row"><span class="vb-full-key">Mobile</span><span class="vb-full-val" id="bMobile">CHF 0</span></div>
                 <div class="vb-full-row"><span class="vb-full-key">Streaming & Abos</span><span class="vb-full-val" id="bStreaming">CHF 0</span></div>
@@ -796,6 +799,7 @@
                 <div class="vb-full-row requires-extra-pets"><span class="vb-full-key">Haustiere</span><span class="vb-full-val" id="bPets">CHF 0</span></div>
                 <div class="vb-full-row"><span class="vb-full-key">Kleidung</span><span class="vb-full-val" id="bClothes">CHF 0</span></div>
                 <div class="vb-full-row"><span class="vb-full-key">Freizeit & Ferien</span><span class="vb-full-val" id="bLeisure">CHF 0</span></div>
+                <div class="vb-full-row requires-extra-car"><span class="vb-full-key">Auto (Treibstoff/Parken)</span><span class="vb-full-val" id="bCarRunning">CHF 0</span></div>
                 <div class="vb-full-row"><span class="vb-full-key">Gesundheit</span><span class="vb-full-val" id="bHealth">CHF 0</span></div>
                 <div class="vb-full-row"><span class="vb-full-key">Total Alltag</span><span class="vb-full-val" id="bVarTotal">CHF 0</span></div>
               </div>
@@ -833,7 +837,6 @@
               <div class="vb-detail-row"><span class="vb-detail-label">ÖV / ÖV-Abos</span><span class="vb-detail-value" id="dPT">CHF 0</span></div>
               <div class="vb-detail-row requires-extra-car"><span class="vb-detail-label">Auto (Vers., Steuer)</span><span class="vb-detail-value" id="dCarIns">CHF 0</span></div>
               <div class="vb-detail-row requires-extra-car"><span class="vb-detail-label">Auto (Leasing/Kredit)</span><span class="vb-detail-value" id="dCarLease">CHF 0</span></div>
-              <div class="vb-detail-row requires-extra-car"><span class="vb-detail-label">Auto (Treibstoff/Parken)</span><span class="vb-detail-value" id="dCarRunning">CHF 0</span></div>
             </div>
             <div class="vb-detail-col">
               <h4>Alltag & Lifestyle</h4>
@@ -846,10 +849,13 @@
               <div class="vb-detail-row requires-extra-pets"><span class="vb-detail-label">Haustierkosten</span><span class="vb-detail-value" id="dPets">CHF 0</span></div>
               <div class="vb-detail-row"><span class="vb-detail-label">Kleidung</span><span class="vb-detail-value" id="dClothes">CHF 0</span></div>
               <div class="vb-detail-row"><span class="vb-detail-label">Freizeit & Ferien</span><span class="vb-detail-value" id="dLeisure">CHF 0</span></div>
+              <div class="vb-detail-row requires-extra-car"><span class="vb-detail-label">Auto (Treibstoff/Parken)</span><span class="vb-detail-value" id="dCarRunning">CHF 0</span></div>
               <div class="vb-detail-row"><span class="vb-detail-label">Gesundheit</span><span class="vb-detail-value" id="dHealth">CHF 0</span></div>
             </div>
           </div>
         </div>
+
+        <div class="vb-footnote" id="vbCalcNote">Berechnungsgrundlagen: Serafe live geschätzt, Steuersatz je Kanton/Online-Richtwert, Frühstück mit CHF 8 voreingerechnet.</div>
 
         <div class="vb-tip-list" id="vbTips"></div>
         <div class="vb-tip-sources">Hinweise basieren auf typischen Richtwerten von Schweizer Budgetberatungsstellen (z. B. Caritas, Schuldenberatung) und ersetzen keine individuelle Beratung.</div>
@@ -862,6 +868,7 @@
           <button class="vb-btn vb-btn-primary" id="vbDownload">PDF / Download</button>
           <button class="vb-btn" id="vbReset">Alles zurücksetzen</button>
         </div>
+        <div class="vb-pdf-footer" style="margin-top:8px; font-size:10px; color:#475569;">Haftungsausschluss: Die Werte sind Näherungen, ersetzen keine Beratung und basieren auf hinterlegten/online abgerufenen Richtwerten. Für exakte Planung bitte individuelle Prüfung vornehmen.</div>
       </div>
     </div>
 
@@ -1109,6 +1116,11 @@
       }
     }
 
+    var calcNote = q('#vbCalcNote');
+    if(calcNote){
+      calcNote.textContent = 'Berechnungsgrundlagen: Serafe ' + remoteMeta.serafeSource + ', Steuersatz ' + (remoteMeta.taxSource || 'online') + ' (' + (calc.appliedTaxRate * 100).toFixed(1) + '%), Frühstück pauschal CHF 8.';
+    }
+
     renderTips({ income: calc.totalIncome, fixed: calc.fixed, variable: calc.variable, taxes: calc.taxes, surplus: calc.surplus, groceries: groceries, eatingOut: eatingOut, housing: calc.housing, canton: calc.canton, hasKids: calc.hasKids });
     updateChildrenVisibility(); updateExtrasVisibility();
   }
@@ -1135,7 +1147,21 @@
     if(meta.hasKids){ addTip('ok','Kinderkosten im Blick behalten.', 'Kinderbetreuung, Freizeit und Hobbys können stark schwanken. Plane einen realistischen Betrag ein und schaue, ob familienunterstützende Angebote (Subventionen, Betreuungsgutscheine) in deinem Kanton zur Verfügung stehen.'); }
   }
 
-  function gotoStep(target){ if(target < 1) target = 1; if(target > state.maxStep) target = state.maxStep; state.step = target; updateStepUI(); if(target === 6){ recalcAndRenderSummary(); } else { refreshLivePreview(); } }
+  function gotoStep(target){
+    if(target < 1) target = 1;
+    if(target > state.maxStep) target = state.maxStep;
+    state.step = target;
+    updateStepUI();
+    if(target === 5){
+      var taxEl = q('#vbTaxes');
+      if(taxEl && parseVal(taxEl) === 0){ taxEl.setAttribute('data-auto','true'); }
+      refreshLivePreview();
+    } else if(target === 6){
+      recalcAndRenderSummary();
+    } else {
+      refreshLivePreview();
+    }
+  }
 
   function persistState(){
     try {
