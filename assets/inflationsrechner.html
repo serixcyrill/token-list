@@ -1,0 +1,706 @@
+<!-- Vemo 3a Inflationsrechner – modernisiertes UI (Budget-Calculator-Style) -->
+<div id="vemo-3a-kaufkraft"></div>
+
+<style>
+  :root {
+    --g: #76d062;
+    --g-strong: #63b94f;
+    --t: #1f2937;
+    --muted: #55607a;
+    --ring: #d7deea;
+    --panel: #f6f8fb;
+    --shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+  }
+
+  #vemo-3a-kaufkraft,
+  #vemo-3a-kaufkraft * {
+    box-sizing: border-box;
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    color: var(--t);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #vemo-3a-kaufkraft {
+    background: radial-gradient(circle at 20% 20%, rgba(118, 208, 98, 0.08), transparent 30%),
+      radial-gradient(circle at 80% 10%, rgba(118, 208, 98, 0.06), transparent 35%),
+      linear-gradient(180deg, #f9fbff, #eef2f7);
+    padding: 28px 18px 36px;
+  }
+
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--ring);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .hdr {
+    padding: 22px 26px 12px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .title {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+
+  .lede {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .content {
+    padding: 0 26px 8px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--ring);
+    border-radius: 16px;
+    padding: 18px 18px 14px;
+    display: grid;
+    gap: 16px;
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .label {
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--ring) !important;
+    border-radius: 14px !important;
+    background: #fff !important;
+    font-weight: 800;
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--g-strong) !important;
+    box-shadow: 0 0 0 4px rgba(118, 208, 98, 0.2);
+    background: #f9fff4 !important;
+  }
+
+  .range-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .range {
+    height: 34px;
+    appearance: none;
+    background: linear-gradient(90deg, var(--g) var(--val, 0%), #eef2f7 var(--val, 0%));
+    border-radius: 999px;
+    outline: none;
+    border: 1px solid var(--ring);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .range:focus-visible {
+    box-shadow: 0 0 0 4px rgba(118, 208, 98, 0.2);
+    border-color: var(--g-strong);
+  }
+
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--g-strong);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+    transition: transform 0.12s ease;
+  }
+
+  .range:active::-webkit-slider-thumb {
+    transform: scale(1.06);
+  }
+
+  .range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--g-strong);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+    transition: transform 0.12s ease;
+  }
+
+  .val {
+    min-width: 120px;
+    text-align: center;
+    padding: 10px 12px;
+    border: 1px solid var(--ring);
+    border-radius: 12px;
+    font-weight: 800;
+    background: #fff;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .chart-shell {
+    background: #fff;
+    border: 1px solid var(--ring);
+    border-radius: 16px;
+    padding: 14px;
+    min-height: 340px;
+    display: grid;
+    gap: 12px;
+  }
+
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 6px 0;
+  }
+
+  .chart-title {
+    margin: 0;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 0.01em;
+  }
+
+  .chart-sub {
+    margin: 0;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  .chart {
+    width: 100%;
+    height: 310px;
+    border: 1px solid var(--ring);
+    border-radius: 12px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gridline {
+    stroke: #e2e8f0;
+    stroke-width: 1;
+  }
+
+  .tick {
+    fill: #64748b;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .axislabel {
+    fill: #475569;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .foot {
+    padding: 18px 26px 22px;
+    border-top: 1px solid var(--ring);
+    background: #fcfdfd;
+  }
+
+  .result {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 960px) {
+    .result {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .box {
+    background: var(--g);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.1);
+    min-height: 122px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  #vemo-3a-kaufkraft .box,
+  #vemo-3a-kaufkraft .box *,
+  #vemo-3a-kaufkraft .box .x,
+  #vemo-3a-kaufkraft .box .s {
+    color: #fff !important;
+  }
+
+  .box:hover {
+    transform: translateY(-2px);
+  }
+
+  .box .x {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.1;
+    min-height: 36px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  .box .s {
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.96;
+  }
+
+  @media (max-width: 640px) {
+    #vemo-3a-kaufkraft {
+      padding: 18px 14px 26px;
+    }
+
+    .title {
+      font-size: 22px;
+    }
+
+    .content {
+      padding: 0 18px 8px;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-shell {
+      display: none !important;
+    }
+
+    .range {
+      height: 38px;
+    }
+
+    .range::-webkit-slider-thumb,
+    .range::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+    }
+
+    .val {
+      min-width: 96px;
+      font-size: 12px;
+    }
+
+    .box {
+      min-height: 110px;
+    }
+
+    .box .x {
+      font-size: 24px;
+    }
+
+    .box .s {
+      font-size: 11px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    function el(t, a) {
+      var n = document.createElement(t);
+      if (a) {
+        for (var k in a) {
+          if (Object.prototype.hasOwnProperty.call(a, k)) {
+            if (k === 'class') n.className = a[k];
+            else n.setAttribute(k, String(a[k]));
+          }
+        }
+      }
+      for (var i = 2; i < arguments.length; i++) {
+        var c = arguments[i];
+        if (c != null) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      }
+      return n;
+    }
+
+    function nf(x) {
+      try {
+        return new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', maximumFractionDigits: 0 }).format(x);
+      } catch (e) {
+        return 'CHF ' + Math.round(x);
+      }
+    }
+
+    function nfi(x) {
+      try {
+        return new Intl.NumberFormat('de-CH', { maximumFractionDigits: 0 }).format(x);
+      } catch (e) {
+        return String(Math.round(x));
+      }
+    }
+
+    function pct(x) {
+      return String(Math.round(x)) + '%';
+    }
+
+    function pow(a, b) {
+      return Math.pow(a, b);
+    }
+
+    function kaufkraft(amount, years, infl) {
+      var r = infl / 100;
+      var f = pow(1 + r, years) || 1;
+      var k = amount / f;
+      var loss = (1 - 1 / f) * 100;
+      return { k: k, loss: loss };
+    }
+
+    var amount = 1000000; // Standard
+    var years = 15; // Standard
+    var infl = 0.0; // Standard
+    var life = 90; // fix
+
+    var mount = document.getElementById('vemo-3a-kaufkraft');
+    mount.innerHTML = '';
+
+    var wrap = el('div', { class: 'wrap' }, el('div', { class: 'card' }));
+    var card = wrap.querySelector('.card');
+    card.appendChild(
+      el(
+        'div',
+        { class: 'hdr' },
+        el('div', { class: 'eyebrow' }, 'Vemo 3a · Smart Money'),
+        el('h2', { class: 'title' }, 'Inflationsrechner'),
+        el('p', { class: 'lede' }, 'Simulieren Sie die reale Kaufkraft Ihres Vorsorgeziels bis zur Pension. Passen Sie Betrag, Jahre und erwartete Inflation an, um die Auswirkungen sofort zu sehen.')
+      )
+    );
+
+    function rangeRow(min, max, step, val, fmt, on) {
+      var r = el('input', { class: 'range', type: 'range', min: String(min), max: String(max), step: String(step), value: String(val) });
+      var v = el('div', { class: 'val' }, fmt(val));
+      function setVal(x) {
+        var p = ((x - min) / (max - min)) * 100;
+        r.style.setProperty('--val', p + '%');
+        v.textContent = fmt(x);
+      }
+      setVal(val);
+      r.addEventListener('input', function (e) {
+        var x = parseFloat(e.target.value);
+        if (isNaN(x)) x = min;
+        setVal(x);
+        on(x);
+      });
+      return el('div', { class: 'range-row' }, r, v);
+    }
+
+    function amountField() {
+      var inp = el('input', { class: 'input', type: 'text', inputmode: 'numeric', placeholder: '1 000 000', value: nfi(amount) });
+      function digits(str) {
+        var d = str.replace(/[^0-9]/g, '');
+        return d ? parseInt(d, 10) : 0;
+      }
+      function format() {
+        inp.value = nfi(amount);
+      }
+      inp.addEventListener('input', function (e) {
+        amount = digits(e.target.value);
+        format();
+        update();
+      });
+      inp.addEventListener('blur', format);
+      return inp;
+    }
+
+    var left = el(
+      'div',
+      { class: 'panel' },
+      el('div', { class: 'field' }, el('div', { class: 'label' }, 'Vorsorgeziel (CHF)'), amountField()),
+      el('div', { class: 'field' }, el('div', { class: 'label' }, 'Jahre bis 65'), rangeRow(0, 45, 1, years, function (x) { return String(Math.round(x)) + ' Jahre'; }, function (x) { years = x; update(); })),
+      el('div', { class: 'field' }, el('div', { class: 'label' }, 'Inflation pro Jahr'), rangeRow(0, 10, 0.1, infl, function (x) { var s = x.toFixed(1); return s.replace('.', ',') + ' %'; }, function (x) { infl = x; update(); }))
+    );
+
+    var right = el(
+      'div',
+      { class: 'chart-shell' },
+      el('div', { class: 'chart-header' }, el('p', { class: 'chart-title' }, 'Kaufkraft-Verlauf'), el('p', { class: 'chart-sub' }, 'Berechnet in heutigen CHF')), 
+      el('div', { class: 'chart', id: 'chart' })
+    );
+
+    card.appendChild(el('div', { class: 'content grid' }, left, right));
+
+    var lossVal = el('div', { class: 'x', id: 'r_loss' }, '');
+    var kVal = el('div', { class: 'x', id: 'r_k' }, '');
+    var mVal = el('div', { class: 'x', id: 'r_m' }, '');
+    var foot = el(
+      'div',
+      { class: 'foot' },
+      el(
+        'div',
+        { class: 'result' },
+        el('div', { class: 'box', id: 'b_loss' }, lossVal, el('div', { class: 's' }, 'Verlust gesamt bis 65')),
+        el('div', { class: 'box', id: 'b_k' }, kVal, el('div', { class: 's' }, 'Kaufkraft bei 65')),
+        el('div', { class: 'box', id: 'b_m' }, mVal, el('div', { class: 's' }, 'Monatslohn bis 90'))
+      )
+    );
+    card.appendChild(foot);
+    mount.appendChild(wrap);
+
+    function draw(vals) {
+      var host = document.getElementById('chart');
+      if (!host) {
+        return;
+      }
+      if (window.matchMedia('(max-width: 640px)').matches) {
+        host.innerHTML = '';
+        return;
+      }
+      host.innerHTML = '';
+
+      var w = host.clientWidth || 760,
+        h = 310;
+      var pL = 132,
+        pR = 26,
+        pT = 22,
+        pB = 64;
+      var yMin = 0,
+        yMax = Math.max(1, amount);
+      var NS = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', String(h));
+
+      var defs = document.createElementNS(NS, 'defs');
+      var grad = document.createElementNS(NS, 'linearGradient');
+      grad.setAttribute('id', 'gradY');
+      grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+      grad.setAttribute('x1', '0');
+      grad.setAttribute('y1', String(pT));
+      grad.setAttribute('x2', '0');
+      grad.setAttribute('y2', String(h - pB));
+      function makeStop(off, col) {
+        var s = document.createElementNS(NS, 'stop');
+        s.setAttribute('offset', off);
+        s.setAttribute('stop-color', col);
+        return s;
+      }
+      grad.appendChild(makeStop('0%', '#76D062'));
+      grad.appendChild(makeStop('60%', '#f59e0b'));
+      grad.appendChild(makeStop('100%', '#ef4444'));
+      defs.appendChild(grad);
+      svg.appendChild(defs);
+
+      for (var t = 0; t <= 4; t++) {
+        var y = h - pB - t * ((h - pT - pB) / 4);
+        var gl = document.createElementNS(NS, 'line');
+        gl.setAttribute('x1', String(pL));
+        gl.setAttribute('x2', String(w - pR));
+        gl.setAttribute('y1', String(y));
+        gl.setAttribute('y2', String(y));
+        gl.setAttribute('class', 'gridline');
+        svg.appendChild(gl);
+        var val = yMin + (t * (yMax - yMin)) / 4;
+        var tl = document.createElementNS(NS, 'text');
+        tl.setAttribute('x', String(pL - 12));
+        tl.setAttribute('y', String(y + 4));
+        tl.setAttribute('text-anchor', 'end');
+        tl.setAttribute('class', 'tick');
+        tl.textContent = nf(val);
+        svg.appendChild(tl);
+      }
+
+      var n = vals.length > 1 ? vals.length - 1 : 1;
+      var maxTicks = 8;
+      var step = Math.max(1, Math.ceil(n / maxTicks));
+      for (var i = 0; i <= n; i += step) {
+        var x = pL + ((w - pL - pR) * i) / n;
+        var gl2 = document.createElementNS(NS, 'line');
+        gl2.setAttribute('x1', String(x));
+        gl2.setAttribute('x2', String(x));
+        gl2.setAttribute('y1', String(pT));
+        gl2.setAttribute('y2', String(h - pB));
+        gl2.setAttribute('class', 'gridline');
+        svg.appendChild(gl2);
+        var tx = document.createElementNS(NS, 'text');
+        tx.setAttribute('x', String(x));
+        tx.setAttribute('y', String(h - pB + 18));
+        tx.setAttribute('text-anchor', 'middle');
+        tx.setAttribute('class', 'tick');
+        tx.textContent = String(i);
+        svg.appendChild(tx);
+      }
+      if (n % step !== 0) {
+        var xEnd = pL + (w - pL - pR);
+        var txEnd = document.createElementNS(NS, 'text');
+        txEnd.setAttribute('x', String(xEnd));
+        txEnd.setAttribute('y', String(h - pB + 18));
+        txEnd.setAttribute('text-anchor', 'end');
+        txEnd.setAttribute('class', 'tick');
+        txEnd.textContent = String(n);
+        svg.appendChild(txEnd);
+      }
+
+      var d = '';
+      for (var j = 0; j < vals.length; j++) {
+        var vx = pL + ((w - pL - pR) * j) / Math.max(1, vals.length - 1);
+        var vy = h - pB - ((vals[j] - yMin) / (yMax - yMin)) * (h - pT - pB);
+        d += (j ? ' L ' : 'M ') + vx.toFixed(1) + ' ' + vy.toFixed(1);
+      }
+      var path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('stroke', 'url(#gradY)');
+      path.setAttribute('stroke-width', '3');
+      path.setAttribute('fill', 'none');
+      svg.appendChild(path);
+
+      var ex = pL + (w - pL - pR);
+      var ey = h - pB - ((vals[vals.length - 1] - yMin) / (yMax - yMin)) * (h - pT - pB);
+      var tY = (ey - pT) / (h - pT - pB);
+      if (tY < 0) tY = 0;
+      if (tY > 1) tY = 1;
+      var hue = 110 * (1 - tY);
+      var sat = 75;
+      var light = 42 - 8 * tY;
+      var dotCol = 'hsl(' + hue + ',' + sat + '%,' + light + '%)';
+      var dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', String(ex));
+      dot.setAttribute('cy', String(ey));
+      dot.setAttribute('r', '3.8');
+      dot.setAttribute('fill', dotCol);
+      dot.setAttribute('stroke', '#fff');
+      dot.setAttribute('stroke-width', '2');
+      svg.appendChild(dot);
+
+      var xlab = document.createElementNS(NS, 'text');
+      xlab.setAttribute('x', String(pL + (w - pL - pR) / 2));
+      xlab.setAttribute('y', String(h - 8));
+      xlab.setAttribute('text-anchor', 'middle');
+      xlab.setAttribute('class', 'axislabel');
+      xlab.textContent = 'Jahre';
+      svg.appendChild(xlab);
+      var yMid = pT + (h - pT - pB) / 2;
+      var ylab = document.createElementNS(NS, 'text');
+      ylab.setAttribute('x', '22');
+      ylab.setAttribute('y', String(yMid));
+      ylab.setAttribute('class', 'axislabel');
+      ylab.setAttribute('transform', 'rotate(-90 22 ' + yMid + ')');
+      ylab.textContent = 'CHF';
+      svg.appendChild(ylab);
+
+      host.appendChild(svg);
+    }
+
+    function setBoxColor(box, t) {
+      if (!box) {
+        return;
+      }
+      function clamp(v) {
+        return Math.max(0, Math.min(1, v));
+      }
+      var te = clamp(t);
+      te = Math.pow(te, 0.35);
+
+      if (te <= 0.0001) {
+        box.style.background = 'linear-gradient(180deg, #76D062, #63b94f)';
+        box.style.boxShadow = '0 12px 26px rgba(15,23,42,0.18)';
+        box.style.borderColor = 'rgba(0,0,0,0.05)';
+        return;
+      }
+
+      var hue = 110 * (1 - te);
+      var sat = 56 + 30 * te;
+      var l1 = 58 - 22 * te;
+      var l2 = 52 - 26 * te;
+      var shadowA = 0.22 + 0.32 * te;
+
+      var gradTop = 'hsl(' + hue.toFixed(1) + ',' + sat.toFixed(1) + '%,' + l1.toFixed(1) + '%)';
+      var gradBot = 'hsl(' + hue.toFixed(1) + ',' + sat.toFixed(1) + '%,' + l2.toFixed(1) + '%)';
+      box.style.background = 'linear-gradient(180deg, ' + gradTop + ', ' + gradBot + ')';
+      box.style.boxShadow = '0 16px 34px rgba(15,23,42,' + shadowA.toFixed(2) + ')';
+      box.style.borderColor = 'rgba(0,0,0,' + (0.06 + 0.2 * te) + ')';
+    }
+
+    function update() {
+      try {
+        var res = kaufkraft(amount, years, infl);
+        var monate = Math.max(1, (life - 65) * 12);
+        var monat = res.k / monate;
+
+        var vals = [];
+        var maxYears = Math.max(1, Math.round(years));
+        for (var i = 0; i <= maxYears; i++) {
+          vals.push(kaufkraft(amount, i, infl).k);
+        }
+        draw(vals);
+
+        lossVal.textContent = pct(res.loss);
+        kVal.textContent = nf(res.k);
+        mVal.textContent = nf(monat) + ' pro Monat';
+
+        var baseMonthly = amount / monate;
+        var tLoss = Math.max(0, Math.min(1, res.loss / 100));
+        var tK = Math.max(0, Math.min(1, 1 - res.k / Math.max(1, amount)));
+        var tM = Math.max(0, Math.min(1, 1 - monat / Math.max(1, baseMonthly)));
+
+        setBoxColor(document.getElementById('b_loss'), tLoss);
+        setBoxColor(document.getElementById('b_k'), tK);
+        setBoxColor(document.getElementById('b_m'), tM);
+      } catch (e) {}
+    }
+
+    window.addEventListener('resize', update);
+    update();
+    setTimeout(update, 50);
+  })();
+</script>
