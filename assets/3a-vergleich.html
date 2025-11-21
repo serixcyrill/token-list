@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3a Vergleich – Alt vs. Neu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { --brand-dark:#79d862; --brand-soft:#e9ebf1; --grad-a:#7edc67; --grad-b:#7edc67; --card-radius:24px; }
+    * { box-sizing: border-box; }
+    body { background:#f6f8fb; color:#282f47; margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    .wrap { max-width:1100px; margin:0 auto; padding:32px 24px 48px }
+    .card { background:#fff; border-radius:var(--card-radius); box-shadow:0 8px 24px rgba(40,47,71,.08) }
+    .card-soft { background: var(--brand-soft); color:#282f47 }
+    .card-grad { background: linear-gradient(135deg, var(--grad-a), var(--grad-b)); color:#fff }
+    .card-inner { padding:20px 24px }
+    .group-title { font-weight:800; letter-spacing:.3px }
+    .line { display:flex; justify-content:space-between; gap:16px; align-items:center; padding:4px 0 }
+    .money { font-weight:800 }
+    .muted { color:#60708a }
+    .small { font-size:.85rem }
+
+    label span { font-size:.9rem; color:#5b6475 }
+    .input-clean { width:100%; height:50px; background:#fff; border:1px solid #d7dce6; border-radius:20px; padding:12px 20px; font-size:16px; line-height:1.2; color:#282f47; text-align:right; outline:none }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0 }
+    input[type=number] { -moz-appearance:textfield; appearance:textfield }
+
+    .line.cost { padding:2px 0 }
+    .line.cost .label { opacity:.5; font-weight:600 }
+    .line.cost .money { opacity:.55; font-weight:700; font-size:.95rem }
+
+    .result-footer { margin-top:16px; padding:24px 22px; border-radius:16px; border:1px solid rgba(40,47,71,0.08) }
+    .result-footer .line { padding:8px 0 }
+    .result-footer .payout .label { font-weight:800; font-size:1.1rem }
+    .result-footer .payout .money { font-size:1.1rem; font-weight:800 }
+
+    .card-grad .group-title, .card-grad label span, .card-grad .line span, .card-grad .money { color:#fff !important }
+    .card-grad .text-gray-400 { color:rgba(255,255,255,0.85) !important }
+    .card-grad .line.cost .label { opacity:.6 }
+    .card-grad .line.cost .money { opacity:.65; font-size:.9rem }
+    .card-grad .result-footer { background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.25) }
+
+    /* ALT: sehr feines dunkles Innenfeld (nur minimal dunkler als außen) */
+    .card-soft .result-footer { background:rgba(40,47,71,0.06); border-color:rgba(40,47,71,0.15); color:#282f47 }
+    .card-soft .result-footer .line span, .card-soft .result-footer .money { color:#282f47 !important }
+
+    .kachel { border-radius: var(--card-radius); overflow: hidden }
+    .k-head { padding:16px 20px; font-weight:800 }
+    .k-body { padding:16px 24px 24px }
+
+    .accent { color:#76D062; font-weight:800 }
+      /* --- FORCE ROUNDED INPUTS (override Tailwind Forms/normalize) --- */
+    input, select, textarea, .input-clean { border-radius:20px !important; -webkit-border-radius:20px !important; -moz-border-radius:20px !important; }
+    .input-clean { border:1px solid #d7dce6 !important; background:#fff !important; }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0 }
+    input[type=number] { -moz-appearance:textfield; appearance:textfield }
+  </style>
+</head>
+<body>
+  <div class="wrap space-y-6">
+
+    <header class="flex flex-col gap-2">
+      <p class="text-xs uppercase tracking-[0.2rem] text-gray-400 font-semibold">3a-Vergleich</p>
+      <div class="flex flex-col gap-1">
+        <h1 class="text-2xl md:text-[28px] font-black text-[#282f47] leading-tight">Vergleich Alt vs. Neu</h1>
+        <p class="text-sm text-gray-500">Behalte das vertraute Layout, aber mit sanften Akzenten für eine klare Beratung.</p>
+      </div>
+    </header>
+
+    <section class="card kachel">
+      <div class="k-head">Eingaben</div>
+      <div class="k-body grid grid-cols-1 md:grid-cols-4 gap-3">
+        <label class="block space-y-1"><span>Startkapital <span class="text-gray-400 text-sm">CHF</span></span><input class="input-clean" id="start" type="text" step="100" value="0"></label>
+        <label class="block space-y-1"><span>Monatliche Rate <span class="text-gray-400 text-sm">CHF</span></span><input class="input-clean" id="rate" type="text" step="10" value="0"></label>
+        <label class="block space-y-1"><span>Laufzeit <span class="text-gray-400 text-sm">Jahre</span></span><input class="input-clean" id="years" type="number" step="1" value="0"></label>
+        <label class="block space-y-1"><span>Rückkaufswert <span class="text-gray-400 text-sm">CHF</span></span><input class="input-clean" id="rueck" type="text" step="100" value="0"></label>
+      </div>
+    </section>
+
+    <section class="grid gap-6 md:grid-cols-2 mt-8">
+
+      <div class="card card-soft">
+        <div class="card-inner">
+          <div class="group-title text-[18px] mb-3">3a alt</div>
+
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <label class="block space-y-1"><span>Rendite nominal <span class="text-gray-400 text-sm">%</span></span><input class="input-clean" id="alt_r" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Total Expense Ratio <span class="text-gray-400 text-sm">%</span></span><input class="input-clean" id="alt_ter" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Produktkosten pro Jahr <span class="text-gray-400 text-sm">%</span></span><input class="input-clean" id="alt_prod" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Ausgabeaufschlag <span class="text-gray-400 text-sm">%</span></span><input class="input-clean" id="alt_aa" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Ruecknahmekommission <span class="text-gray-400 text-sm">%</span></span><input class="input-clean" id="alt_rueckk" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Mantelkosten <span class="text-gray-400 text-sm">%</span></span><input class="input-clean" id="alt_mantel" type="number" step="0.01" value="0"></label>
+            <label class="col-span-2 block space-y-1"><span>Honorar <span class="text-gray-400 text-sm">CHF</span></span><input class="input-clean" id="alt_fee" type="text" step="50" value="0"></label>
+          </div>
+
+          <div class="group-title text-[14px] mt-2 mb-2">Berechnungen</div>
+          <div class="space-y-0.5">
+            <div class="line cost"><span class="label">Bestehendes Kapital</span><span id="alt_best" class="money">–</span></div>
+            <div class="line cost"><span class="label">Neue Einzahlungen</span><span id="alt_ein_neu" class="money">–</span></div>
+            <div class="line cost"><strong class="label">Summe Einzahlungen total</strong><span id="alt_sum_ein" class="money">–</span></div>
+            <div class="line cost"><span class="label">Produktkosten p.a.</span><span id="alt_cost_prod" class="money">–</span></div>
+            <div class="line cost"><span class="label">TER-Kosten p.a.</span><span id="alt_cost_ter" class="money">–</span></div>
+            <div class="line cost"><span class="label">Ausgabeaufschlag</span><span id="alt_cost_aa" class="money">–</span></div>
+            <div class="line cost"><span class="label">Mantelkosten</span><span id="alt_cost_mantel" class="money">–</span></div>
+            <div class="line cost"><span class="label">Ruecknahmekommission</span><span id="alt_cost_rueckk" class="money">–</span></div>
+            <div class="line cost"><span class="label">Honorar</span><span id="alt_cost_fee" class="money">–</span></div>
+            <div class="line cost"><strong class="label">Gesamt</strong><span id="alt_cost_total" class="money">–</span></div>
+          </div>
+          <div class="result-footer">
+            <div class="line payout"><span class="label">Summe bei Pension</span><span id="alt_payout" class="money">–</span></div>
+            <div class="line"><span class="label">Monatliche Rente bei Auszahlung</span><span id="alt_monatslohn" class="money">–</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-grad">
+        <div class="card-inner">
+          <div class="group-title text-[18px] mb-3">3a Neu</div>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <label class="block space-y-1"><span>Rendite nominal <span class="text-gray-200 text-sm">%</span></span><input class="input-clean" id="neu_r" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Total Expense Ratio <span class="text-gray-200 text-sm">%</span></span><input class="input-clean" id="neu_ter" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Produktkosten pro Jahr <span class="text-gray-200 text-sm">%</span></span><input class="input-clean" id="neu_prod" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Ausgabeaufschlag <span class="text-gray-200 text-sm">%</span></span><input class="input-clean" id="neu_aa" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Ruecknahmekommission <span class="text-gray-200 text-sm">%</span></span><input class="input-clean" id="neu_rueckk" type="number" step="0.01" value="0"></label>
+            <label class="block space-y-1"><span>Mantelkosten <span class="text-gray-200 text-sm">%</span></span><input class="input-clean" id="neu_mantel" type="number" step="0.01" value="0"></label>
+            <label class="col-span-2 block space-y-1"><span>Honorar <span class="text-gray-200 text-sm">CHF</span></span><input class="input-clean" id="neu_fee" type="text" step="50" value="0"></label>
+          </div>
+
+          <div class="group-title text-[14px] mt-2 mb-2">Berechnungen</div>
+          <div class="space-y-0.5">
+            <div class="line cost"><span class="label">Bestehendes Kapital</span><span id="neu_best" class="money">–</span></div>
+            <div class="line cost"><span class="label">Neue Einzahlungen</span><span id="neu_ein_neu" class="money">–</span></div>
+            <div class="line cost"><strong class="label">Summe Einzahlungen total</strong><span id="neu_sum_ein" class="money">–</span></div>
+            <div class="line cost"><span class="label">Produktkosten p.a.</span><span id="neu_cost_prod" class="money">–</span></div>
+            <div class="line cost"><span class="label">TER-Kosten p.a.</span><span id="neu_cost_ter" class="money">–</span></div>
+            <div class="line cost"><span class="label">Ausgabeaufschlag</span><span id="neu_cost_aa" class="money">–</span></div>
+            <div class="line cost"><span class="label">Mantelkosten</span><span id="neu_cost_mantel" class="money">–</span></div>
+            <div class="line cost"><span class="label">Ruecknahmekommission</span><span id="neu_cost_rueckk" class="money">–</span></div>
+            <div class="line cost"><span class="label">Honorar</span><span id="neu_cost_fee" class="money">–</span></div>
+            <div class="line cost"><strong class="label">Gesamt</strong><span id="neu_cost_total" class="money">–</span></div>
+          </div>
+          <div class="result-footer">
+            <div class="line payout"><span class="label">Summe bei Pension</span><span id="neu_payout" class="money">–</span></div>
+            <div class="line"><span class="label">Monatliche Rente bei Auszahlung</span><span id="neu_monatslohn" class="money">–</span></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="grid gap-6 md:grid-cols-2 mt-8">
+      <div class="card card-soft md:col-span-2">
+        <div class="card-inner">
+          <div class="line"><span id="compare_sentence" class="money">–</span></div>
+          <div class="line"><span id="compare_sentence2" class="money">–</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex flex-col md:flex-row gap-3 items-center md:justify-center mt-6">
+      <button id="downloadPdfBtn"
+        class="export-btn"
+        style="background:linear-gradient(135deg,#79d862,#a9ef87);
+               color:#fff;border:none;border-radius:20px;
+               padding:14px 28px;font-weight:800;cursor:pointer;
+               box-shadow:0 6px 14px rgba(40,47,71,.15);">
+        PDF herunterladen
+      </button>
+    </div>
+
+    <p class="muted small text-center mt-10">Alle Angaben sind unverbindlich und basieren auf Zirka-Werten sowie vereinfachten, linearen Berechnungen. Abweichungen in der tatsächlichen Entwicklung sind möglich.</p>
+  </div>
+
+  <script>
+    const CHF = new Intl.NumberFormat('de-CH', { style:'currency', currency:'CHF', minimumFractionDigits:0, maximumFractionDigits:0 });
+    const $ = id => document.getElementById(id);
+
+    function unformatCurrency(str){ return Number(String(str).replace(/[^0-9-]/g,''))||0 }
+    function formatCurrency0(n){ const sign = n < 0 ? '-' : ''; let s = String(Math.floor(Math.abs(Number(n) || 0))); let out = ''; while (s.length > 3) { out = ' ' + s.slice(-3) + out; s = s.slice(0, -3); } out = s + out; return sign + out; }
+    function attachCurrencyFormatting(id){ const i=$(id); if(!i) return; i.addEventListener('input', ()=>{ const raw=unformatCurrency(i.value); i.value = formatCurrency0(raw); i.selectionStart=i.selectionEnd=i.value.length; }); i.addEventListener('blur', ()=>{ const raw=unformatCurrency(i.value); i.value = formatCurrency0(raw); }); }
+    function N(x){ const s=String(x).replace(/[\s'’]/g,'').replace(',', '.'); const v=parseFloat(s); return isNaN(v)?0:v }
+
+    function scenario({r, ter, prod, aa, rueckk, mantel, fee}, start, rate, years){
+      const contribYear = rate*12;
+      const netRate = (r - ter - prod)/100;
+      const aaCostYear = contribYear * (aa/100);
+      const netContribYear = contribYear - aaCostYear;
+      const mantelTotal = contribYear * years * (mantel/100);
+      let bal = start;
+      let terCost=0, prodCost=0;
+      for(let y=1; y<=years; y++){
+        const interest = bal * netRate;
+        const terC = bal * (ter/100);
+        const prodC = bal * (prod/100);
+        terCost += terC; prodCost += prodC;
+        bal = bal + netContribYear + interest;
+      }
+      const grossPayout = bal;
+      const rueckCost = grossPayout * (rueckk/100);
+      const totalPayout = Math.max(0, grossPayout - rueckCost - mantelTotal - fee);
+      const sumEinNeu = contribYear*years;
+      const costAA = aaCostYear*years;
+      const totalCosts = terCost + prodCost + costAA + mantelTotal + rueckCost + fee;
+      return { best:start, einNeu:sumEinNeu, sumEin:start+sumEinNeu, terCost, prodCost, costAA, mantelTotal, rueckCost, fee, totalCosts, payout:totalPayout, monatslohn: totalPayout/300 };
+    }
+
+    function solveRateForTarget(params, start, years, target){ let lo=0, hi=2000; const payout=m=>scenario(params, start, m, years).payout; let tries=0; while(payout(hi)<target && tries<20){ hi*=2; tries++; if(hi>50000) break } for(let i=0;i<40;i++){ const mid=(lo+hi)/2; if(payout(mid)>=target) hi=mid; else lo=mid } return hi }
+
+    function recalc(){ const start = unformatCurrency($("start").value); const rate = unformatCurrency($("rate").value); const years = Math.max(1, Math.floor(N($("years").value))); const rueck = unformatCurrency($("rueck").value);
+      const alt = scenario({ r:N($("alt_r").value), ter:N($("alt_ter").value), prod:N($("alt_prod").value), aa:N($("alt_aa").value), rueckk:N($("alt_rueckk").value), mantel:N($("alt_mantel").value), fee:unformatCurrency($("alt_fee").value) }, start, rate, years);
+      const neuParams = { r:N($("neu_r").value), ter:N($("neu_ter").value), prod:N($("neu_prod").value), aa:N($("neu_aa").value), rueckk:N($("neu_rueckk").value), mantel:N($("neu_mantel").value), fee:unformatCurrency($("neu_fee").value) };
+      const neu = scenario(neuParams, rueck, rate, years);
+      const set = (id,val)=>{ const el=$(id); if(el) el.textContent = CHF.format(val) };
+      set('alt_best', alt.best); set('alt_ein_neu', alt.einNeu); set('alt_sum_ein', alt.sumEin); set('alt_cost_prod', alt.prodCost); set('alt_cost_ter', alt.terCost); set('alt_cost_aa', alt.costAA); set('alt_cost_mantel', alt.mantelTotal); set('alt_cost_rueckk', alt.rueckCost); set('alt_cost_fee', alt.fee); set('alt_cost_total', alt.totalCosts); set('alt_payout', alt.payout); set('alt_monatslohn', alt.monatslohn);
+      set('neu_best', neu.best); set('neu_ein_neu', neu.einNeu); set('neu_sum_ein', neu.sumEin); set('neu_cost_prod', neu.prodCost); set('neu_cost_ter', neu.terCost); set('neu_cost_aa', neu.costAA); set('neu_cost_mantel', neu.mantelTotal); set('neu_cost_rueckk', neu.rueckCost); set('neu_cost_fee', neu.fee); set('neu_cost_total', neu.totalCosts); set('neu_payout', neu.payout); set('neu_monatslohn', neu.monatslohn);
+      const diff = neu.payout - alt.payout; const altTarget = alt.payout; const needRate = solveRateForTarget(neuParams, rueck, years, altTarget); const diffHTML = `<span class="accent">${CHF.format(Math.round(Math.abs(diff)))}</span>`; const rateHTML = `<span class="accent">${CHF.format(Math.round(needRate))}</span>`; let sentence = diff >= 0 ? `Du hast ${diffHTML} mehr Kapital als mit der alten Lösung – oder du zahlst nur noch ${rateHTML} pro Monat ein und würdest auf das gleiche Ergebnis kommen.` : `Du hast ${diffHTML} weniger Kapital als mit der alten Lösung – oder du müsstest ${rateHTML} pro Monat einzahlen, um auf das gleiche Ergebnis zu kommen.`; const s1=$("compare_sentence"); if(s1) s1.innerHTML = sentence;
+      const feeNeu = unformatCurrency($("neu_fee").value); const feeAlt = unformatCurrency($("alt_fee").value); const honorar = feeNeu || feeAlt; let sentence2 = ''; if (honorar > 0 && rate > 0) { const amortMonths = Math.ceil(honorar / rate); const monthsHTML = `<span class="accent">${amortMonths} Monate</span>`; const feeHTML = `<span class="accent">${CHF.format(honorar)}</span>`; const rateHTML2 = `<span class="accent">${CHF.format(rate)}</span>`; sentence2 = `Dein Honorar von ${feeHTML} ist mit einer monatlichen Einzahlung von ${rateHTML2} in ${monthsHTML} amortisiert.`; } else { sentence2 = `Trage oben Honorar und monatliche Rate ein, um die Amortisation zu sehen.`; } const s2=$("compare_sentence2"); if(s2) s2.innerHTML = sentence2; }
+
+    const inputIds = ['start','rate','years','rueck','alt_r','alt_ter','alt_prod','alt_aa','alt_rueckk','alt_mantel','alt_fee','neu_r','neu_ter','neu_prod','neu_aa','neu_rueckk','neu_mantel','neu_fee'];
+    inputIds.forEach(id => { const el=$(id); if(el) el.addEventListener('input', recalc) });
+    window.addEventListener('DOMContentLoaded', () => { ['start','rate','rueck','alt_fee','neu_fee'].forEach(id => { attachCurrencyFormatting(id); const el=$(id); if(el) el.value = formatCurrency0(unformatCurrency(el.value)); }); recalc(); });
+  </script>
+
+  <!-- PDF-Export -->
+  <script>
+    function loadScript(src){
+      return new Promise((resolve,reject)=>{
+        const s=document.createElement('script');
+        s.src=src; s.async=true; s.crossOrigin='anonymous'; s.referrerPolicy='no-referrer';
+        s.onload=resolve; s.onerror=()=>{ s.remove(); reject(new Error('load fail: '+src)); };
+        document.head.appendChild(s);
+      });
+    }
+
+    async function ensureHtml2Canvas(){
+      if(window.html2canvas) return;
+      const cdns=[
+        'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+        'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
+      ];
+      let lastErr;
+      for(const src of cdns){
+        try{ await loadScript(src); if(window.html2canvas) return; }
+        catch(e){ lastErr=e; }
+      }
+      throw (lastErr||new Error('html2canvas konnte nicht geladen werden'));
+    }
+
+    async function ensureJsPDF(){
+      if(window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+      const cdns = [
+        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+        'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'
+      ];
+      let lastErr;
+      for(const src of cdns){
+        try{ await loadScript(src); if(window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF; }
+        catch(e){ lastErr=e; }
+      }
+      throw (lastErr||new Error('jsPDF konnte nicht geladen werden'));
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      const pdfBtn=document.getElementById('downloadPdfBtn');
+      const exportBtns=document.querySelectorAll('.export-btn');
+      const hideButtons=()=>exportBtns.forEach(btn=>{ btn.dataset.prevDisplay=btn.style.display; btn.style.display='none'; });
+      const showButtons=()=>exportBtns.forEach(btn=>{ btn.style.display=btn.dataset.prevDisplay||''; });
+
+      if(pdfBtn){
+        pdfBtn.addEventListener('click', async ()=>{
+          const root=document.querySelector('.wrap');
+          if(!root) return;
+
+          const originalText=pdfBtn.textContent;
+          pdfBtn.disabled=true;
+          pdfBtn.textContent='PDF wird erstellt…';
+          hideButtons();
+
+          try{
+            const jsPDF = await ensureJsPDF();
+            await ensureHtml2Canvas();
+            await new Promise(r=>setTimeout(r,80));
+            const canvas = await html2canvas(root, {
+              scale:2,
+              backgroundColor:'#ffffff',
+              useCORS:true,
+              allowTaint:true,
+              logging:false,
+              windowWidth:root.scrollWidth,
+              windowHeight:root.scrollHeight
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p','pt','a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 24;
+            const maxWidth = pageWidth - margin * 2;
+            const maxHeight = pageHeight - margin * 2;
+            const ratio = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
+            const imgWidth = canvas.width * ratio;
+            const imgHeight = canvas.height * ratio;
+            const offsetX = (pageWidth - imgWidth) / 2;
+            const offsetY = (pageHeight - imgHeight) / 2;
+
+            pdf.addImage(imgData, 'PNG', offsetX, offsetY, imgWidth, imgHeight);
+            pdf.save('vemo-ergebnis.pdf');
+          } catch(e){
+            console.error(e);
+            alert('PDF-Export nicht verfügbar. Bitte erneut versuchen.');
+          } finally {
+            showButtons();
+            pdfBtn.disabled=false;
+            pdfBtn.textContent=originalText;
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
