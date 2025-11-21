@@ -168,10 +168,40 @@
     const CHF = new Intl.NumberFormat('de-CH', { style:'currency', currency:'CHF', minimumFractionDigits:0, maximumFractionDigits:0 });
     const $ = id => document.getElementById(id);
 
+    const STORAGE_KEY = 'vemo-3a-inputs';
     function unformatCurrency(str){ return Number(String(str).replace(/[^0-9-]/g,''))||0 }
     function formatCurrency0(n){ const sign = n < 0 ? '-' : ''; let s = String(Math.floor(Math.abs(Number(n) || 0))); let out = ''; while (s.length > 3) { out = ' ' + s.slice(-3) + out; s = s.slice(0, -3); } out = s + out; return sign + out; }
     function attachCurrencyFormatting(id){ const i=$(id); if(!i) return; i.addEventListener('input', ()=>{ const raw=unformatCurrency(i.value); i.value = formatCurrency0(raw); i.selectionStart=i.selectionEnd=i.value.length; }); i.addEventListener('blur', ()=>{ const raw=unformatCurrency(i.value); i.value = formatCurrency0(raw); }); }
     function N(x){ const s=String(x).replace(/[\s'’]/g,'').replace(',', '.'); const v=parseFloat(s); return isNaN(v)?0:v }
+
+    function saveInputs(){
+      const data = {};
+      const currencyIds = ['start','rate','rueck','alt_fee','neu_fee'];
+      inputIds.forEach(id => {
+        const el = $(id);
+        if(!el) return;
+        data[id] = currencyIds.includes(id) ? unformatCurrency(el.value) : el.value;
+      });
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) { /* ignore quota issues */ }
+    }
+
+    function restoreInputs(){
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const data = JSON.parse(raw);
+        const currencyIds = ['start','rate','rueck','alt_fee','neu_fee'];
+        inputIds.forEach(id => {
+          const el = $(id);
+          if(!el || data[id] === undefined) return;
+          if(currencyIds.includes(id)){
+            el.value = formatCurrency0(unformatCurrency(data[id]));
+          } else {
+            el.value = data[id];
+          }
+        });
+      } catch(e) { /* ignore JSON/parse issues */ }
+    }
 
     function scenario({r, ter, prod, aa, rueckk, mantel, fee}, start, rate, years){ const contribYear = rate*12; const netRate = (r - ter - prod)/100; const aaCostYear = contribYear * (aa/100); const netContribYear = contribYear - aaCostYear; const mantelTotal = contribYear * years * (mantel/100); let bal = start; let terCost=0, prodCost=0; for(let y=1; y<=years; y++){ const interest = bal * netRate; const terC = bal * (ter/100); const prodC = bal * (prod/100); terCost += terC; prodCost += prodC; bal = bal + netContribYear + interest; } const grossPayout = bal; const rueckCost = grossPayout * (rueckk/100); const totalPayout = Math.max(0, grossPayout - rueckCost - mantelTotal - fee); const sumEinNeu = contribYear*years; const costAA = aaCostYear*years; const totalCosts = terCost + prodCost + costAA + mantelTotal + rueckCost + fee; return { best:start, einNeu:sumEinNeu, sumEin:start+sumEinNeu, terCost, prodCost, costAA, mantelTotal, rueckCost, fee, totalCosts, payout:totalPayout, monatslohn: totalPayout/300 }; }
 
@@ -188,8 +218,13 @@
       const oldAnnual = rate*12; const newAnnual = needRate*12; const annualSave = Math.max(0, oldAnnual - newAnnual); let sentence2 = ''; if (annualSave > 0) { const feeNeu = unformatCurrency($("neu_fee").value); const monthlyContribution = rate; const amortMonthsRaw = monthlyContribution > 0 ? (feeNeu / monthlyContribution) : 0; const amortMonths = Math.max(0, Math.floor(amortMonthsRaw)); const monthsHTML = `<span class="accent">${amortMonths} Monate</span>`; const savePerYearHTML = `<span class="accent">${CHF.format(Math.round(annualSave))}</span>`; sentence2 = `Dein Honorar hast du nach ${monthsHTML} amortisiert; danach sparst du jährlich ${savePerYearHTML}, die du nicht mehr einzahlen musst.`; } else { sentence2 = `Mit deiner aktuellen Rate ergibt sich keine jährliche Einzahlungsreduktion gegenüber der alten Lösung.`; } const s2=$("compare_sentence2"); if(s2) s2.innerHTML = sentence2; }
 
     const inputIds = ['start','rate','years','rueck','alt_r','alt_ter','alt_prod','alt_aa','alt_rueckk','alt_mantel','alt_fee','neu_r','neu_ter','neu_prod','neu_aa','neu_rueckk','neu_mantel','neu_fee'];
-    inputIds.forEach(id => { const el=$(id); if(el) el.addEventListener('input', recalc) });
-    window.addEventListener('DOMContentLoaded', () => { ['start','rate','rueck','alt_fee','neu_fee'].forEach(id => { attachCurrencyFormatting(id); const el=$(id); if(el) el.value = formatCurrency0(unformatCurrency(el.value)); }); recalc(); });
+    inputIds.forEach(id => { const el=$(id); if(el) el.addEventListener('input', ()=>{ recalc(); saveInputs(); }); });
+    window.addEventListener('beforeunload', saveInputs);
+    window.addEventListener('DOMContentLoaded', () => {
+      restoreInputs();
+      ['start','rate','rueck','alt_fee','neu_fee'].forEach(id => { attachCurrencyFormatting(id); const el=$(id); if(el) el.value = formatCurrency0(unformatCurrency(el.value)); });
+      recalc();
+    });
   </script>
 
   <!-- PDF-Export: Auto-Loader + Click-Handler -->
