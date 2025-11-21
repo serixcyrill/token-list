@@ -21,6 +21,14 @@
     .small { font-size:.85rem }
     .disclaimer { font-size:.7rem }
 
+    .autosave-banner { display:flex; justify-content:flex-end; margin-bottom:12px; }
+    .autosave-chip { display:flex; align-items:center; gap:10px; background:linear-gradient(120deg,#76d062,#9cea7b); color:#fff; padding:12px 16px; border-radius:999px; box-shadow:0 8px 24px rgba(121,216,98,0.35); font-weight:700; min-width:260px; }
+    .autosave-dot { width:12px; height:12px; border-radius:50%; background:#fff; box-shadow:0 0 0 6px rgba(255,255,255,0.18); animation:pulse 2.4s infinite ease-in-out; }
+    .autosave-text { display:flex; flex-direction:column; line-height:1.2; }
+    .autosave-label { opacity:0.9; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.6px; }
+    .autosave-time { font-size:0.9rem; }
+    @keyframes pulse { 0%{ transform:scale(1); opacity:1 } 50%{ transform:scale(1.15); opacity:0.5 } 100%{ transform:scale(1); opacity:1 } }
+
     label span { font-size:.9rem; color:#5b6475 }
     .input-clean { width:100%; height:50px; background:#fff; border:1px solid #d7dce6; border-radius:20px; padding:12px 20px; font-size:16px; line-height:1.2; color:#282f47; text-align:right; outline:none }
     input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0 }
@@ -57,11 +65,21 @@
     input[type=number] { -moz-appearance:textfield; appearance:textfield }
   </style>
 </head>
-<body>
-  <div class="wrap">
+  <body>
+    <div class="wrap">
 
-    <section class="card kachel">
-      <div class="k-head">Eingaben</div>
+      <div class="autosave-banner">
+        <div class="autosave-chip" id="autosave-status">
+          <span class="autosave-dot" id="autosave-dot" aria-hidden="true"></span>
+          <div class="autosave-text">
+            <span class="autosave-label">Auto-Save aktiv</span>
+            <span class="autosave-time" id="autosave-time">Noch nichts gespeichert</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="card kachel">
+        <div class="k-head">Eingaben</div>
       <div class="k-body grid grid-cols-1 md:grid-cols-4 gap-3">
         <label class="block space-y-1"><span>Startkapital <span class="text-gray-400 text-sm">CHF</span></span><input class="input-clean" id="start" type="text" step="100" value="0"></label>
         <label class="block space-y-1"><span>Monatliche Rate <span class="text-gray-400 text-sm">CHF</span></span><input class="input-clean" id="rate" type="text" step="10" value="0"></label>
@@ -174,6 +192,21 @@
     function attachCurrencyFormatting(id){ const i=$(id); if(!i) return; i.addEventListener('input', ()=>{ const raw=unformatCurrency(i.value); i.value = formatCurrency0(raw); i.selectionStart=i.selectionEnd=i.value.length; }); i.addEventListener('blur', ()=>{ const raw=unformatCurrency(i.value); i.value = formatCurrency0(raw); }); }
     function N(x){ const s=String(x).replace(/[\s'’]/g,'').replace(',', '.'); const v=parseFloat(s); return isNaN(v)?0:v }
 
+    function formatSaveTime(ts){
+      if(!ts) return 'Noch nichts gespeichert';
+      const d = new Date(ts);
+      const time = d.toLocaleTimeString('de-CH', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      const date = d.toLocaleDateString('de-CH');
+      return `${date} · ${time}`;
+    }
+
+    function updateAutosaveStatus(ts){
+      const timeEl = $('autosave-time');
+      const chip = $('autosave-status');
+      if(!timeEl || !chip) return;
+      timeEl.textContent = `Zuletzt gespeichert: ${formatSaveTime(ts)}`;
+    }
+
     function saveInputs(){
       const data = {};
       const currencyIds = ['start','rate','rueck','alt_fee','neu_fee'];
@@ -182,13 +215,16 @@
         if(!el) return;
         data[id] = currencyIds.includes(id) ? unformatCurrency(el.value) : el.value;
       });
+      data.savedAt = Date.now();
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) { /* ignore quota issues */ }
+      updateAutosaveStatus(data.savedAt);
     }
 
     function restoreInputs(){
+      let savedAt;
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return;
+        if(!raw) return undefined;
         const data = JSON.parse(raw);
         const currencyIds = ['start','rate','rueck','alt_fee','neu_fee'];
         inputIds.forEach(id => {
@@ -200,7 +236,9 @@
             el.value = data[id];
           }
         });
+        savedAt = data.savedAt;
       } catch(e) { /* ignore JSON/parse issues */ }
+      return savedAt;
     }
 
     function scenario({r, ter, prod, aa, rueckk, mantel, fee}, start, rate, years){ const contribYear = rate*12; const netRate = (r - ter - prod)/100; const aaCostYear = contribYear * (aa/100); const netContribYear = contribYear - aaCostYear; const mantelTotal = contribYear * years * (mantel/100); let bal = start; let terCost=0, prodCost=0; for(let y=1; y<=years; y++){ const interest = bal * netRate; const terC = bal * (ter/100); const prodC = bal * (prod/100); terCost += terC; prodCost += prodC; bal = bal + netContribYear + interest; } const grossPayout = bal; const rueckCost = grossPayout * (rueckk/100); const totalPayout = Math.max(0, grossPayout - rueckCost - mantelTotal - fee); const sumEinNeu = contribYear*years; const costAA = aaCostYear*years; const totalCosts = terCost + prodCost + costAA + mantelTotal + rueckCost + fee; return { best:start, einNeu:sumEinNeu, sumEin:start+sumEinNeu, terCost, prodCost, costAA, mantelTotal, rueckCost, fee, totalCosts, payout:totalPayout, monatslohn: totalPayout/300 }; }
@@ -221,7 +259,8 @@
     inputIds.forEach(id => { const el=$(id); if(el) el.addEventListener('input', ()=>{ recalc(); saveInputs(); }); });
     window.addEventListener('beforeunload', saveInputs);
     window.addEventListener('DOMContentLoaded', () => {
-      restoreInputs();
+      const savedAt = restoreInputs();
+      updateAutosaveStatus(savedAt);
       ['start','rate','rueck','alt_fee','neu_fee'].forEach(id => { attachCurrencyFormatting(id); const el=$(id); if(el) el.value = formatCurrency0(unformatCurrency(el.value)); });
       recalc();
     });
