@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vemo Finanzplaner – Standalone</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --vemo-green: #76d062;
+        --vemo-dark: #0f172a;
+        --vemo-bg: #f4f5f7;
+        --card-bg: #ffffff;
+        --card-border: #e5e7eb;
+        --muted: #6b7280;
+        --error: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+        background: var(--vemo-bg);
+        color: var(--vemo-dark);
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .app-shell {
+        display: grid;
+        grid-template-columns: 240px 1fr 360px;
+        min-height: 100vh;
+      }
+
+      nav {
+        background: #0b1220;
+        color: #e5e7eb;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      nav h1 {
+        font-size: 18px;
+        margin: 0 0 8px;
+        color: #ffffff;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        transition: background 0.2s ease;
+        cursor: pointer;
+      }
+
+      .nav-item:hover,
+      .nav-item.active {
+        background: rgba(118, 208, 98, 0.15);
+        color: #ffffff;
+      }
+
+      header {
+        grid-column: 2 / 4;
+        padding: 18px 24px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--card-border);
+        background: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      header .actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.1s ease, box-shadow 0.2s ease;
+      }
+
+      .btn.primary {
+        background: var(--vemo-green);
+        color: #0b1220;
+        box-shadow: 0 8px 16px rgba(118, 208, 98, 0.25);
+      }
+
+      .btn.secondary {
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        color: var(--vemo-dark);
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .progress {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        padding: 16px 24px;
+        background: #ffffff;
+        border-bottom: 1px solid var(--card-border);
+      }
+
+      .progress-step {
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid var(--card-border);
+        background: var(--card-bg);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+      }
+
+      .progress-step.active {
+        border-color: var(--vemo-green);
+        box-shadow: 0 12px 24px rgba(118, 208, 98, 0.15);
+        color: var(--vemo-dark);
+      }
+
+      .badge {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: var(--vemo-green);
+      }
+
+      main {
+        padding: 20px 24px 32px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        border: 1px solid var(--card-border);
+        padding: 16px;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.04);
+        display: grid;
+        gap: 10px;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .status.valid {
+        color: #16a34a;
+      }
+
+      .status.open {
+        color: var(--muted);
+      }
+
+      .status.error {
+        color: var(--error);
+      }
+
+      .field-list {
+        display: grid;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .info-panel {
+        padding: 20px;
+        background: #0f172a;
+        color: #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .info-panel h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .metric-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .metric {
+        background: rgba(255, 255, 255, 0.06);
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .metric .label {
+        font-size: 12px;
+        color: #cbd5e1;
+      }
+
+      .metric .value {
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .table th,
+      .table td {
+        padding: 8px 6px;
+        border-bottom: 1px solid var(--card-border);
+        text-align: left;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      @media (max-width: 1280px) {
+        .app-shell {
+          grid-template-columns: 200px 1fr;
+        }
+        header {
+          grid-column: 2 / 3;
+        }
+        .info-panel {
+          display: none;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+        nav {
+          flex-direction: row;
+          overflow-x: auto;
+        }
+        header {
+          grid-column: 1 / 2;
+        }
+        .progress {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <nav>
+        <h1>Vemo Planner</h1>
+        <div class="nav-item active"><span>📇</span><span>Kontakte</span></div>
+        <div class="nav-item"><span>📁</span><span>Mandate</span></div>
+        <div class="nav-item"><span>✅</span><span>Tätigkeiten</span></div>
+        <div class="nav-item"><span>📄</span><span>Dokumente</span></div>
+        <div class="nav-item"><span>🧭</span><span>Produkte</span></div>
+        <div class="nav-item"><span>📊</span><span>Analysen</span></div>
+      </nav>
+
+      <div style="grid-column: 2 / 4; display: contents">
+        <header>
+          <div>
+            <div class="muted" style="font-size: 12px">Financial Planner</div>
+            <div style="font-weight: 700; font-size: 18px">Haushalt Muster – Basisplan</div>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" onclick="exportPlan()">Export PDF</button>
+            <button class="btn primary" onclick="runEngine()">Simulation aktualisieren</button>
+          </div>
+        </header>
+
+        <div class="progress" id="progress"></div>
+
+        <main id="cards"></main>
+      </div>
+
+      <aside class="info-panel">
+        <h3>Ergebnisse & Hinweise</h3>
+        <div class="metric-grid" id="metrics"></div>
+        <div class="card" style="background: rgba(255,255,255,0.04); border: none; color: #e5e7eb">
+          <div class="card-header">
+            <div class="card-title" style="color: #ffffff">Simulation</div>
+            <span class="badge" aria-hidden="true"></span>
+          </div>
+          <p class="muted" style="color: #cbd5e1">Änderungen werden automatisch berechnet. Kennzahlen basieren auf den Eingaben aus ANWEISUNG 1 & 2.</p>
+        </div>
+      </aside>
+    </div>
+
+    <script type="module">
+      // Eingabe-JSON aus ANWEISUNG 1
+      const defaultPlanInput = {
+        meta: { version: '1.0', währung: 'CHF', land: 'CH' },
+        planung: {
+          startjahr: 2025,
+          planungsHorizontJahre: 40,
+          standardRentenalter: 65,
+          berechnungsIntervall: 'jahr',
+          inflationAllgemein: 0.008,
+          inflationEinkommen: 0.008,
+          inflationAusgaben: 0.008,
+          renditeLiquideMittel: 0.01,
+          renditeVorsorge: 0.02,
+          renditeAnlagen: 0.03,
+        },
+        personen: [
+          {
+            id: 'person1',
+            rolle: 'hauptperson',
+            nameAnzeigename: 'Herr Muster',
+            geburtsdatum: '1975-11-06',
+            geschlecht: 'm',
+            zivilstand: 'ledig',
+            anzahlKinder: 1,
+            ahvFehljahre: 0,
+            steuerGemeindePLZ: '8000',
+            einkommen: {
+              nettoMonat: 6000,
+              monatsAusgaben: 5000,
+              liquidesVermoegenStart: 0,
+              weitereEinkommenQuellen: [
+                {
+                  id: 'nebenjob1',
+                  bezeichnung: 'Nebenerwerb',
+                  betragProJahr: 0,
+                  startjahr: 2025,
+                  endjahr: 9999,
+                  steuerbar: true,
+                },
+              ],
+              vermoegensZufluss: [
+                { id: 'erbschaft1', jahr: 2030, betrag: 0, beschreibung: 'Vermoegenszufluss' },
+              ],
+            },
+            vorsorgeKonten: {
+              liquideMittel: { saldoStart: 0, rendite: 0.01 },
+              saeule3aBank: { aktiv: true, saldoHeute: 0, jahresEinzahlung: 0, rendite: 0.015, auszahlungsJahr: 2040 },
+              saeule3aVersicherung: { aktiv: false, praemieJahr: 0, erlebensfallSumme: 0, renditeIntern: 0.01, auszahlungsJahr: 2040 },
+              saeule3bLebensversicherung: { aktiv: false, praemieJahr: 0, erlebensfallSumme: 0, renditeIntern: 0.01, auszahlungsJahr: 2040 },
+              pensionskasse: {
+                pkAusweisVorhanden: false,
+                koordinierterLohn: 0,
+                jahresBeitragArbeitnehmer: 0,
+                jahresBeitragArbeitgeber: 0,
+                altersGuthabenHeute: 0,
+                technischerZins: 0.01,
+                umwandlungsSatz: 0.065,
+              },
+            },
+            risikoParameter: {
+              krankheitLohnfortzahlung: { dauerWochen: 3, prozentVomLohn: 0.8 },
+              krankentaggeld: { wartefristTage: 3, prozentVomMassgebendenLohn: 0.8, maximaleDauerTage: 720 },
+              todesfallLeistungen: {
+                pkPartnerrenteJahr: 0,
+                pkWaisenrenteProKindJahr: 0,
+                ahvHinterlassenenRenteJahr: 0,
+                privateTodesfallKapitalien: [{ id: 'todesfallPolice1', betrag: 0, beschreibung: 'Todesfallversicherung' }],
+              },
+              erwerbsunfaehigkeitLeistungen: { pkInvalidenrenteJahr: 0, ahvIvRenteJahr: 0, privateInvalidenrenteJahr: 0 },
+            },
+            anlageProfil: {
+              fragebogenPunkte: 0,
+              anlageStrategieName: '',
+              risikoToleranz: 'mittel',
+              anlageHorizontJahre: 20,
+              ausschlussProdukte: [],
+              ausschlussBranchen: [],
+            },
+          },
+        ],
+        liegenschaft: {
+          aktiv: false,
+          verkehrswert: 0,
+          eigenmittel: 0,
+          bruttoEinkommenHaushaltJahr: 0,
+          imputierterZinsSatz: 0.05,
+          amortisationSatz: 0.01,
+          unterhaltSatz: 0.01,
+        },
+        einstellungenAusgabe: {
+          erstesAusgabeJahr: 2025,
+          widgetsLayout: 'zweispaltig',
+          steuernBerechnen: true,
+          sozialversicherungenBerechnen: true,
+        },
+      };
+
+      // Schrittdefinitionen in Vemo-Stil
+      const steps = [
+        {
+          id: 'bedarf',
+          title: 'Bedarf',
+          description: 'Stammdaten und Grundannahmen',
+          status: 'active',
+          cards: [
+            {
+              title: 'Zivilstand & Personendaten',
+              status: 'valid',
+              fields: ['Zivilstand', 'Geschlecht', 'Geburtsdatum', 'AHV-Fehljahre'],
+            },
+            {
+              title: 'Kontakt & Plan',
+              status: 'open',
+              fields: ['Adresse', 'E-Mail', 'Telefon', 'Beratungsdatum', 'Planname'],
+            },
+            {
+              title: 'Einkommen & Ausgaben',
+              status: 'valid',
+              fields: ['Netto-Monatseinkommen', 'Monatsausgaben', 'Liquides Vermögen Start'],
+            },
+            {
+              title: 'Weitere Einkünfte & Steuer-PLZ',
+              status: 'open',
+              fields: ['Weitere Einkünfte', 'PLZ Steuer-Gemeinde'],
+            },
+          ],
+        },
+        {
+          id: 'einkommen',
+          title: 'Einkommen & Vermögen',
+          description: 'Assets, Hypotheken und Vorsorge',
+          status: 'open',
+          cards: [
+            { title: 'Liegenschaften', status: 'open', fields: ['Verkehrswert', 'Eigenmietwert', 'imputierter Zins'] },
+            { title: 'Hypotheken', status: 'open', fields: ['Fremdkapital', 'Amortisation'] },
+            { title: 'Säule 3a', status: 'open', fields: ['Saldo', 'Einzahlung', 'Rendite'] },
+            { title: 'Säule 3b', status: 'open', fields: ['Lebensversicherungen', 'Sparversicherungen'] },
+            { title: 'Wünsche & Zuflüsse', status: 'open', fields: ['Vermögenszuflüsse', 'PK-Ausweise'] },
+          ],
+        },
+        {
+          id: 'risiko',
+          title: 'Risikoprofil & Ziele',
+          description: 'Fragebogen, Formalitäten, Finanzziele',
+          status: 'open',
+          cards: [
+            { title: 'Risiko-Fragebogen', status: 'open', fields: ['~9 Fragen', 'Punktesumme'] },
+            { title: 'Anlageziele & Ausschlüsse', status: 'open', fields: ['Anlagezweck', 'Horizont', 'Ausschlüsse'] },
+            { title: 'Formalitäten', status: 'open', fields: ['Bestätigungen', 'Broschüren'] },
+            { title: 'Finanzziele', status: 'open', fields: ['Zielrentenalter', 'Ja/Nein Ziele'] },
+          ],
+        },
+        {
+          id: 'vorsorge',
+          title: 'Vorsorgedaten & Simulation',
+          description: 'Leistungen, Empfehlungen, Tragbarkeit',
+          status: 'open',
+          cards: [
+            { title: 'Leistungen', status: 'open', fields: ['Krankentaggeld', 'Todesfall', 'Erwerbsunfähigkeit'] },
+            { title: 'Anlageempfehlungen', status: 'open', fields: ['Anlageart', 'Erwartete Entwicklung'] },
+            { title: 'Dokumente & Einstellungen', status: 'open', fields: ['Uploads', 'Planungshorizont', 'Ausgabejahr'] },
+            { title: 'Tragbarkeit Liegenschaft', status: 'open', fields: ['Kosten Wohnen', 'Tragbarkeitsquote'] },
+          ],
+        },
+      ];
+
+      // Vereinfachte Rechenengine (orientiert an ANWEISUNG 2)
+      function calculatePlan(input) {
+        const { planung, personen, liegenschaft } = input;
+        const jahre = [];
+        const personState = new Map();
+
+        personen.forEach((p) => {
+          personState.set(p.id, {
+            liquide: p.einkommen.liquidesVermoegenStart ?? 0,
+          });
+        });
+
+        for (let jahrIndex = 0; jahrIndex < planung.planungsHorizontJahre; jahrIndex++) {
+          const kalenderjahr = planung.startjahr + jahrIndex;
+          const personOutputs = [];
+          let haushaltEinkommen = 0;
+          let haushaltAusgaben = 0;
+          let haushaltVermoegen = 0;
+
+          for (const person of personen) {
+            const alter = computeAge(person.geburtsdatum, kalenderjahr);
+            const phase = alter >= planung.standardRentenalter ? 'rente' : 'erwerb';
+            const state = personState.get(person.id);
+
+            const inflE = Math.pow(1 + planung.inflationEinkommen, jahrIndex);
+            const inflA = Math.pow(1 + planung.inflationAusgaben, jahrIndex);
+
+            const nettoEinkommenJahr = phase === 'erwerb' ? person.einkommen.nettoMonat * 12 * inflE : 0;
+            const weitereEinkommenJahr = person.einkommen.weitereEinkommenQuellen
+              .filter((q) => kalenderjahr >= q.startjahr && kalenderjahr <= q.endjahr)
+              .reduce((sum, q) => sum + q.betragProJahr, 0);
+            const gesamtNettoEinkommenJahr = nettoEinkommenJahr + weitereEinkommenJahr;
+
+            const lebenshaltungJahr = person.einkommen.monatsAusgaben * 12 * inflA;
+            const steuernJahr = 0; // Platzhalter für Steuerlogik
+            const sparquoteJahr = gesamtNettoEinkommenJahr - lebenshaltungJahr - steuernJahr;
+
+            const zufluss = person.einkommen.vermoegensZufluss
+              .filter((z) => z.jahr === kalenderjahr)
+              .reduce((sum, z) => sum + z.betrag, 0);
+
+            const liquideMittelAnfang = state.liquide;
+            const liquideMittelEnde =
+              liquideMittelAnfang * (1 + planung.renditeLiquideMittel) + sparquoteJahr + zufluss;
+            state.liquide = liquideMittelEnde;
+
+            const personOutput = {
+              personId: person.id,
+              alter,
+              phase,
+              einkommen: {
+                nettoEinkommenJahr,
+                weitereEinkommenJahr,
+                gesamtNettoEinkommenJahr,
+              },
+              ausgaben: {
+                lebenshaltungJahr,
+                steuernJahr,
+                gesamtAusgabenJahr: lebenshaltungJahr + steuernJahr,
+              },
+              cashflow: {
+                sparquoteJahr,
+                sonderZahlungenJahr: 0,
+              },
+              vermoegen: {
+                liquideMittelAnfang,
+                liquideMittelEnde,
+                saeule3aBankAnfang: person.vorsorgeKonten.saeule3aBank.saldoHeute,
+                saeule3aBankEnde: person.vorsorgeKonten.saeule3aBank.saldoHeute,
+                saeule3aVersicherungWert: person.vorsorgeKonten.saeule3aVersicherung.erlebensfallSumme,
+                saeule3bWert: person.vorsorgeKonten.saeule3bLebensversicherung.erlebensfallSumme,
+                pensionskasseAltersguthaben: person.vorsorgeKonten.pensionskasse.altersGuthabenHeute,
+              },
+              renteLeistungen: {
+                ahvRenteJahr: phase === 'rente' ? nettoEinkommenJahr * 0.6 : 0,
+                pkAltersrenteJahr: 0,
+                sonstigeRentenJahr: 0,
+              },
+              szenarien: {
+                basis: {
+                  einkommenJahr: gesamtNettoEinkommenJahr,
+                  ausgabenJahr: lebenshaltungJahr,
+                  steuernJahr,
+                  vermoegenEndeJahr: liquideMittelEnde,
+                },
+                erwerbsunfaehigkeit: {
+                  einkommenJahr: 0,
+                  rentenJahr: person.risikoParameter.erwerbsunfaehigkeitLeistungen.pkInvalidenrenteJahr,
+                  gesamtMittelJahr: person.risikoParameter.erwerbsunfaehigkeitLeistungen.pkInvalidenrenteJahr,
+                  deckungsgrad:
+                    lebenshaltungJahr > 0
+                      ? person.risikoParameter.erwerbsunfaehigkeitLeistungen.pkInvalidenrenteJahr / lebenshaltungJahr
+                      : 0,
+                },
+                todesfall: {
+                  rentenJahr: person.risikoParameter.todesfallLeistungen.pkPartnerrenteJahr,
+                  kapitalisiert: person.risikoParameter.todesfallLeistungen.privateTodesfallKapitalien.reduce(
+                    (s, k) => s + k.betrag,
+                    0
+                  ),
+                  deckungsgrad:
+                    lebenshaltungJahr > 0
+                      ? person.risikoParameter.todesfallLeistungen.pkPartnerrenteJahr / lebenshaltungJahr
+                      : 0,
+                },
+              },
+            };
+
+            personOutputs.push(personOutput);
+            haushaltEinkommen += gesamtNettoEinkommenJahr;
+            haushaltAusgaben += lebenshaltungJahr + steuernJahr;
+            haushaltVermoegen += liquideMittelEnde;
+          }
+
+          jahre.push({
+            jahrIndex,
+            kalenderjahr,
+            personen: personOutputs,
+            haushalt: {
+              gesamtVermoegenEndeJahr: haushaltVermoegen,
+              gesamtEinkommenNettoJahr: haushaltEinkommen,
+              gesamtAusgabenJahr: haushaltAusgaben,
+            },
+          });
+        }
+
+        const tragbarkeit = calculateTragbarkeit(input.liegenschaft);
+        const kennzahlen = summarizeKennzahlen(jahre);
+
+        return {
+          meta: { version: '1.0', berechnungsIntervall: 'jahr' },
+          jahre,
+          tragbarkeit,
+          kennzahlen,
+        };
+      }
+
+      function computeAge(geburtsdatum, kalenderjahr) {
+        const dob = new Date(geburtsdatum);
+        const endOfYear = new Date(`${kalenderjahr}-12-31T00:00:00Z`);
+        let age = endOfYear.getUTCFullYear() - dob.getUTCFullYear();
+        const hasBirthdayPassed =
+          endOfYear.getUTCMonth() > dob.getUTCMonth() ||
+          (endOfYear.getUTCMonth() === dob.getUTCMonth() && endOfYear.getUTCDate() >= dob.getUTCDate());
+        if (!hasBirthdayPassed) age -= 1;
+        return age;
+      }
+
+      function calculateTragbarkeit(liegenschaft) {
+        if (!liegenschaft.aktiv) {
+          return {
+            verkehrswert: liegenschaft.verkehrswert,
+            eigenmittel: liegenschaft.eigenmittel,
+            fremdkapital: 0,
+            jahresKostenWohnen: 0,
+            tragbarkeitsQuote: 0,
+            tragbarNachBankstandard: true,
+          };
+        }
+
+        const fremdkapital = Math.max(liegenschaft.verkehrswert - liegenschaft.eigenmittel, 0);
+        const jahresKostenWohnen =
+          fremdkapital * liegenschaft.imputierterZinsSatz +
+          fremdkapital * liegenschaft.amortisationSatz +
+          liegenschaft.verkehrswert * liegenschaft.unterhaltSatz;
+        const tragbarkeitsQuote =
+          liegenschaft.bruttoEinkommenHaushaltJahr > 0
+            ? jahresKostenWohnen / liegenschaft.bruttoEinkommenHaushaltJahr
+            : 0;
+        const tragbarNachBankstandard =
+          tragbarkeitsQuote <= 0.33 && liegenschaft.eigenmittel >= liegenschaft.verkehrswert * 0.2;
+
+        return {
+          verkehrswert: liegenschaft.verkehrswert,
+          eigenmittel: liegenschaft.eigenmittel,
+          fremdkapital,
+          jahresKostenWohnen,
+          tragbarkeitsQuote,
+          tragbarNachBankstandard,
+        };
+      }
+
+      function summarizeKennzahlen(jahre) {
+        const letzte = jahre[jahre.length - 1]?.haushalt ?? { gesamtVermoegenEndeJahr: 0 };
+        const vermögenBeiPensionierung = jahre.find((j) => j.personen.some((p) => p.phase === 'rente'))?.haushalt
+          ?.gesamtVermoegenEndeJahr;
+        return {
+          vermögenBeiPensionierung: vermögenBeiPensionierung ?? 0,
+          vermögenMit80: jahre.find((j) => j.kalenderjahr === 2055)?.haushalt?.gesamtVermoegenEndeJahr ?? 0,
+          vermögenMit90: jahre.find((j) => j.kalenderjahr === 2065)?.haushalt?.gesamtVermoegenEndeJahr ?? 0,
+          jahrMitGeldAufgebraucht: letzte.gesamtVermoegenEndeJahr > 0 ? null : jahre.find((j) => j.haushalt.gesamtVermoegenEndeJahr <= 0)?.kalenderjahr ?? null,
+        };
+      }
+
+      // Rendering
+      function renderSteps() {
+        const progress = document.getElementById('progress');
+        progress.innerHTML = steps
+          .map(
+            (step) => `
+          <div class="progress-step ${step.status === 'active' ? 'active' : ''}">
+            <span class="badge" aria-hidden="true"></span>
+            <div>
+              <div style="font-weight: 700">${step.title}</div>
+              <div class="muted" style="font-size: 12px">${step.description}</div>
+            </div>
+          </div>
+        `
+          )
+          .join('');
+
+        const cards = document.getElementById('cards');
+        cards.innerHTML = steps
+          .flatMap((step) =>
+            step.cards.map(
+              (card) => `
+              <article class="card">
+                <div class="card-header">
+                  <h3 class="card-title">${card.title}</h3>
+                  <span class="status ${card.status}">${card.status}</span>
+                </div>
+                <div class="field-list">${card.fields.map((f) => `<span>• ${f}</span>`).join('')}</div>
+                <div style="display:flex; gap:8px; justify-content:flex-end;">
+                  <button class="btn secondary" style="padding:8px 10px; font-size:12px;">Speichern</button>
+                  <button class="btn primary" style="padding:8px 10px; font-size:12px;">Weiter</button>
+                </div>
+              </article>
+            `
+            )
+          )
+          .join('');
+      }
+
+      function renderMetrics(output) {
+        const metrics = document.getElementById('metrics');
+        metrics.innerHTML = `
+          <div class="metric">
+            <div class="label">Vermögen Jahr 1</div>
+            <div class="value">CHF ${formatNumber(output.jahre[0].haushalt.gesamtVermoegenEndeJahr)}</div>
+          </div>
+          <div class="metric">
+            <div class="label">Vermögen bei Pensionierung</div>
+            <div class="value">CHF ${formatNumber(output.kennzahlen.vermögenBeiPensionierung)}</div>
+          </div>
+          <div class="metric">
+            <div class="label">Vermögen mit 80</div>
+            <div class="value">CHF ${formatNumber(output.kennzahlen.vermögenMit80)}</div>
+          </div>
+          <div class="metric">
+            <div class="label">Tragbarkeitsquote</div>
+            <div class="value">${(output.tragbarkeit.tragbarkeitsQuote * 100).toFixed(1)}%</div>
+          </div>
+        `;
+      }
+
+      function formatNumber(num) {
+        return Math.round(num).toLocaleString('de-CH');
+      }
+
+      function runEngine() {
+        const output = calculatePlan(defaultPlanInput);
+        renderMetrics(output);
+        renderHouseholdTable(output.jahre.slice(0, 5));
+      }
+
+      function renderHouseholdTable(years) {
+        const tableCard = document.createElement('article');
+        tableCard.className = 'card';
+        tableCard.innerHTML = `
+          <div class="card-header">
+            <h3 class="card-title">Haushalts-Simulation (erste 5 Jahre)</h3>
+            <span class="status valid">Live</span>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>Jahr</th><th>Einkommen</th><th>Ausgaben</th><th>Vermögen Ende</th></tr>
+            </thead>
+            <tbody>
+              ${years
+                .map(
+                  (y) => `
+                  <tr>
+                    <td>${y.kalenderjahr}</td>
+                    <td>CHF ${formatNumber(y.haushalt.gesamtEinkommenNettoJahr)}</td>
+                    <td>CHF ${formatNumber(y.haushalt.gesamtAusgabenJahr)}</td>
+                    <td>CHF ${formatNumber(y.haushalt.gesamtVermoegenEndeJahr)}</td>
+                  </tr>
+                `
+                )
+                .join('')}
+            </tbody>
+          </table>
+        `;
+
+        const cards = document.getElementById('cards');
+        const existingTable = document.getElementById('household-table');
+        if (existingTable) existingTable.remove();
+        tableCard.id = 'household-table';
+        cards.prepend(tableCard);
+      }
+
+      function exportPlan() {
+        const blob = new Blob([JSON.stringify(defaultPlanInput, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'finanzplan-eingabe.json';
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+
+      renderSteps();
+      runEngine();
+    </script>
+  </body>
+</html>
