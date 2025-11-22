@@ -387,6 +387,7 @@
           var a=state.a; var arr=[];
           arr.push({ id:'provider', type:'single', title:'Bei welcher Gesellschaft befindet sich deine 3a-Lösung', options:[{value:'bank',label:'Banklösung',sub:'Depot oder Säule 3a Konto'},{value:'insurance',label:'Versicherung',sub:'Policengebundene 3a-Lösung'}] });
           arr.push({ id:'duration', type:'dropdown', title:'Wie viele Jahre läuft deine Lösung noch', options:[{value:'1-5',label:'1 bis 5 Jahre'},{value:'6-10',label:'6 bis 10 Jahre'},{value:'11-15',label:'11 bis 15 Jahre'},{value:'16-20',label:'16 bis 20 Jahre'},{value:'20+',label:'Mehr als 20 Jahre'}] });
+          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein', slider:{min:50,max:1500,step:10,unit:'CHF',decimals:0,format:'chf'} });
           arr.push({ id:'invest_eq', type:'slider', title:'Wie stark ist dein Guthaben in Aktienfonds investiert', slider:{min:0,max:99,step:0.1,unit:'%'} });
           if(isNum(a.invest_eq) && a.invest_eq<99){
             arr.push({ id:'rest_bucket', type:'single', title:'Wohin fliesst der Restanteil, der nicht investiert ist', options:[{value:'bonds',label:'Obligationen'},{value:'tech_rate',label:'Technischer Zins'},{value:'cash',label:'Geldkonto / Währung'}] });
@@ -406,9 +407,16 @@
 
         function sliderUI(q,key){
           var val=state.a[key]; var isUnknown=(val==='unknown'); var num=isNum(val)?val:q.slider.min; if(val===undefined){ state.a[key]=num; }
+          var decimals=typeof q.slider.decimals==='number'?q.slider.decimals:1;
+          function fmt(v){
+            if(q.slider.format==='chf'){
+              return 'CHF '+Number(v).toLocaleString('de-CH', {maximumFractionDigits:decimals, minimumFractionDigits:decimals});
+            }
+            return parseFloat(v).toFixed(decimals)+(q.slider.unit||'');
+          }
           var slider=h('input',{class:'input',type:'range',min:q.slider.min,max:q.slider.max,step:q.slider.step,value:num});
           slider.style.setProperty('--val', ((num - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%');
-          var label=h('div',{}, isUnknown?'Unklar':(parseFloat(num).toFixed(1)+q.slider.unit));
+          var label=h('div',{}, isUnknown?'Unklar':fmt(num));
           var info=null;
           if(q.info){ info=h('button',{class:'info-badge','data-tip':q.info,type:'button','aria-label':'Info zu Gebühren'},'i'); }
           var row=h('div',{class:'inline'}, slider);
@@ -416,9 +424,9 @@
           if(info){ meta.appendChild(info); }
           var unklar=h('label',{class:'unklar'}, h('input',{type:'checkbox'}), h('span',{},'Unklar'));
           var chk=unklar.querySelector('input'); chk.checked=isUnknown;
-          function apply(){ if(chk.checked){ slider.setAttribute('disabled',''); label.textContent='Unklar'; } else { slider.removeAttribute('disabled'); label.textContent=parseFloat(slider.value).toFixed(1)+q.slider.unit; } }
+          function apply(){ if(chk.checked){ slider.setAttribute('disabled',''); label.textContent='Unklar'; } else { slider.removeAttribute('disabled'); label.textContent=fmt(slider.value); } }
           apply();
-          slider.addEventListener('input', function(e){ var v=parseFloat(e.target.value); state.a[key]=v; slider.style.setProperty('--val', ((v - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%'); if(!chk.checked){ label.textContent=v.toFixed(1)+q.slider.unit; } });
+          slider.addEventListener('input', function(e){ var v=parseFloat(e.target.value); state.a[key]=v; slider.style.setProperty('--val', ((v - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%'); if(!chk.checked){ label.textContent=fmt(v); } });
           slider.addEventListener('change', function(){ if(!chk.checked){ state.a[key]=parseFloat(slider.value); } render(); });
           chk.addEventListener('change', function(){ state.a[key]=chk.checked?'unknown':parseFloat(slider.value); apply(); render(); });
           var wrap=h('div',{}); wrap.appendChild(row); wrap.appendChild(meta); wrap.appendChild(unklar); return wrap;
@@ -472,6 +480,42 @@
           return { warns:warns, positives:positives };
         }
 
+        function durationYears(key){
+          var map={ '1-5':5, '6-10':8, '11-15':13, '16-20':18, '20+':25 };
+          return map[key]||null;
+        }
+
+        function futureValueMonthly(payment, years, annualRate){
+          var months=years*12; var r=annualRate/12;
+          if(!r){ return payment*months; }
+          return payment*((Math.pow(1+r, months)-1)/r);
+        }
+
+        function formatCHF(val){
+          return 'CHF '+Math.round(val).toLocaleString('de-CH');
+        }
+
+        function buildProjection(a){
+          var years=durationYears(a.duration);
+          if(!years || !isNum(a.monthly_contribution)) return null;
+          var monthly=a.monthly_contribution;
+          var gross=0.073; var lowFee=0.006; var highFee=0.02;
+          var netLow=gross-lowFee, netHigh=gross-highFee;
+          var withLowFees=futureValueMonthly(monthly, years, netLow);
+          var withHighFees=futureValueMonthly(monthly, years, netHigh);
+          var paidIn=monthly*12*years;
+          var diff=withLowFees - withHighFees;
+          return {
+            years:years,
+            monthly:monthly,
+            paidIn:paidIn,
+            lowFeeEnd:withLowFees,
+            highFeeEnd:withHighFees,
+            diff:diff,
+            rates:{ gross:gross, netLow:netLow, netHigh:netHigh, lowFee:lowFee, highFee:highFee }
+          };
+        }
+
         function axisUI(axes){
           var wrap=h('div',{class:'axis-wrap'}, h('div',{class:'axis-list'}));
           var list=wrap.firstChild;
@@ -483,6 +527,24 @@
             list.appendChild(row);
           }
           return wrap;
+        }
+
+        function projectionUI(p){
+          var lowNetPct=(p.rates.netLow*100).toFixed(1)+'%';
+          var highNetPct=(p.rates.netHigh*100).toFixed(1)+'%';
+          var lowFeePct=(p.rates.lowFee*100).toFixed(1)+'%';
+          var highFeePct=(p.rates.highFee*100).toFixed(1)+'%';
+          return h('div',{class:'panel'},
+            h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
+            h('p',{class:'subtitle',style:'margin:0 0 4px;font-size:14px;'}, 'Bei deiner Laufzeit können Gebühren im Zinseszinseffekt eine Auswirkung von rund '+formatCHF(p.diff)+' haben. Hol dir eine zweite Meinung.'),
+            h('p',{class:'subtitle',style:'margin:0 0 12px;font-size:13px;'}, 'Spannweite bei angenommener 7.3% Rendite: '+lowFeePct+' bis '+highFeePct+' Gebühren (netto ca. '+lowNetPct+' bis '+highNetPct+').'),
+            h('div',{class:'axis-list'},
+              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'},'Monatliche Einzahlung'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.monthly))),
+              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'},'Eingezahlt über '+p.years+' Jahre'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.paidIn))),
+              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'}, 'Erwartetes Ergebnis bei 7.3% Rendite und '+lowFeePct+' Gebühren (netto ca. '+lowNetPct+')'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.lowFeeEnd))),
+              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'}, 'Erwartetes Ergebnis bei 7.3% Rendite und '+highFeePct+' Gebühren (netto ca. '+highNetPct+')'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.highFeeEnd)))
+            )
+          );
         }
 
         function sourcesUI(){
@@ -509,6 +571,8 @@
             var gaugePanel=h('div',{class:'panel center'}, gauge(r.total,r.stroke,r.emoji), h('div',{class:'verdict'}, r.verdict));
             var axesPanel=h('div',{class:'panel'}, h('h3',{style:'margin:0 0 12px;font-size:16px;'},'Score nach Kategorien'), axisUI(r.axes));
             results.appendChild(gaugePanel); results.appendChild(axesPanel);
+            var proj=buildProjection(state.a);
+            if(proj){ results.appendChild(projectionUI(proj)); }
 
             var t=r.tips; var details=h('div',{class:'content stack'});
             if(state.details){
