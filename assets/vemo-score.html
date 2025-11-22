@@ -255,6 +255,17 @@
     .info-badge:hover::after, .info-badge:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
     .info-badge:hover::before, .info-badge:focus-visible::before { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    @media (max-width: 640px) {
+      .info-badge::after {
+        left: 50vw;
+        transform: translate(-50%, 6px);
+        width: calc(100vw - 28px);
+        max-width: none;
+      }
+      .info-badge::before { display: none; }
+      .info-badge:hover::after, .info-badge:focus-visible::after { transform: translate(-50%, 0); }
+    }
+
     .header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 
     .btnrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px 20px; }
