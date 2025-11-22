@@ -96,8 +96,8 @@
 
     .eyebrow.float {
       position: absolute;
-      top: -22px;
-      right: 0;
+      top: -30px;
+      right: 12px;
       box-shadow: 0 10px 24px rgba(118,208,98,0.22);
       z-index: 3;
     }
@@ -335,6 +335,7 @@
       .gauge { max-width: 220px; }
       .btnrow { padding: 0 12px 16px; }
       .content { padding: 16px 18px; }
+      .cta-contact { align-self: center !important; width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -647,7 +648,7 @@
             equityNote=h('div',{class:'pill warn',style:'margin-top:10px;'},'Achtung: Durch die tiefe Aktienquote könnten dir langfristig ', h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(lossLow)+' bis '+formatCHF(lossHigh)), ' fehlen.');
           }
           var disclaimer=h('p',{class:'subtitle',style:'margin:12px 0 10px;font-size:12px; color:#9ca3af;'},'Achtung: Das Tool ist eine Beta-Version und wird stetig verbessert. Bitte kontaktiere einen Berater für eine echte Analyse.');
-          var cta=h('a',{class:'btn primary',href:'https://vemo.ch/kontakt/',target:'_blank',rel:'noopener',style:'margin-top:6px; align-self:flex-start;'},'Berater kontaktieren');
+          var cta=h('a',{class:'btn primary cta-contact',href:'https://vemo.ch/kontakt/',target:'_blank',rel:'noopener',style:'margin-top:6px; align-self:flex-start;'},'Berater kontaktieren');
           return h('div',{class:'panel full'},
             h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
             h('p',{class:'subtitle',style:'margin:0 0 8px;font-size:14px; line-height:1.6;'},
