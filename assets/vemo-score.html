@@ -290,6 +290,7 @@
 
     .pill { background: var(--vemo-green-soft); border: 1px solid #cdeec4; color: #134e1f; padding: 12px 14px; border-radius: 12px; font-size: 13px; margin-top: 6px; }
     .pill.warn { background: #fff7ed; border-color: #ffedd5; color: #9a3412; }
+    .accent-block { background: var(--vemo-green-soft); color: var(--vemo-text); padding: 6px 12px; border-radius: 12px; font-weight: 800; display: inline-block; }
 
     .note { color: var(--vemo-muted); font-size: 13px; text-align: center; margin: 0; }
 
@@ -436,18 +437,18 @@
           var a=state.a; var arr=[];
           var maxMonthlyLabel=MAX_3A_MONTHLY.toLocaleString('de-CH',{maximumFractionDigits:2, minimumFractionDigits:0});
           arr.push({ id:'provider', type:'single', title:'Bei welcher Gesellschaft befindet sich deine 3a-Lösung', options:[{value:'bank',label:'Banklösung',sub:'Depot oder Säule 3a Konto'},{value:'insurance',label:'Versicherung',sub:'Policengebundene 3a-Lösung'}] });
-          arr.push({ id:'duration', type:'dropdown', title:'Wie viele Jahre läuft deine Lösung noch', options:durationOptions() });
-          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein (max. CHF '+maxMonthlyLabel+')', slider:{min:0,max:MAX_3A_MONTHLY,step:1,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY}, info:'Für die Säule 3a (Angestellte) gilt aktuell ein Maximalbetrag von CHF '+MAX_3A_ANNUAL.toLocaleString('de-CH')+' pro Jahr bzw. CHF '+maxMonthlyLabel+' pro Monat.' });
-          arr.push({ id:'invest_eq', type:'slider', title:'Wie stark ist dein Guthaben in Aktienfonds investiert', slider:{min:0,max:99,step:0.1,unit:'%'} });
-          if(isNum(a.invest_eq) && a.invest_eq<99){
+          arr.push({ id:'age', type:'slider', title:'Wie alt bist du?', slider:{min:20,max:64,step:1,unit:'',decimals:0,default:35}, info:'Wir rechnen mit einer Pensionierung mit 65 – je jünger du bist, desto länger läuft der Zinseszinseffekt.' });
+          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein (max. CHF '+maxMonthlyLabel+')', slider:{min:0,max:MAX_3A_MONTHLY,step:50,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY}, info:'Für die Säule 3a (Angestellte) gilt aktuell ein Maximalbetrag von CHF '+MAX_3A_ANNUAL.toLocaleString('de-CH')+' pro Jahr bzw. CHF '+maxMonthlyLabel+' pro Monat.' });
+          arr.push({ id:'invest_eq', type:'slider', title:'Wie stark ist dein Guthaben in Aktienfonds investiert', slider:{min:0,max:100,step:10,unit:'%',decimals:0} });
+          if(isNum(a.invest_eq) && a.invest_eq<100){
             arr.push({ id:'rest_bucket', type:'single', title:'Wohin fliesst der Restanteil, der nicht investiert ist', options:[{value:'bonds',label:'Obligationen'},{value:'tech_rate',label:'Technischer Zins'},{value:'cash',label:'Geldkonto / Währung'}] });
           }
           if(isNum(a.invest_eq) && a.invest_eq>=80){
             arr.push({ id:'investment_approach', type:'single', title:'Investment-Ansatz', options:[{value:'passive',label:'Passiver Ansatz'},{value:'trend',label:'Trendfonds / Themenfonds'},{value:'none',label:'Keine Strategie'},{value:'unknown',label:'Unklar'}] });
           }
-          arr.push({ id:'ter', type:'slider', title:'TER deiner Fonds', slider:{min:0,max:4,step:0.1,unit:'%'}, info:'Die TER findest du im Fonds-Factsheet. Sie wird oft als "Total Expense Ratio" oder Gesamtkostenquote ausgewiesen.' });
-          arr.push({ id:'redemption_commission_pct', type:'slider', title:'Rücknahmekommissionen', slider:{min:0,max:10,step:0.1,unit:'%'}, info:'Rücknahmekommissionen stehen im KIID/PRIIP KID des Fonds unter Kosten oder im Factsheet bei Rückgabe- bzw. Verkaufsgebühren.' });
-          arr.push({ id:'front_load_pct', type:'slider', title:'Ausgabeaufschlag', slider:{min:0,max:10,step:0.1,unit:'%'}, info:'Ausgabeaufschlag (Agio) wird im KIID/PRIIP KID im Abschnitt Kosten oder Vertriebsgebühren genannt.' });
+          arr.push({ id:'ter', type:'slider', title:'TER deiner Fonds', slider:{min:0,max:4,step:0.1,unit:'%'}, info:'TER sind die laufenden Fondskosten pro Jahr und kürzen deine Netto-Rendite direkt um diesen Prozentsatz.' });
+          arr.push({ id:'redemption_commission_pct', type:'slider', title:'Rücknahmekommissionen', slider:{min:0,max:10,step:0.1,unit:'%'}, info:'Rücknahmekommissionen werden bei der Auszahlung fällig und mindern den zurückgezahlten Betrag entsprechend.' });
+          arr.push({ id:'front_load_pct', type:'slider', title:'Ausgabeaufschlag', slider:{min:0,max:10,step:0.1,unit:'%'}, info:'Ausgabeaufschläge werden beim Kauf einbehalten und reduzieren den investierten Betrag um diesen Prozentsatz.' });
           if(a.provider==='insurance'){
             arr.push({ id:'ins_services', type:'multiple', title:'Welche Versicherungsleistungen sind in der Police enthalten', options:[{value:'death_benefit',label:'Todesfallkapital'},{value:'disability_pension',label:'Erwerbsunfähigkeitsrente'},{value:'premium_waiver',label:'Prämienbefreiung'},{value:'none',label:'Keine'}] });
             arr.push({ id:'commission_transparency', type:'single', title:'Provision offengelegt', options:[{value:'yes',label:'Ja'},{value:'no',label:'Nein'},{value:'unknown',label:'Unklar'}] });
@@ -489,10 +490,10 @@
           var a=state.a;
           var structure=75, costs=85, transparency=60, flexibility=80, investment=30;
           if(a.provider==='insurance'){ structure=60; costs=70; transparency=55; flexibility=60; investment=30; }
-          if(isNum(a.invest_eq)){
-            var investMax=90; var eq=a.invest_eq; var inv=(eq/99)*investMax;
-            if(eq<99 && a.rest_bucket){ var rest=99 - eq; if(a.rest_bucket==='bonds') inv -= rest*(investMax/99)*0.15; if(a.rest_bucket==='tech_rate') inv -= rest*(investMax/99)*0.35; if(a.rest_bucket==='cash') inv -= rest*(investMax/99)*0.50; }
-            if(eq>=80){ if(a.investment_approach==='passive'){ if(eq>=99) inv=investMax; } else if(a.investment_approach==='trend'){ inv -= 30; } else if(a.investment_approach==='none'){ inv -= 40; } else if(a.investment_approach==='unknown'){ inv -= 35; } }
+            if(isNum(a.invest_eq)){
+              var investMax=90; var eq=a.invest_eq; var inv=(eq/100)*investMax;
+              if(eq<100 && a.rest_bucket){ var rest=100 - eq; if(a.rest_bucket==='bonds') inv -= rest*(investMax/100)*0.15; if(a.rest_bucket==='tech_rate') inv -= rest*(investMax/100)*0.35; if(a.rest_bucket==='cash') inv -= rest*(investMax/100)*0.50; }
+              if(eq>=80){ if(a.investment_approach==='passive'){ if(eq>=100) inv=investMax; } else if(a.investment_approach==='trend'){ inv -= 30; } else if(a.investment_approach==='none'){ inv -= 40; } else if(a.investment_approach==='unknown'){ inv -= 35; } }
             investment=clamp(Math.round(inv));
           } else if(a.invest_eq==='unknown'){ transparency-=20; }
           if(isNum(a.invest_eq) && a.invest_eq>=80){ if(a.investment_approach==='passive'){ structure+=5; transparency+=5; } else if(a.investment_approach==='trend'){ structure-=8; transparency-=5; } else if(a.investment_approach==='none'){ structure-=12; transparency-=8; } else if(a.investment_approach==='unknown'){ transparency-=15; } }
@@ -522,36 +523,37 @@
             var s=Array.isArray(a.ins_services)?a.ins_services:[];
             if(s.indexOf('none')>-1) warns.push('Achtung: Keine Versicherungsdeckung gewählt. Eine Versicherungslösung macht in diesem Fall keinen Sinn.');
           }
-          if((a.duration==='1-5'||a.duration==='6-10'||a.duration==='11-15') && isNum(a.invest_eq) && a.invest_eq>80){ warns.push('Warnhinweis 88: Hoher Aktienanteil bei kurzer Restlaufzeit kann riskant sein - dringende Überprüfung.'); }
+            var yrs=horizonYears(a);
+            if(yrs && yrs<=15 && isNum(a.invest_eq) && a.invest_eq>80){ warns.push('Warnhinweis 88: Hoher Aktienanteil bei kurzer Restlaufzeit kann riskant sein - dringende Überprüfung.'); }
           if(isNum(a.ter) && a.ter>0.5){ warns.push('Achtung: TER über 0.5 Prozent. Möglich aktiver Fonds mit hohen Kosten.'); }
           if(a.ter==='unknown') warns.push('Achtung: TER unbekannt. Factsheet prüfen - hohe Kosten führen zu weniger Rendite.');
           if(a.invest_eq==='unknown') warns.push('Achtung: Investmentquote unbekannt - hier fehlt Wissen.');
           if(a.redemption_commission_pct==='unknown') warns.push('Achtung: Rücknahmekommission nicht bekannt - kann viel ausmachen.');
           if(a.front_load_pct==='unknown') warns.push('Achtung: Ausgabeaufschlag nicht bekannt - kann viel ausmachen.');
-          if(isNum(a.invest_eq) && a.invest_eq<99){ if(a.rest_bucket==='tech_rate') warns.push('Achtung: Technischer Zins senkt die Rendite oft massiv.'); if(a.rest_bucket==='cash') warns.push('Achtung: Nicht investierter Anteil auf dem Geldkonto senkt die Rendite und ist der Inflation ausgesetzt.'); }
+            if(isNum(a.invest_eq) && a.invest_eq<100){ if(a.rest_bucket==='tech_rate') warns.push('Achtung: Technischer Zins senkt die Rendite oft massiv.'); if(a.rest_bucket==='cash') warns.push('Achtung: Nicht investierter Anteil auf dem Geldkonto senkt die Rendite und ist der Inflation ausgesetzt.'); }
           if(isNum(a.invest_eq) && a.invest_eq>=80){ if(a.investment_approach==='passive') positives.push('Passiver Ansatz gewählt - gut für Kosten und Marktabdeckung.'); if(a.investment_approach==='trend') warns.push('Achtung: Trend- oder Themenfonds bergen Risiken und oft höhere Kosten; statistisch erzielen sie langfristig häufig schlechtere Renditen.'); if(a.investment_approach==='none') warns.push('Achtung: Keine Strategie führt oft zu einer schlechteren Rendite.'); if(a.investment_approach==='unknown') warns.push('Achtung: Strategie unbekannt.'); }
           return { warns:warns, positives:positives };
         }
 
-        function durationOptions(){
-          var arr=[];
-          for(var y=5; y<=45; y++){
-            arr.push({ value:String(y), label: y+' Jahre' });
+          function horizonYears(a){
+            var pensionAge=65;
+            if(isNum(a.age)){
+              var years=Math.round(pensionAge - a.age);
+              if(years<1) years=1;
+              return Math.max(5, Math.min(45, years));
+            }
+            if(a.duration){
+              var num=parseInt(a.duration, 10);
+              if(!Number.isNaN(num) && num>0) return num;
+            }
+            return null;
           }
-          return arr;
-        }
 
-        function durationYears(key){
-          var num=parseInt(key, 10);
-          if(Number.isNaN(num) || num<1) return null;
-          return num;
-        }
-
-        function equityRate(eq){
-          if(!isNum(eq)) return null;
-          var ratio=Math.max(0, Math.min(1, eq/99));
-          return 0.073 * ratio; // 7.3% maximale Annahme bei 100% Aktienanteil
-        }
+          function equityRate(eq){
+            if(!isNum(eq)) return null;
+            var ratio=Math.max(0, Math.min(1, eq/100));
+            return 0.073 * ratio; // 7.3% maximale Annahme bei 100% Aktienanteil
+          }
 
         function feeAssumption(a){
           var ter=isNum(a.ter)?a.ter:(a.ter==='unknown'?1.2:0);
@@ -576,8 +578,8 @@
           return 'CHF '+Math.round(val).toLocaleString('de-CH');
         }
 
-        function buildProjection(a){
-          var years=durationYears(a.duration);
+          function buildProjection(a){
+            var years=horizonYears(a);
           if(!years || !isNum(a.monthly_contribution)) return null;
           var baseRate=equityRate(a.invest_eq);
           if(baseRate===null) return null;
@@ -631,23 +633,27 @@
           var diffAbs=Math.abs(p.diff);
           var diffLow=diffAbs*0.9;
           var diffHigh=diffAbs*1.1;
-          var diffRange=h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(diffLow)+' bis '+formatCHF(diffHigh));
+          var diffRange=h('span',{class:'accent-block'}, formatCHF(diffLow)+' bis '+formatCHF(diffHigh));
           var zeroFeeWarn = p.zeroFees ? h('div',{class:'pill warn',style:'margin-top:10px;'},'Achtung: Eine 3a-Lösung ohne Gebühren ist unrealistisch – bitte prüfe deine Angaben.') : null;
           var equityNote=null;
           if(p.equityGap>0 && p.baseRate < 0.05 && p.years>=10){
             var lossLow=p.equityGap*0.9;
             var lossHigh=p.equityGap*1.1;
-            equityNote=h('div',{class:'pill warn',style:'margin-top:10px;'},'Achtung: Durch die tiefe Aktienquote könnten etwa ', h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(lossLow)+' bis '+formatCHF(lossHigh)), ' weniger zusammenkommen.');
+            equityNote=h('div',{class:'pill warn',style:'margin-top:10px;'},'Achtung: Durch die tiefe Aktienquote könnten dir langfristig ', h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(lossLow)+' bis '+formatCHF(lossHigh)), ' fehlen.');
           }
+          var disclaimer=h('p',{class:'subtitle',style:'margin:12px 0 10px;font-size:12px; color:#9ca3af;'},'Achtung: Das Tool ist eine Beta-Version und wird stetig verbessert. Bitte kontaktiere einen Berater für eine echte Analyse.');
+          var cta=h('a',{class:'btn primary',href:'https://vemo.ch/kontakt/',target:'_blank',rel:'noopener',style:'margin-top:6px; align-self:flex-start;'},'Berater kontaktieren');
           return h('div',{class:'panel full'},
             h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
-            h('p',{class:'subtitle',style:'margin:0 0 12px;font-size:14px; line-height:1.6;'},
+            h('p',{class:'subtitle',style:'margin:0 0 8px;font-size:14px; line-height:1.6;'},
               'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,' Jahre mit einer Brutto-Renditeannahme von ',basePct,
-              ' (netto ca. ',netPct,') rechnen wir mit geschätzten Gebühren. Laut dieser Annahme könnten die Gebühren etwa ', diffRange,
-              ' Unterschied ausmachen. Hol dir eine zweite Meinung.'
+              ' (netto ca. ',netPct,') rechnen wir mit geschätzten Gebühren. Unter dieser Annahme fehlen dir voraussichtlich ', diffRange,
+              ' gegenüber einer gebührenfreien Variante. Hol dir eine 2. Meinung.'
             ),
             zeroFeeWarn,
-            equityNote
+            equityNote,
+            disclaimer,
+            cta
           );
         }
 
