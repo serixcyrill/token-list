@@ -32,7 +32,8 @@
         linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       color: var(--vemo-text);
-      overflow-x: hidden;
+      overflow-x: clip;
+      width: 100%;
     }
 
     .vemo-tool-wrapper {
@@ -40,6 +41,8 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     .vemo-tool-card {
@@ -48,7 +51,7 @@
       background: rgba(255, 255, 255, 0.92);
       border-radius: var(--radius-lg);
       border: 1px solid rgba(208, 215, 228, 0.65);
-      box-shadow: var(--shadow-strong);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
       padding: 26px 28px 24px;
       backdrop-filter: blur(var(--blur-glass));
       position: relative;
@@ -73,7 +76,7 @@
       color: var(--vemo-text);
     }
 
-    .shell { display: grid; gap: 16px; min-width: 0; }
+    .shell { display: grid; gap: 16px; }
 
     .hdr {
       display: grid;
@@ -82,16 +85,35 @@
       position: relative;
     }
 
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--vemo-green-soft);
+      color: #19532a;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .eyebrow.float {
+      position: absolute;
+      top: -30px;
+      right: 12px;
+      box-shadow: 0 10px 24px rgba(118,208,98,0.22);
+      z-index: 3;
+    }
+
     .title { font-size: 28px; margin: 0; font-weight: 700; }
-    .subtitle { margin: 0; color: var(--vemo-muted); font-size: 15px; overflow-wrap: anywhere; }
+    .subtitle { margin: 0; color: var(--vemo-muted); font-size: 15px; }
 
     .wrap-card {
       background: rgba(255, 255, 255, 0.86);
       border: 1px solid var(--vemo-ring);
       border-radius: 18px;
-      box-shadow: var(--shadow-soft);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
       overflow: visible;
-      min-width: 0;
     }
 
     .pbar {
@@ -111,7 +133,7 @@
       transition: width .25s ease;
     }
 
-    .content { padding: 20px 22px; min-width: 0; }
+    .content { padding: 20px 22px; }
     .stack { display: grid; gap: 12px; }
 
     .option {
@@ -194,19 +216,16 @@
       cursor: help;
       border: 1px solid rgba(12, 18, 34, 0.08);
       box-shadow: 0 6px 14px rgba(15,23,42,0.16);
-      z-index: 5;
-      flex-shrink: 0;
     }
 
     .info-badge:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(125,211,252,0.35); }
 
-    /* Tooltip nach unten */
     .info-badge::after {
       content: attr(data-tip);
       position: absolute;
-      top: calc(100% + 12px);
+      bottom: calc(100% + 12px);
       left: 50%;
-      transform: translateX(-50%) translateY(-6px);
+      transform: translateX(-50%) translateY(6px);
       background: #0b1531;
       color: #fff;
       padding: 10px 12px;
@@ -216,69 +235,45 @@
       pointer-events: none;
       transition: opacity .15s ease, transform .15s ease;
       width: min(360px, calc(100vw - 32px));
+      max-width: clamp(260px, 72vw, 360px);
       font-size: 13px;
       line-height: 1.45;
-      z-index: 10;
+      z-index: 2;
       text-align: left;
       white-space: normal;
       word-break: break-word;
+      box-sizing: border-box;
     }
 
     .info-badge::before {
       content: '';
       position: absolute;
-      top: calc(100% + 4px);
+      bottom: calc(100% + 4px);
       left: 50%;
-      transform: translateX(-50%) translateY(-6px);
+      transform: translateX(-50%) translateY(6px);
       border: 8px solid transparent;
-      border-bottom-color: #0b1531;
+      border-top-color: #0b1531;
       opacity: 0;
       transition: opacity .15s ease, transform .15s ease;
-      z-index: 10;
     }
 
-    .info-badge:hover::after,
-    .info-badge:focus-visible::after,
-    .info-badge.open::after {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .info-badge:hover::before,
-    .info-badge:focus-visible::before,
-    .info-badge.open::before {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* Info-Text für Handy-Version */
-    .info-inline {
-      display: none;
-      font-size: 13px;
-      color: var(--vemo-muted);
-      margin-top: 8px;
-      line-height: 1.4;
-    }
+    .info-badge:hover::after, .info-badge:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .info-badge:hover::before, .info-badge:focus-visible::before { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     @media (max-width: 640px) {
-      .info-badge { display: none; }       /* Bubble ausblenden auf Handy */
-      .info-inline { display: block; }     /* Text stattdessen anzeigen */
-      .axes-panel { display: none; }       /* Nur den Haupt-Score auf dem Handy anzeigen */
-      .results-grid { gap: 14px; margin-top: 10px; }
-      .results-grid .panel { padding: 16px; }
-      .gauge { width: 100%; }
-      .vemo-tool-wrapper { padding-top: 48px; }
+      .info-badge::after {
+        left: 50%;
+        transform: translate(-50%, 6px);
+        width: min(360px, calc(100vw - 32px));
+        max-width: none;
+      }
+      .info-badge::before { display: none; }
+      .info-badge:hover::after, .info-badge:focus-visible::after { transform: translate(-50%, 0); }
     }
 
-    @media (max-width: 960px) {
-      .results-grid { grid-template-columns: 1fr; }
-      .axis-item { grid-template-columns: 1fr; align-items: flex-start; }
-      .axis-item .val { text-align: left; }
-    }
+    .header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 
-    .header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; min-width: 0; }
-
-    .btnrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px 20px; min-width: 0; }
+    .btnrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px 20px; }
 
     .btn {
       appearance: none;
@@ -304,73 +299,59 @@
 
     .center { text-align: center; }
 
-    .results-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      padding: 0 4px;
-      width: 100%;
-      min-width: 0;
-      margin-top: 6px;
-    }
-    .results-grid .panel {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid var(--vemo-ring);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: var(--shadow-soft);
-      min-width: 0; /* Prevent grid children from forcing horizontal scroll on mobile */
-      overflow: hidden;
-    }
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 0 4px; }
+    .results-grid .panel { background: rgba(255,255,255,0.9); border: 1px solid var(--vemo-ring); border-radius: 18px; padding: 18px; box-shadow: var(--shadow-soft); }
     .results-grid .panel.full { grid-column: 1 / -1; }
-    .results-grid .panel.main-score { width: 100%; }
 
-    .gauge { position: relative; width: min(460px, 100%); max-width: none; margin: 0 auto; aspect-ratio: 1; }
+    .gauge { position: relative; width: 100%; max-width: 260px; margin: 0 auto; aspect-ratio: 1; }
     .gauge .centered { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; }
     .score { font-size: 44px; font-weight: 800; }
     .verdict { font-weight: 700; font-size: 16px; color: var(--vemo-text); }
 
-    .pill { background: var(--vemo-green-soft); border: 1px solid #cdeec4; color: #134e1f; padding: 12px 14px; border-radius: 12px; font-size: 13px; margin-top: 6px; overflow-wrap: anywhere; }
+    .pill { background: var(--vemo-green-soft); border: 1px solid #cdeec4; color: #134e1f; padding: 12px 14px; border-radius: 12px; font-size: 13px; margin-top: 6px; }
     .pill.warn { background: #fff7ed; border-color: #ffedd5; color: #9a3412; }
     .accent-block { background: var(--vemo-green-soft); color: var(--vemo-text); padding: 6px 12px; border-radius: 12px; font-weight: 800; display: inline-block; }
 
-    .note { color: var(--vemo-muted); font-size: 13px; text-align: center; margin: 0; overflow-wrap: anywhere; }
+    .note { color: var(--vemo-muted); font-size: 13px; text-align: center; margin: 0; }
 
     .axis-wrap { padding: 4px 0 6px; }
-    .axis-list { display: grid; gap: 10px; min-width: 0; }
-    .axis-item { display: grid; grid-template-columns: 130px 1fr 52px; align-items: center; gap: 10px; min-width: 0; }
-    .axis-item .name { font-weight: 600; font-size: 13px; color: #475569; overflow-wrap: anywhere; }
+    .axis-list { display: grid; gap: 10px; }
+    .axis-item { display: grid; grid-template-columns: 130px 1fr 52px; align-items: center; gap: 10px; }
+    .axis-item .name { font-weight: 600; font-size: 13px; color: #475569; }
     .axis-item .bar { position: relative; height: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 999px; overflow: hidden; }
     .axis-item .bar .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, var(--vemo-green), #9ae38b); transition: width .3s ease; }
     .axis-item .val { font-size: 13px; text-align: right; color: #334155; font-weight: 700; }
 
     .sources-wrap { padding-top: 6px; }
     .sources-title { font-size: 13px; letter-spacing: .02em; color: #64748b; margin: 0 0 10px 0; font-weight: 700; text-transform: uppercase; }
-    .sources { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 10px; min-width: 0; }
-    .src { display: flex; align-items: center; justify-content: center; background: #fafcff; border: 1px solid rgba(15,23,42,.08); border-radius: 12px; padding: 12px 14px; font-weight: 600; text-decoration: none; color: var(--vemo-text); cursor: pointer; transition: all .15s ease; text-align: center; overflow-wrap: anywhere; }
+    .sources { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 10px; }
+    .src { display: flex; align-items: center; justify-content: center; background: #fafcff; border: 1px solid rgba(15,23,42,.08); border-radius: 12px; padding: 12px 14px; font-weight: 600; text-decoration: none; color: var(--vemo-text); cursor: pointer; transition: all .15s ease; }
     .src:hover { background: #f8fff6; border-color: var(--vemo-green); box-shadow: 0 4px 10px rgba(118,208,98,.12); transform: translateY(-1px); }
 
     .err { padding: 16px; color: #9a3412; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 12px; white-space: pre-wrap; }
 
+    @media (max-width: 960px) {
+      .results-grid { grid-template-columns: 1fr; }
+      .axis-item { grid-template-columns: 1fr; align-items: flex-start; }
+      .axis-item .val { text-align: left; }
+    }
+
     @media (max-width: 768px) {
-      .vemo-tool-wrapper { padding: 12px; }
+      .vemo-tool-wrapper { padding: 12px; overflow-x: hidden; }
       .vemo-tool-card { padding: 18px 16px 20px; border-radius: 18px; }
       .title { font-size: 24px; }
       .btnrow { flex-direction: column; }
       .btnrow .btn { width: 100%; }
       .option { padding: 12px 14px; }
-      .results-grid { gap: 14px; }
-      .results-grid .panel { padding: 16px; }
     }
 
     @media (max-width: 520px) {
       .hdr { text-align: left; }
-      .gauge { width: 100%; }
+      .eyebrow.float { display: none; }
+      .gauge { max-width: 220px; }
       .btnrow { padding: 0 12px 16px; }
       .content { padding: 16px 18px; }
       .cta-contact { align-self: center !important; width: 100%; justify-content: center; }
-      .results-grid { gap: 12px; }
-      .results-grid .panel { padding: 14px; }
     }
   </style>
 </head>
@@ -395,14 +376,15 @@
             w.appendChild(e);
             m.appendChild(w);
           }
-        }catch(_){}}
+        }catch(_){/* noop */}
+      }
       try{
         'use strict';
         var mount=document.getElementById('vemo-score');
         var WEIGHTS={ structure:0.20, costs:0.30, investment:0.25, transparency:0.15, flexibility:0.10 };
         var STORAGE_KEY='vemo-3a-fast-check';
-        var MAX_3A_ANNUAL=7258;
-        var MAX_3A_MONTHLY=604;
+        var MAX_3A_ANNUAL=7258; // Aktueller Maximalbetrag Schweiz
+        var MAX_3A_MONTHLY=Math.round((MAX_3A_ANNUAL/12)*100)/100; // Monatsmaximum (präziser gerundet)
 
         function restoreState(){
           try{
@@ -417,14 +399,14 @@
                 details: !!parsed.details
               };
             }
-          }catch(_){ }
+          }catch(_){}
           return null;
         }
 
         var state=restoreState() || { step:0, a:{}, show:false, details:false };
 
         function persistState(){
-          try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(_){ }
+          try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(_){/* ignore quota */}
         }
 
         function h(tag, attrs){
@@ -475,115 +457,23 @@
 
         function steps(){
           var a=state.a; var arr=[];
-          var maxMonthlyLabel=MAX_3A_MONTHLY.toLocaleString('de-CH',{maximumFractionDigits:0, minimumFractionDigits:0});
-
-          arr.push({
-            id:'provider',
-            type:'single',
-            title:'Bei welcher Gesellschaft befindet sich deine 3a-Lösung',
-            options:[
-              {value:'bank',label:'Banklösung',sub:'Depot oder Säule 3a Konto'},
-              {value:'insurance',label:'Versicherung',sub:'Policengebundene 3a-Lösung'}
-            ]
-          });
-
-          arr.push({
-            id:'age',
-            type:'slider',
-            title:'Wie alt bist du?',
-            slider:{min:20,max:64,step:1,unit:'',decimals:0,default:35},
-            info:'Wir rechnen mit einer Pensionierung mit 65 – je jünger du bist, desto länger läuft der Zinseszinseffekt.'
-          });
-
-          arr.push({
-            id:'monthly_contribution',
-            type:'slider',
-            title:'Wie viel zahlst du pro Monat ein?',
-            slider:{min:0,max:MAX_3A_MONTHLY,step:50,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY},
-            info:'Für die Säule 3a (Angestellte) gilt aktuell ein Maximalbetrag von CHF '+MAX_3A_ANNUAL.toLocaleString('de-CH')+' pro Jahr bzw. CHF '+maxMonthlyLabel+' pro Monat.'
-          });
-
-          arr.push({
-            id:'invest_eq',
-            type:'slider',
-            title:'Wie stark ist dein Guthaben in Aktienfonds investiert',
-            slider:{min:0,max:100,step:10,unit:'%',decimals:0},
-            info:'Je höher der Aktienanteil, desto grösser sind langfristig die Renditechancen – aber auch die Schwankungen.'
-          });
-
+          var maxMonthlyLabel=MAX_3A_MONTHLY.toLocaleString('de-CH',{maximumFractionDigits:2, minimumFractionDigits:0});
+          arr.push({ id:'provider', type:'single', title:'Bei welcher Gesellschaft befindet sich deine 3a-Lösung', options:[{value:'bank',label:'Banklösung',sub:'Depot oder Säule 3a Konto'},{value:'insurance',label:'Versicherung',sub:'Policengebundene 3a-Lösung'}] });
+          arr.push({ id:'age', type:'slider', title:'Wie alt bist du?', slider:{min:20,max:64,step:1,unit:'',decimals:0,default:35}, info:'Wir rechnen mit einer Pensionierung mit 65 – je jünger du bist, desto länger läuft der Zinseszinseffekt.' });
+          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein (max. CHF '+maxMonthlyLabel+')', slider:{min:0,max:MAX_3A_MONTHLY,step:50,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY}, info:'Für die Säule 3a (Angestellte) gilt aktuell ein Maximalbetrag von CHF '+MAX_3A_ANNUAL.toLocaleString('de-CH')+' pro Jahr bzw. CHF '+maxMonthlyLabel+' pro Monat.' });
+          arr.push({ id:'invest_eq', type:'slider', title:'Wie stark ist dein Guthaben in Aktienfonds investiert', slider:{min:0,max:100,step:10,unit:'%',decimals:0} });
           if(isNum(a.invest_eq) && a.invest_eq<100){
-            arr.push({
-              id:'rest_bucket',
-              type:'single',
-              title:'Wohin fliesst der Restanteil, der nicht investiert ist',
-              options:[
-                {value:'bonds',label:'Obligationen'},
-                {value:'tech_rate',label:'Technischer Zins'},
-                {value:'cash',label:'Geldkonto / Währung'}
-              ]
-            });
+            arr.push({ id:'rest_bucket', type:'single', title:'Wohin fliesst der Restanteil, der nicht investiert ist', options:[{value:'bonds',label:'Obligationen'},{value:'tech_rate',label:'Technischer Zins'},{value:'cash',label:'Geldkonto / Währung'}] });
           }
-
           if(isNum(a.invest_eq) && a.invest_eq>=80){
-            arr.push({
-              id:'investment_approach',
-              type:'single',
-              title:'Investment-Ansatz',
-              options:[
-                {value:'passive',label:'Passiver Ansatz'},
-                {value:'trend',label:'Trendfonds / Themenfonds'},
-                {value:'none',label:'Keine Strategie'},
-                {value:'unknown',label:'Unklar'}
-              ]
-            });
+            arr.push({ id:'investment_approach', type:'single', title:'Investment-Ansatz', options:[{value:'passive',label:'Passiver Ansatz'},{value:'trend',label:'Trendfonds / Themenfonds'},{value:'none',label:'Keine Strategie'},{value:'unknown',label:'Unklar'}] });
           }
-
-          arr.push({
-            id:'ter',
-            type:'slider',
-            title:'TER deiner Fonds',
-            slider:{min:0,max:4,step:0.1,unit:'%'},
-            info:'TER sind die laufenden Fondskosten pro Jahr und kürzen deine Netto-Rendite direkt um diesen Prozentsatz.'
-          });
-
-          arr.push({
-            id:'redemption_commission_pct',
-            type:'slider',
-            title:'Rücknahmekommissionen',
-            slider:{min:0,max:10,step:0.1,unit:'%'},
-            info:'Rücknahmekommissionen werden bei der Auszahlung fällig und mindern den zurückgezahlten Betrag entsprechend.'
-          });
-
-          arr.push({
-            id:'front_load_pct',
-            type:'slider',
-            title:'Ausgabeaufschlag',
-            slider:{min:0,max:10,step:0.1,unit:'%'},
-            info:'Ausgabeaufschläge werden beim Kauf einbehalten und reduzieren den investierten Betrag um diesen Prozentsatz.'
-          });
-
+          arr.push({ id:'ter', type:'slider', title:'TER deiner Fonds', slider:{min:0,max:4,step:0.1,unit:'%'}, info:'TER sind die laufenden Fondskosten pro Jahr und kürzen deine Netto-Rendite direkt um diesen Prozentsatz.' });
+          arr.push({ id:'redemption_commission_pct', type:'slider', title:'Rücknahmekommissionen', slider:{min:0,max:10,step:0.1,unit:'%'}, info:'Rücknahmekommissionen werden bei der Auszahlung fällig und mindern den zurückgezahlten Betrag entsprechend.' });
+          arr.push({ id:'front_load_pct', type:'slider', title:'Ausgabeaufschlag', slider:{min:0,max:10,step:0.1,unit:'%'}, info:'Ausgabeaufschläge werden beim Kauf einbehalten und reduzieren den investierten Betrag um diesen Prozentsatz.' });
           if(a.provider==='insurance'){
-            arr.push({
-              id:'ins_services',
-              type:'multiple',
-              title:'Welche Versicherungsleistungen sind in der Police enthalten',
-              options:[
-                {value:'death_benefit',label:'Todesfallkapital'},
-                {value:'disability_pension',label:'Erwerbsunfähigkeitsrente'},
-                {value:'premium_waiver',label:'Prämienbefreiung'},
-                {value:'none',label:'Keine'}
-              ]
-            });
-            arr.push({
-              id:'commission_transparency',
-              type:'single',
-              title:'Provision offengelegt',
-              options:[
-                {value:'yes',label:'Ja'},
-                {value:'no',label:'Nein'},
-                {value:'unknown',label:'Unklar'}
-              ]
-            });
+            arr.push({ id:'ins_services', type:'multiple', title:'Welche Versicherungsleistungen sind in der Police enthalten', options:[{value:'death_benefit',label:'Todesfallkapital'},{value:'disability_pension',label:'Erwerbsunfähigkeitsrente'},{value:'premium_waiver',label:'Prämienbefreiung'},{value:'none',label:'Keine'}] });
+            arr.push({ id:'commission_transparency', type:'single', title:'Provision offengelegt', options:[{value:'yes',label:'Ja'},{value:'no',label:'Nein'},{value:'unknown',label:'Unklar'}] });
           }
           return arr;
         }
@@ -594,111 +484,98 @@
           var num=isNum(val)?val:defaultVal;
           if(val===undefined){ state.a[key]=defaultVal; num=defaultVal; }
           var decimals=typeof q.slider.decimals==='number'?q.slider.decimals:1;
-
           function fmt(v){
             if(q.slider.format==='chf'){
               return 'CHF '+Number(v).toLocaleString('de-CH', {maximumFractionDigits:decimals, minimumFractionDigits:decimals});
             }
             return parseFloat(v).toFixed(decimals)+(q.slider.unit||'');
           }
-
-          var slider=h('input',{
-            class:'input',
-            type:'range',
-            min:q.slider.min,
-            max:q.slider.max,
-            step:q.slider.step,
-            value:num
-          });
+          var slider=h('input',{class:'input',type:'range',min:q.slider.min,max:q.slider.max,step:q.slider.step,value:num});
           slider.style.setProperty('--val', ((num - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%');
-
           var label=h('div',{}, isUnknown?'Unklar':fmt(num));
           var info=null;
-          var infoInline=null;
-
-          if(q.info){
-            info=h('button',{
-              class:'info-badge',
-              'data-tip':q.info,
-              type:'button',
-              'aria-label':'Info'
-            },'i');
-
-            info.addEventListener('click', function(e){
-              e.preventDefault();
-              e.stopPropagation();
-              this.classList.toggle('open');
-            });
-
-            infoInline=h('div',{class:'info-inline'}, q.info);
-          }
-
+          if(q.info){ info=h('button',{class:'info-badge','data-tip':q.info,type:'button','aria-label':'Info zu Gebühren'},'i'); }
           var row=h('div',{class:'inline'}, slider);
           var meta=h('div',{class:'slider-meta'}, label);
           if(info){ meta.appendChild(info); }
-
-          var unklar=h('label',{class:'unklar'},
-            h('input',{type:'checkbox'}),
-            h('span',{},'Unklar')
-          );
+          var unklar=h('label',{class:'unklar'}, h('input',{type:'checkbox'}), h('span',{},'Unklar'));
           var chk=unklar.querySelector('input'); chk.checked=isUnknown;
-
-          function apply(){
-            if(chk.checked){
-              slider.setAttribute('disabled','');
-              label.textContent='Unklar';
-            } else {
-              slider.removeAttribute('disabled');
-              label.textContent=fmt(slider.value);
-            }
-          }
+          function apply(){ if(chk.checked){ slider.setAttribute('disabled',''); label.textContent='Unklar'; } else { slider.removeAttribute('disabled'); label.textContent=fmt(slider.value); } }
           apply();
-
-          slider.addEventListener('input', function(e){
-            var v=parseFloat(e.target.value);
-            state.a[key]=v;
-            slider.style.setProperty('--val', ((v - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%');
-            if(!chk.checked){ label.textContent=fmt(v); }
-          });
-
-          slider.addEventListener('change', function(){
-            if(!chk.checked){ state.a[key]=parseFloat(slider.value); }
-            updateAndRender();
-          });
-
-          chk.addEventListener('change', function(){
-            state.a[key]=chk.checked?'unknown':parseFloat(slider.value);
-            apply();
-            updateAndRender();
-          });
-
-          var wrap=h('div',{});
-          wrap.appendChild(row);
-          wrap.appendChild(meta);
-          wrap.appendChild(unklar);
-          if(infoInline){ wrap.appendChild(infoInline); }
-          return wrap;
+          slider.addEventListener('input', function(e){ var v=parseFloat(e.target.value); state.a[key]=v; slider.style.setProperty('--val', ((v - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%'); if(!chk.checked){ label.textContent=fmt(v); } });
+          slider.addEventListener('change', function(){ if(!chk.checked){ state.a[key]=parseFloat(slider.value); } updateAndRender(); });
+          chk.addEventListener('change', function(){ state.a[key]=chk.checked?'unknown':parseFloat(slider.value); apply(); updateAndRender(); });
+          var wrap=h('div',{}); wrap.appendChild(row); wrap.appendChild(meta); wrap.appendChild(unklar); return wrap;
         }
 
-        function horizonYears(a){
-          var pensionAge=65;
-          if(isNum(a.age)){
-            var years=Math.round(pensionAge - a.age);
-            if(years<1) years=1;
-            return Math.max(5, Math.min(45, years));
+        function score(){
+          var a=state.a;
+          var structure=75, costs=85, transparency=60, flexibility=80, investment=30;
+          if(a.provider==='insurance'){ structure=60; costs=70; transparency=55; flexibility=60; investment=30; }
+            if(isNum(a.invest_eq)){
+              var investMax=90; var eq=a.invest_eq; var inv=(eq/100)*investMax;
+              if(eq<100 && a.rest_bucket){ var rest=100 - eq; if(a.rest_bucket==='bonds') inv -= rest*(investMax/100)*0.15; if(a.rest_bucket==='tech_rate') inv -= rest*(investMax/100)*0.35; if(a.rest_bucket==='cash') inv -= rest*(investMax/100)*0.50; }
+              if(eq>=80){ if(a.investment_approach==='passive'){ if(eq>=100) inv=investMax; } else if(a.investment_approach==='trend'){ inv -= 30; } else if(a.investment_approach==='none'){ inv -= 40; } else if(a.investment_approach==='unknown'){ inv -= 35; } }
+            investment=clamp(Math.round(inv));
+          } else if(a.invest_eq==='unknown'){ transparency-=20; }
+          if(isNum(a.invest_eq) && a.invest_eq>=80){ if(a.investment_approach==='passive'){ structure+=5; transparency+=5; } else if(a.investment_approach==='trend'){ structure-=8; transparency-=5; } else if(a.investment_approach==='none'){ structure-=12; transparency-=8; } else if(a.investment_approach==='unknown'){ transparency-=15; } }
+          if(isNum(a.ter)){ costs -= a.ter*20; } else if(a.ter==='unknown'){ costs -= 10; transparency -= 15; }
+          if(isNum(a.redemption_commission_pct)) costs -= a.redemption_commission_pct*2; else if(a.redemption_commission_pct==='unknown'){ costs -= 10; transparency -= 10; }
+          if(isNum(a.front_load_pct)) costs -= a.front_load_pct*2; else if(a.front_load_pct==='unknown'){ costs -= 10; transparency -= 10; }
+          if(a.provider==='insurance'){
+            var s=Array.isArray(a.ins_services)?a.ins_services:[];
+            if(s.indexOf('death_benefit')>-1) structure-=8;
+            if(s.indexOf('disability_pension')>-1) structure-=8;
+            if(s.indexOf('premium_waiver')>-1) structure-=3;
+            if(a.commission_transparency==='yes') transparency+=15; else if(a.commission_transparency==='no') transparency-=15; else if(a.commission_transparency==='unknown') transparency-=10;
           }
-          if(a.duration){
-            var num=parseInt(a.duration, 10);
-            if(!Number.isNaN(num) && num>0) return num;
-          }
-          return null;
+          structure=clamp(Math.round(structure)); costs=clamp(Math.round(costs)); investment=clamp(Math.round(investment)); transparency=clamp(Math.round(transparency)); flexibility=clamp(Math.round(flexibility));
+          var total=Math.round(structure*WEIGHTS.structure + costs*WEIGHTS.costs + investment*WEIGHTS.investment + transparency*WEIGHTS.transparency + flexibility*WEIGHTS.flexibility);
+          var stroke='#76D062', emoji='✅', verdict='Sehr gut';
+          if(total<50){ stroke='#ef4444'; emoji='❌'; verdict='Verbesserungsbedarf'; }
+          else if(total<80){ stroke='#f97316'; emoji='⚠️'; verdict='Durchschnittlich'; }
+          return { total:total, stroke:stroke, emoji:emoji, verdict:verdict, axes:{structure:structure,costs:costs,investment:investment,transparency:transparency,flexibility:flexibility}, tips:buildTips(a) };
         }
 
-        function equityRate(eq){
-          if(!isNum(eq)) return null;
-          var ratio=Math.max(0, Math.min(1, eq/100));
-          return 0.048 * ratio; // 4.8% bei 100% Aktien, tiefer bei weniger Aktien
+        function buildTips(a){
+          var warns=[], positives=[];
+          if(a.provider==='bank'){ positives.push('Bank in Ordnung. Meist günstiger als Versicherung, aber laufende Kosten wie Depot und TER prüfen.'); }
+          if(a.provider==='insurance'){
+            warns.push('Achtung: Versicherungsverträge sind oft intransparent und verursachen sehr hohe laufende Kosten beim Besparen.');
+            var s=Array.isArray(a.ins_services)?a.ins_services:[];
+            if(s.indexOf('none')>-1) warns.push('Achtung: Keine Versicherungsdeckung gewählt. Eine Versicherungslösung macht in diesem Fall keinen Sinn.');
+          }
+            var yrs=horizonYears(a);
+            if(yrs && yrs<=15 && isNum(a.invest_eq) && a.invest_eq>80){ warns.push('Warnhinweis 88: Hoher Aktienanteil bei kurzer Restlaufzeit kann riskant sein - dringende Überprüfung.'); }
+          if(isNum(a.ter) && a.ter>0.5){ warns.push('Achtung: TER über 0.5 Prozent. Möglich aktiver Fonds mit hohen Kosten.'); }
+          if(a.ter==='unknown') warns.push('Achtung: TER unbekannt. Factsheet prüfen - hohe Kosten führen zu weniger Rendite.');
+          if(a.invest_eq==='unknown') warns.push('Achtung: Investmentquote unbekannt - hier fehlt Wissen.');
+          if(a.redemption_commission_pct==='unknown') warns.push('Achtung: Rücknahmekommission nicht bekannt - kann viel ausmachen.');
+          if(a.front_load_pct==='unknown') warns.push('Achtung: Ausgabeaufschlag nicht bekannt - kann viel ausmachen.');
+            if(isNum(a.invest_eq) && a.invest_eq<100){ if(a.rest_bucket==='tech_rate') warns.push('Achtung: Technischer Zins senkt die Rendite oft massiv.'); if(a.rest_bucket==='cash') warns.push('Achtung: Nicht investierter Anteil auf dem Geldkonto senkt die Rendite und ist der Inflation ausgesetzt.'); }
+          if(isNum(a.invest_eq) && a.invest_eq>=80){ if(a.investment_approach==='passive') positives.push('Passiver Ansatz gewählt - gut für Kosten und Marktabdeckung.'); if(a.investment_approach==='trend') warns.push('Achtung: Trend- oder Themenfonds bergen Risiken und oft höhere Kosten; statistisch erzielen sie langfristig häufig schlechtere Renditen.'); if(a.investment_approach==='none') warns.push('Achtung: Keine Strategie führt oft zu einer schlechteren Rendite.'); if(a.investment_approach==='unknown') warns.push('Achtung: Strategie unbekannt.'); }
+          return { warns:warns, positives:positives };
         }
+
+          function horizonYears(a){
+            var pensionAge=65;
+            if(isNum(a.age)){
+              var years=Math.round(pensionAge - a.age);
+              if(years<1) years=1;
+              return Math.max(5, Math.min(45, years));
+            }
+            if(a.duration){
+              var num=parseInt(a.duration, 10);
+              if(!Number.isNaN(num) && num>0) return num;
+            }
+            return null;
+          }
+
+          function equityRate(eq){
+            if(!isNum(eq)) return null;
+            var ratio=Math.max(0, Math.min(1, eq/100));
+            return 0.073 * ratio; // 7.3% maximale Annahme bei 100% Aktienanteil
+          }
 
         function feeAssumption(a){
           var ter=isNum(a.ter)?a.ter:(a.ter==='unknown'?1.2:0);
@@ -723,195 +600,49 @@
           return 'CHF '+Math.round(val).toLocaleString('de-CH');
         }
 
-        function buildProjection(a){
-          var years=horizonYears(a);
+          function buildProjection(a){
+            var years=horizonYears(a);
           if(!years || !isNum(a.monthly_contribution)) return null;
           var baseRate=equityRate(a.invest_eq);
           if(baseRate===null) return null;
-
           if(a.investment_approach && a.investment_approach!=='passive'){
             baseRate=Math.max(baseRate - 0.01, 0);
           }
-
           var monthly=a.monthly_contribution;
           if(a.provider==='insurance'){ monthly = monthly*0.95; }
-
           var fee=feeAssumption(a);
-          var cheapRunning=0.0039; // 0.39% für die gebührengünstige Variante
-
-          var currentNetRate=Math.max(baseRate - fee.runningPct, 0);
-          var cheapNetRate=Math.max(baseRate - cheapRunning, 0);
-
-          var withCurrent=futureValueMonthly(monthly*(1-fee.frontLoadPct), years, currentNetRate) * (1 - fee.redemptionPct);
-          var withCheap=futureValueMonthly(monthly, years, cheapNetRate);
-
+          var zeroFees = fee.runningPct===0 && fee.frontLoadPct===0 && fee.redemptionPct===0;
+          var growthRate=Math.max(baseRate - fee.runningPct, 0);
+          var withBase=futureValueMonthly(monthly, years, baseRate);
+          var withFees=futureValueMonthly(monthly*(1-fee.frontLoadPct), years, growthRate);
+          withFees = withFees * (1 - fee.redemptionPct);
           var paidIn=monthly*12*years;
-          var diff=withCheap - withCurrent;
-
-          var maxRate=0.048;
+          var diff=withBase - withFees;
+          var maxRate=0.073;
           var fullEquity=futureValueMonthly(monthly, years, maxRate);
-          var equityGap=Math.max(0, fullEquity - withCheap);
-
+          var equityGap=Math.max(0, fullEquity - withBase);
           return {
             years:years,
             monthly:monthly,
             paidIn:paidIn,
             baseRate:baseRate,
-            currentNetRate:currentNetRate,
-            cheapNetRate:cheapNetRate,
+            netRate:growthRate,
             fee:fee,
-            withCurrent:withCurrent,
-            withCheap:withCheap,
+            withBase:withBase,
+            withFees:withFees,
             diff:diff,
-            zeroFees:(fee.runningPct===0 && fee.frontLoadPct===0 && fee.redemptionPct===0),
+            zeroFees:zeroFees,
             equityGap:equityGap
           };
-        }
-
-        function score(){
-          var a=state.a;
-          var structure=75, costs=85, transparency=60, flexibility=80, investment=30;
-
-          if(a.provider==='insurance'){
-            structure=60; costs=70; transparency=55; flexibility=60; investment=30;
-          }
-
-          if(isNum(a.invest_eq)){
-            var investMax=90; var eq=a.invest_eq; var inv=(eq/100)*investMax;
-            if(eq<100 && a.rest_bucket){
-              var rest=100 - eq;
-              if(a.rest_bucket==='bonds') inv -= rest*(investMax/100)*0.15;
-              if(a.rest_bucket==='tech_rate') inv -= rest*(investMax/100)*0.35;
-              if(a.rest_bucket==='cash') inv -= rest*(investMax/100)*0.50;
-            }
-            if(eq>=80){
-              if(a.investment_approach==='passive'){
-                if(eq>=100) inv=investMax;
-              } else if(a.investment_approach==='trend'){ inv -= 30; }
-              else if(a.investment_approach==='none'){ inv -= 40; }
-              else if(a.investment_approach==='unknown'){ inv -= 35; }
-            }
-            investment=clamp(Math.round(inv));
-          } else if(a.invest_eq==='unknown'){
-            transparency-=20;
-          }
-
-          if(isNum(a.invest_eq) && a.invest_eq>=80){
-            if(a.investment_approach==='passive'){ structure+=5; transparency+=5; }
-            else if(a.investment_approach==='trend'){ structure-=8; transparency-=5; }
-            else if(a.investment_approach==='none'){ structure-=12; transparency-=8; }
-            else if(a.investment_approach==='unknown'){ transparency-=15; }
-          }
-
-          if(isNum(a.ter)){ costs -= a.ter*20; }
-          else if(a.ter==='unknown'){ costs -= 10; transparency -= 15; }
-
-          if(isNum(a.redemption_commission_pct)) costs -= a.redemption_commission_pct*2;
-          else if(a.redemption_commission_pct==='unknown'){ costs -= 10; transparency -= 10; }
-
-          if(isNum(a.front_load_pct)) costs -= a.front_load_pct*2;
-          else if(a.front_load_pct==='unknown'){ costs -= 10; transparency -= 10; }
-
-          if(a.provider==='insurance'){
-            var s=Array.isArray(a.ins_services)?a.ins_services:[];
-            if(s.indexOf('death_benefit')>-1) structure-=8;
-            if(s.indexOf('disability_pension')>-1) structure-=8;
-            if(s.indexOf('premium_waiver')>-1) structure-=3;
-
-            if(a.commission_transparency==='yes') transparency+=15;
-            else if(a.commission_transparency==='no') transparency-=15;
-            else if(a.commission_transparency==='unknown') transparency-=10;
-          }
-
-          structure=clamp(Math.round(structure));
-          costs=clamp(Math.round(costs));
-          investment=clamp(Math.round(investment));
-          transparency=clamp(Math.round(transparency));
-          flexibility=clamp(Math.round(flexibility));
-
-          var total=Math.round(
-            structure*WEIGHTS.structure +
-            costs*WEIGHTS.costs +
-            investment*WEIGHTS.investment +
-            transparency*WEIGHTS.transparency +
-            flexibility*WEIGHTS.flexibility
-          );
-
-          var stroke='#76D062', emoji='✅', verdict='Sehr gut';
-          if(total<50){ stroke='#ef4444'; emoji='❌'; verdict='Verbesserungsbedarf'; }
-          else if(total<80){ stroke='#f97316'; emoji='⚠️'; verdict='Durchschnittlich'; }
-
-          return {
-            total:total,
-            stroke:stroke,
-            emoji:emoji,
-            verdict:verdict,
-            axes:{structure:structure,costs:costs,investment:investment,transparency:transparency,flexibility:flexibility},
-            tips:buildTips(a)
-          };
-        }
-
-        function buildTips(a){
-          var warns=[], positives=[];
-          if(a.provider==='bank'){
-            positives.push('Bank in Ordnung. Meist günstiger als Versicherung, aber laufende Kosten wie Depot und TER prüfen.');
-          }
-          if(a.provider==='insurance'){
-            warns.push('Achtung: Versicherungsverträge sind oft intransparent und verursachen sehr hohe laufende Kosten beim Besparen.');
-            var s=Array.isArray(a.ins_services)?a.ins_services:[];
-            if(s.indexOf('none')>-1){
-              warns.push('Achtung: Keine Versicherungsdeckung gewählt. Eine Versicherungslösung macht in diesem Fall keinen Sinn.');
-            }
-          }
-          var yrs=horizonYears(a);
-          if(yrs && yrs<=15 && isNum(a.invest_eq) && a.invest_eq>80){
-            warns.push('Warnhinweis 88: Hoher Aktienanteil bei kurzer Restlaufzeit kann riskant sein - dringende Überprüfung.');
-          }
-          if(isNum(a.ter) && a.ter>0.5){
-            warns.push('Achtung: TER über 0.5 Prozent. Möglich aktiver Fonds mit hohen Kosten.');
-          }
-          if(a.ter==='unknown'){
-            warns.push('Achtung: TER unbekannt. Factsheet prüfen - hohe Kosten führen zu weniger Rendite.');
-          }
-          if(a.invest_eq==='unknown'){
-            warns.push('Achtung: Investmentquote unbekannt - hier fehlt Wissen.');
-          }
-          if(a.redemption_commission_pct==='unknown'){
-            warns.push('Achtung: Rücknahmekommission nicht bekannt - kann viel ausmachen.');
-          }
-          if(a.front_load_pct==='unknown'){
-            warns.push('Achtung: Ausgabeaufschlag nicht bekannt - kann viel ausmachen.');
-          }
-          if(isNum(a.invest_eq) && a.invest_eq<100){
-            if(a.rest_bucket==='tech_rate') warns.push('Achtung: Technischer Zins senkt die Rendite oft massiv.');
-            if(a.rest_bucket==='cash') warns.push('Achtung: Nicht investierter Anteil auf dem Geldkonto senkt die Rendite und ist der Inflation ausgesetzt.');
-          }
-          if(isNum(a.invest_eq) && a.invest_eq>=80){
-            if(a.investment_approach==='passive') positives.push('Passiver Ansatz gewählt - gut für Kosten und Marktabdeckung.');
-            if(a.investment_approach==='trend') warns.push('Achtung: Trend- oder Themenfonds bergen Risiken und oft höhere Kosten; statistisch erzielen sie langfristig häufig schlechtere Renditen.');
-            if(a.investment_approach==='none') warns.push('Achtung: Keine Strategie führt oft zu einer schlechteren Rendite.');
-            if(a.investment_approach==='unknown') warns.push('Achtung: Strategie unbekannt.');
-          }
-          return { warns:warns, positives:positives };
         }
 
         function axisUI(axes){
           var wrap=h('div',{class:'axis-wrap'}, h('div',{class:'axis-list'}));
           var list=wrap.firstChild;
-          var items=[
-            ['Struktur','structure'],
-            ['Kosten','costs'],
-            ['Investment','investment'],
-            ['Transparenz','transparency'],
-            ['Flexibilität','flexibility']
-          ];
+          var items=[['Struktur','structure'],['Kosten','costs'],['Investment','investment'],['Transparenz','transparency'],['Flexibilität','flexibility']];
           for(var i=0;i<items.length;i++){
             var label=items[i][0], key=items[i][1];
-            var row=h('div',{class:'axis-item'},
-              h('div',{class:'name'},label),
-              h('div',{class:'bar'}, h('div',{class:'fill'})),
-              h('div',{class:'val'}, String(Math.round(axes[key])))
-            );
+            var row=h('div',{class:'axis-item'}, h('div',{class:'name'},label), h('div',{class:'bar'}, h('div',{class:'fill'})), h('div',{class:'val'}, String(Math.round(axes[key]))));
             row.querySelector('.fill').style.width=axes[key]+'%';
             list.appendChild(row);
           }
@@ -919,71 +650,28 @@
         }
 
         function projectionUI(p){
-          var basePctText='4.8%';
-          var totalFeeDisplay=p.fee.totalDisplay;
+          var basePct=(p.baseRate*100).toFixed(1)+'%';
+          var netPct=(p.netRate*100).toFixed(1)+'%';
           var diffAbs=Math.abs(p.diff);
           var diffLow=diffAbs*0.9;
           var diffHigh=diffAbs*1.1;
-
-          var zeroFeeWarn = p.zeroFees
-            ? h('div',{class:'pill warn',style:'margin-top:10px;'},'Achtung: Eine 3a-Lösung ohne Gebühren ist unrealistisch – bitte prüfe deine Angaben.')
-            : null;
-
+          var diffRange=h('span',{class:'accent-block'}, formatCHF(diffLow)+' bis '+formatCHF(diffHigh));
+          var zeroFeeWarn = p.zeroFees ? h('div',{class:'pill warn',style:'margin-top:10px;'},'Achtung: Eine 3a-Lösung ohne Gebühren ist unrealistisch – bitte prüfe deine Angaben.') : null;
           var equityNote=null;
           if(p.equityGap>0 && p.baseRate < 0.05 && p.years>=10){
             var lossLow=p.equityGap*0.9;
             var lossHigh=p.equityGap*1.1;
-            equityNote=h('div',{class:'pill warn',style:'margin-top:10px;'},
-              'Achtung: Durch die tiefe Aktienquote könnten dir langfristig ',
-              h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(lossLow)+' bis '+formatCHF(lossHigh)),
-              ' fehlen.'
-            );
+            equityNote=h('div',{class:'pill warn',style:'margin-top:10px;'},'Achtung: Durch die tiefe Aktienquote könnten dir langfristig ', h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(lossLow)+' bis '+formatCHF(lossHigh)), ' fehlen.');
           }
-
-          var disclaimerText='Alle Angaben ohne Gewaehr. Dieses Tool dient nur zur Veranschaulichung und ersetzt keine individuelle Beratung. Es ist eine Beta-Version und macht Fehler.';
-
-          var textParagraph;
-          if(p.zeroFees || diffAbs < 1){
-            textParagraph = h('p',{
-              class:'subtitle',
-              style:'margin:0 0 8px;font-size:14px; line-height:1.6;'
-            },
-              'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,
-              ' Jahre mit einer Brutto-Rendite von ',basePctText,
-              ' können wir auf Basis deiner Angaben keinen sinnvollen Gebühren-Effekt berechnen. ',
-              'Entweder fallen laut deinen Angaben keine Gebühren an oder sie sind sehr tief. ',
-              'In der Praxis ist das selten. Hol dir eine 2. Meinung.'
-            );
-          } else {
-            var diffRange=h('span',{class:'accent-block'}, formatCHF(diffLow)+' bis '+formatCHF(diffHigh));
-            textParagraph = h('p',{
-              class:'subtitle',
-              style:'margin:0 0 8px;font-size:14px; line-height:1.6;'
-            },
-              'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,
-              ' Jahre mit einer Brutto-Rendite von ',basePctText,
-              ' kommen die Gebühren auf ca. ', totalFeeDisplay,
-              '. Unter dieser Annahme fehlen dir voraussichtlich ', diffRange,
-              ' gegenüber einer gebührengünstigeren Variante. Hol dir eine 2. Meinung.'
-            );
-          }
-
-          var disclaimer=h('p',{
-            class:'subtitle',
-            style:'margin:12px 0 10px;font-size:12px; color:#9ca3af;'
-          },disclaimerText);
-
-          var cta=h('a',{
-            class:'btn primary cta-contact',
-            href:'https://vemo.ch/kontakt/',
-            target:'_blank',
-            rel:'noopener',
-            style:'margin-top:6px; align-self:flex-start;'
-          },'Berater kontaktieren');
-
+          var disclaimer=h('p',{class:'subtitle',style:'margin:12px 0 10px;font-size:12px; color:#9ca3af;'},'Achtung: Das Tool ist eine Beta-Version und wird stetig verbessert. Bitte kontaktiere einen Berater für eine echte Analyse.');
+          var cta=h('a',{class:'btn primary cta-contact',href:'https://vemo.ch/kontakt/',target:'_blank',rel:'noopener',style:'margin-top:6px; align-self:flex-start;'},'Berater kontaktieren');
           return h('div',{class:'panel full'},
             h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
-            textParagraph,
+            h('p',{class:'subtitle',style:'margin:0 0 8px;font-size:14px; line-height:1.6;'},
+              'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,' Jahre mit einer Brutto-Renditeannahme von ',basePct,
+              ' (netto ca. ',netPct,') rechnen wir mit geschätzten Gebühren. Unter dieser Annahme fehlen dir voraussichtlich ', diffRange,
+              ' gegenüber einer gebührenfreien Variante. Hol dir eine 2. Meinung.'
+            ),
             zeroFeeWarn,
             equityNote,
             disclaimer,
@@ -1009,77 +697,30 @@
 
           var seq=steps();
           if(state.step>=seq.length){ state.step=Math.max(0, seq.length-1); }
-
           if(state.show){
             var r=score();
             var header=h('div',{class:'hdr'},
               h('div',{class:'header-row'},
-                h('div',{},
-                  h('h2',{class:'title'},'Dein Vemo Score'),
-                  h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität')
-                )
+                h('div',{}, h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität'))
               )
             );
-
             var results=h('div',{class:'results-grid'});
-            var gaugePanel=h('div',{class:'panel center main-score'},
-              gauge(r.total,r.stroke,r.emoji),
-              h('div',{class:'verdict'}, r.verdict)
-            );
-            var axesPanel=h('div',{class:'panel axes-panel'},
-              h('h3',{style:'margin:0 0 12px;font-size:16px;'},'Score nach Kategorien'),
-              axisUI(r.axes)
-            );
-            results.appendChild(gaugePanel);
-            results.appendChild(axesPanel);
-
+            var gaugePanel=h('div',{class:'panel center'}, gauge(r.total,r.stroke,r.emoji), h('div',{class:'verdict'}, r.verdict));
+            var axesPanel=h('div',{class:'panel'}, h('h3',{style:'margin:0 0 12px;font-size:16px;'},'Score nach Kategorien'), axisUI(r.axes));
+            results.appendChild(gaugePanel); results.appendChild(axesPanel);
             var proj=buildProjection(state.a);
             if(proj){ results.appendChild(projectionUI(proj)); }
 
             var t=r.tips; var details=h('div',{class:'content stack'});
             if(state.details){
-              if(t.warns.length){
-                var w=h('div',{});
-                w.appendChild(h('h3',{},'Warnsignale'));
-                for(var wi=0; wi<t.warns.length; wi++){
-                  w.appendChild(h('div',{class:'pill warn'}, t.warns[wi]));
-                }
-                details.appendChild(w);
-              }
-              if(t.positives.length){
-                var p=h('div',{});
-                p.appendChild(h('h3',{},'Positive Signale'));
-                for(var pi=0; pi<t.positives.length; pi++){
-                  p.appendChild(h('div',{class:'pill'}, t.positives[pi]));
-                }
-                details.appendChild(p);
-              }
+              if(t.warns.length){ var w=h('div',{}); w.appendChild(h('h3',{},'Warnsignale')); for(var wi=0; wi<t.warns.length; wi++){ w.appendChild(h('div',{class:'pill warn'}, t.warns[wi])); } details.appendChild(w); }
+              if(t.positives.length){ var p=h('div',{}); p.appendChild(h('h3',{},'Positive Signale')); for(var pi=0; pi<t.positives.length; pi++){ p.appendChild(h('div',{class:'pill'}, t.positives[pi])); } details.appendChild(p); }
             }
-
-            var toggle=h('div',{class:'content center',style:'padding-top:0;'},
-              h('button',{class:'btn ghost'}, state.details?'Details ausblenden':'Details anzeigen')
-            );
-            toggle.querySelector('button').addEventListener('click', function(){
-              updateAndRender(function(){ state.details=!state.details; });
-            });
-
-            var disclaimerText='Alle Angaben ohne Gewaehr. Dieses Tool dient nur zur Veranschaulichung und ersetzt keine individuelle Beratung. Es ist eine Beta-Version und macht Fehler.';
-
-            var foot=h('div',{class:'content',style:'border-top:1px solid var(--vemo-ring); display:grid; gap:10px;'},
-              h('button',{class:'btn primary',style:'width:100%;'},'Neue Analyse starten'),
-              h('p',{class:'note'},disclaimerText)
-            );
-            foot.querySelector('button').addEventListener('click', function(){
-              updateAndRender(function(){ state.step=0; state.a={}; state.show=false; state.details=false; });
-            });
-
-            shell.appendChild(header);
-            shell.appendChild(results);
-            if(state.details){ shell.appendChild(details); }
-            shell.appendChild(toggle);
-            shell.appendChild(sourcesUI());
-            shell.appendChild(foot);
-            return;
+            var toggle=h('div',{class:'content center',style:'padding-top:0;'}, h('button',{class:'btn ghost'}, state.details?'Details ausblenden':'Details anzeigen'));
+            toggle.querySelector('button').addEventListener('click', function(){ updateAndRender(function(){ state.details=!state.details; }); });
+            var foot=h('div',{class:'content',style:'border-top:1px solid var(--vemo-ring); display:grid; gap:10px;'}, h('button',{class:'btn primary',style:'width:100%;'},'Neue Analyse starten'), h('p',{class:'note'},'Alle Angaben ohne Gewähr. Dieses Tool dient nur zur Veranschaulichung und ersetzt keine individuelle Beratung oder Garantie.'));
+            foot.querySelector('button').addEventListener('click', function(){ updateAndRender(function(){ state.step=0; state.a={}; state.show=false; state.details=false; }); });
+            shell.appendChild(header); shell.appendChild(results); if(state.details){ shell.appendChild(details); } shell.appendChild(toggle); shell.appendChild(sourcesUI()); shell.appendChild(foot); return;
           }
 
           var stepObj=seq[state.step] || seq[0];
@@ -1087,41 +728,21 @@
           var fill=h('div',{class:'fill'});
           var header2=h('div',{class:'hdr'},
             h('div',{class:'header-row'},
-              h('div',{},
-                h('div',{class:'pbar'}, fill),
-                h('h2',{class:'title'}, stepObj.title),
-                h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.')
-              )
+              h('div',{}, h('div',{class:'pbar'}, fill), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.'))
             )
           );
           fill.style.width=pct+'%';
 
           var body=h('div',{class:'content stack wrap-card'});
           var ans=state.a[stepObj.id];
-
           if(stepObj.type==='single'){
             var opts=(stepObj.options||[]);
             for(var oi=0; oi<opts.length; oi++){
               (function(opt){
                 var selected=ans===opt.value;
-                var inner=h('div',{},
-                  h('div',{class:'label'},opt.label),
-                  opt.sub?h('small',{},opt.sub):null
-                );
-                var b=h('button',{
-                  class:'option',
-                  'data-selected':selected?'true':'false'
-                },
-                  inner,
-                  selected?h('span',{},'✓'):h('span',{})
-                );
-                b.addEventListener('click', function(){
-                  updateAndRender(function(){
-                    state.a[stepObj.id]=opt.value;
-                    var s=steps();
-                    state.step=Math.min(state.step+1, s.length-1);
-                  });
-                });
+                var inner=h('div',{}, h('div',{class:'label'},opt.label), opt.sub?h('small',{},opt.sub):null);
+                var b=h('button',{class:'option','data-selected':selected?'true':'false'}, inner, selected?h('span',{},'✓'):h('span',{},''));
+                b.addEventListener('click', function(){ updateAndRender(function(){ state.a[stepObj.id]=opt.value; var s=steps(); state.step=Math.min(state.step+1, s.length-1); }); });
                 body.appendChild(b);
               })(opts[oi]);
             }
@@ -1130,83 +751,31 @@
             for(var mi=0; mi<opts2.length; mi++){
               (function(opt){
                 var on=sel.indexOf(opt.value)>-1;
-                var b=h('button',{
-                  class:'option',
-                  'data-selected':on?'true':'false'
-                },
-                  h('div',{class:'label'},opt.label)
-                );
-                b.addEventListener('click', function(){
-                  updateAndRender(function(){
-                    var next=sel.slice();
-                    if(on){
-                      next=next.filter(function(v){ return v!==opt.value; });
-                    } else {
-                      if(opt.value==='none'){
-                        next=['none'];
-                      } else {
-                        next=next.filter(function(v){ return v!=='none'; }).concat(opt.value);
-                      }
-                    }
-                    state.a[stepObj.id]=next;
-                  });
-                });
+                var b=h('button',{class:'option','data-selected':on?'true':'false'}, h('div',{class:'label'},opt.label));
+                b.addEventListener('click', function(){ updateAndRender(function(){ var next=sel.slice(); if(on){ next=next.filter(function(v){ return v!==opt.value; }); } else { if(opt.value==='none'){ next=['none']; } else { next=next.filter(function(v){ return v!=='none'; }).concat(opt.value); } } state.a[stepObj.id]=next; }); });
                 body.appendChild(b);
               })(opts2[mi]);
             }
           } else if(stepObj.type==='dropdown'){
-            var sEl=h('select',{class:'select'});
-            sEl.appendChild(h('option',{value:''},'Bitte auswählen'));
-            var optz=stepObj.options;
-            for(var di=0; di<optz.length; di++){
-              sEl.appendChild(h('option',{value:optz[di].value}, optz[di].label));
-            }
-            sEl.value=(ans||'');
-            sEl.addEventListener('change', function(e){
-              updateAndRender(function(){ state.a[stepObj.id]=e.target.value; });
-            });
-            body.appendChild(sEl);
+            var sEl=h('select',{class:'select'}); sEl.appendChild(h('option',{value:''},'Bitte auswählen'));
+            var optz=stepObj.options; for(var di=0; di<optz.length; di++){ sEl.appendChild(h('option',{value:optz[di].value}, optz[di].label)); }
+            sEl.value=(ans||''); sEl.addEventListener('change', function(e){ updateAndRender(function(){ state.a[stepObj.id]=e.target.value; }); }); body.appendChild(sEl);
           } else if(stepObj.type==='slider'){
             body.appendChild(sliderUI(stepObj, stepObj.id));
           }
 
           var cur = state.a[stepObj.id];
-          var canNext = stepObj.type==='multiple'
-            ? (Array.isArray(cur)&&cur.length>0)
-            : (stepObj.type==='slider' ? (cur==='unknown' || isNum(cur)) : !!cur);
+          var canNext = stepObj.type==='multiple' ? (Array.isArray(cur)&&cur.length>0) : (stepObj.type==='slider' ? (cur==='unknown' || isNum(cur)) : !!cur);
+          var actions=h('div',{class:'btnrow'}, h('button',{class:'btn ghost', disabled: state.step===0}, 'Zurück'), h('button',{class:'btn primary', disabled: !canNext}, state.step>=seq.length-1?'Ergebnis anzeigen':'Weiter'));
+          actions.children[0].addEventListener('click', function(){ if(state.step>0){ updateAndRender(function(){ state.step--; }); } });
+          actions.children[1].addEventListener('click', function(){ var seqNow=steps(); if(state.step<seqNow.length-1){ updateAndRender(function(){ state.step++; }); } else { updateAndRender(function(){ state.show=true; }); } });
 
-          var actions=h('div',{class:'btnrow'},
-            h('button',{class:'btn ghost', disabled: state.step===0}, 'Zurück'),
-            h('button',{class:'btn primary', disabled: !canNext}, state.step>=seq.length-1?'Ergebnis anzeigen':'Weiter')
-          );
-          actions.children[0].addEventListener('click', function(){
-            if(state.step>0){
-              updateAndRender(function(){ state.step--; });
-            }
-          });
-          actions.children[1].addEventListener('click', function(){
-            var seqNow=steps();
-            if(state.step<seqNow.length-1){
-              updateAndRender(function(){ state.step++; });
-            } else {
-              updateAndRender(function(){ state.show=true; });
-            }
-          });
-
-          shell.appendChild(header2);
-          shell.appendChild(body);
-          shell.appendChild(actions);
+          shell.appendChild(header2); shell.appendChild(body); shell.appendChild(actions);
           persistState();
         }
 
-        if(document.readyState==='loading'){
-          document.addEventListener('DOMContentLoaded', render);
-        } else {
-          render();
-        }
-      } catch(e){
-        fail('SyntaxError: '+(e&&e.message?e.message:String(e)));
-      }
+        if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', render); } else { render(); }
+      } catch(e){ fail('SyntaxError: '+(e&&e.message?e.message:String(e))); }
     })();
   </script>
 </body>
