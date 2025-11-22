@@ -246,17 +246,23 @@
     .info-badge:hover::before, .info-badge:focus-visible::before { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .live-save {
+      position: absolute;
+      top: 10px;
+      right: 12px;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: linear-gradient(120deg, rgba(118,208,98,0.16), rgba(118,208,98,0.26));
+      gap: 6px;
+      background: linear-gradient(120deg, rgba(118,208,98,0.14), rgba(118,208,98,0.2));
       color: #1d3c22;
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 12px;
-      border: 1px solid rgba(118,208,98,0.35);
-      box-shadow: 0 10px 22px rgba(118,208,98,0.16);
+      border: 1px solid rgba(118,208,98,0.3);
+      box-shadow: 0 10px 20px rgba(118,208,98,0.12);
       font-weight: 700;
-      font-size: 13px;
+      font-size: 11px;
+      line-height: 1.1;
+      pointer-events: none;
+      opacity: 0.9;
     }
 
     .header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
@@ -425,9 +431,9 @@
         }
 
         function liveSaveBadge(){
-          return h('div',{class:'live-save'},
-            h('span',{style:'display:inline-flex;width:8px;height:8px;border-radius:"50%";background:var(--vemo-green);box-shadow:"0 0 0 6px rgba(118,208,98,0.25)";'}),
-            h('span',{},'Live Save aktiv – Antworten werden gespeichert. Gebühreninfos findest du über die (i)-Buttons.')
+          return h('div',{class:'live-save',title:'Automatisches Speichern aktiv – Gebühreninfos über die (i)-Buttons'},
+            h('span',{style:'display:inline-flex;width:7px;height:7px;border-radius:"50%";background:var(--vemo-green);box-shadow:"0 0 0 5px rgba(118,208,98,0.22)";'}),
+            h('span',{},'Live Save')
           );
         }
 
@@ -645,7 +651,7 @@
             h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
             h('p',{class:'subtitle',style:'margin:0 0 12px;font-size:14px; line-height:1.6;'},
               'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,' Jahre mit einer Brutto-Renditeannahme von ',basePct,
-              ' (netto ca. ',netPct,') kalkulieren wir Gebühren von insgesamt rund ',p.fee.totalDisplay,
+              ' (netto ca. ',netPct,') unterstellen wir eine geschätzte Gebühr von insgesamt rund ',p.fee.totalDisplay,
               '. Laut dieser Annahme können sie etwa ', diffEmph,' Unterschied ausmachen. ',assumedText,
               'Hol dir bei Bedarf eine zweite Meinung.'
             )
