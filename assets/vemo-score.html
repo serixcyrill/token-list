@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vemo 3a Rechner - Logic V9</title>
+  <title>Vemo 3a Fast Check</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -186,6 +186,63 @@
     .inline { display: flex; align-items: center; gap: 12px; }
     .unklar { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--vemo-muted); font-size: 14px; }
 
+    .slider-meta { display: flex; align-items: center; gap: 10px; color: var(--vemo-muted); font-size: 14px; margin-top: 10px; }
+
+    .info-badge {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--vemo-blue);
+      color: #0b1531;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: help;
+      border: 1px solid rgba(12, 18, 34, 0.08);
+      box-shadow: 0 6px 14px rgba(15,23,42,0.16);
+    }
+
+    .info-badge:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(125,211,252,0.35); }
+
+    .info-badge::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(6px);
+      background: #0b1531;
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-soft);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease, transform .15s ease;
+      width: min(320px, 78vw);
+      font-size: 13px;
+      line-height: 1.45;
+      z-index: 2;
+      text-align: left;
+    }
+
+    .info-badge::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 4px);
+      left: 50%;
+      transform: translateX(-50%) translateY(6px);
+      border: 8px solid transparent;
+      border-top-color: #0b1531;
+      opacity: 0;
+      transition: opacity .15s ease, transform .15s ease;
+    }
+
+    .info-badge:hover::after, .info-badge:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .info-badge:hover::before, .info-badge:focus-visible::before { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     .btnrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px 20px; }
 
     .btn {
@@ -337,9 +394,9 @@
           if(isNum(a.invest_eq) && a.invest_eq>=80){
             arr.push({ id:'investment_approach', type:'single', title:'Investment-Ansatz', options:[{value:'passive',label:'Passiver Ansatz'},{value:'trend',label:'Trendfonds / Themenfonds'},{value:'none',label:'Keine Strategie'},{value:'unknown',label:'Unklar'}] });
           }
-          arr.push({ id:'ter', type:'slider', title:'TER deiner Fonds', slider:{min:0,max:4,step:0.1,unit:'%'} });
-          arr.push({ id:'redemption_commission_pct', type:'slider', title:'Rücknahmekommissionen', slider:{min:0,max:10,step:0.1,unit:'%'} });
-          arr.push({ id:'front_load_pct', type:'slider', title:'Ausgabeaufschlag', slider:{min:0,max:10,step:0.1,unit:'%'} });
+          arr.push({ id:'ter', type:'slider', title:'TER deiner Fonds', slider:{min:0,max:4,step:0.1,unit:'%'}, info:'Die TER findest du im Fonds-Factsheet. Sie wird oft als "Total Expense Ratio" oder Gesamtkostenquote ausgewiesen.' });
+          arr.push({ id:'redemption_commission_pct', type:'slider', title:'Rücknahmekommissionen', slider:{min:0,max:10,step:0.1,unit:'%'}, info:'Rücknahmekommissionen stehen im KIID/PRIIP KID des Fonds unter Kosten oder im Factsheet bei Rückgabe- bzw. Verkaufsgebühren.' });
+          arr.push({ id:'front_load_pct', type:'slider', title:'Ausgabeaufschlag', slider:{min:0,max:10,step:0.1,unit:'%'}, info:'Ausgabeaufschlag (Agio) wird im KIID/PRIIP KID im Abschnitt Kosten oder Vertriebsgebühren genannt.' });
           if(a.provider==='insurance'){
             arr.push({ id:'ins_services', type:'multiple', title:'Welche Versicherungsleistungen sind in der Police enthalten', options:[{value:'death_benefit',label:'Todesfallkapital'},{value:'disability_pension',label:'Erwerbsunfähigkeitsrente'},{value:'premium_waiver',label:'Prämienbefreiung'},{value:'none',label:'Keine'}] });
             arr.push({ id:'commission_transparency', type:'single', title:'Provision offengelegt', options:[{value:'yes',label:'Ja'},{value:'no',label:'Nein'},{value:'unknown',label:'Unklar'}] });
@@ -352,7 +409,11 @@
           var slider=h('input',{class:'input',type:'range',min:q.slider.min,max:q.slider.max,step:q.slider.step,value:num});
           slider.style.setProperty('--val', ((num - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%');
           var label=h('div',{}, isUnknown?'Unklar':(parseFloat(num).toFixed(1)+q.slider.unit));
-          var row=h('div',{class:'inline'}, slider, label);
+          var info=null;
+          if(q.info){ info=h('button',{class:'info-badge','data-tip':q.info,type:'button','aria-label':'Info zu Gebühren'},'i'); }
+          var row=h('div',{class:'inline'}, slider);
+          var meta=h('div',{class:'slider-meta'}, label);
+          if(info){ meta.appendChild(info); }
           var unklar=h('label',{class:'unklar'}, h('input',{type:'checkbox'}), h('span',{},'Unklar'));
           var chk=unklar.querySelector('input'); chk.checked=isUnknown;
           function apply(){ if(chk.checked){ slider.setAttribute('disabled',''); label.textContent='Unklar'; } else { slider.removeAttribute('disabled'); label.textContent=parseFloat(slider.value).toFixed(1)+q.slider.unit; } }
@@ -360,7 +421,7 @@
           slider.addEventListener('input', function(e){ var v=parseFloat(e.target.value); state.a[key]=v; slider.style.setProperty('--val', ((v - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%'); if(!chk.checked){ label.textContent=v.toFixed(1)+q.slider.unit; } });
           slider.addEventListener('change', function(){ if(!chk.checked){ state.a[key]=parseFloat(slider.value); } render(); });
           chk.addEventListener('change', function(){ state.a[key]=chk.checked?'unknown':parseFloat(slider.value); apply(); render(); });
-          var wrap=h('div',{}); wrap.appendChild(row); wrap.appendChild(unklar); return wrap;
+          var wrap=h('div',{}); wrap.appendChild(row); wrap.appendChild(meta); wrap.appendChild(unklar); return wrap;
         }
 
         function score(){
@@ -443,7 +504,7 @@
           var seq=steps();
           if(state.show){
             var r=score();
-            var header=h('div',{class:'hdr center'}, h('div',{class:'eyebrow'},'Vemo 3a Rechner – Ergebnis'), h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität'));
+            var header=h('div',{class:'hdr center'}, h('div',{class:'eyebrow'},'Vemo 3a Fast Check – Ergebnis'), h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität'));
             var results=h('div',{class:'results-grid'});
             var gaugePanel=h('div',{class:'panel center'}, gauge(r.total,r.stroke,r.emoji), h('div',{class:'verdict'}, r.verdict));
             var axesPanel=h('div',{class:'panel'}, h('h3',{style:'margin:0 0 12px;font-size:16px;'},'Score nach Kategorien'), axisUI(r.axes));
@@ -464,7 +525,7 @@
           var stepObj=seq[state.step] || seq[0];
           var pct=Math.round(((Math.min(state.step+1,seq.length))/Math.max(1,seq.length))*100);
           var fill=h('div',{class:'fill'});
-          var header2=h('div',{class:'hdr'}, h('div',{class:'pbar'}, fill), h('div',{class:'eyebrow'},'Vemo 3a Rechner – Logic V9'), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.'));
+          var header2=h('div',{class:'hdr'}, h('div',{class:'pbar'}, fill), h('div',{class:'eyebrow'},'Vemo 3a Fast Check'), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.'));
           fill.style.width=pct+'%';
 
           var body=h('div',{class:'content stack wrap-card'});
