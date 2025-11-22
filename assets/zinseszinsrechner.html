@@ -249,6 +249,27 @@
       #zinseszins-app .pill.saved{ border-color:rgba(22,163,74,.22); background:rgba(22,163,74,.08); color:#166534; opacity:0.28; transition:opacity .24s ease; }
       #zinseszins-app .pill.saved.visible{ opacity:1; }
       #zinseszins-app .status-meta{ color:#475569; font-weight:600; font-size:13px; line-height:1.45; }
+
+    /* --- Mobile-first Optimierungen --- */
+    @media (max-width: 760px){
+      #zinseszins-app{ padding:22px 12px 44px; }
+      #zinseszins-app header{ padding:14px 16px 8px; gap:6px 8px; }
+      #zinseszins-app h1{ font-size:24px; letter-spacing:-0.15px; }
+      #zinseszins-app p.lead{ font-size:13px; line-height:1.55; }
+      #zinseszins-app main{ padding:18px 18px 28px; }
+      #zinseszins-app .grid{ gap:16px; }
+      #zinseszins-app .panel{ padding:16px; border-radius:18px; box-shadow:0 12px 26px rgba(15,23,42,.08); }
+      #zinseszins-app .form-grid{ gap:14px; }
+      #zinseszins-app label{ font-size:13px; margin-bottom:4px; }
+      #zinseszins-app .input, #zinseszins-app select.input{ padding:13px 14px; font-size:15px; }
+      #zinseszins-app button{ margin-top:10px; padding:15px; border-radius:14px; }
+      #zinseszins-app .kpis{ grid-template-columns:1fr; gap:12px; }
+      #zinseszins-app .kpi{ min-height:86px; padding:12px 14px; }
+      #zinseszins-app .kpi-value{ font-size:20px; }
+      #zinseszins-app .kpi.endcap{ order:-1; min-height:110px; border-radius:16px; }
+      #zinseszins-app .chart-section{ margin-top:16px; }
+      #zinseszins-app #chart{ height:280px; }
+    }
   </style>
 </head>
 <body>
