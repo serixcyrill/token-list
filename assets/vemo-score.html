@@ -79,6 +79,7 @@
       display: grid;
       gap: 10px;
       padding: 4px 2px 6px;
+      position: relative;
     }
 
     .eyebrow {
@@ -91,6 +92,13 @@
       border-radius: 999px;
       font-weight: 600;
       font-size: 13px;
+    }
+
+    .eyebrow.float {
+      position: absolute;
+      top: 2px;
+      right: 0;
+      box-shadow: 0 10px 24px rgba(118,208,98,0.22);
     }
 
     .title { font-size: 28px; margin: 0; font-weight: 700; }
@@ -582,7 +590,9 @@
             baseRate=Math.max(baseRate - 0.01, 0);
           }
           var monthly=a.monthly_contribution;
+          if(a.provider==='insurance'){ monthly = monthly*0.95; }
           var fee=feeAssumption(a);
+          var zeroFees = fee.runningPct===0 && fee.frontLoadPct===0 && fee.redemptionPct===0;
           var growthRate=Math.max(baseRate - fee.runningPct, 0);
           var withBase=futureValueMonthly(monthly, years, baseRate);
           var withFees=futureValueMonthly(monthly*(1-fee.frontLoadPct), years, growthRate);
@@ -598,7 +608,8 @@
             fee:fee,
             withBase:withBase,
             withFees:withFees,
-            diff:diff
+            diff:diff,
+            zeroFees:zeroFees
           };
         }
 
@@ -619,15 +630,20 @@
           var basePct=(p.baseRate*100).toFixed(1)+'%';
           var netPct=(p.netRate*100).toFixed(1)+'%';
           var assumedText=p.fee.assumptions.length ? 'Wir nehmen '+p.fee.assumptions.join(' und ')+' an. ' : '';
-          var diffEmph=h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(p.diff));
+          var diffAbs=Math.abs(p.diff);
+          var diffLow=diffAbs*0.9;
+          var diffHigh=diffAbs*1.1;
+          var diffRange=h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(diffLow)+' bis '+formatCHF(diffHigh));
+          var zeroFeeWarn = p.zeroFees ? h('div',{class:'pill warn',style:'margin-top:10px;'},'Achtung: Eine 3a-Lösung ohne Gebühren ist unrealistisch – bitte prüfe deine Angaben.') : null;
           return h('div',{class:'panel full'},
             h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
             h('p',{class:'subtitle',style:'margin:0 0 12px;font-size:14px; line-height:1.6;'},
               'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,' Jahre mit einer Brutto-Renditeannahme von ',basePct,
               ' (netto ca. ',netPct,') unterstellen wir eine geschätzte Gebühr von insgesamt rund ',p.fee.totalDisplay,
-              '. Laut dieser Annahme können sie etwa ', diffEmph,' Unterschied ausmachen. ',assumedText,
+              '. Laut dieser Annahme könnten die Gebühren etwa ', diffRange,' Unterschied ausmachen. ',assumedText,
               'Hol dir bei Bedarf eine zweite Meinung.'
-            )
+            ),
+            zeroFeeWarn
           );
         }
 
@@ -651,9 +667,12 @@
           if(state.step>=seq.length){ state.step=Math.max(0, seq.length-1); }
           if(state.show){
             var r=score();
-            var header=h('div',{class:'hdr'}, h('div',{class:'header-row'},
-              h('div',{}, h('div',{class:'eyebrow'},'Vemo 3a Fast Check – Ergebnis'), h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität'))
-            ));
+            var header=h('div',{class:'hdr'},
+              h('div',{class:'eyebrow float'},'Vemo 3a Fast Check'),
+              h('div',{class:'header-row'},
+                h('div',{}, h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität'))
+              )
+            );
             var results=h('div',{class:'results-grid'});
             var gaugePanel=h('div',{class:'panel center'}, gauge(r.total,r.stroke,r.emoji), h('div',{class:'verdict'}, r.verdict));
             var axesPanel=h('div',{class:'panel'}, h('h3',{style:'margin:0 0 12px;font-size:16px;'},'Score nach Kategorien'), axisUI(r.axes));
@@ -676,9 +695,12 @@
           var stepObj=seq[state.step] || seq[0];
           var pct=Math.round(((Math.min(state.step+1,seq.length))/Math.max(1,seq.length))*100);
           var fill=h('div',{class:'fill'});
-          var header2=h('div',{class:'hdr'}, h('div',{class:'header-row'},
-            h('div',{}, h('div',{class:'pbar'}, fill), h('div',{class:'eyebrow'},'Vemo 3a Fast Check'), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.'))
-          ));
+          var header2=h('div',{class:'hdr'},
+            h('div',{class:'eyebrow float'},'Vemo 3a Fast Check'),
+            h('div',{class:'header-row'},
+              h('div',{}, h('div',{class:'pbar'}, fill), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.'))
+            )
+          );
           fill.style.width=pct+'%';
 
           var body=h('div',{class:'content stack wrap-card'});
