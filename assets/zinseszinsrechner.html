@@ -41,10 +41,7 @@
       color:#0f172a;
       font-family:'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
       padding:28px 16px 60px;
-      background:
-        radial-gradient(circle at 16% 24%, rgba(126,217,87,.10), transparent 26%),
-        radial-gradient(circle at 86% 16%, rgba(91,124,250,.10), transparent 24%),
-        linear-gradient(180deg,#fbfcff 0%, #eef2ff 100%);
+      background:transparent;
       position:relative;
       isolation:isolate;
     }
@@ -54,10 +51,15 @@
       margin:0 auto;
       position:relative;
     }
-    #zinseszins-app .orb{ position:absolute; inset:0; filter:blur(90px); opacity:.4; background:
-        radial-gradient(circle at 18% 42%, rgba(126,217,87,.18), transparent 25%),
-        radial-gradient(circle at 78% 20%, rgba(91,124,250,.20), transparent 22%);
-      z-index:0; pointer-events:none; }
+    #zinseszins-app .orb{
+      position:absolute;
+      inset:0;
+      filter:blur(90px);
+      opacity:0;
+      background:none;
+      z-index:0;
+      pointer-events:none;
+    }
     #zinseszins-app .shell{
       position:relative; z-index:1;
       background:var(--glass);
