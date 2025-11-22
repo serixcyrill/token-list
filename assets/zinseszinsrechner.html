@@ -175,13 +175,13 @@
     .kpi-label{ color:var(--muted); font-size:13px; }
     .kpi-value{ font-size:22px; font-weight:800; letter-spacing:-0.2px; margin-top:4px; color:#0f172a; }
 
-    .summary{ margin-top:18px; display:grid; gap:12px; }
-    .summary-head{ display:flex; align-items:center; gap:10px; justify-content:space-between; }
-    .summary-pill{ background:#e2e8f0; color:#0f172a; font-weight:700; font-size:12px; padding:8px 10px; border-radius:999px; border:1px solid rgba(15,23,42,.08); }
-    .summary-body{ display:grid; gap:12px; }
-    .row{ display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border:1px solid var(--ring); border-radius:14px; background:#f8fafc; }
-    .row .l{ color:#0f172a; font-weight:700; }
-    .row .r{ font-weight:700; color:#111827; }
+    .kpi.accent{
+      background:linear-gradient(180deg,rgba(126,217,87,.18) 0%, rgba(126,217,87,.10) 70%);
+      border-color:rgba(126,217,87,.45);
+      box-shadow:0 18px 34px rgba(126,217,87,.15);
+    }
+    .kpi.accent .kpi-label{ color:#0f172a; }
+    .kpi.accent .kpi-value{ color:#14532d; }
 
     .chart-section{ margin-top:22px; }
     .chart-card{ padding:18px 18px 10px; border:1px solid var(--ring); border-radius:18px; background:#f8fafc; box-shadow:0 12px 28px rgba(15,23,42,.08); }
@@ -300,15 +300,9 @@
                 <div class="kpi-label">Gesamteinzahlungen</div>
                 <div class="kpi-value" id="einzahlungen">–</div>
               </div>
-            </div>
-
-            <div class="summary" id="summary">
-              <div class="summary-head">
-                <h3 style="margin:0;">Zusammenfassung</h3>
-                <div class="summary-pill" id="ratio-pill">–</div>
-              </div>
-              <div id="summary-body" class="summary-body">
-                <div class="empty">Gib Werte ein und klicke auf „Berechnen“, um eine Projektion zu sehen.</div>
+              <div class="kpi accent">
+                <div class="kpi-label">Zinsen-Anteil</div>
+                <div class="kpi-value" id="zinsen-anteil">0.0%</div>
               </div>
             </div>
           </section>
@@ -333,7 +327,6 @@
   <script>
     (function(){
       const CHF0 = (n)=> new Intl.NumberFormat('de-CH',{style:'currency',currency:'CHF',minimumFractionDigits:0,maximumFractionDigits:0}).format(n||0);
-      const CHF2 = (n)=> new Intl.NumberFormat('de-CH',{style:'currency',currency:'CHF'}).format(n||0);
       const INT = new Intl.NumberFormat('de-CH');
 
       const el = {
@@ -346,11 +339,9 @@
         end: document.getElementById('endkapital'),
         interest: document.getElementById('zinsen'),
         deposits: document.getElementById('einzahlungen'),
-        summary: document.getElementById('summary'),
-        summaryBody: document.getElementById('summary-body'),
         chart: document.getElementById('chart'),
         saved: document.getElementById('save-status'),
-        ratio: document.getElementById('ratio-pill'),
+        ratio: document.getElementById('zinsen-anteil'),
         insight: document.getElementById('insight'),
         live: document.getElementById('live-badge')
       };
@@ -417,7 +408,6 @@
         const totalInterest = balance - totalDeposits;
 
         renderKpis(balance, totalDeposits, totalInterest);
-        renderSummary({ principal, monthly, years, rate, interval });
         updateRatioPill(totalInterest, totalDeposits);
         renderInsight(yearsArr, depositArr, interestArr, balance);
         renderChart(yearsArr, depositArr, interestArr);
@@ -431,28 +421,11 @@
         el.interest.textContent = CHF0(interest);
       }
 
-      function renderSummary({ principal, monthly, years, rate, interval }){
-        const map = {
-          jahrlich: 'jährlich',
-          quartalsweise: 'quartalsweise',
-          monatlich: 'monatlich'
-        };
-        el.summaryBody.innerHTML = `
-          <div class="row"><div class="l">Anfangskapital</div><div class="r">${CHF2(principal)}</div></div>
-          <div class="row"><div class="l">Monatliche Sparrate</div><div class="r">${CHF2(monthly)}</div></div>
-          <div class="row"><div class="l">Spardauer</div><div class="r">${years} Jahre</div></div>
-          <div class="row"><div class="l">Jährlicher Zinssatz</div><div class="r">${(rate*100).toLocaleString('de-CH',{maximumFractionDigits:2})}%</div></div>
-          <div class="row"><div class="l">Ausschüttungsintervall</div><div class="r">${map[interval]}</div></div>
-        `;
-      }
-
       function updateRatioPill(interest, deposits){
         if(!el.ratio) return;
         const total = Math.max(1, deposits + interest);
         const ratio = Math.max(0, interest) / total;
-        el.ratio.textContent = `${(ratio*100).toFixed(1)}% Zinsen-Anteil`;
-        el.ratio.style.background = `linear-gradient(120deg, rgba(126,217,87,${0.32 + ratio*0.3}), rgba(91,124,250,${0.16 + ratio*0.2}))`;
-        el.ratio.style.borderColor = 'rgba(15,23,42,.08)';
+        el.ratio.textContent = `${(ratio*100).toFixed(1)}%`;
       }
 
       function renderInsight(yearsArr, depositsArr, interestArr, balance){
