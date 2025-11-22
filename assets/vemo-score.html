@@ -347,6 +347,7 @@
         var mount=document.getElementById('vemo-score');
         var WEIGHTS={ structure:0.20, costs:0.30, investment:0.25, transparency:0.15, flexibility:0.10 };
         var state={ step:0, a:{}, show:false, details:false };
+        var MAX_3A_MONTHLY=588; // CHF 7'056 Jahresmaximum / 12 (2025 Richtwert Schweiz)
 
         function h(tag, attrs){
           var n=document.createElement(tag);
@@ -387,7 +388,7 @@
           var a=state.a; var arr=[];
           arr.push({ id:'provider', type:'single', title:'Bei welcher Gesellschaft befindet sich deine 3a-Lösung', options:[{value:'bank',label:'Banklösung',sub:'Depot oder Säule 3a Konto'},{value:'insurance',label:'Versicherung',sub:'Policengebundene 3a-Lösung'}] });
           arr.push({ id:'duration', type:'dropdown', title:'Wie viele Jahre läuft deine Lösung noch', options:[{value:'1-5',label:'1 bis 5 Jahre'},{value:'6-10',label:'6 bis 10 Jahre'},{value:'11-15',label:'11 bis 15 Jahre'},{value:'16-20',label:'16 bis 20 Jahre'},{value:'20+',label:'Mehr als 20 Jahre'}] });
-          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein', slider:{min:50,max:1500,step:10,unit:'CHF',decimals:0,format:'chf'} });
+          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein (max. CHF '+MAX_3A_MONTHLY+')', slider:{min:0,max:MAX_3A_MONTHLY,step:10,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY}, info:'Für die Säule 3a (Angestellte) gilt 2025 ein Maximalbetrag von CHF 7’056 pro Jahr bzw. CHF '+MAX_3A_MONTHLY+' pro Monat.' });
           arr.push({ id:'invest_eq', type:'slider', title:'Wie stark ist dein Guthaben in Aktienfonds investiert', slider:{min:0,max:99,step:0.1,unit:'%'} });
           if(isNum(a.invest_eq) && a.invest_eq<99){
             arr.push({ id:'rest_bucket', type:'single', title:'Wohin fliesst der Restanteil, der nicht investiert ist', options:[{value:'bonds',label:'Obligationen'},{value:'tech_rate',label:'Technischer Zins'},{value:'cash',label:'Geldkonto / Währung'}] });
@@ -406,7 +407,10 @@
         }
 
         function sliderUI(q,key){
-          var val=state.a[key]; var isUnknown=(val==='unknown'); var num=isNum(val)?val:q.slider.min; if(val===undefined){ state.a[key]=num; }
+          var val=state.a[key]; var isUnknown=(val==='unknown');
+          var defaultVal=typeof q.slider.default==='number'?q.slider.default:q.slider.min;
+          var num=isNum(val)?val:defaultVal;
+          if(val===undefined){ state.a[key]=defaultVal; num=defaultVal; }
           var decimals=typeof q.slider.decimals==='number'?q.slider.decimals:1;
           function fmt(v){
             if(q.slider.format==='chf'){
@@ -485,6 +489,25 @@
           return map[key]||null;
         }
 
+        function equityRate(eq){
+          if(!isNum(eq)) return null;
+          var ratio=Math.max(0, Math.min(1, eq/99));
+          return 0.073 * ratio; // 7.3% maximale Annahme bei 100% Aktienanteil
+        }
+
+        function feeAssumption(a){
+          var ids=['ter','redemption_commission_pct','front_load_pct'];
+          var total=0; var hasUnknown=false; var hasKnown=false;
+          for(var i=0;i<ids.length;i++){
+            var v=a[ids[i]];
+            if(isNum(v)){ total+=v; hasKnown=true; }
+            else if(v==='unknown'){ hasUnknown=true; }
+          }
+          if(hasUnknown && total<1){ total=1; }
+          if(!hasKnown && hasUnknown){ hasKnown=false; }
+          return { pct:total/100, pctDisplay:(Math.round(total*10)/10).toFixed(1)+'%', assumed:hasUnknown };
+        }
+
         function futureValueMonthly(payment, years, annualRate){
           var months=years*12; var r=annualRate/12;
           if(!r){ return payment*months; }
@@ -498,21 +521,25 @@
         function buildProjection(a){
           var years=durationYears(a.duration);
           if(!years || !isNum(a.monthly_contribution)) return null;
+          var baseRate=equityRate(a.invest_eq);
+          if(baseRate===null) return null;
           var monthly=a.monthly_contribution;
-          var gross=0.073; var lowFee=0.006; var highFee=0.02;
-          var netLow=gross-lowFee, netHigh=gross-highFee;
-          var withLowFees=futureValueMonthly(monthly, years, netLow);
-          var withHighFees=futureValueMonthly(monthly, years, netHigh);
+          var fee=feeAssumption(a);
+          var netRate=Math.max(baseRate - fee.pct, 0);
+          var withBase=futureValueMonthly(monthly, years, baseRate);
+          var withFees=futureValueMonthly(monthly, years, netRate);
           var paidIn=monthly*12*years;
-          var diff=withLowFees - withHighFees;
+          var diff=withBase - withFees;
           return {
             years:years,
             monthly:monthly,
             paidIn:paidIn,
-            lowFeeEnd:withLowFees,
-            highFeeEnd:withHighFees,
-            diff:diff,
-            rates:{ gross:gross, netLow:netLow, netHigh:netHigh, lowFee:lowFee, highFee:highFee }
+            baseRate:baseRate,
+            netRate:netRate,
+            fee:fee,
+            withBase:withBase,
+            withFees:withFees,
+            diff:diff
           };
         }
 
@@ -530,19 +557,18 @@
         }
 
         function projectionUI(p){
-          var lowNetPct=(p.rates.netLow*100).toFixed(1)+'%';
-          var highNetPct=(p.rates.netHigh*100).toFixed(1)+'%';
-          var lowFeePct=(p.rates.lowFee*100).toFixed(1)+'%';
-          var highFeePct=(p.rates.highFee*100).toFixed(1)+'%';
+          var basePct=(p.baseRate*100).toFixed(1)+'%';
+          var netPct=(p.netRate*100).toFixed(1)+'%';
+          var assumedText=p.fee.assumed ? 'Wir nehmen eine Gebühr von '+p.fee.pctDisplay+' an, weil "Unklar" gewählt wurde. ' : '';
+          var sentence='Achtung: Laut dieser Annahme betragen deine Gebühren circa '+p.fee.pctDisplay+' und können bei deinem Kapital über '+p.years+' Jahre einen Unterschied von etwa '+formatCHF(p.diff)+' ausmachen. '+assumedText+'Hol dir bei Bedarf eine zweite Meinung.';
           return h('div',{class:'panel'},
             h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
-            h('p',{class:'subtitle',style:'margin:0 0 4px;font-size:14px;'}, 'Bei deiner Laufzeit können Gebühren im Zinseszinseffekt eine Auswirkung von rund '+formatCHF(p.diff)+' haben. Hol dir eine zweite Meinung.'),
-            h('p',{class:'subtitle',style:'margin:0 0 12px;font-size:13px;'}, 'Spannweite bei angenommener 7.3% Rendite: '+lowFeePct+' bis '+highFeePct+' Gebühren (netto ca. '+lowNetPct+' bis '+highNetPct+').'),
+            h('p',{class:'subtitle',style:'margin:0 0 10px;font-size:14px;'}, sentence),
             h('div',{class:'axis-list'},
               h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'},'Monatliche Einzahlung'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.monthly))),
               h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'},'Eingezahlt über '+p.years+' Jahre'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.paidIn))),
-              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'}, 'Erwartetes Ergebnis bei 7.3% Rendite und '+lowFeePct+' Gebühren (netto ca. '+lowNetPct+')'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.lowFeeEnd))),
-              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'}, 'Erwartetes Ergebnis bei 7.3% Rendite und '+highFeePct+' Gebühren (netto ca. '+highNetPct+')'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.highFeeEnd)))
+              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'}, 'Erwartetes Ergebnis bei '+basePct+' Rendite (ohne Gebühren)'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.withBase))),
+              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'}, 'Erwartetes Ergebnis nach Gebühren (netto ca. '+netPct+')'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.withFees)))
             )
           );
         }
