@@ -424,7 +424,6 @@
         renderKpis(balance, totalDeposits, totalInterest);
         updateRatioPill(totalInterest, totalDeposits);
         renderChart(yearsArr, depositArr, interestArr);
-        updateStatusMeta({ principal, monthly, years, rate: rate*100, interval });
 
         persistState();
       }
@@ -605,26 +604,31 @@
           const raw = localStorage.getItem(STORAGE_KEY);
           if(!raw) return;
           const state = JSON.parse(raw);
+          const savedAt = state.savedAt;
           if(state.principal) el.principal.value = state.principal;
           if(state.monthly) el.monthly.value = state.monthly;
           if(state.years) el.years.value = state.years;
           if(state.rate) el.rate.value = state.rate;
           if(state.interval) el.interval.value = state.interval;
           [el.principal, el.monthly, el.years].forEach(formatThousands);
+          updateStatusMeta(savedAt);
         }catch(e){ console.warn('Konnte gespeicherte Daten nicht laden', e); }
       }
 
       function persistState(){
+        const savedAt = Date.now();
         const payload = {
           principal: el.principal.value,
           monthly: el.monthly.value,
           years: el.years.value,
           rate: el.rate.value,
-          interval: el.interval.value
+          interval: el.interval.value,
+          savedAt
         };
         try{
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
           toggleSaved(true);
+          updateStatusMeta(savedAt);
           clearTimeout(persistState._timer);
           persistState._timer = setTimeout(()=> toggleSaved(false), 1800);
         }catch(e){ console.warn('Konnte Daten nicht speichern', e); }
@@ -639,11 +643,15 @@
         }
       }
 
-      function updateStatusMeta({ principal, monthly, years, rate, interval }){
+      const formatSavedAt = (ts)=> new Intl.DateTimeFormat('de-CH',{ dateStyle:'short', timeStyle:'medium' }).format(ts);
+
+      function updateStatusMeta(savedAt){
         if(!el.statusMeta) return;
-        const rateLabel = `${rate.toLocaleString('de-CH',{ maximumFractionDigits:2 })} %`;
-        const intervalLabel = interval === 'jahrlich' ? 'jährlich' : interval;
-        el.statusMeta.textContent = `Speichert: ${CHF0(principal)} Start • ${CHF0(monthly)} mtl. • ${years} Jahre • ${rateLabel} • ${intervalLabel}`;
+        if(savedAt){
+          el.statusMeta.textContent = `Gespeichert um ${formatSavedAt(savedAt)}`;
+        }else{
+          el.statusMeta.textContent = 'Speichert deine Eingaben automatisch.';
+        }
       }
 
       function registerAutosave(){
