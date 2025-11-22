@@ -684,7 +684,6 @@
           if(state.show){
             var r=score();
             var header=h('div',{class:'hdr'},
-              h('div',{class:'eyebrow float'},'Vemo 3a Fast Check'),
               h('div',{class:'header-row'},
                 h('div',{}, h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität'))
               )
@@ -703,7 +702,7 @@
             }
             var toggle=h('div',{class:'content center',style:'padding-top:0;'}, h('button',{class:'btn ghost'}, state.details?'Details ausblenden':'Details anzeigen'));
             toggle.querySelector('button').addEventListener('click', function(){ updateAndRender(function(){ state.details=!state.details; }); });
-            var foot=h('div',{class:'content',style:'border-top:1px solid var(--vemo-ring); display:grid; gap:10px;'}, h('button',{class:'btn primary',style:'width:100%;'},'Neue Analyse starten'), h('p',{class:'note'},'Alle Angaben ohne Gewähr und ersetzen keine individuelle Beratung'));
+            var foot=h('div',{class:'content',style:'border-top:1px solid var(--vemo-ring); display:grid; gap:10px;'}, h('button',{class:'btn primary',style:'width:100%;'},'Neue Analyse starten'), h('p',{class:'note'},'Alle Angaben ohne Gewähr. Dieses Tool dient nur zur Veranschaulichung und ersetzt keine individuelle Beratung oder Haftungszusage.'));
             foot.querySelector('button').addEventListener('click', function(){ updateAndRender(function(){ state.step=0; state.a={}; state.show=false; state.details=false; }); });
             shell.appendChild(header); shell.appendChild(results); if(state.details){ shell.appendChild(details); } shell.appendChild(toggle); shell.appendChild(sourcesUI()); shell.appendChild(foot); return;
           }
@@ -712,7 +711,6 @@
           var pct=Math.round(((Math.min(state.step+1,seq.length))/Math.max(1,seq.length))*100);
           var fill=h('div',{class:'fill'});
           var header2=h('div',{class:'hdr'},
-            h('div',{class:'eyebrow float'},'Vemo 3a Fast Check'),
             h('div',{class:'header-row'},
               h('div',{}, h('div',{class:'pbar'}, fill), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.'))
             )
