@@ -17,8 +17,8 @@
       --accent-2:#5b7cfa;
       --ring:rgba(17,24,39,.08);
       --ring-strong:rgba(126,217,87,.35);
-      --glass:rgba(255,255,255,.76);
-      --panel:rgba(255,255,255,.8);
+      --glass:rgba(255,255,255,.52);
+      --panel:rgba(255,255,255,.62);
       --radius:18px;
       --shadow:0 18px 40px rgba(15,23,42,.10);
     }
@@ -78,7 +78,7 @@
       flex-wrap:wrap;
       gap:8px 12px;
       align-items:flex-start;
-      background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.34) 70%);
+      background:linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.22) 70%);
     }
     #zinseszins-app .head-left{ display:flex; flex-direction:column; gap:4px; }
     #zinseszins-app .eyebrow{
@@ -146,7 +146,7 @@
       #zinseszins-app .input, #zinseszins-app select.input{
       width:100%;
         border:1px solid var(--ring);
-        background:rgba(248,250,252,.78);
+      background:rgba(248,250,252,.56);
       color:#0f172a;
       font-size:15px;
       padding:14px 16px;
@@ -155,7 +155,7 @@
       transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease, background-color .2s ease;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
     }
-      #zinseszins-app .input:focus{ border-color:var(--ring-strong); box-shadow:0 0 0 4px rgba(126,217,87,.15); background:#fff; }
+      #zinseszins-app .input:focus{ border-color:var(--ring-strong); box-shadow:0 0 0 4px rgba(126,217,87,.15); background:rgba(255,255,255,.78); }
       #zinseszins-app .input:active{ transform:translateY(1px); }
 
       #zinseszins-app .input-wrap{ position:relative; }
@@ -171,7 +171,7 @@
       margin-top:14px;
       border-radius:16px;
       padding:16px;
-      background:linear-gradient(120deg,#8df0b4,#4ade80);
+      background:linear-gradient(120deg,rgba(141,240,180,.86),rgba(74,222,128,.82));
       color:#0f172a;
       font-weight:800;
       font-size:16px;
@@ -206,30 +206,30 @@
       gap:12px;
       padding:18px 22px;
       min-height:120px;
-      background:linear-gradient(180deg,rgba(243,246,255,.9) 0%, rgba(255,255,255,.82) 90%);
-      border:1px solid rgba(91,124,250,.16);
-      box-shadow:0 18px 36px rgba(91,124,250,.12);
+      background:linear-gradient(180deg,rgba(243,246,255,.64) 0%, rgba(255,255,255,.56) 90%);
+      border:1px solid rgba(91,124,250,.14);
+      box-shadow:0 18px 36px rgba(91,124,250,.08);
     }
       #zinseszins-app .kpi.endcap .kpi-label{ font-size:14px; color:#0f172a; letter-spacing:0; }
       #zinseszins-app .kpi.endcap .kpi-value{ font-size:30px; color:#0f172a; }
 
       #zinseszins-app .kpi.accent{
-      background:linear-gradient(180deg,rgba(126,217,87,.16) 0%, rgba(126,217,87,.09) 70%);
-      border-color:rgba(126,217,87,.38);
-      box-shadow:0 18px 34px rgba(126,217,87,.13);
+      background:linear-gradient(180deg,rgba(126,217,87,.12) 0%, rgba(126,217,87,.06) 70%);
+      border-color:rgba(126,217,87,.30);
+      box-shadow:0 18px 34px rgba(126,217,87,.08);
     }
       #zinseszins-app .kpi.accent .kpi-label{ color:#0f172a; }
       #zinseszins-app .kpi.accent .kpi-value{ color:#14532d; }
 
       #zinseszins-app .chart-section{ margin-top:22px; }
-      #zinseszins-app .chart-card{ padding:18px 18px 10px; border:1px solid var(--ring); border-radius:18px; background:rgba(248,250,252,.85); box-shadow:0 12px 28px rgba(15,23,42,.08); }
+      #zinseszins-app .chart-card{ padding:18px 18px 10px; border:1px solid var(--ring); border-radius:18px; background:rgba(248,250,252,.58); box-shadow:0 12px 28px rgba(15,23,42,.08); }
       #zinseszins-app .chart-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
       #zinseszins-app .legend{ display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:600; font-size:12px; }
       #zinseszins-app .legend .dot{ width:12px; height:12px; box-shadow:none; }
       #zinseszins-app #chart{ width:100%; height:360px; }
       #zinseszins-app #chart .bar{ transform-origin: bottom; transform-box: fill-box; transition: transform .9s cubic-bezier(.22,.61,.36,1); }
 
-      #zinseszins-app .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; background:var(--panel); }
+      #zinseszins-app .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; background:rgba(255,255,255,.36); }
 
       #zinseszins-app .status-card{ display:flex; flex-direction:column; gap:8px; }
       #zinseszins-app .status-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
@@ -243,10 +243,10 @@
       font-weight:800;
       border:1px solid var(--ring);
       color:#0f172a;
-      background:#f8fafc;
+      background:rgba(255,255,255,.5);
     }
-      #zinseszins-app .pill.live{ border-color:rgba(91,124,250,.28); background:rgba(91,124,250,.10); }
-      #zinseszins-app .pill.saved{ border-color:rgba(22,163,74,.25); background:rgba(22,163,74,.10); color:#166534; opacity:0.28; transition:opacity .24s ease; }
+      #zinseszins-app .pill.live{ border-color:rgba(91,124,250,.26); background:rgba(91,124,250,.12); }
+      #zinseszins-app .pill.saved{ border-color:rgba(22,163,74,.22); background:rgba(22,163,74,.08); color:#166534; opacity:0.28; transition:opacity .24s ease; }
       #zinseszins-app .pill.saved.visible{ opacity:1; }
       #zinseszins-app .status-meta{ color:#475569; font-weight:600; font-size:13px; line-height:1.45; }
   </style>
