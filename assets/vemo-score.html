@@ -221,11 +221,13 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity .15s ease, transform .15s ease;
-      width: min(320px, 78vw);
+      width: min(360px, calc(100vw - 32px));
       font-size: 13px;
       line-height: 1.45;
       z-index: 2;
       text-align: left;
+      white-space: normal;
+      word-break: break-word;
     }
 
     .info-badge::before {
@@ -347,7 +349,8 @@
         var mount=document.getElementById('vemo-score');
         var WEIGHTS={ structure:0.20, costs:0.30, investment:0.25, transparency:0.15, flexibility:0.10 };
         var state={ step:0, a:{}, show:false, details:false };
-        var MAX_3A_MONTHLY=588; // CHF 7'056 Jahresmaximum / 12 (2025 Richtwert Schweiz)
+        var MAX_3A_ANNUAL=7258; // Aktueller Maximalbetrag Schweiz
+        var MAX_3A_MONTHLY=Math.round(MAX_3A_ANNUAL/12); // Monatsmaximum (gerundet)
 
         function h(tag, attrs){
           var n=document.createElement(tag);
@@ -387,8 +390,8 @@
         function steps(){
           var a=state.a; var arr=[];
           arr.push({ id:'provider', type:'single', title:'Bei welcher Gesellschaft befindet sich deine 3a-Lösung', options:[{value:'bank',label:'Banklösung',sub:'Depot oder Säule 3a Konto'},{value:'insurance',label:'Versicherung',sub:'Policengebundene 3a-Lösung'}] });
-          arr.push({ id:'duration', type:'dropdown', title:'Wie viele Jahre läuft deine Lösung noch', options:[{value:'1-5',label:'1 bis 5 Jahre'},{value:'6-10',label:'6 bis 10 Jahre'},{value:'11-15',label:'11 bis 15 Jahre'},{value:'16-20',label:'16 bis 20 Jahre'},{value:'20+',label:'Mehr als 20 Jahre'}] });
-          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein (max. CHF '+MAX_3A_MONTHLY+')', slider:{min:0,max:MAX_3A_MONTHLY,step:10,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY}, info:'Für die Säule 3a (Angestellte) gilt 2025 ein Maximalbetrag von CHF 7’056 pro Jahr bzw. CHF '+MAX_3A_MONTHLY+' pro Monat.' });
+          arr.push({ id:'duration', type:'dropdown', title:'Wie viele Jahre läuft deine Lösung noch', options:durationOptions() });
+          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein (max. CHF '+MAX_3A_MONTHLY+')', slider:{min:0,max:MAX_3A_MONTHLY,step:5,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY}, info:'Für die Säule 3a (Angestellte) gilt aktuell ein Maximalbetrag von CHF '+MAX_3A_ANNUAL.toLocaleString('de-CH')+' pro Jahr bzw. CHF '+MAX_3A_MONTHLY+' pro Monat.' });
           arr.push({ id:'invest_eq', type:'slider', title:'Wie stark ist dein Guthaben in Aktienfonds investiert', slider:{min:0,max:99,step:0.1,unit:'%'} });
           if(isNum(a.invest_eq) && a.invest_eq<99){
             arr.push({ id:'rest_bucket', type:'single', title:'Wohin fliesst der Restanteil, der nicht investiert ist', options:[{value:'bonds',label:'Obligationen'},{value:'tech_rate',label:'Technischer Zins'},{value:'cash',label:'Geldkonto / Währung'}] });
@@ -484,9 +487,18 @@
           return { warns:warns, positives:positives };
         }
 
+        function durationOptions(){
+          var arr=[];
+          for(var y=5; y<=45; y++){
+            arr.push({ value:String(y), label: y+' Jahre' });
+          }
+          return arr;
+        }
+
         function durationYears(key){
-          var map={ '1-5':5, '6-10':8, '11-15':13, '16-20':18, '20+':25 };
-          return map[key]||null;
+          var num=parseInt(key, 10);
+          if(Number.isNaN(num) || num<1) return null;
+          return num;
         }
 
         function equityRate(eq){
@@ -497,14 +509,13 @@
 
         function feeAssumption(a){
           var ids=['ter','redemption_commission_pct','front_load_pct'];
-          var total=0; var hasUnknown=false; var hasKnown=false;
+          var total=0; var hasUnknown=false;
           for(var i=0;i<ids.length;i++){
             var v=a[ids[i]];
-            if(isNum(v)){ total+=v; hasKnown=true; }
+            if(isNum(v)){ total+=v; }
             else if(v==='unknown'){ hasUnknown=true; }
           }
-          if(hasUnknown && total<1){ total=1; }
-          if(!hasKnown && hasUnknown){ hasKnown=false; }
+          if(hasUnknown){ total+=1.2; }
           return { pct:total/100, pctDisplay:(Math.round(total*10)/10).toFixed(1)+'%', assumed:hasUnknown };
         }
 
@@ -523,6 +534,9 @@
           if(!years || !isNum(a.monthly_contribution)) return null;
           var baseRate=equityRate(a.invest_eq);
           if(baseRate===null) return null;
+          if(a.investment_approach && a.investment_approach!=='passive'){
+            baseRate=Math.max(baseRate - 0.01, 0);
+          }
           var monthly=a.monthly_contribution;
           var fee=feeAssumption(a);
           var netRate=Math.max(baseRate - fee.pct, 0);
@@ -560,15 +574,13 @@
           var basePct=(p.baseRate*100).toFixed(1)+'%';
           var netPct=(p.netRate*100).toFixed(1)+'%';
           var assumedText=p.fee.assumed ? 'Wir nehmen eine Gebühr von '+p.fee.pctDisplay+' an, weil "Unklar" gewählt wurde. ' : '';
-          var sentence='Achtung: Laut dieser Annahme betragen deine Gebühren circa '+p.fee.pctDisplay+' und können bei deinem Kapital über '+p.years+' Jahre einen Unterschied von etwa '+formatCHF(p.diff)+' ausmachen. '+assumedText+'Hol dir bei Bedarf eine zweite Meinung.';
+          var diffEmph=h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(p.diff));
           return h('div',{class:'panel'},
             h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
-            h('p',{class:'subtitle',style:'margin:0 0 10px;font-size:14px;'}, sentence),
-            h('div',{class:'axis-list'},
-              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'},'Monatliche Einzahlung'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.monthly))),
-              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'},'Eingezahlt über '+p.years+' Jahre'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.paidIn))),
-              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'}, 'Erwartetes Ergebnis bei '+basePct+' Rendite (ohne Gebühren)'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.withBase))),
-              h('div',{class:'axis-item',style:'grid-template-columns:1fr;'}, h('div',{class:'name'}, 'Erwartetes Ergebnis nach Gebühren (netto ca. '+netPct+')'), h('div',{class:'val',style:'text-align:left;'}, formatCHF(p.withFees)))
+            h('p',{class:'subtitle',style:'margin:0 0 12px;font-size:14px; line-height:1.6;'},
+              'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,' Jahre und einer Rendite-Annahme von ',basePct,
+              ' (netto ca. ',netPct,') kann die Gebührenlast von rund ',p.fee.pctDisplay,' etwa ', diffEmph,
+              ' Unterschied machen. ', assumedText,'Hol dir bei Bedarf eine zweite Meinung.'
             )
           );
         }
