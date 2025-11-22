@@ -280,8 +280,8 @@
   }
 
   .foot {
-    padding: 20px 28px 24px;
-    background: #fcfdfd;
+    padding: 20px 28px 26px;
+    background: transparent;
   }
 
   .result {
@@ -318,6 +318,10 @@
   #vemo-3a-kaufkraft .box .x,
   #vemo-3a-kaufkraft .box .s {
     color: #fff !important;
+  }
+
+  .box .x {
+    white-space: nowrap;
   }
 
   .box:hover {
@@ -534,7 +538,7 @@
         { class: 'result' },
         el('div', { class: 'box', id: 'b_loss' }, lossVal, el('div', { class: 's' }, 'Verlust gesamt bis 65')),
         el('div', { class: 'box', id: 'b_k' }, kVal, el('div', { class: 's' }, 'Kaufkraft bei 65')),
-        el('div', { class: 'box', id: 'b_m' }, mVal, el('div', { class: 's' }, 'Monatslohn bis 90'))
+        el('div', { class: 'box', id: 'b_m' }, mVal, el('div', { class: 's' }, 'Kaufkraft pro Monat bis 90'))
       )
     );
     card.appendChild(foot);
@@ -730,7 +734,7 @@
 
         lossVal.textContent = pct(res.loss);
         kVal.textContent = nf(res.k);
-        mVal.textContent = nf(monat) + ' pro Monat';
+      mVal.textContent = nf(monat);
 
         var baseMonthly = amount / monate;
         var tLoss = Math.max(0, Math.min(1, res.loss / 100));
