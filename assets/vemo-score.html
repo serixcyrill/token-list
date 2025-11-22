@@ -96,8 +96,8 @@
 
     .eyebrow.float {
       position: absolute;
-      top: 2px;
-      right: 0;
+      top: -10px;
+      right: 12px;
       box-shadow: 0 10px 24px rgba(118,208,98,0.22);
     }
 
@@ -269,6 +269,8 @@
       cursor: pointer;
       border: 1px solid transparent;
       transition: all .15s ease;
+      text-decoration: none;
+      color: inherit;
     }
     .btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(118,208,98,.25); }
     .btn.primary { background: linear-gradient(120deg, var(--vemo-green), #9ae38b); color: #fff; border-color: var(--vemo-green); box-shadow: 0 14px 32px rgba(118,208,98,0.35); }
@@ -327,6 +329,7 @@
 
     @media (max-width: 520px) {
       .hdr { text-align: left; }
+      .eyebrow.float { top: -12px; right: 8px; font-size: 12px; padding: 6px 10px; }
       .gauge { max-width: 220px; }
       .btnrow { padding: 0 12px 16px; }
       .content { padding: 16px 18px; }
