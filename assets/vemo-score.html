@@ -245,26 +245,6 @@
     .info-badge:hover::after, .info-badge:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
     .info-badge:hover::before, .info-badge:focus-visible::before { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .live-save {
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(120deg, rgba(118,208,98,0.14), rgba(118,208,98,0.2));
-      color: #1d3c22;
-      padding: 6px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(118,208,98,0.3);
-      box-shadow: 0 10px 20px rgba(118,208,98,0.12);
-      font-weight: 700;
-      font-size: 11px;
-      line-height: 1.1;
-      pointer-events: none;
-      opacity: 0.9;
-    }
-
     .header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 
     .btnrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px 20px; }
@@ -428,13 +408,6 @@
           if(typeof fn==='function') fn();
           persistState();
           render();
-        }
-
-        function liveSaveBadge(){
-          return h('div',{class:'live-save',title:'Automatisches Speichern aktiv – Gebühreninfos über die (i)-Buttons'},
-            h('span',{style:'display:inline-flex;width:7px;height:7px;border-radius:"50%";background:var(--vemo-green);box-shadow:"0 0 0 5px rgba(118,208,98,0.22)";'}),
-            h('span',{},'Live Save')
-          );
         }
 
         function gauge(val,color,emoji){
@@ -679,8 +652,7 @@
           if(state.show){
             var r=score();
             var header=h('div',{class:'hdr'}, h('div',{class:'header-row'},
-              h('div',{}, h('div',{class:'eyebrow'},'Vemo 3a Fast Check – Ergebnis'), h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität')),
-              liveSaveBadge()
+              h('div',{}, h('div',{class:'eyebrow'},'Vemo 3a Fast Check – Ergebnis'), h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität'))
             ));
             var results=h('div',{class:'results-grid'});
             var gaugePanel=h('div',{class:'panel center'}, gauge(r.total,r.stroke,r.emoji), h('div',{class:'verdict'}, r.verdict));
@@ -705,8 +677,7 @@
           var pct=Math.round(((Math.min(state.step+1,seq.length))/Math.max(1,seq.length))*100);
           var fill=h('div',{class:'fill'});
           var header2=h('div',{class:'hdr'}, h('div',{class:'header-row'},
-            h('div',{}, h('div',{class:'pbar'}, fill), h('div',{class:'eyebrow'},'Vemo 3a Fast Check'), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.')),
-            liveSaveBadge()
+            h('div',{}, h('div',{class:'pbar'}, fill), h('div',{class:'eyebrow'},'Vemo 3a Fast Check'), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.'))
           ));
           fill.style.width=pct+'%';
 
