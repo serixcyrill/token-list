@@ -368,7 +368,12 @@
           for(var i=2;i<arguments.length;i++){
             var c=arguments[i];
             if(c===null||c===undefined) continue;
-            n.appendChild(typeof c==='string'?document.createTextNode(c):c);
+            var type=typeof c;
+            if(type==='string' || type==='number' || type==='boolean'){
+              n.appendChild(document.createTextNode(String(c)));
+            } else {
+              n.appendChild(c);
+            }
           }
           return n;
         }
