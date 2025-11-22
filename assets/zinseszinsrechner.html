@@ -175,10 +175,11 @@
     .kpi-label{ color:var(--muted); font-size:13px; }
     .kpi-value{ font-size:22px; font-weight:800; letter-spacing:-0.2px; margin-top:4px; color:#0f172a; }
 
-    .summary{ margin-top:18px; display:grid; gap:8px; }
+    .summary{ margin-top:18px; display:grid; gap:12px; }
     .summary-head{ display:flex; align-items:center; gap:10px; justify-content:space-between; }
     .summary-pill{ background:#e2e8f0; color:#0f172a; font-weight:700; font-size:12px; padding:8px 10px; border-radius:999px; border:1px solid rgba(15,23,42,.08); }
-    .row{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid var(--ring); border-radius:12px; background:#f8fafc; }
+    .summary-body{ display:grid; gap:12px; }
+    .row{ display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border:1px solid var(--ring); border-radius:14px; background:#f8fafc; }
     .row .l{ color:#0f172a; font-weight:700; }
     .row .r{ font-weight:700; color:#111827; }
 
@@ -245,21 +246,21 @@
           <section class="panel">
             <div class="form-grid cols-2">
               <div>
-                <label for="anfang">Anfangskapital <span class="hint">Einmalige Einzahlung</span></label>
+                <label for="anfang">Anfangskapital</label>
                 <div class="input-wrap">
                   <input id="anfang" class="input" inputmode="numeric" value="5'000" />
                   <span class="suffix">CHF</span>
                 </div>
               </div>
               <div>
-                <label for="rate">Monatliche Sparrate <span class="hint">Wiederkehrend</span></label>
+                <label for="rate">Monatliche Sparrate</label>
                 <div class="input-wrap">
                   <input id="rate" class="input" inputmode="numeric" value="250" />
                   <span class="suffix">CHF</span>
                 </div>
               </div>
               <div>
-                <label for="dauer">Spardauer <span class="hint">in Jahren</span></label>
+                <label for="dauer">Spardauer</label>
                 <div class="input-wrap">
                   <input id="dauer" class="input" inputmode="numeric" value="12" />
                   <span class="suffix">Jahre</span>
@@ -274,7 +275,7 @@
               </div>
             </div>
             <div style="margin-top:14px;">
-              <label for="intervall">Ausschüttungsintervall <span class="hint">Bestimmt, wann Zinsen gutgeschrieben werden</span></label>
+              <label for="intervall">Ausschüttungsintervall</label>
               <select id="intervall" class="input">
                 <option value="jahrlich">jährlich</option>
                 <option value="quartalsweise">quartalsweise</option>
@@ -306,7 +307,7 @@
                 <h3 style="margin:0;">Zusammenfassung</h3>
                 <div class="summary-pill" id="ratio-pill">–</div>
               </div>
-              <div id="summary-body">
+              <div id="summary-body" class="summary-body">
                 <div class="empty">Gib Werte ein und klicke auf „Berechnen“, um eine Projektion zu sehen.</div>
               </div>
             </div>
