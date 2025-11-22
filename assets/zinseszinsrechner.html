@@ -55,27 +55,27 @@
     }
 
     header{
-      padding:18px 24px 16px;
+      padding:18px 24px 10px;
       border-bottom:1px solid var(--ring);
       display:flex;
       flex-wrap:wrap;
-      gap:10px 14px;
-      align-items:center;
+      gap:8px 12px;
+      align-items:flex-start;
       background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.34) 70%);
     }
     .head-left{ display:flex; flex-direction:column; gap:4px; }
     .eyebrow{
       display:inline-flex;
       align-items:center;
-      gap:10px;
-      padding:8px 12px;
+      gap:8px;
+      padding:8px 11px;
       background:#f8fafc;
       border:1px solid var(--ring);
       border-radius:999px;
       color:#0f172a;
       font-weight:700;
       font-size:11px;
-      letter-spacing:1.2px;
+      letter-spacing:1px;
       text-transform:uppercase;
     }
     .dot{ width:8px; height:8px; border-radius:99px; background:var(--accent); box-shadow:none; }
@@ -166,7 +166,7 @@
     button:active{ transform:translateY(1px); }
 
     .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; align-items:stretch; }
-    .kpi{
+    .kpi{ 
       background:#fff;
       border:1px solid var(--ring);
       border-radius:14px;
@@ -214,36 +214,24 @@
 
     .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; background:#fff; }
 
-    .save-status{
+    .status-card{ display:flex; flex-direction:column; gap:8px; }
+    .status-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .pill{
       display:inline-flex;
       align-items:center;
       gap:6px;
-      color:#16a34a;
-      font-weight:700;
+      padding:7px 10px;
+      border-radius:999px;
       font-size:12px;
-      background:rgba(22,163,74,.12);
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(22,163,74,.2);
-      opacity:0;
-      transform:translateY(4px);
-      transition:opacity .2s ease, transform .2s ease;
-    }
-    .save-status.visible{ opacity:1; transform:translateY(0); }
-
-    .summary-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(91,124,250,.12);
-      color:#1e293b;
       font-weight:800;
-      font-size:12px;
-      letter-spacing:0.4px;
-      border:1px solid rgba(91,124,250,.2);
+      border:1px solid var(--ring);
+      color:#0f172a;
+      background:#f8fafc;
     }
+    .pill.live{ border-color:rgba(91,124,250,.28); background:rgba(91,124,250,.10); }
+    .pill.saved{ border-color:rgba(22,163,74,.25); background:rgba(22,163,74,.10); color:#166534; opacity:0.28; transition:opacity .24s ease; }
+    .pill.saved.visible{ opacity:1; }
+    .status-meta{ color:#475569; font-weight:600; font-size:13px; line-height:1.45; }
   </style>
 </head>
 <body>
@@ -257,10 +245,6 @@
             <h1>Zinseszinsrechner</h1>
             <p class="lead">Plane deine Geldanlage mit einem klaren, reduzierten Interface. Wir berechnen Endkapital, Zinsen und zeigen eine Jahresprojektion.</p>
           </div>
-        </div>
-        <div style="margin-left:auto; display:flex; align-items:flex-end; gap:10px;">
-          <div class="summary-pill" id="live-badge">Live-Berechnung</div>
-          <div class="save-status" id="save-status">Gespeichert</div>
         </div>
       </header>
       <main>
@@ -317,6 +301,13 @@
                 <div class="kpi-label">Gesamteinzahlungen</div>
                 <div class="kpi-value" id="einzahlungen">–</div>
               </div>
+              <div class="kpi status-card">
+                <div class="status-row">
+                  <span class="pill live">Live</span>
+                  <span class="pill saved" id="status-saved">Gespeichert</span>
+                </div>
+                <div class="status-meta" id="status-meta">Speichert deine Eingaben automatisch.</div>
+              </div>
               <div class="kpi">
                 <div class="kpi-label">Zinsen-Anteil</div>
                 <div class="kpi-value" id="zinsen-anteil">0.0%</div>
@@ -363,9 +354,9 @@
         interest: document.getElementById('zinsen'),
         deposits: document.getElementById('einzahlungen'),
         chart: document.getElementById('chart'),
-        saved: document.getElementById('save-status'),
+        saved: document.getElementById('status-saved'),
         ratio: document.getElementById('zinsen-anteil'),
-        live: document.getElementById('live-badge')
+        statusMeta: document.getElementById('status-meta')
       };
 
       const STORAGE_KEY = 'zinseszinsrechner-state-v1';
@@ -433,6 +424,7 @@
         renderKpis(balance, totalDeposits, totalInterest);
         updateRatioPill(totalInterest, totalDeposits);
         renderChart(yearsArr, depositArr, interestArr);
+        updateStatusMeta({ principal, monthly, years, rate: rate*100, interval });
 
         persistState();
       }
@@ -645,6 +637,13 @@
         }else{
           el.saved.classList.remove('visible');
         }
+      }
+
+      function updateStatusMeta({ principal, monthly, years, rate, interval }){
+        if(!el.statusMeta) return;
+        const rateLabel = `${rate.toLocaleString('de-CH',{ maximumFractionDigits:2 })} %`;
+        const intervalLabel = interval === 'jahrlich' ? 'jährlich' : interval;
+        el.statusMeta.textContent = `Speichert: ${CHF0(principal)} Start • ${CHF0(monthly)} mtl. • ${years} Jahre • ${rateLabel} • ${intervalLabel}`;
       }
 
       function registerAutosave(){
