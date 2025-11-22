@@ -55,15 +55,15 @@
     }
 
     header{
-      padding:30px 34px 24px;
+      padding:18px 24px 16px;
       border-bottom:1px solid var(--ring);
       display:flex;
       flex-wrap:wrap;
-      gap:14px 20px;
-      align-items:flex-start;
-      background:linear-gradient(180deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.28) 68%);
+      gap:10px 14px;
+      align-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.34) 70%);
     }
-    .head-left{ display:flex; flex-direction:column; gap:6px; }
+    .head-left{ display:flex; flex-direction:column; gap:4px; }
     .eyebrow{
       display:inline-flex;
       align-items:center;
@@ -81,15 +81,15 @@
     .dot{ width:8px; height:8px; border-radius:99px; background:var(--accent); box-shadow:none; }
     h1{
       margin:0;
-      font-size:34px;
+      font-size:30px;
       font-family:'Space Grotesk', 'Inter', system-ui;
-      letter-spacing:-0.2px;
+      letter-spacing:-0.25px;
       color:#0f172a;
     }
     p.lead{
       margin:0;
       color:#475569;
-      max-width:760px;
+      max-width:720px;
       line-height:1.6;
     }
 
@@ -99,7 +99,7 @@
       gap:20px;
     }
     @media (min-width: 860px){
-      .grid.cols-2{ grid-template-columns:1.05fr 0.95fr; align-items:start; }
+      .grid.cols-2{ grid-template-columns:1.05fr 0.95fr; align-items:stretch; }
     }
 
     .panel{
@@ -108,6 +108,9 @@
       border-radius:22px;
       padding:22px;
       box-shadow:0 14px 32px rgba(15,23,42,.08);
+      display:flex;
+      flex-direction:column;
+      height:100%;
     }
 
     .form-grid{ display:grid; gap:18px; }
@@ -132,10 +135,10 @@
       padding:14px 16px;
       border-radius:14px;
       outline:none;
-      transition: border-color .2s ease, box-shadow .2s ease, transform .08s;
+      transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease, background-color .2s ease;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
     }
-    .input:focus{ border-color:var(--ring-strong); box-shadow:0 0 0 4px rgba(126,217,87,.15); }
+    .input:focus{ border-color:var(--ring-strong); box-shadow:0 0 0 4px rgba(126,217,87,.15); background:#fff; }
     .input:active{ transform:translateY(1px); }
 
     .input-wrap{ position:relative; }
@@ -157,10 +160,10 @@
       font-size:16px;
       cursor:pointer;
       box-shadow:0 16px 32px rgba(75,181,67,.20);
-      transition: transform .08s ease, box-shadow .18s ease, filter .18s ease;
+      transition: transform .12s ease, box-shadow .2s ease, filter .18s ease;
     }
     button:hover{ box-shadow:0 22px 42px rgba(75,181,67,.24); filter:brightness(1.02); }
-    button:active{ transform:translateY(1.5px); }
+    button:active{ transform:translateY(1px); }
 
     .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; }
     .kpi{
@@ -189,20 +192,7 @@
     .legend{ display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:600; font-size:12px; }
     .legend .dot{ width:12px; height:12px; box-shadow:none; }
     #chart{ width:100%; height:360px; }
-
-    .insight{
-      margin-top:16px;
-      background:linear-gradient(120deg,rgba(91,124,250,.05),rgba(126,217,87,.08));
-      border:1px solid rgba(148,163,184,.35);
-      color:#0f172a;
-      padding:12px 14px;
-      border-radius:14px;
-      font-weight:700;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .insight small{ display:block; color:var(--muted-2); font-weight:600; }
+    #chart .bar{ transform-origin: bottom; transform-box: fill-box; transition: transform .7s ease-in-out; }
 
     .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; background:#fff; }
 
@@ -222,6 +212,20 @@
       transition:opacity .2s ease, transform .2s ease;
     }
     .save-status.visible{ opacity:1; transform:translateY(0); }
+
+    .summary-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(91,124,250,.12);
+      color:#1e293b;
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:0.4px;
+      border:1px solid rgba(91,124,250,.2);
+    }
   </style>
 </head>
 <body>
@@ -283,7 +287,6 @@
               </select>
             </div>
             <button id="berechnen">Berechnen</button>
-            <div class="insight" id="insight" style="display:none;"></div>
           </section>
 
           <section class="panel" id="results-panel">
@@ -342,13 +345,12 @@
         chart: document.getElementById('chart'),
         saved: document.getElementById('save-status'),
         ratio: document.getElementById('zinsen-anteil'),
-        insight: document.getElementById('insight'),
         live: document.getElementById('live-badge')
       };
 
       const STORAGE_KEY = 'zinseszinsrechner-state-v1';
 
-      const debounce = (fn, delay=180)=>{
+      const debounce = (fn, delay=140)=>{
         let t;
         return (...args)=>{
           clearTimeout(t);
@@ -409,7 +411,6 @@
 
         renderKpis(balance, totalDeposits, totalInterest);
         updateRatioPill(totalInterest, totalDeposits);
-        renderInsight(yearsArr, depositArr, interestArr, balance);
         renderChart(yearsArr, depositArr, interestArr);
 
         persistState();
@@ -426,23 +427,6 @@
         const total = Math.max(1, deposits + interest);
         const ratio = Math.max(0, interest) / total;
         el.ratio.textContent = `${(ratio*100).toFixed(1)}%`;
-      }
-
-      function renderInsight(yearsArr, depositsArr, interestArr, balance){
-        if(!el.insight) return;
-        if(!yearsArr.length){ el.insight.style.display='none'; return; }
-
-        const lastIndex = yearsArr.length - 1;
-        const lastYear = yearsArr[lastIndex];
-        const lastInterest = interestArr[lastIndex] || 0;
-        const prevInterest = lastIndex > 0 ? interestArr[lastIndex-1] : 0;
-        const lastYearGain = Math.max(0, lastInterest - prevInterest);
-        const lastDeposits = depositsArr[lastIndex] || 0;
-        const avgMonthly = lastDeposits / (lastYear * 12 || 1);
-        const interestShare = balance > 0 ? (lastInterest / Math.max(balance,1))*100 : 0;
-
-        el.insight.innerHTML = `<span class="dot" style="background:var(--accent);"></span><div>Nach ${lastYear} Jahren stammen ${(interestShare).toFixed(1)}% deines Kapitals aus Zinsen.<small>${CHF0(lastYearGain)} Zinsen im letzten Jahr · durchschn. monatlich ${CHF0(avgMonthly)}</small></div>`;
-        el.insight.style.display='flex';
       }
 
       function renderChart(years, deposits, interest){
@@ -534,6 +518,8 @@
           depRect.setAttribute('fill', 'url(#blue)');
           depRect.setAttribute('rx','3');
           depRect.setAttribute('opacity','0.92');
+          depRect.classList.add('bar');
+          depRect.style.transform = 'scaleY(0.02)';
           g.appendChild(depRect);
 
           const intRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
@@ -543,7 +529,14 @@
           intRect.setAttribute('height', intH);
           intRect.setAttribute('fill', 'url(#green)');
           intRect.setAttribute('rx','3');
+          intRect.classList.add('bar');
+          intRect.style.transform = 'scaleY(0.02)';
           g.appendChild(intRect);
+
+          requestAnimationFrame(()=>{
+            depRect.style.transform = 'scaleY(1)';
+            intRect.style.transform = 'scaleY(1)';
+          });
 
           const px = x + barW/2;
           const py = ih - totalH;
@@ -618,7 +611,7 @@
         el.interval.addEventListener('change', ()=> calculate());
       }
 
-      const calculateDebounced = debounce(calculate, 200);
+      const calculateDebounced = debounce(calculate, 160);
 
       loadState();
       registerAutosave();
