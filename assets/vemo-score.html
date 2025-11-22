@@ -32,7 +32,8 @@
         linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       color: var(--vemo-text);
-      overflow-x: hidden;
+      overflow-x: clip;
+      width: 100%;
     }
 
     .vemo-tool-wrapper {
@@ -40,6 +41,8 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     .vemo-tool-card {
@@ -232,12 +235,14 @@
       pointer-events: none;
       transition: opacity .15s ease, transform .15s ease;
       width: min(360px, calc(100vw - 32px));
+      max-width: clamp(260px, 72vw, 360px);
       font-size: 13px;
       line-height: 1.45;
       z-index: 2;
       text-align: left;
       white-space: normal;
       word-break: break-word;
+      box-sizing: border-box;
     }
 
     .info-badge::before {
@@ -257,9 +262,9 @@
 
     @media (max-width: 640px) {
       .info-badge::after {
-        left: 50vw;
+        left: 50%;
         transform: translate(-50%, 6px);
-        width: calc(100vw - 28px);
+        width: min(360px, calc(100vw - 32px));
         max-width: none;
       }
       .info-badge::before { display: none; }
@@ -332,7 +337,7 @@
     }
 
     @media (max-width: 768px) {
-      .vemo-tool-wrapper { padding: 12px; }
+      .vemo-tool-wrapper { padding: 12px; overflow-x: hidden; }
       .vemo-tool-card { padding: 18px 16px 20px; border-radius: 18px; }
       .title { font-size: 24px; }
       .btnrow { flex-direction: column; }
@@ -713,7 +718,7 @@
             }
             var toggle=h('div',{class:'content center',style:'padding-top:0;'}, h('button',{class:'btn ghost'}, state.details?'Details ausblenden':'Details anzeigen'));
             toggle.querySelector('button').addEventListener('click', function(){ updateAndRender(function(){ state.details=!state.details; }); });
-            var foot=h('div',{class:'content',style:'border-top:1px solid var(--vemo-ring); display:grid; gap:10px;'}, h('button',{class:'btn primary',style:'width:100%;'},'Neue Analyse starten'), h('p',{class:'note'},'Alle Angaben ohne Gewähr. Dieses Tool dient nur zur Veranschaulichung und ersetzt keine individuelle Beratung oder Haftungszusage.'));
+            var foot=h('div',{class:'content',style:'border-top:1px solid var(--vemo-ring); display:grid; gap:10px;'}, h('button',{class:'btn primary',style:'width:100%;'},'Neue Analyse starten'), h('p',{class:'note'},'Alle Angaben ohne Gewähr. Dieses Tool dient nur zur Veranschaulichung und ersetzt keine individuelle Beratung oder Garantie.'));
             foot.querySelector('button').addEventListener('click', function(){ updateAndRender(function(){ state.step=0; state.a={}; state.show=false; state.details=false; }); });
             shell.appendChild(header); shell.appendChild(results); if(state.details){ shell.appendChild(details); } shell.appendChild(toggle); shell.appendChild(sourcesUI()); shell.appendChild(foot); return;
           }
