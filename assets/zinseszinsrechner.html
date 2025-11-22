@@ -165,7 +165,7 @@
     button:hover{ box-shadow:0 22px 42px rgba(75,181,67,.24); filter:brightness(1.02); }
     button:active{ transform:translateY(1px); }
 
-    .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; }
+    .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; align-items:stretch; }
     .kpi{
       background:linear-gradient(180deg,#f8fafc 0%, #fff 68%);
       border:1px solid var(--ring);
@@ -173,10 +173,30 @@
       padding:14px 16px 12px;
       position:relative;
       overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:92px;
     }
     .kpi:before{ content:''; position:absolute; inset:-8px -8px auto auto; width:120px; height:120px; background:radial-gradient(circle, rgba(126,217,87,.12), transparent 65%); filter:blur(10px); }
     .kpi-label{ color:var(--muted); font-size:13px; }
     .kpi-value{ font-size:22px; font-weight:800; letter-spacing:-0.2px; margin-top:4px; color:#0f172a; }
+
+    .kpi.endcap{
+      grid-column:1 / -1;
+      flex-direction:row;
+      align-items:center;
+      gap:12px;
+      padding:18px 22px;
+      min-height:120px;
+      background:linear-gradient(120deg,#e0f7ef 0%, #f8fff5 50%, #ffffff 100%);
+      border:1px solid rgba(22,163,74,.22);
+      box-shadow:0 20px 38px rgba(22,163,74,.14);
+    }
+    .kpi.endcap:before{ display:none; }
+    .kpi.endcap .kpi-label{ font-size:14px; color:#0f172a; letter-spacing:0; }
+    .kpi.endcap .kpi-value{ font-size:30px; color:#0f172a; }
+    .kpi.endcap small{ color:var(--muted); font-weight:700; letter-spacing:0.2px; }
 
     .kpi.accent{
       background:linear-gradient(180deg,rgba(126,217,87,.18) 0%, rgba(126,217,87,.10) 70%);
@@ -292,10 +312,6 @@
           <section class="panel" id="results-panel">
             <div class="kpis">
               <div class="kpi">
-                <div class="kpi-label">Endkapital</div>
-                <div class="kpi-value" id="endkapital">–</div>
-              </div>
-              <div class="kpi">
                 <div class="kpi-label">Zinserträge</div>
                 <div class="kpi-value" id="zinsen">–</div>
               </div>
@@ -306,6 +322,13 @@
               <div class="kpi">
                 <div class="kpi-label">Zinsen-Anteil</div>
                 <div class="kpi-value" id="zinsen-anteil">0.0%</div>
+              </div>
+              <div class="kpi endcap">
+                <div>
+                  <div class="kpi-label">Endkapital</div>
+                  <div class="kpi-value" id="endkapital">–</div>
+                </div>
+                <small>Projektion bei gewähltem Intervall</small>
               </div>
             </div>
           </section>
