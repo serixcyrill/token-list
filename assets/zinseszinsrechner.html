@@ -55,36 +55,42 @@
     }
 
     header{
-      padding:30px 34px 22px;
+      padding:30px 34px 24px;
       border-bottom:1px solid var(--ring);
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
-      align-items:flex-end;
-      background:linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.2) 70%);
+      gap:14px 20px;
+      align-items:flex-start;
+      background:linear-gradient(180deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.28) 68%);
     }
+    .head-left{ display:flex; flex-direction:column; gap:6px; }
     .eyebrow{
-      text-transform:uppercase;
-      letter-spacing:3px;
-      font-size:11px;
-      color:var(--muted);
-      font-weight:700;
       display:inline-flex;
       align-items:center;
-      gap:6px;
+      gap:10px;
+      padding:8px 12px;
+      background:#f8fafc;
+      border:1px solid var(--ring);
+      border-radius:999px;
+      color:#0f172a;
+      font-weight:700;
+      font-size:11px;
+      letter-spacing:1.2px;
+      text-transform:uppercase;
     }
-    .dot{ width:10px; height:10px; border-radius:99px; background:var(--accent); box-shadow:0 0 0 8px rgba(126,217,87,.14); }
+    .dot{ width:8px; height:8px; border-radius:99px; background:var(--accent); box-shadow:none; }
     h1{
-      margin:6px 0 2px;
-      font-size:32px;
+      margin:0;
+      font-size:34px;
       font-family:'Space Grotesk', 'Inter', system-ui;
-      letter-spacing:-0.3px;
+      letter-spacing:-0.2px;
       color:#0f172a;
     }
     p.lead{
       margin:0;
       color:#475569;
       max-width:760px;
+      line-height:1.6;
     }
 
     main{ padding:30px 32px 42px; }
@@ -176,16 +182,17 @@
     .row .l{ color:#0f172a; font-weight:700; }
     .row .r{ font-weight:700; color:#111827; }
 
-    .chart-card{ margin-top:18px; padding:18px; border:1px solid var(--ring); border-radius:14px; background:#f8fafc; }
+    .chart-section{ margin-top:22px; }
+    .chart-card{ padding:18px 18px 10px; border:1px solid var(--ring); border-radius:18px; background:#f8fafc; box-shadow:0 12px 28px rgba(15,23,42,.08); }
     .chart-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
     .legend{ display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:600; font-size:12px; }
     .legend .dot{ width:12px; height:12px; box-shadow:none; }
-    #chart{ width:100%; height:340px; }
+    #chart{ width:100%; height:360px; }
 
     .insight{
       margin-top:16px;
-      background:linear-gradient(120deg,rgba(91,124,250,.08),rgba(126,217,87,.10));
-      border:1px solid rgba(91,124,250,.22);
+      background:linear-gradient(120deg,rgba(91,124,250,.05),rgba(126,217,87,.08));
+      border:1px solid rgba(148,163,184,.35);
       color:#0f172a;
       padding:12px 14px;
       border-radius:14px;
@@ -221,10 +228,12 @@
     <div class="orb"></div>
     <div class="shell">
       <header>
-        <div class="eyebrow"><span class="dot"></span> Projektions-Tool</div>
-        <div>
-          <h1>Zinseszinsrechner</h1>
-          <p class="lead">Plane deine Geldanlage mit einem klaren, reduzierten Interface. Wir berechnen Endkapital, Zinsen und zeigen eine Jahresprojektion.</p>
+        <div class="head-left">
+          <div class="eyebrow"><span class="dot"></span> Projektions-Tool</div>
+          <div>
+            <h1>Zinseszinsrechner</h1>
+            <p class="lead">Plane deine Geldanlage mit einem klaren, reduzierten Interface. Wir berechnen Endkapital, Zinsen und zeigen eine Jahresprojektion.</p>
+          </div>
         </div>
         <div style="margin-left:auto; display:flex; align-items:flex-end; gap:10px;">
           <div class="summary-pill" id="live-badge">Live-Berechnung</div>
@@ -301,19 +310,21 @@
                 <div class="empty">Gib Werte ein und klicke auf „Berechnen“, um eine Projektion zu sehen.</div>
               </div>
             </div>
-
-            <div class="chart-card">
-              <div class="chart-head">
-                <h3 style="margin:0;">Jahres-Chart</h3>
-                <div class="legend">
-                  <span class="dot" style="background:var(--accent);"></span> Zinsen
-                  <span class="dot" style="background:var(--accent-2);"></span> Einzahlungen
-                </div>
-              </div>
-              <svg id="chart" viewBox="0 0 820 320" aria-label="Zinseszins Diagramm"></svg>
-            </div>
           </section>
         </div>
+
+        <section class="chart-section">
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3 style="margin:0;">Jahres-Chart</h3>
+              <div class="legend">
+                <span class="dot" style="background:var(--accent);"></span> Zinsen
+                <span class="dot" style="background:var(--accent-2);"></span> Einzahlungen
+              </div>
+            </div>
+            <svg id="chart" viewBox="0 0 1080 360" aria-label="Zinseszins Diagramm"></svg>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -456,7 +467,7 @@
         const avgMonthly = lastDeposits / (lastYear * 12 || 1);
         const interestShare = balance > 0 ? (lastInterest / Math.max(balance,1))*100 : 0;
 
-        el.insight.innerHTML = `<span>🚀</span><div>Nach ${lastYear} Jahren stammen ${(interestShare).toFixed(1)}% deines Kapitals aus Zinsen.<small>${CHF0(lastYearGain)} Zinsen im letzten Jahr | durchschn. monatlich ${CHF0(avgMonthly)}</small></div>`;
+        el.insight.innerHTML = `<span class="dot" style="background:var(--accent);"></span><div>Nach ${lastYear} Jahren stammen ${(interestShare).toFixed(1)}% deines Kapitals aus Zinsen.<small>${CHF0(lastYearGain)} Zinsen im letzten Jahr · durchschn. monatlich ${CHF0(avgMonthly)}</small></div>`;
         el.insight.style.display='flex';
       }
 
@@ -464,7 +475,7 @@
         const svg = el.chart;
         svg.innerHTML = '';
 
-        const W = 840, H = 340, pad = { l:64, r:24, t:18, b:34 };
+        const W = 1080, H = 360, pad = { l:64, r:24, t:18, b:34 };
         const iw = W - pad.l - pad.r;
         const ih = H - pad.t - pad.b;
         svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -478,10 +489,6 @@
           <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#b3c6ff" />
             <stop offset="100%" stop-color="#5b7cfa" />
-          </linearGradient>
-          <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="rgba(91,124,250,.25)" />
-            <stop offset="100%" stop-color="rgba(126,217,87,.1)" />
           </linearGradient>`;
         svg.appendChild(defs);
 
@@ -579,42 +586,6 @@
             g.appendChild(tx);
           }
         }
-
-        const areaPath = document.createElementNS('http://www.w3.org/2000/svg','path');
-        const areaD = `M 0 ${ih} ${points.map(p=>`L ${p[0]} ${p[1]}`).join(' ')} L ${points[points.length-1][0]} ${ih} Z`;
-        areaPath.setAttribute('d', areaD);
-        areaPath.setAttribute('fill','url(#area)');
-        areaPath.setAttribute('opacity','0.5');
-        g.insertBefore(areaPath, g.firstChild);
-
-        const linePath = document.createElementNS('http://www.w3.org/2000/svg','path');
-        linePath.setAttribute('d', `M ${points.map(p=>`${p[0]} ${p[1]}`).join(' L ')}`);
-        linePath.setAttribute('fill','none');
-        linePath.setAttribute('stroke','#1d4ed8');
-        linePath.setAttribute('stroke-width','2');
-        linePath.setAttribute('stroke-linecap','round');
-        linePath.setAttribute('stroke-linejoin','round');
-        g.appendChild(linePath);
-
-        const last = points[points.length-1];
-        const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
-        dot.setAttribute('cx', last[0]);
-        dot.setAttribute('cy', last[1]);
-        dot.setAttribute('r', 4.5);
-        dot.setAttribute('fill','#1d4ed8');
-        dot.setAttribute('stroke','#fff');
-        dot.setAttribute('stroke-width','1.5');
-        g.appendChild(dot);
-
-        const label = document.createElementNS('http://www.w3.org/2000/svg','text');
-        label.textContent = INT.format(totals[totals.length-1]);
-        label.setAttribute('x', last[0]);
-        label.setAttribute('y', last[1] - 10);
-        label.setAttribute('fill','#0f172a');
-        label.setAttribute('font-size','11');
-        label.setAttribute('font-weight','700');
-        label.setAttribute('text-anchor','middle');
-        g.appendChild(label);
 
         const xLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
         xLbl.textContent = 'Jahre';
