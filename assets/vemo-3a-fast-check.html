@@ -263,6 +263,7 @@
     @media (max-width: 640px) {
       .info-badge { display: none; }       /* Bubble ausblenden auf Handy */
       .info-inline { display: block; }     /* Text stattdessen anzeigen */
+      .axes-panel { display: none; }       /* Nur den Haupt-Score auf dem Handy anzeigen */
     }
 
     @media (max-width: 960px) {
@@ -1019,7 +1020,7 @@
               gauge(r.total,r.stroke,r.emoji),
               h('div',{class:'verdict'}, r.verdict)
             );
-            var axesPanel=h('div',{class:'panel'},
+            var axesPanel=h('div',{class:'panel axes-panel'},
               h('h3',{style:'margin:0 0 12px;font-size:16px;'},'Score nach Kategorien'),
               axisUI(r.axes)
             );
