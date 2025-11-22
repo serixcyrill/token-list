@@ -245,6 +245,22 @@
     .info-badge:hover::after, .info-badge:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
     .info-badge:hover::before, .info-badge:focus-visible::before { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    .live-save {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(120deg, rgba(118,208,98,0.16), rgba(118,208,98,0.26));
+      color: #1d3c22;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(118,208,98,0.35);
+      box-shadow: 0 10px 22px rgba(118,208,98,0.16);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
     .btnrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px 20px; }
 
     .btn {
@@ -271,6 +287,7 @@
 
     .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 0 4px; }
     .results-grid .panel { background: rgba(255,255,255,0.9); border: 1px solid var(--vemo-ring); border-radius: 18px; padding: 18px; box-shadow: var(--shadow-soft); }
+    .results-grid .panel.full { grid-column: 1 / -1; }
 
     .gauge { position: relative; width: 100%; max-width: 260px; margin: 0 auto; aspect-ratio: 1; }
     .gauge .centered { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; }
@@ -348,9 +365,32 @@
         'use strict';
         var mount=document.getElementById('vemo-score');
         var WEIGHTS={ structure:0.20, costs:0.30, investment:0.25, transparency:0.15, flexibility:0.10 };
-        var state={ step:0, a:{}, show:false, details:false };
+        var STORAGE_KEY='vemo-3a-fast-check';
         var MAX_3A_ANNUAL=7258; // Aktueller Maximalbetrag Schweiz
-        var MAX_3A_MONTHLY=Math.round(MAX_3A_ANNUAL/12); // Monatsmaximum (gerundet)
+        var MAX_3A_MONTHLY=Math.round((MAX_3A_ANNUAL/12)*100)/100; // Monatsmaximum (präziser gerundet)
+
+        function restoreState(){
+          try{
+            var raw=localStorage.getItem(STORAGE_KEY);
+            if(!raw) return null;
+            var parsed=JSON.parse(raw);
+            if(parsed && typeof parsed==='object'){
+              return {
+                step: typeof parsed.step==='number'?parsed.step:0,
+                a: parsed.a && typeof parsed.a==='object'?parsed.a:{},
+                show: !!parsed.show,
+                details: !!parsed.details
+              };
+            }
+          }catch(_){}
+          return null;
+        }
+
+        var state=restoreState() || { step:0, a:{}, show:false, details:false };
+
+        function persistState(){
+          try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(_){/* ignore quota */}
+        }
 
         function h(tag, attrs){
           var n=document.createElement(tag);
@@ -378,6 +418,19 @@
           return n;
         }
 
+        function updateAndRender(fn){
+          if(typeof fn==='function') fn();
+          persistState();
+          render();
+        }
+
+        function liveSaveBadge(){
+          return h('div',{class:'live-save'},
+            h('span',{style:'display:inline-flex;width:8px;height:8px;border-radius:"50%";background:var(--vemo-green);box-shadow:"0 0 0 6px rgba(118,208,98,0.25)";'}),
+            h('span',{},'Live Save aktiv – Antworten werden gespeichert. Gebühreninfos findest du über die (i)-Buttons.')
+          );
+        }
+
         function gauge(val,color,emoji){
           var r=40; var c=2*Math.PI*r; var dash=(c*Math.max(0,Math.min(100,val)))/100;
           var wrap=h('div',{class:'gauge'}); var NS='http://www.w3.org/2000/svg';
@@ -394,9 +447,10 @@
 
         function steps(){
           var a=state.a; var arr=[];
+          var maxMonthlyLabel=MAX_3A_MONTHLY.toLocaleString('de-CH',{maximumFractionDigits:2, minimumFractionDigits:0});
           arr.push({ id:'provider', type:'single', title:'Bei welcher Gesellschaft befindet sich deine 3a-Lösung', options:[{value:'bank',label:'Banklösung',sub:'Depot oder Säule 3a Konto'},{value:'insurance',label:'Versicherung',sub:'Policengebundene 3a-Lösung'}] });
           arr.push({ id:'duration', type:'dropdown', title:'Wie viele Jahre läuft deine Lösung noch', options:durationOptions() });
-          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein (max. CHF '+MAX_3A_MONTHLY+')', slider:{min:0,max:MAX_3A_MONTHLY,step:5,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY}, info:'Für die Säule 3a (Angestellte) gilt aktuell ein Maximalbetrag von CHF '+MAX_3A_ANNUAL.toLocaleString('de-CH')+' pro Jahr bzw. CHF '+MAX_3A_MONTHLY+' pro Monat.' });
+          arr.push({ id:'monthly_contribution', type:'slider', title:'Wie viel zahlst du pro Monat ein (max. CHF '+maxMonthlyLabel+')', slider:{min:0,max:MAX_3A_MONTHLY,step:1,unit:'',format:'chf',decimals:0,default:MAX_3A_MONTHLY}, info:'Für die Säule 3a (Angestellte) gilt aktuell ein Maximalbetrag von CHF '+MAX_3A_ANNUAL.toLocaleString('de-CH')+' pro Jahr bzw. CHF '+maxMonthlyLabel+' pro Monat.' });
           arr.push({ id:'invest_eq', type:'slider', title:'Wie stark ist dein Guthaben in Aktienfonds investiert', slider:{min:0,max:99,step:0.1,unit:'%'} });
           if(isNum(a.invest_eq) && a.invest_eq<99){
             arr.push({ id:'rest_bucket', type:'single', title:'Wohin fliesst der Restanteil, der nicht investiert ist', options:[{value:'bonds',label:'Obligationen'},{value:'tech_rate',label:'Technischer Zins'},{value:'cash',label:'Geldkonto / Währung'}] });
@@ -439,8 +493,8 @@
           function apply(){ if(chk.checked){ slider.setAttribute('disabled',''); label.textContent='Unklar'; } else { slider.removeAttribute('disabled'); label.textContent=fmt(slider.value); } }
           apply();
           slider.addEventListener('input', function(e){ var v=parseFloat(e.target.value); state.a[key]=v; slider.style.setProperty('--val', ((v - q.slider.min)/(q.slider.max - q.slider.min))*100 + '%'); if(!chk.checked){ label.textContent=fmt(v); } });
-          slider.addEventListener('change', function(){ if(!chk.checked){ state.a[key]=parseFloat(slider.value); } render(); });
-          chk.addEventListener('change', function(){ state.a[key]=chk.checked?'unknown':parseFloat(slider.value); apply(); render(); });
+          slider.addEventListener('change', function(){ if(!chk.checked){ state.a[key]=parseFloat(slider.value); } updateAndRender(); });
+          chk.addEventListener('change', function(){ state.a[key]=chk.checked?'unknown':parseFloat(slider.value); apply(); updateAndRender(); });
           var wrap=h('div',{}); wrap.appendChild(row); wrap.appendChild(meta); wrap.appendChild(unklar); return wrap;
         }
 
@@ -513,15 +567,21 @@
         }
 
         function feeAssumption(a){
-          var ids=['ter','redemption_commission_pct','front_load_pct'];
-          var total=0; var hasUnknown=false;
-          for(var i=0;i<ids.length;i++){
-            var v=a[ids[i]];
-            if(isNum(v)){ total+=v; }
-            else if(v==='unknown'){ hasUnknown=true; }
-          }
-          if(hasUnknown){ total+=1.2; }
-          return { pct:total/100, pctDisplay:(Math.round(total*10)/10).toFixed(1)+'%', assumed:hasUnknown };
+          var assumed=[];
+          var ter=isNum(a.ter)?a.ter:(a.ter==='unknown'?1.2:0);
+          if(a.ter==='unknown') assumed.push('TER mit 1.2% angenommen');
+          var front=isNum(a.front_load_pct)?a.front_load_pct:(a.front_load_pct==='unknown'?1:0);
+          if(a.front_load_pct==='unknown') assumed.push('Ausgabeaufschlag mit 1% angenommen');
+          var redemption=isNum(a.redemption_commission_pct)?a.redemption_commission_pct:(a.redemption_commission_pct==='unknown'?1:0);
+          if(a.redemption_commission_pct==='unknown') assumed.push('Rücknahmekommission mit 1% angenommen');
+          var total=ter+front+redemption;
+          return {
+            runningPct:ter/100,
+            frontLoadPct:front/100,
+            redemptionPct:redemption/100,
+            totalDisplay:(Math.round(total*10)/10).toFixed(1)+'%',
+            assumptions:assumed
+          };
         }
 
         function futureValueMonthly(payment, years, annualRate){
@@ -544,9 +604,10 @@
           }
           var monthly=a.monthly_contribution;
           var fee=feeAssumption(a);
-          var netRate=Math.max(baseRate - fee.pct, 0);
+          var growthRate=Math.max(baseRate - fee.runningPct, 0);
           var withBase=futureValueMonthly(monthly, years, baseRate);
-          var withFees=futureValueMonthly(monthly, years, netRate);
+          var withFees=futureValueMonthly(monthly*(1-fee.frontLoadPct), years, growthRate);
+          withFees = withFees * (1 - fee.redemptionPct);
           var paidIn=monthly*12*years;
           var diff=withBase - withFees;
           return {
@@ -554,7 +615,7 @@
             monthly:monthly,
             paidIn:paidIn,
             baseRate:baseRate,
-            netRate:netRate,
+            netRate:growthRate,
             fee:fee,
             withBase:withBase,
             withFees:withFees,
@@ -578,14 +639,15 @@
         function projectionUI(p){
           var basePct=(p.baseRate*100).toFixed(1)+'%';
           var netPct=(p.netRate*100).toFixed(1)+'%';
-          var assumedText=p.fee.assumed ? 'Wir nehmen eine Gebühr von '+p.fee.pctDisplay+' an, weil "Unklar" gewählt wurde. ' : '';
+          var assumedText=p.fee.assumptions.length ? 'Wir nehmen '+p.fee.assumptions.join(' und ')+' an. ' : '';
           var diffEmph=h('span',{style:'color: var(--vemo-green); font-weight:800;'}, formatCHF(p.diff));
-          return h('div',{class:'panel'},
+          return h('div',{class:'panel full'},
             h('h3',{style:'margin:0 0 10px;font-size:16px;'},'Gebühren-Effekt bei deiner Laufzeit'),
             h('p',{class:'subtitle',style:'margin:0 0 12px;font-size:14px; line-height:1.6;'},
-              'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,' Jahre und einer Rendite-Annahme von ',basePct,
-              ' (netto ca. ',netPct,') kann die Gebührenlast von rund ',p.fee.pctDisplay,' etwa ', diffEmph,
-              ' Unterschied machen. ', assumedText,'Hol dir bei Bedarf eine zweite Meinung.'
+              'Bei ', formatCHF(p.monthly),' monatlicher Einzahlung über ',p.years,' Jahre mit einer Brutto-Renditeannahme von ',basePct,
+              ' (netto ca. ',netPct,') kalkulieren wir Gebühren von insgesamt rund ',p.fee.totalDisplay,
+              '. Laut dieser Annahme können sie etwa ', diffEmph,' Unterschied ausmachen. ',assumedText,
+              'Hol dir bei Bedarf eine zweite Meinung.'
             )
           );
         }
@@ -607,9 +669,13 @@
           mount.appendChild(shell);
 
           var seq=steps();
+          if(state.step>=seq.length){ state.step=Math.max(0, seq.length-1); }
           if(state.show){
             var r=score();
-            var header=h('div',{class:'hdr center'}, h('div',{class:'eyebrow'},'Vemo 3a Fast Check – Ergebnis'), h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität'));
+            var header=h('div',{class:'hdr'}, h('div',{class:'header-row'},
+              h('div',{}, h('div',{class:'eyebrow'},'Vemo 3a Fast Check – Ergebnis'), h('h2',{class:'title'},'Dein Vemo Score'), h('p',{class:'subtitle'},'Basierend auf Struktur, Kosten, Investment, Transparenz und Flexibilität')),
+              liveSaveBadge()
+            ));
             var results=h('div',{class:'results-grid'});
             var gaugePanel=h('div',{class:'panel center'}, gauge(r.total,r.stroke,r.emoji), h('div',{class:'verdict'}, r.verdict));
             var axesPanel=h('div',{class:'panel'}, h('h3',{style:'margin:0 0 12px;font-size:16px;'},'Score nach Kategorien'), axisUI(r.axes));
@@ -623,16 +689,19 @@
               if(t.positives.length){ var p=h('div',{}); p.appendChild(h('h3',{},'Positive Signale')); for(var pi=0; pi<t.positives.length; pi++){ p.appendChild(h('div',{class:'pill'}, t.positives[pi])); } details.appendChild(p); }
             }
             var toggle=h('div',{class:'content center',style:'padding-top:0;'}, h('button',{class:'btn ghost'}, state.details?'Details ausblenden':'Details anzeigen'));
-            toggle.querySelector('button').addEventListener('click', function(){ state.details=!state.details; render(); });
+            toggle.querySelector('button').addEventListener('click', function(){ updateAndRender(function(){ state.details=!state.details; }); });
             var foot=h('div',{class:'content',style:'border-top:1px solid var(--vemo-ring); display:grid; gap:10px;'}, h('button',{class:'btn primary',style:'width:100%;'},'Neue Analyse starten'), h('p',{class:'note'},'Alle Angaben ohne Gewähr und ersetzen keine individuelle Beratung'));
-            foot.querySelector('button').addEventListener('click', function(){ state.step=0; state.a={}; state.show=false; state.details=false; render(); });
+            foot.querySelector('button').addEventListener('click', function(){ updateAndRender(function(){ state.step=0; state.a={}; state.show=false; state.details=false; }); });
             shell.appendChild(header); shell.appendChild(results); if(state.details){ shell.appendChild(details); } shell.appendChild(toggle); shell.appendChild(sourcesUI()); shell.appendChild(foot); return;
           }
 
           var stepObj=seq[state.step] || seq[0];
           var pct=Math.round(((Math.min(state.step+1,seq.length))/Math.max(1,seq.length))*100);
           var fill=h('div',{class:'fill'});
-          var header2=h('div',{class:'hdr'}, h('div',{class:'pbar'}, fill), h('div',{class:'eyebrow'},'Vemo 3a Fast Check'), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.'));
+          var header2=h('div',{class:'hdr'}, h('div',{class:'header-row'},
+            h('div',{}, h('div',{class:'pbar'}, fill), h('div',{class:'eyebrow'},'Vemo 3a Fast Check'), h('h2',{class:'title'}, stepObj.title), h('p',{class:'subtitle'},'Beantworte kurz die Fragen und erhalte einen Score.')),
+            liveSaveBadge()
+          ));
           fill.style.width=pct+'%';
 
           var body=h('div',{class:'content stack wrap-card'});
@@ -644,7 +713,7 @@
                 var selected=ans===opt.value;
                 var inner=h('div',{}, h('div',{class:'label'},opt.label), opt.sub?h('small',{},opt.sub):null);
                 var b=h('button',{class:'option','data-selected':selected?'true':'false'}, inner, selected?h('span',{},'✓'):h('span',{},''));
-                b.addEventListener('click', function(){ state.a[stepObj.id]=opt.value; var s=steps(); state.step=Math.min(state.step+1, s.length-1); render(); });
+                b.addEventListener('click', function(){ updateAndRender(function(){ state.a[stepObj.id]=opt.value; var s=steps(); state.step=Math.min(state.step+1, s.length-1); }); });
                 body.appendChild(b);
               })(opts[oi]);
             }
@@ -654,14 +723,14 @@
               (function(opt){
                 var on=sel.indexOf(opt.value)>-1;
                 var b=h('button',{class:'option','data-selected':on?'true':'false'}, h('div',{class:'label'},opt.label));
-                b.addEventListener('click', function(){ var next=sel.slice(); if(on){ next=next.filter(function(v){ return v!==opt.value; }); } else { if(opt.value==='none'){ next=['none']; } else { next=next.filter(function(v){ return v!=='none'; }).concat(opt.value); } } state.a[stepObj.id]=next; render(); });
+                b.addEventListener('click', function(){ updateAndRender(function(){ var next=sel.slice(); if(on){ next=next.filter(function(v){ return v!==opt.value; }); } else { if(opt.value==='none'){ next=['none']; } else { next=next.filter(function(v){ return v!=='none'; }).concat(opt.value); } } state.a[stepObj.id]=next; }); });
                 body.appendChild(b);
               })(opts2[mi]);
             }
           } else if(stepObj.type==='dropdown'){
             var sEl=h('select',{class:'select'}); sEl.appendChild(h('option',{value:''},'Bitte auswählen'));
             var optz=stepObj.options; for(var di=0; di<optz.length; di++){ sEl.appendChild(h('option',{value:optz[di].value}, optz[di].label)); }
-            sEl.value=(ans||''); sEl.addEventListener('change', function(e){ state.a[stepObj.id]=e.target.value; render(); }); body.appendChild(sEl);
+            sEl.value=(ans||''); sEl.addEventListener('change', function(e){ updateAndRender(function(){ state.a[stepObj.id]=e.target.value; }); }); body.appendChild(sEl);
           } else if(stepObj.type==='slider'){
             body.appendChild(sliderUI(stepObj, stepObj.id));
           }
@@ -669,10 +738,11 @@
           var cur = state.a[stepObj.id];
           var canNext = stepObj.type==='multiple' ? (Array.isArray(cur)&&cur.length>0) : (stepObj.type==='slider' ? (cur==='unknown' || isNum(cur)) : !!cur);
           var actions=h('div',{class:'btnrow'}, h('button',{class:'btn ghost', disabled: state.step===0}, 'Zurück'), h('button',{class:'btn primary', disabled: !canNext}, state.step>=seq.length-1?'Ergebnis anzeigen':'Weiter'));
-          actions.children[0].addEventListener('click', function(){ if(state.step>0){ state.step--; render(); } });
-          actions.children[1].addEventListener('click', function(){ var seqNow=steps(); if(state.step<seqNow.length-1){ state.step++; render(); } else { state.show=true; render(); } });
+          actions.children[0].addEventListener('click', function(){ if(state.step>0){ updateAndRender(function(){ state.step--; }); } });
+          actions.children[1].addEventListener('click', function(){ var seqNow=steps(); if(state.step<seqNow.length-1){ updateAndRender(function(){ state.step++; }); } else { updateAndRender(function(){ state.show=true; }); } });
 
           shell.appendChild(header2); shell.appendChild(body); shell.appendChild(actions);
+          persistState();
         }
 
         if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', render); } else { render(); }
