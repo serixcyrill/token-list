@@ -264,6 +264,10 @@
       .info-badge { display: none; }       /* Bubble ausblenden auf Handy */
       .info-inline { display: block; }     /* Text stattdessen anzeigen */
       .axes-panel { display: none; }       /* Nur den Haupt-Score auf dem Handy anzeigen */
+      .results-grid { gap: 14px; margin-top: 10px; }
+      .results-grid .panel { padding: 16px; }
+      .gauge { width: 100%; }
+      .vemo-tool-wrapper { padding-top: 48px; }
     }
 
     @media (max-width: 960px) {
@@ -307,6 +311,7 @@
       padding: 0 4px;
       width: 100%;
       min-width: 0;
+      margin-top: 6px;
     }
     .results-grid .panel {
       background: rgba(255,255,255,0.9);
@@ -318,8 +323,9 @@
       overflow: hidden;
     }
     .results-grid .panel.full { grid-column: 1 / -1; }
+    .results-grid .panel.main-score { width: 100%; }
 
-    .gauge { position: relative; width: 100%; max-width: 260px; margin: 0 auto; aspect-ratio: 1; }
+    .gauge { position: relative; width: min(460px, 100%); max-width: none; margin: 0 auto; aspect-ratio: 1; }
     .gauge .centered { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; }
     .score { font-size: 44px; font-weight: 800; }
     .verdict { font-weight: 700; font-size: 16px; color: var(--vemo-text); }
@@ -359,7 +365,7 @@
 
     @media (max-width: 520px) {
       .hdr { text-align: left; }
-      .gauge { max-width: 220px; }
+      .gauge { width: 100%; }
       .btnrow { padding: 0 12px 16px; }
       .content { padding: 16px 18px; }
       .cta-contact { align-self: center !important; width: 100%; justify-content: center; }
@@ -1016,7 +1022,7 @@
             );
 
             var results=h('div',{class:'results-grid'});
-            var gaugePanel=h('div',{class:'panel center'},
+            var gaugePanel=h('div',{class:'panel center main-score'},
               gauge(r.total,r.stroke,r.emoji),
               h('div',{class:'verdict'}, r.verdict)
             );
