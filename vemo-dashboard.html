@@ -139,6 +139,7 @@
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 14px;
+      flex-wrap: wrap;
     }
 
     .section-heading h2 {
@@ -152,6 +153,20 @@
       margin: 0;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    .section-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #eef6ef;
+      border-radius: 999px;
+      color: #1c3a2c;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
     }
 
     .vorsorge-grid {
@@ -192,8 +207,8 @@
 
     .meta {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
       margin-bottom: 12px;
       font-size: 13px;
       color: var(--text);
@@ -276,6 +291,31 @@
       gap: 10px;
     }
 
+    .mode-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .mode-tabs button {
+      border: 1px solid #dfe3ec;
+      background: #f8fafc;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: border 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .mode-tabs button.active {
+      background: var(--accent-strong);
+      border-color: var(--accent);
+      color: #0f1a2a;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
     .portfolio-item {
       background: #f8fafc;
       border: 1px solid #edf0f5;
@@ -331,6 +371,22 @@
       font-weight: 600;
     }
 
+    footer {
+      margin: 10px auto 36px;
+      width: min(1200px, 92vw);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .footer-card {
+      background: linear-gradient(145deg, #f7fbf9, #ffffff);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid #e3e9f2;
+    }
+
     @media (max-width: 720px) {
       header {
         flex-direction: column;
@@ -374,8 +430,9 @@
     <main>
       <section class="card" id="vorsorge">
         <div class="section-heading">
-          <h2 data-editable="true">Vorsorge</h2>
+          <h2 data-editable="true">Vorsorge Mandate</h2>
           <p class="section-sub" data-editable="true">Ihre passenden Vorsorgeoptionen auf einen Blick.</p>
+          <span class="section-meta" data-editable="true">Letztes Update: 12.09.2024</span>
         </div>
         <div class="vorsorge-grid">
           <article class="vorsorge-card rank-1">
@@ -431,6 +488,12 @@
         <div class="section-heading">
           <h2 data-editable="true">Ablaufmanagement</h2>
           <p class="section-sub" data-editable="true">Planung über die nächsten fünf Jahre nach Assetklassen.</p>
+          <span class="section-meta" data-editable="true">Strategie wählen: konservativ / mittel / aggressiv</span>
+        </div>
+        <div class="mode-tabs" aria-label="Risikoprofil wählen">
+          <button type="button" class="active" data-risk="konservativ">Konservativ</button>
+          <button type="button" data-risk="mittel">Mittel</button>
+          <button type="button" data-risk="aggressiv">Aggressiv</button>
         </div>
         <div class="table-wrap">
           <table>
@@ -444,36 +507,17 @@
                 <th>Jahr 5</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td data-editable="true">Aktien</td>
-                <td data-editable="true">40%</td>
-                <td data-editable="true">38%</td>
-                <td data-editable="true">35%</td>
-                <td data-editable="true">32%</td>
-                <td data-editable="true">30%</td>
-              </tr>
-              <tr>
-                <td data-editable="true">Obligationen</td>
-                <td data-editable="true">35%</td>
-                <td data-editable="true">36%</td>
-                <td data-editable="true">38%</td>
-                <td data-editable="true">39%</td>
-                <td data-editable="true">40%</td>
-              </tr>
-              <tr>
-                <td data-editable="true">Liquidität</td>
-                <td data-editable="true">25%</td>
-                <td data-editable="true">26%</td>
-                <td data-editable="true">27%</td>
-                <td data-editable="true">29%</td>
-                <td data-editable="true">30%</td>
-              </tr>
-            </tbody>
+            <tbody id="ablaufBody"></tbody>
           </table>
         </div>
       </section>
     </main>
+    <footer>
+      <div class="footer-card">
+        <p data-editable="true"><strong>Haftungsausschluss:</strong> Diese Übersicht stellt keine Anlageberatung dar und dient ausschließlich Informationszwecken.</p>
+        <p data-editable="true">Die Inhalte richten sich nur an berechtigte Personen und dürfen ohne Zustimmung nicht weitergegeben werden.</p>
+      </div>
+    </footer>
   </div>
 
   <script>
@@ -481,7 +525,6 @@
     const searchForm = document.getElementById('searchForm');
     const searchInput = document.getElementById('searchInput');
     const adminNotice = document.getElementById('adminNotice');
-    const editableNodes = Array.from(document.querySelectorAll('[data-editable]'));
     let adminMode = false;
 
     const portfolioData = {
@@ -503,6 +546,24 @@
       ],
     };
 
+    const ablaufData = {
+      konservativ: [
+        ['Aktien', '25%', '24%', '22%', '20%', '18%'],
+        ['Obligationen', '55%', '56%', '57%', '58%', '59%'],
+        ['Liquidität', '20%', '20%', '21%', '22%', '23%'],
+      ],
+      mittel: [
+        ['Aktien', '40%', '38%', '36%', '34%', '32%'],
+        ['Obligationen', '40%', '41%', '42%', '43%', '44%'],
+        ['Liquidität', '20%', '21%', '22%', '23%', '24%'],
+      ],
+      aggressiv: [
+        ['Aktien', '60%', '58%', '55%', '52%', '50%'],
+        ['Obligationen', '25%', '26%', '28%', '30%', '32%'],
+        ['Liquidität', '15%', '16%', '17%', '18%', '18%'],
+      ],
+    };
+
     function renderPortfolios(type) {
       const list = document.getElementById('portfolioList');
       list.innerHTML = '';
@@ -521,6 +582,23 @@
         wrapper.appendChild(title);
         wrapper.appendChild(desc);
         list.appendChild(wrapper);
+      });
+      refreshEditableState();
+    }
+
+    function renderAblauf(risk) {
+      const body = document.getElementById('ablaufBody');
+      body.innerHTML = '';
+      ablaufData[risk].forEach((row) => {
+        const tr = document.createElement('tr');
+        row.forEach((cell, idx) => {
+          const td = document.createElement('td');
+          td.textContent = cell;
+          td.dataset.editable = 'true';
+          if (idx === 0) td.style.fontWeight = '600';
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
       });
       refreshEditableState();
     }
@@ -556,8 +634,18 @@
       });
     });
 
+    document.querySelectorAll('[data-risk]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-risk]').forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        const risk = button.getAttribute('data-risk');
+        renderAblauf(risk);
+      });
+    });
+
     // Initial render
     renderPortfolios('factor');
+    renderAblauf('konservativ');
     refreshEditableState();
   </script>
 </body>
