@@ -47,6 +47,23 @@
       font-size: 13px;
       font-weight: 600;
       border-bottom: 1px solid rgba(114, 210, 122, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .notice .exit-admin {
+      border: 1px solid rgba(114, 210, 122, 0.6);
+      background: #f7fbf9;
+      color: #1c3a2c;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(114, 210, 122, 0.15);
+      display: none;
     }
 
     main {
@@ -831,7 +848,10 @@
 </head>
 <body>
   <div class="page">
-    <div id="adminNotice" class="notice" style="display: none;">Admin Modus aktiv.</div>
+    <div id="adminNotice" class="notice" style="display: none;">
+      <span>Admin Modus aktiv.</span>
+      <button type="button" class="exit-admin" id="exitAdmin">Modus verlassen</button>
+    </div>
 
     <main>
       <section class="card" id="vorsorge">
@@ -1099,9 +1119,27 @@
     const closeModalBtn = document.getElementById('closeModal');
     const submitCodeBtn = document.getElementById('submitCode');
     const avatarInputs = document.querySelectorAll('.avatar-input');
+    const exitAdminBtn = document.getElementById('exitAdmin');
     let adminMode = false;
     let updateClickCount = 0;
     let updateTimer;
+
+    function bindEditableSync(el, type, index, field, rerender = false) {
+      if (!el) return;
+      const apply = () => {
+        portfolioData[type][index][field] = el.textContent.trim();
+        if (rerender) {
+          renderPortfolios(type);
+        }
+      };
+      el.addEventListener('blur', apply);
+      el.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          el.blur();
+        }
+      });
+    }
 
     const portfolioMeta = {
       factor: {
@@ -1355,6 +1393,7 @@
         label: item.title,
         value: item.allocation,
         color: colors[index % colors.length],
+        index,
       }));
 
       allocations.forEach((entry) => {
@@ -1370,6 +1409,7 @@
         const label = document.createElement('span');
         label.textContent = entry.label;
         label.dataset.editable = 'true';
+        bindEditableSync(label, type, entry.index, 'title', true);
         left.appendChild(dot);
         left.appendChild(label);
         const value = document.createElement('span');
@@ -1395,6 +1435,7 @@
         const title = document.createElement('h4');
         title.textContent = item.title;
         title.dataset.editable = 'true';
+        bindEditableSync(title, type, index, 'title', true);
 
         const desc = document.createElement('p');
         desc.textContent = item.desc;
@@ -1569,6 +1610,7 @@
     function toggleAdminMode() {
       adminMode = !adminMode;
       adminNotice.style.display = adminMode ? 'block' : 'none';
+      exitAdminBtn.style.display = adminMode ? 'inline-flex' : 'none';
       refreshEditableState();
     }
 
@@ -1594,6 +1636,9 @@
       document.querySelectorAll('.portfolio-shell').forEach((shell) => {
         shell.classList.toggle('admin', adminMode);
       });
+      if (exitAdminBtn) {
+        exitAdminBtn.style.display = adminMode ? 'inline-flex' : 'none';
+      }
     }
 
     avatarInputs.forEach((input) => {
@@ -1673,6 +1718,9 @@
     });
 
     addFundBtn.addEventListener('click', addNewFund);
+    exitAdminBtn.addEventListener('click', () => {
+      if (adminMode) toggleAdminMode();
+    });
     bindDetailsToggles();
 
     // Initial render
