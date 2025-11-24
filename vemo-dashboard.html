@@ -97,56 +97,33 @@
       }
     }
 
-    .search {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: min(400px, 100%);
-    }
-
-    .search input {
-      flex: 1;
-      padding: 10px 12px;
+    .admin-hotspot {
+      width: 48px;
+      height: 32px;
       border-radius: 10px;
-      border: 1px solid #d7d9e0;
-      font-size: 14px;
-      color: var(--text);
-      background: #f9fafc;
-      outline: none;
-      transition: border 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px dashed transparent;
+      transition: border 0.2s ease, background 0.2s ease;
     }
 
-    .search input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(114, 210, 122, 0.18);
+    .admin-hotspot:hover {
+      border-color: rgba(114, 210, 122, 0.35);
+      background: rgba(114, 210, 122, 0.06);
     }
 
-    .search button {
-      border: none;
-      background: var(--accent-strong);
-      color: #0f1a2a;
-      padding: 10px 14px;
-      border-radius: 10px;
+    .admin-hotspot .dots {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.1s ease;
-      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
-    }
-
-    .search button:hover {
-      background: var(--accent-hover);
-    }
-
-    .search button:active {
-      transform: translateY(1px);
-    }
-
-    .search svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
+      gap: 4px;
+      opacity: 0.45;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 2px;
     }
 
     .notice {
@@ -383,6 +360,218 @@
       gap: 10px;
     }
 
+    .portfolio-shell {
+      background: #f8fafc;
+      border: 1px solid #edf0f5;
+      padding: 14px;
+      border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.08);
+    }
+
+    .portfolio-toggle {
+      width: 100%;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text);
+      padding: 4px 0 6px;
+    }
+
+    .portfolio-shell.open {
+      border-color: rgba(114, 210, 122, 0.6);
+      box-shadow: 0 10px 26px rgba(114, 210, 122, 0.12);
+    }
+
+    .portfolio-shell .chevron {
+      transition: transform 0.2s ease;
+    }
+
+    .portfolio-shell.open .chevron {
+      transform: rotate(90deg);
+    }
+
+    .portfolio-summary {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 10px;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid #e3e9f2;
+      border-radius: 12px;
+    }
+
+    .portfolio-info {
+      display: grid;
+      gap: 10px;
+    }
+
+    .portfolio-info p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .portfolio-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .portfolio-meta .chip {
+      background: #eef6ef;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-weight: 600;
+      font-size: 12px;
+      color: #1c3a2c;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
+    }
+
+    .chart-wrap {
+      position: relative;
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .chart-legend {
+      display: grid;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chart-center-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .funds-wrapper {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .allocation-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .allocation-input {
+      width: 90px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #dfe3ec;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .delete-btn {
+      border: none;
+      background: #ffe8e6;
+      color: #b04137;
+      padding: 6px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      display: none;
+    }
+
+    .portfolio-shell.admin .delete-btn {
+      display: inline-flex;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 16px;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 18px;
+      width: min(360px, 100%);
+      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e3e9f2;
+      display: grid;
+      gap: 12px;
+    }
+
+    .modal h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .modal input {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dfe3ec;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .modal .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .modal .primary {
+      background: var(--accent-strong);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .modal .ghost {
+      background: #f1f3f8;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     .mode-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -556,8 +745,12 @@
         gap: 10px;
       }
 
-      .search {
-        width: 100%;
+      .portfolio-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-wrap {
+        grid-template-columns: 1fr;
       }
 
       .section-heading {
@@ -580,15 +773,9 @@
         <div class="title" data-editable="true">Vemo Übersicht</div>
         <div class="status-chip"><span class="live-dot" aria-hidden="true"></span><span data-editable="true">Live</span></div>
       </div>
-      <form class="search" id="searchForm">
-        <input type="text" id="searchInput" placeholder="Suchen..." aria-label="Suche" />
-        <button type="submit" aria-label="Suchen">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
-            <circle cx="11" cy="11" r="7"></circle>
-            <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
-          </svg>
-        </button>
-      </form>
+      <div class="admin-hotspot" id="adminHotspot" aria-label="versteckter Admin Schalter">
+        <span class="dots">···</span>
+      </div>
     </header>
     <div id="adminNotice" class="notice" style="display: none;">Admin Modus aktiv.</div>
 
@@ -736,13 +923,57 @@
     </footer>
   </div>
 
+  <div class="modal-backdrop" id="adminModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
+      <h3 id="adminModalTitle">Admin-Zugang</h3>
+      <p style="margin:0;color:var(--muted);font-size:13px;">Bitte Code eingeben, um den Bearbeitungsmodus zu aktivieren oder zu verlassen.</p>
+      <input type="password" id="adminCodeInput" placeholder="Code eingeben" />
+      <div class="actions">
+        <button class="ghost" type="button" id="closeModal">Abbrechen</button>
+        <button class="primary" type="button" id="submitCode">Bestätigen</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const adminCode = 'Vemokorrektur20954.';
-    const searchForm = document.getElementById('searchForm');
-    const searchInput = document.getElementById('searchInput');
     const adminNotice = document.getElementById('adminNotice');
     const addFundBtn = document.getElementById('addFund');
+    const hotspot = document.getElementById('adminHotspot');
+    const modal = document.getElementById('adminModal');
+    const codeInput = document.getElementById('adminCodeInput');
+    const closeModalBtn = document.getElementById('closeModal');
+    const submitCodeBtn = document.getElementById('submitCode');
     let adminMode = false;
+    let hotspotCount = 0;
+    let hotspotTimer;
+
+    const portfolioMeta = {
+      factor: {
+        title: 'Faktorportfolio',
+        summary: 'Smart-Beta-Strategien mit Qualitäts- und Value-Fokus, fein austariert nach Volatilität.',
+        since: 'Rendite seit 2018: +36,4%',
+        info: 'Dynamisches Rebalancing zwischen Qualitäts- und Momentum-Faktoren.',
+      },
+      marketcap: {
+        title: 'Marketcap Mix',
+        summary: 'Globale Marktführer kombiniert mit wachstumsstarken MidCaps für robuste Marktabdeckung.',
+        since: 'Rendite seit 2017: +41,2%',
+        info: 'Schwerpunkt auf Bilanzstärke, Cashflow-Qualität und Dividendenhistorie.',
+      },
+      bip: {
+        title: 'BIP Allokation',
+        summary: 'Regionale Gewichtung nach Wirtschaftsleistung für kontinuierliche Partizipation am Wachstum.',
+        since: 'Rendite seit 2016: +32,1%',
+        info: 'Systematische Anpassung an makroökonomische Verschiebungen mit minimalem Turnover.',
+      },
+      obligationen: {
+        title: 'Obligationen Fokus',
+        summary: 'Nachhaltige und klassische Anleihen-Bausteine für Stabilität und laufende Erträge.',
+        since: 'Rendite seit 2015: +18,7%',
+        info: 'Diversifikation über Laufzeiten und ESG-zertifizierte Emissionen.',
+      },
+    };
 
     const portfolioData = {
       factor: [
@@ -751,6 +982,8 @@
           desc: 'Stark diversifiziertes Faktorportfolio mit Fokus auf Qualität und niedrige Volatilität.',
           returns5: 'Ø Rendite 5 Jahre: 5,2% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 6,1% p.a.',
+          allocation: 32,
+          since: 'Rendite seit Start: +24,1%',
           pros: ['Breite Diversifikation über Stilfaktoren.', 'Geringere Schwankung gegenüber Einzelfaktoren.'],
           cons: ['Kann Phasen relativer Unterperformance haben.', 'Rebalancing-Kosten können anfallen.'],
         },
@@ -759,8 +992,20 @@
           desc: 'Betont Value- und Size-Prämien in europäischen Kernmärkten.',
           returns5: 'Ø Rendite 5 Jahre: 4,4% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 5,8% p.a.',
+          allocation: 28,
+          since: 'Rendite seit Start: +18,6%',
           pros: ['Erhöhtes Exposure zu Value- und Size-Faktoren.', 'Transparente, regelbasierte Selektion.'],
           cons: ['Höhere Faktorrotation möglich.', 'Kann in Wachstumsphasen zurückfallen.'],
+        },
+        {
+          title: 'Quality Momentum Blend',
+          desc: 'Gezielter Mix aus Qualitätsunternehmen mit Momentum-Overlay.',
+          returns5: 'Ø Rendite 5 Jahre: 5,6% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,5% p.a.',
+          allocation: 40,
+          since: 'Rendite seit Start: +27,4%',
+          pros: ['Kombiniert defensive und offensive Stile.', 'Klare Faktorregeln mit monatlichem Review.'],
+          cons: ['Tracking Error zum Gesamtmarkt möglich.', 'Kann bei Faktor-Umbrüchen schwanken.'],
         },
       ],
       marketcap: [
@@ -769,6 +1014,8 @@
           desc: 'Breit gestreute Großkonzerne mit robuster Bilanzstruktur.',
           returns5: 'Ø Rendite 5 Jahre: 5,9% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 7,2% p.a.',
+          allocation: 45,
+          since: 'Rendite seit Start: +29,3%',
           pros: ['Hohe Liquidität und Transparenz.', 'Stabile Dividendenhistorie.'],
           cons: ['Geringerer Small-Cap-Anteil.', 'Stärker an globale Konjunktur gekoppelt.'],
         },
@@ -777,8 +1024,20 @@
           desc: 'Wachstumsstarke Unternehmen mit solidem Track Record.',
           returns5: 'Ø Rendite 5 Jahre: 6,4% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 8,0% p.a.',
+          allocation: 35,
+          since: 'Rendite seit Start: +33,0%',
           pros: ['Höheres Wachstumspotenzial.', 'Breite Sektorstreuung.'],
           cons: ['Teilweise geringere Liquidität.', 'Höhere Schwankungen möglich.'],
+        },
+        {
+          title: 'SmallCap Satellit',
+          desc: 'Selektive Beimischung innovativer Small Caps.',
+          returns5: 'Ø Rendite 5 Jahre: 7,1% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 8,6% p.a.',
+          allocation: 20,
+          since: 'Rendite seit Start: +22,8%',
+          pros: ['Skalierbare Wachstumschancen.', 'Gezieltes Risikobudget.'],
+          cons: ['Höhere Volatilität.', 'Begrenzte Liquidität in Stressphasen.'],
         },
       ],
       bip: [
@@ -787,6 +1046,8 @@
           desc: 'Regionale Gewichtung entsprechend Wirtschaftsleistung für stabile Allokation.',
           returns5: 'Ø Rendite 5 Jahre: 4,8% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 6,0% p.a.',
+          allocation: 42,
+          since: 'Rendite seit Start: +21,3%',
           pros: ['Stabile Allokation nach Wirtschaftskraft.', 'Geringe Klumpenrisiken.'],
           cons: ['Langsame Anpassung an Markttrends.', 'Weniger taktische Chancen.'],
         },
@@ -795,8 +1056,20 @@
           desc: 'Zusatzschwerpunkt auf aufstrebenden Volkswirtschaften.',
           returns5: 'Ø Rendite 5 Jahre: 6,9% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 7,7% p.a.',
+          allocation: 33,
+          since: 'Rendite seit Start: +25,0%',
           pros: ['Partizipation an höherem Wachstum.', 'Breite Länderdiversifikation.'],
           cons: ['Währungs- und Liquiditätsrisiken.', 'Höhere geopolitische Unsicherheit.'],
+        },
+        {
+          title: 'Developed Core',
+          desc: 'Kernmärkte nach Wirtschaftskraft, stabilisiert durch taktische Korridore.',
+          returns5: 'Ø Rendite 5 Jahre: 4,5% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 5,9% p.a.',
+          allocation: 25,
+          since: 'Rendite seit Start: +19,8%',
+          pros: ['Geringer Turnover.', 'Hohe Planbarkeit.'],
+          cons: ['Begrenzt opportunistisch.', 'Abweichungen zu kapitalgewichteten Indizes.'],
         },
       ],
       obligationen: [
@@ -805,6 +1078,8 @@
           desc: 'Staats- und Unternehmensanleihen mit Investment-Grade-Rating.',
           returns5: 'Ø Rendite 5 Jahre: 2,3% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 3,1% p.a.',
+          allocation: 50,
+          since: 'Rendite seit Start: +11,4%',
           pros: ['Solide Bonität.', 'Geringere Volatilität.'],
           cons: ['Begrenztes Renditepotenzial.', 'Zinsänderungsrisiko.'],
         },
@@ -813,8 +1088,20 @@
           desc: 'Nachhaltigkeitsorientierte Anleihen mit zertifizierten Projekten.',
           returns5: 'Ø Rendite 5 Jahre: 2,7% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 3,4% p.a.',
+          allocation: 30,
+          since: 'Rendite seit Start: +12,1%',
           pros: ['Nachhaltigkeitsfokus.', 'Transparente Mittelverwendung.'],
           cons: ['Begrenzte Historie.', 'Teilweise geringere Liquidität.'],
+        },
+        {
+          title: 'Inflation Linkers',
+          desc: 'Anleihen mit Inflationsschutz zur Stabilisierung der Kaufkraft.',
+          returns5: 'Ø Rendite 5 Jahre: 2,1% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 2,9% p.a.',
+          allocation: 20,
+          since: 'Rendite seit Start: +9,7%',
+          pros: ['Inflationsabsicherung.', 'Defensive Ausrichtung.'],
+          cons: ['Begrenztes Upside.', 'Abhängig von Inflationspfad.'],
         },
       ],
     };
@@ -837,12 +1124,123 @@
       ],
     };
 
+    function drawDonut(canvas, allocations) {
+      const ctx = canvas.getContext('2d');
+      const total = allocations.reduce((sum, item) => sum + item.value, 0) || 1;
+      const radius = Math.min(canvas.width, canvas.height) / 2 - 8;
+      let startAngle = -Math.PI / 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      allocations.forEach((slice, index) => {
+        const angle = (slice.value / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height / 2);
+        ctx.arc(canvas.width / 2, canvas.height / 2, radius, startAngle, startAngle + angle);
+        ctx.closePath();
+        ctx.fillStyle = slice.color;
+        ctx.fill();
+        startAngle += angle;
+      });
+      ctx.beginPath();
+      ctx.fillStyle = '#ffffff';
+      ctx.arc(canvas.width / 2, canvas.height / 2, radius * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     function renderPortfolios(type) {
       const list = document.getElementById('portfolioList');
       list.innerHTML = '';
-      portfolioData[type].forEach((item) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'portfolio-item';
+      const meta = portfolioMeta[type];
+
+      const shell = document.createElement('div');
+      shell.className = 'portfolio-shell';
+      const toggle = document.createElement('button');
+      toggle.className = 'portfolio-toggle';
+      toggle.innerHTML = `<span data-editable="true">${meta.title}</span><span class="chevron" aria-hidden="true">›</span>`;
+      const content = document.createElement('div');
+      content.style.display = 'block';
+      shell.classList.add('open');
+
+      toggle.addEventListener('click', () => {
+        const open = content.style.display === 'block';
+        content.style.display = open ? 'none' : 'block';
+        shell.classList.toggle('open', !open);
+      });
+
+      const summary = document.createElement('div');
+      summary.className = 'portfolio-summary';
+      const info = document.createElement('div');
+      info.className = 'portfolio-info';
+      const summaryText = document.createElement('p');
+      summaryText.textContent = meta.summary;
+      summaryText.dataset.editable = 'true';
+      const infoText = document.createElement('p');
+      infoText.textContent = meta.info;
+      infoText.dataset.editable = 'true';
+      const chips = document.createElement('div');
+      chips.className = 'portfolio-meta';
+      const sinceChip = document.createElement('span');
+      sinceChip.className = 'chip';
+      sinceChip.textContent = meta.since;
+      sinceChip.dataset.editable = 'true';
+      chips.appendChild(sinceChip);
+      info.appendChild(summaryText);
+      info.appendChild(infoText);
+      info.appendChild(chips);
+
+      const chartWrap = document.createElement('div');
+      chartWrap.className = 'chart-wrap';
+      const canvas = document.createElement('canvas');
+      canvas.width = 140;
+      canvas.height = 140;
+      const legend = document.createElement('div');
+      legend.className = 'chart-legend';
+
+      const colors = ['#72d27a', '#7ed957', '#6ac66e', '#94e195', '#4eb467'];
+      const allocations = portfolioData[type].map((item, index) => ({
+        label: item.title,
+        value: item.allocation,
+        color: colors[index % colors.length],
+      }));
+
+      allocations.forEach((entry) => {
+        const li = document.createElement('div');
+        li.className = 'legend-item';
+        const left = document.createElement('div');
+        left.style.display = 'flex';
+        left.style.alignItems = 'center';
+        left.style.gap = '8px';
+        const dot = document.createElement('span');
+        dot.className = 'legend-dot';
+        dot.style.background = entry.color;
+        const label = document.createElement('span');
+        label.textContent = entry.label;
+        label.dataset.editable = 'true';
+        left.appendChild(dot);
+        left.appendChild(label);
+        const value = document.createElement('span');
+        value.textContent = `${entry.value}%`;
+        li.appendChild(left);
+        li.appendChild(value);
+        legend.appendChild(li);
+      });
+
+      const centerLabel = document.createElement('div');
+      centerLabel.className = 'chart-center-label';
+      const totalAlloc = allocations.reduce((sum, el) => sum + el.value, 0);
+      centerLabel.textContent = `${totalAlloc}%`;
+      chartWrap.appendChild(canvas);
+      chartWrap.appendChild(centerLabel);
+      chartWrap.appendChild(legend);
+
+      summary.appendChild(info);
+      summary.appendChild(chartWrap);
+
+      const fundsWrapper = document.createElement('div');
+      fundsWrapper.className = 'funds-wrapper';
+
+      portfolioData[type].forEach((item, index) => {
+        const fund = document.createElement('div');
+        fund.className = 'portfolio-item';
 
         const title = document.createElement('h4');
         title.textContent = item.title;
@@ -862,6 +1260,31 @@
         ten.dataset.editable = 'true';
         returns.appendChild(five);
         returns.appendChild(ten);
+
+        const since = document.createElement('span');
+        since.className = 'section-sub';
+        since.textContent = item.since;
+        since.dataset.editable = 'true';
+
+        const allocationRow = document.createElement('div');
+        allocationRow.className = 'allocation-row';
+        const allocationLabel = document.createElement('div');
+        allocationLabel.innerHTML = `<strong>Allokation:</strong> <span class="allocation-value">${item.allocation}%</span>`;
+        const allocationInput = document.createElement('input');
+        allocationInput.type = 'number';
+        allocationInput.className = 'allocation-input';
+        allocationInput.value = item.allocation;
+        allocationInput.min = 0;
+        allocationInput.max = 100;
+        allocationInput.step = 1;
+        allocationInput.style.display = adminMode ? 'block' : 'none';
+        allocationInput.addEventListener('input', () => {
+          const newVal = Number(allocationInput.value) || 0;
+          portfolioData[type][index].allocation = newVal;
+          renderPortfolios(type);
+        });
+        allocationRow.appendChild(allocationLabel);
+        allocationRow.appendChild(allocationInput);
 
         const pros = document.createElement('div');
         pros.className = 'sublist';
@@ -893,13 +1316,38 @@
         cons.appendChild(consTitle);
         cons.appendChild(consList);
 
-        wrapper.appendChild(title);
-        wrapper.appendChild(desc);
-        wrapper.appendChild(returns);
-        wrapper.appendChild(pros);
-        wrapper.appendChild(cons);
-        list.appendChild(wrapper);
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.justifyContent = 'space-between';
+        actions.style.alignItems = 'center';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = 'Entfernen';
+        deleteBtn.addEventListener('click', () => {
+          portfolioData[type].splice(index, 1);
+          renderPortfolios(type);
+        });
+        actions.appendChild(deleteBtn);
+
+        fund.appendChild(title);
+        fund.appendChild(desc);
+        fund.appendChild(returns);
+        fund.appendChild(since);
+        fund.appendChild(allocationRow);
+        fund.appendChild(pros);
+        fund.appendChild(cons);
+        fund.appendChild(actions);
+        fundsWrapper.appendChild(fund);
       });
+
+      content.appendChild(summary);
+      content.appendChild(fundsWrapper);
+      shell.appendChild(toggle);
+      shell.appendChild(content);
+      list.appendChild(shell);
+
+      drawDonut(canvas, allocations);
+      shell.classList.toggle('admin', adminMode);
       refreshEditableState();
     }
 
@@ -960,6 +1408,8 @@
         desc: 'Eigene Beschreibung hinzufügen.',
         returns5: 'Ø Rendite 5 Jahre: Wert ergänzen',
         returns10: 'Ø Rendite 10 Jahre: Wert ergänzen',
+        allocation: 15,
+        since: 'Rendite seit Start: Wert ergänzen',
         pros: ['Vorteil hinzufügen'],
         cons: ['Nachteil hinzufügen'],
       });
@@ -982,13 +1432,54 @@
       addFundBtn.style.opacity = adminMode ? '1' : '0.6';
       addFundBtn.style.cursor = adminMode ? 'pointer' : 'not-allowed';
       document.getElementById('portfolioActions').style.display = adminMode ? 'flex' : 'none';
+      document.querySelectorAll('.allocation-input').forEach((input) => {
+        input.style.display = adminMode ? 'block' : 'none';
+      });
+      document.querySelectorAll('.delete-btn').forEach((btn) => {
+        btn.style.display = adminMode ? 'inline-flex' : 'none';
+      });
+      document.querySelectorAll('.portfolio-shell').forEach((shell) => {
+        shell.classList.toggle('admin', adminMode);
+      });
     }
 
-    searchForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const value = searchInput.value.trim();
-      if (value === adminCode) {
+    function openModal() {
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      codeInput.value = '';
+      codeInput.focus();
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    hotspot.addEventListener('click', () => {
+      hotspotCount += 1;
+      clearTimeout(hotspotTimer);
+      if (hotspotCount >= 5) {
+        hotspotCount = 0;
+        openModal();
+      }
+      hotspotTimer = setTimeout(() => {
+        hotspotCount = 0;
+      }, 1200);
+    });
+
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+    submitCodeBtn.addEventListener('click', () => {
+      if (codeInput.value.trim() === adminCode) {
         toggleAdminMode();
+        closeModal();
+      }
+    });
+    codeInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        submitCodeBtn.click();
       }
     });
 
