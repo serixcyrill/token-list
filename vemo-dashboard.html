@@ -33,6 +33,29 @@
       color: var(--text);
     }
 
+    a:hover {
+      color: var(--text);
+    }
+
+    .pill,
+    .section-meta,
+    .mode-tabs button.active,
+    .tab-buttons button.active,
+    .portfolio-actions .secondary-btn,
+    .notice {
+      color: #0f1a2a !important;
+    }
+
+    .tab-buttons button:hover,
+    .mode-tabs button:hover,
+    .secondary-btn:hover,
+    .toggle-details:hover,
+    .advisor-actions a:hover {
+      background: #eef6ef !important;
+      border-color: rgba(114, 210, 122, 0.45) !important;
+      color: #0f1a2a !important;
+    }
+
     .page {
       min-height: 100vh;
       display: flex;
@@ -367,9 +390,22 @@
     .chart-wrap {
       position: relative;
       display: grid;
-      grid-template-columns: 170px 1fr;
+      grid-template-columns: 190px 1fr;
       gap: 14px;
       align-items: center;
+    }
+
+    .chart-visual {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      display: grid;
+      place-items: center;
+    }
+
+    .chart-visual canvas {
+      width: 170px;
+      height: 170px;
     }
 
     .chart-legend {
@@ -395,17 +431,23 @@
 
     .chart-center-label {
       position: absolute;
-      inset: 0;
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 108px;
+      height: 108px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       font-weight: 700;
-      color: #15313a;
+      color: #0f1a2a;
       font-size: 13px;
       pointer-events: none;
-      background: radial-gradient(circle at 50% 50%, rgba(244, 247, 251, 0.9), rgba(255, 255, 255, 0.9) 55%, rgba(244, 247, 251, 0.2));
+      background: radial-gradient(circle at 50% 50%, rgba(244, 247, 251, 0.96), rgba(255, 255, 255, 0.95));
       border-radius: 50%;
+      box-shadow: 0 12px 26px rgba(21, 49, 58, 0.08), inset 0 0 0 1px rgba(114, 210, 122, 0.2);
     }
 
     .chart-center-label .label-top {
@@ -418,6 +460,12 @@
     .chart-center-label .label-value {
       font-size: 18px;
       color: #1a7340;
+    }
+
+    .chart-center-label .label-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
     }
 
     .funds-wrapper {
@@ -1335,7 +1383,7 @@
       });
       ctx.beginPath();
       ctx.fillStyle = '#ffffff';
-      ctx.arc(canvas.width / 2, canvas.height / 2, radius * 0.55, 0, Math.PI * 2);
+      ctx.arc(canvas.width / 2, canvas.height / 2, radius * 0.65, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -1382,9 +1430,11 @@
 
       const chartWrap = document.createElement('div');
       chartWrap.className = 'chart-wrap';
+      const chartVisual = document.createElement('div');
+      chartVisual.className = 'chart-visual';
       const canvas = document.createElement('canvas');
-      canvas.width = 140;
-      canvas.height = 140;
+      canvas.width = 170;
+      canvas.height = 170;
       const legend = document.createElement('div');
       legend.className = 'chart-legend';
 
@@ -1395,6 +1445,22 @@
         color: colors[index % colors.length],
         index,
       }));
+
+      const centerLabel = document.createElement('div');
+      centerLabel.className = 'chart-center-label';
+      const labelTop = document.createElement('div');
+      labelTop.className = 'label-top';
+      labelTop.textContent = 'Gesamtrendite';
+      const labelValue = document.createElement('div');
+      labelValue.className = 'label-value';
+      const labelSub = document.createElement('div');
+      labelSub.className = 'label-sub';
+      const sinceParts = meta.since.split(':');
+      labelValue.textContent = sinceParts[1] ? sinceParts[1].trim() : meta.since;
+      labelSub.textContent = sinceParts[0]?.replace('Rendite', '').trim() || 'seit Start';
+      centerLabel.appendChild(labelTop);
+      centerLabel.appendChild(labelValue);
+      centerLabel.appendChild(labelSub);
 
       allocations.forEach((entry) => {
         const li = document.createElement('div');
@@ -1419,7 +1485,9 @@
         legend.appendChild(li);
       });
 
-      chartWrap.appendChild(canvas);
+      chartVisual.appendChild(canvas);
+      chartVisual.appendChild(centerLabel);
+      chartWrap.appendChild(chartVisual);
       chartWrap.appendChild(legend);
 
       summary.appendChild(info);
