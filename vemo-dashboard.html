@@ -98,32 +98,44 @@
     }
 
     .admin-hotspot {
-      width: 48px;
-      height: 32px;
-      border-radius: 10px;
+      min-width: 120px;
+      height: 54px;
+      border-radius: 14px;
       position: relative;
       overflow: hidden;
       cursor: pointer;
-      border: 1px dashed transparent;
-      transition: border 0.2s ease, background 0.2s ease;
-    }
-
-    .admin-hotspot:hover {
-      border-color: rgba(114, 210, 122, 0.35);
-      background: rgba(114, 210, 122, 0.06);
-    }
-
-    .admin-hotspot .dots {
-      position: absolute;
-      inset: 0;
+      border: 1.5px dashed rgba(114, 210, 122, 0.4);
+      transition: border 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      background: linear-gradient(120deg, rgba(114, 210, 122, 0.12), rgba(91, 142, 255, 0.08));
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      opacity: 0.45;
-      color: var(--muted);
+      padding: 0 14px;
+    }
+
+    .admin-hotspot:hover {
+      border-color: rgba(114, 210, 122, 0.6);
+      background: linear-gradient(120deg, rgba(114, 210, 122, 0.18), rgba(91, 142, 255, 0.12));
+      box-shadow: 0 10px 22px rgba(114, 210, 122, 0.18);
+    }
+
+    .admin-hotspot .dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.6;
+      color: var(--text);
       font-weight: 700;
       letter-spacing: 2px;
+      font-size: 16px;
+    }
+
+    .admin-hotspot .hint {
+      margin-left: 8px;
+      color: #1c3a2c;
+      font-weight: 700;
+      font-size: 12px;
+      opacity: 0.8;
     }
 
     .notice {
@@ -437,8 +449,8 @@
     .chart-wrap {
       position: relative;
       display: grid;
-      grid-template-columns: 140px 1fr;
-      gap: 10px;
+      grid-template-columns: 170px 1fr;
+      gap: 14px;
       align-items: center;
     }
 
@@ -469,10 +481,25 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
       font-weight: 700;
-      color: var(--text);
+      color: #15313a;
       font-size: 13px;
       pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(244, 247, 251, 0.9), rgba(255, 255, 255, 0.9) 55%, rgba(244, 247, 251, 0.2));
+      border-radius: 50%;
+    }
+
+    .chart-center-label .label-top {
+      font-size: 11px;
+      letter-spacing: 0.2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .chart-center-label .label-value {
+      font-size: 18px;
+      color: #1a7340;
     }
 
     .funds-wrapper {
@@ -724,6 +751,67 @@
 
     .info-panel strong {
       color: var(--text);
+      font-size: 13px;
+    }
+
+    .extras {
+      display: grid;
+      gap: 12px;
+    }
+
+    .extra-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .extra-card {
+      background: #ffffff;
+      border: 1px solid #e3e9f2;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 8px;
+    }
+
+    .extra-card h4 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .extra-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chip-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: #eef6ff;
+      color: #1c3a2c;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .progress-badge {
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: linear-gradient(120deg, rgba(114, 210, 122, 0.15), rgba(75, 137, 255, 0.12));
+      font-weight: 700;
+      color: #1c3a2c;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .info-time {
@@ -775,6 +863,7 @@
       </div>
       <div class="admin-hotspot" id="adminHotspot" aria-label="versteckter Admin Schalter">
         <span class="dots">···</span>
+        <span class="hint">Admin</span>
       </div>
     </header>
     <div id="adminNotice" class="notice" style="display: none;">Admin Modus aktiv.</div>
@@ -906,6 +995,37 @@
             </thead>
             <tbody id="ablaufBody"></tbody>
           </table>
+        </div>
+      </section>
+      <section class="card">
+        <div class="section-heading">
+          <h2 data-editable="true">Zusatzfunktionen für mehr Mehrwert</h2>
+          <p class="section-sub" data-editable="true">Smarter Service, den jede Kundin und jeder Kunde sofort nutzen kann.</p>
+          <span class="section-meta" data-editable="true">Neu &amp; experimentell</span>
+        </div>
+        <div class="extras">
+          <div class="extra-grid">
+            <div class="extra-card">
+              <h4 data-editable="true">Realtime-Signale</h4>
+              <p data-editable="true">Erhält Push-Hinweise bei Marktbewegungen oder wenn Rebalancing sinnvoll ist.</p>
+              <span class="chip-inline" data-editable="true">Aktiv: 12 Feeds</span>
+            </div>
+            <div class="extra-card">
+              <h4 data-editable="true">ESG-Radar</h4>
+              <p data-editable="true">Nachhaltigkeits-Score mit individuellen Schwellenwerten und Trendverlauf.</p>
+              <span class="progress-badge" data-editable="true">Ø Score: 78 / 100</span>
+            </div>
+            <div class="extra-card">
+              <h4 data-editable="true">Steuer-Quickcheck</h4>
+              <p data-editable="true">Schätzt Quellensteuer &amp; Optimierungspotenziale für die aktuelle Allokation.</p>
+              <span class="chip-inline" data-editable="true">Beta-Vorschau</span>
+            </div>
+            <div class="extra-card">
+              <h4 data-editable="true">Termin-Assistent</h4>
+              <p data-editable="true">Bietet freie Slots und fasst Fragen vor, damit Meetings schneller starten.</p>
+              <span class="progress-badge" data-editable="true">Nächster Slot: morgen</span>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -1195,7 +1315,7 @@
       const legend = document.createElement('div');
       legend.className = 'chart-legend';
 
-      const colors = ['#72d27a', '#7ed957', '#6ac66e', '#94e195', '#4eb467'];
+      const colors = ['#5ac8fa', '#7ed957', '#ffb347', '#a78bfa', '#4ad66d', '#ff6b6b'];
       const allocations = portfolioData[type].map((item, index) => ({
         label: item.title,
         value: item.allocation,
@@ -1227,7 +1347,7 @@
       const centerLabel = document.createElement('div');
       centerLabel.className = 'chart-center-label';
       const totalAlloc = allocations.reduce((sum, el) => sum + el.value, 0);
-      centerLabel.textContent = `${totalAlloc}%`;
+      centerLabel.innerHTML = `<span class="label-top">Allokation</span><span class="label-value">${totalAlloc}%</span>`;
       chartWrap.appendChild(canvas);
       chartWrap.appendChild(centerLabel);
       chartWrap.appendChild(legend);
