@@ -754,64 +754,144 @@
       font-size: 13px;
     }
 
-    .extras {
+    .advisor-grid {
       display: grid;
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
     }
 
-    .extra-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
-    }
-
-    .extra-card {
-      background: #ffffff;
+    .advisor-card {
       border: 1px solid #e3e9f2;
       border-radius: 14px;
-      padding: 14px;
+      padding: 16px;
+      background: #ffffff;
       box-shadow: var(--shadow);
       display: grid;
-      gap: 8px;
+      gap: 12px;
     }
 
-    .extra-card h4 {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 700;
-      display: flex;
+    .advisor-header {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
       align-items: center;
-      gap: 8px;
     }
 
-    .extra-card p {
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #e8f8ec, #dfe9ff);
+      border: 1px solid #dbe5f0;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
+      border-radius: 16px;
+      pointer-events: none;
+    }
+
+    .avatar-input-wrap {
+      display: grid;
+      gap: 4px;
+    }
+
+    .avatar-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .avatar-input {
+      display: none;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d6dce7;
+      background: #f8fbff;
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .advisor-meta h4 {
       margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .advisor-meta .role {
+      display: inline-flex;
+      padding: 5px 10px;
+      background: #eef6ef;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1c3a2c;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
+      margin-top: 4px;
+    }
+
+    .advisor-meta p {
+      margin: 6px 0 0;
       color: var(--muted);
       font-size: 13px;
     }
 
-    .chip-inline {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 8px;
-      background: #eef6ff;
-      color: #1c3a2c;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 12px;
+    .advisor-qualifications h5 {
+      margin: 0 0 6px 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--text);
     }
 
-    .progress-badge {
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: linear-gradient(120deg, rgba(114, 210, 122, 0.15), rgba(75, 137, 255, 0.12));
-      font-weight: 700;
-      color: #1c3a2c;
-      font-size: 12px;
+    .advisor-qualifications ul {
+      margin: 0 0 10px 16px;
+      padding: 0;
+      color: var(--muted);
+      font-size: 13px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .advisor-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .advisor-actions a {
+      text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      padding: 10px 14px;
+      background: var(--accent-strong);
+      color: #0f2b18;
+      font-weight: 700;
+      border-radius: 12px;
+      box-shadow: 0 12px 24px rgba(114, 210, 122, 0.25);
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .advisor-actions a:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(114, 210, 122, 0.35);
+    }
+
+    .advisor-actions .note {
+      font-size: 12px;
+      color: var(--muted);
     }
 
     .info-time {
@@ -997,33 +1077,102 @@
           </table>
         </div>
       </section>
-      <section class="card">
+      <section class="card" id="advisorSection">
         <div class="section-heading">
-          <h2 data-editable="true">Zusatzfunktionen für mehr Mehrwert</h2>
-          <p class="section-sub" data-editable="true">Smarter Service, den jede Kundin und jeder Kunde sofort nutzen kann.</p>
-          <span class="section-meta" data-editable="true">Neu &amp; experimentell</span>
+          <h2 data-editable="true">Telefontermin mit Honorarberater:in</h2>
+          <p class="section-sub" data-editable="true">In der Beschreibung sind Fragen zu deiner 3-Jahr- bzw. Altersvorsorge gratis verfügbar. Buche einen kurzen Telefontermin, um mit einem Honorarberater zu sprechen.</p>
+          <span class="section-meta" data-editable="true">Direkt buchbar</span>
         </div>
-        <div class="extras">
-          <div class="extra-grid">
-            <div class="extra-card">
-              <h4 data-editable="true">Realtime-Signale</h4>
-              <p data-editable="true">Erhält Push-Hinweise bei Marktbewegungen oder wenn Rebalancing sinnvoll ist.</p>
-              <span class="chip-inline" data-editable="true">Aktiv: 12 Feeds</span>
+        <div class="advisor-grid">
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-diego" aria-label="Profilbild Diego Berchtold"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label">Profilbild-URL</span>
+                <input class="avatar-input" type="url" data-target="avatar-diego" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Diego Berchtold</h4>
+                <span class="role" data-editable="true">Honorarberater</span>
+                <p data-editable="true">Berät dich persönlich zu Vorsorge Mantel, Portfolios und Ablaufmanagement.</p>
+              </div>
             </div>
-            <div class="extra-card">
-              <h4 data-editable="true">ESG-Radar</h4>
-              <p data-editable="true">Nachhaltigkeits-Score mit individuellen Schwellenwerten und Trendverlauf.</p>
-              <span class="progress-badge" data-editable="true">Ø Score: 78 / 100</span>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Professional/academic degree(s)</li>
+                <li data-editable="true">Bachelor-Abschluss: Betriebsökonomie</li>
+                <li data-editable="true">Professional knowledge</li>
+                <li data-editable="true">Other Certificate(s) / Diploma(s): VBV - Versicherung &amp; Vorsorge</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">Code of conduct trainings: Mendo – FIDLEG Kompakt – Kenntnisnachweis Verhaltensregeln</li>
+              </ul>
             </div>
-            <div class="extra-card">
-              <h4 data-editable="true">Steuer-Quickcheck</h4>
-              <p data-editable="true">Schätzt Quellensteuer &amp; Optimierungspotenziale für die aktuelle Allokation.</p>
-              <span class="chip-inline" data-editable="true">Beta-Vorschau</span>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchung: https://calendly.com/diego-vemo/telefontermin</span>
             </div>
-            <div class="extra-card">
-              <h4 data-editable="true">Termin-Assistent</h4>
-              <p data-editable="true">Bietet freie Slots und fasst Fragen vor, damit Meetings schneller starten.</p>
-              <span class="progress-badge" data-editable="true">Nächster Slot: morgen</span>
+          </div>
+
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-lara" aria-label="Profilbild Lara Steiner"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label">Profilbild-URL</span>
+                <input class="avatar-input" type="url" data-target="avatar-lara" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Lara Steiner</h4>
+                <span class="role" data-editable="true">Senior Honorarberaterin</span>
+                <p data-editable="true">Spezialisiert auf nachhaltige Portfolios und steueroptimierte Auszahlungspfade.</p>
+              </div>
+            </div>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Master: Finance &amp; Risk Management</li>
+                <li data-editable="true">CAS Sustainable Finance</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">MIFID &amp; FIDLEG Refresh 2024</li>
+              </ul>
+            </div>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchungslink bitte im Admin-Modus anpassen.</span>
+            </div>
+          </div>
+
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-marco" aria-label="Profilbild Marco Keller"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label">Profilbild-URL</span>
+                <input class="avatar-input" type="url" data-target="avatar-marco" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Marco Keller</h4>
+                <span class="role" data-editable="true">Honorarberater</span>
+                <p data-editable="true">Fokus auf Auszahlungsszenarien, Risikoabsicherung und Liquiditätsplanung.</p>
+              </div>
+            </div>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Bachelor: Banking &amp; Finance</li>
+                <li data-editable="true">Dipl. Finanzplanungsexperte</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">Compliance &amp; Ethik Update 2024</li>
+              </ul>
+            </div>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchungslink bitte im Admin-Modus anpassen.</span>
             </div>
           </div>
         </div>
@@ -1064,6 +1213,7 @@
     const codeInput = document.getElementById('adminCodeInput');
     const closeModalBtn = document.getElementById('closeModal');
     const submitCodeBtn = document.getElementById('submitCode');
+    const avatarInputs = document.querySelectorAll('.avatar-input');
     let adminMode = false;
     let hotspotCount = 0;
     let hotspotTimer;
@@ -1344,12 +1494,7 @@
         legend.appendChild(li);
       });
 
-      const centerLabel = document.createElement('div');
-      centerLabel.className = 'chart-center-label';
-      const totalAlloc = allocations.reduce((sum, el) => sum + el.value, 0);
-      centerLabel.innerHTML = `<span class="label-top">Allokation</span><span class="label-value">${totalAlloc}%</span>`;
       chartWrap.appendChild(canvas);
-      chartWrap.appendChild(centerLabel);
       chartWrap.appendChild(legend);
 
       summary.appendChild(info);
@@ -1555,6 +1700,9 @@
       document.querySelectorAll('.allocation-input').forEach((input) => {
         input.style.display = adminMode ? 'block' : 'none';
       });
+      avatarInputs.forEach((input) => {
+        input.style.display = adminMode ? 'block' : 'none';
+      });
       document.querySelectorAll('.delete-btn').forEach((btn) => {
         btn.style.display = adminMode ? 'inline-flex' : 'none';
       });
@@ -1562,6 +1710,24 @@
         shell.classList.toggle('admin', adminMode);
       });
     }
+
+    avatarInputs.forEach((input) => {
+      const target = document.getElementById(input.dataset.target);
+      const applyImage = () => {
+        if (!target) return;
+        const url = input.value.trim();
+        if (url) {
+          target.style.backgroundImage = `url('${url}')`;
+          target.classList.add('has-image');
+        } else {
+          target.style.backgroundImage = '';
+          target.classList.remove('has-image');
+        }
+      };
+      input.addEventListener('change', applyImage);
+      input.addEventListener('blur', applyImage);
+      applyImage();
+    });
 
     function openModal() {
       modal.style.display = 'flex';
