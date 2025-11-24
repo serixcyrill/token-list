@@ -1522,22 +1522,6 @@
         index,
       }));
 
-      const centerLabel = document.createElement('div');
-      centerLabel.className = 'chart-center-label';
-      const labelTop = document.createElement('div');
-      labelTop.className = 'label-top';
-      labelTop.textContent = 'Gesamtrendite';
-      const labelValue = document.createElement('div');
-      labelValue.className = 'label-value';
-      const labelSub = document.createElement('div');
-      labelSub.className = 'label-sub';
-      const sinceParts = meta.since.split(':');
-      labelValue.textContent = sinceParts[1] ? sinceParts[1].trim() : meta.since;
-      labelSub.textContent = sinceParts[0]?.replace('Rendite', '').trim() || 'seit Start';
-      centerLabel.appendChild(labelTop);
-      centerLabel.appendChild(labelValue);
-      centerLabel.appendChild(labelSub);
-
       allocations.forEach((entry) => {
         const li = document.createElement('div');
         li.className = 'legend-item';
@@ -1562,7 +1546,6 @@
       });
 
       chartVisual.appendChild(canvas);
-      chartVisual.appendChild(centerLabel);
       chartWrap.appendChild(chartVisual);
       chartWrap.appendChild(legend);
 
