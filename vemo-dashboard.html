@@ -337,7 +337,7 @@
     }
 
     .portfolio-actions {
-      display: flex;
+      display: none;
       gap: 10px;
       align-items: center;
       margin-bottom: 10px;
@@ -425,6 +425,25 @@
       margin: 0;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    .portfolio-item .sublist {
+      margin-top: 8px;
+    }
+
+    .portfolio-item .sublist h5 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .portfolio-item .sublist ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12.5px;
+      display: grid;
+      gap: 4px;
     }
 
     table {
@@ -663,7 +682,7 @@
           <button type="button" data-portfolio-tab="bip">BIP</button>
           <button type="button" data-portfolio-tab="obligationen">Obligationen</button>
         </div>
-        <div class="portfolio-actions">
+        <div class="portfolio-actions" id="portfolioActions">
           <button type="button" id="addFund" class="secondary-btn">+ Fonds hinzufügen</button>
           <span class="section-sub" data-editable="true">Eigene Fonds können im Admin-Modus ergänzt werden.</span>
         </div>
@@ -727,20 +746,76 @@
 
     const portfolioData = {
       factor: [
-        { title: 'Faktor Plus Global', desc: 'Stark diversifiziertes Faktorportfolio mit Fokus auf Qualität und niedrige Volatilität.' },
-        { title: 'Smart Beta Europa', desc: 'Betont Value- und Size-Prämien in europäischen Kernmärkten.' },
+        {
+          title: 'Faktor Plus Global',
+          desc: 'Stark diversifiziertes Faktorportfolio mit Fokus auf Qualität und niedrige Volatilität.',
+          returns5: 'Ø Rendite 5 Jahre: 5,2% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,1% p.a.',
+          pros: ['Breite Diversifikation über Stilfaktoren.', 'Geringere Schwankung gegenüber Einzelfaktoren.'],
+          cons: ['Kann Phasen relativer Unterperformance haben.', 'Rebalancing-Kosten können anfallen.'],
+        },
+        {
+          title: 'Smart Beta Europa',
+          desc: 'Betont Value- und Size-Prämien in europäischen Kernmärkten.',
+          returns5: 'Ø Rendite 5 Jahre: 4,4% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 5,8% p.a.',
+          pros: ['Erhöhtes Exposure zu Value- und Size-Faktoren.', 'Transparente, regelbasierte Selektion.'],
+          cons: ['Höhere Faktorrotation möglich.', 'Kann in Wachstumsphasen zurückfallen.'],
+        },
       ],
       marketcap: [
-        { title: 'Global Market Leaders', desc: 'Breit gestreute Großkonzerne mit robuster Bilanzstruktur.' },
-        { title: 'MidCap Chancen', desc: 'Wachstumsstarke Unternehmen mit solidem Track Record.' },
+        {
+          title: 'Global Market Leaders',
+          desc: 'Breit gestreute Großkonzerne mit robuster Bilanzstruktur.',
+          returns5: 'Ø Rendite 5 Jahre: 5,9% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 7,2% p.a.',
+          pros: ['Hohe Liquidität und Transparenz.', 'Stabile Dividendenhistorie.'],
+          cons: ['Geringerer Small-Cap-Anteil.', 'Stärker an globale Konjunktur gekoppelt.'],
+        },
+        {
+          title: 'MidCap Chancen',
+          desc: 'Wachstumsstarke Unternehmen mit solidem Track Record.',
+          returns5: 'Ø Rendite 5 Jahre: 6,4% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 8,0% p.a.',
+          pros: ['Höheres Wachstumspotenzial.', 'Breite Sektorstreuung.'],
+          cons: ['Teilweise geringere Liquidität.', 'Höhere Schwankungen möglich.'],
+        },
       ],
       bip: [
-        { title: 'GDP Balanced', desc: 'Regionale Gewichtung entsprechend Wirtschaftsleistung für stabile Allokation.' },
-        { title: 'Emerging Focus', desc: 'Zusatzschwerpunkt auf aufstrebenden Volkswirtschaften.' },
+        {
+          title: 'GDP Balanced',
+          desc: 'Regionale Gewichtung entsprechend Wirtschaftsleistung für stabile Allokation.',
+          returns5: 'Ø Rendite 5 Jahre: 4,8% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,0% p.a.',
+          pros: ['Stabile Allokation nach Wirtschaftskraft.', 'Geringe Klumpenrisiken.'],
+          cons: ['Langsame Anpassung an Markttrends.', 'Weniger taktische Chancen.'],
+        },
+        {
+          title: 'Emerging Focus',
+          desc: 'Zusatzschwerpunkt auf aufstrebenden Volkswirtschaften.',
+          returns5: 'Ø Rendite 5 Jahre: 6,9% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 7,7% p.a.',
+          pros: ['Partizipation an höherem Wachstum.', 'Breite Länderdiversifikation.'],
+          cons: ['Währungs- und Liquiditätsrisiken.', 'Höhere geopolitische Unsicherheit.'],
+        },
       ],
       obligationen: [
-        { title: 'Euro Bonds Core', desc: 'Staats- und Unternehmensanleihen mit Investment-Grade-Rating.' },
-        { title: 'Green Bonds Select', desc: 'Nachhaltigkeitsorientierte Anleihen mit zertifizierten Projekten.' },
+        {
+          title: 'Euro Bonds Core',
+          desc: 'Staats- und Unternehmensanleihen mit Investment-Grade-Rating.',
+          returns5: 'Ø Rendite 5 Jahre: 2,3% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 3,1% p.a.',
+          pros: ['Solide Bonität.', 'Geringere Volatilität.'],
+          cons: ['Begrenztes Renditepotenzial.', 'Zinsänderungsrisiko.'],
+        },
+        {
+          title: 'Green Bonds Select',
+          desc: 'Nachhaltigkeitsorientierte Anleihen mit zertifizierten Projekten.',
+          returns5: 'Ø Rendite 5 Jahre: 2,7% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 3,4% p.a.',
+          pros: ['Nachhaltigkeitsfokus.', 'Transparente Mittelverwendung.'],
+          cons: ['Begrenzte Historie.', 'Teilweise geringere Liquidität.'],
+        },
       ],
     };
 
@@ -777,8 +852,52 @@
         desc.textContent = item.desc;
         desc.dataset.editable = 'true';
 
+        const returns = document.createElement('div');
+        returns.className = 'meta';
+        const five = document.createElement('span');
+        five.textContent = item.returns5;
+        five.dataset.editable = 'true';
+        const ten = document.createElement('span');
+        ten.textContent = item.returns10;
+        ten.dataset.editable = 'true';
+        returns.appendChild(five);
+        returns.appendChild(ten);
+
+        const pros = document.createElement('div');
+        pros.className = 'sublist';
+        const prosTitle = document.createElement('h5');
+        prosTitle.textContent = 'Vorteile';
+        prosTitle.dataset.editable = 'true';
+        const prosList = document.createElement('ul');
+        item.pros.forEach((text) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          li.dataset.editable = 'true';
+          prosList.appendChild(li);
+        });
+        pros.appendChild(prosTitle);
+        pros.appendChild(prosList);
+
+        const cons = document.createElement('div');
+        cons.className = 'sublist';
+        const consTitle = document.createElement('h5');
+        consTitle.textContent = 'Nachteile';
+        consTitle.dataset.editable = 'true';
+        const consList = document.createElement('ul');
+        item.cons.forEach((text) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          li.dataset.editable = 'true';
+          consList.appendChild(li);
+        });
+        cons.appendChild(consTitle);
+        cons.appendChild(consList);
+
         wrapper.appendChild(title);
         wrapper.appendChild(desc);
+        wrapper.appendChild(returns);
+        wrapper.appendChild(pros);
+        wrapper.appendChild(cons);
         list.appendChild(wrapper);
       });
       refreshEditableState();
@@ -836,7 +955,14 @@
     function addNewFund() {
       if (!adminMode) return;
       const current = getActivePortfolioType();
-      portfolioData[current].push({ title: 'Neuer Fonds', desc: 'Eigene Beschreibung hinzufügen.' });
+      portfolioData[current].push({
+        title: 'Neuer Fonds',
+        desc: 'Eigene Beschreibung hinzufügen.',
+        returns5: 'Ø Rendite 5 Jahre: Wert ergänzen',
+        returns10: 'Ø Rendite 10 Jahre: Wert ergänzen',
+        pros: ['Vorteil hinzufügen'],
+        cons: ['Nachteil hinzufügen'],
+      });
       renderPortfolios(current);
     }
 
@@ -855,6 +981,7 @@
       addFundBtn.disabled = !adminMode;
       addFundBtn.style.opacity = adminMode ? '1' : '0.6';
       addFundBtn.style.cursor = adminMode ? 'pointer' : 'not-allowed';
+      document.getElementById('portfolioActions').style.display = adminMode ? 'flex' : 'none';
     }
 
     searchForm.addEventListener('submit', (event) => {
