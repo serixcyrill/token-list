@@ -359,8 +359,10 @@
     }
 
     .portfolio-info {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
+      justify-content: center;
     }
 
     .portfolio-info p {
@@ -373,14 +375,15 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      align-items: center;
     }
 
     .portfolio-meta .chip {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 32px;
-      padding: 6px 12px;
+      min-height: 36px;
+      padding: 8px 14px;
       background: #eef6ef;
       border-radius: 999px;
       font-weight: 600;
@@ -395,7 +398,7 @@
       display: grid;
       grid-template-columns: 190px 1fr;
       gap: 14px;
-      alignments: center;
+      align-items: center;
     }
 
     .chart-visual {
@@ -1489,6 +1492,7 @@
         gid,
         single: 'true',
         output: 'csv',
+        cacheBust: Date.now().toString(),
       });
       return `${SHEET_CSV_BASE}?${params.toString()}`;
     }
@@ -1530,7 +1534,7 @@
 
     async function fetchSheetCsv(gid) {
       const url = buildCsvUrl(gid);
-      const res = await fetch(url);
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Sheet Request fehlgeschlagen: ${res.status}`);
       return res.text();
     }
@@ -1767,7 +1771,7 @@
         rows.forEach((row) => {
           const header = (row[0] || '').toLowerCase();
           if (header === 'assetklasse') {
-            const riskCell = (row[11] || '').toLowerCase();
+            const riskCell = (row.findLast((cell) => cell !== '') || '').toLowerCase();
             const normalized = riskCell.replace(/[^a-z]/g, '');
             currentRisk = normalized || null;
             return;
