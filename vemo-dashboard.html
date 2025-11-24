@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vemo Übersicht</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: #f4f7fb;
+      --card-bg: #ffffff;
+      --text: #282f47;
+      --accent: #72d27a;
+      --accent-strong: #7ed957;
+      --accent-hover: #6ac66e;
+      --muted: #6b7080;
+      --shadow: 0 10px 30px rgba(40, 47, 71, 0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.4px;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: min(400px, 100%);
+    }
+
+    .search input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d7d9e0;
+      font-size: 14px;
+      color: var(--text);
+      background: #f9fafc;
+      outline: none;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .search input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(114, 210, 122, 0.18);
+    }
+
+    .search button {
+      border: none;
+      background: var(--accent-strong);
+      color: #0f1a2a;
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .search button:hover {
+      background: var(--accent-hover);
+    }
+
+    .search button:active {
+      transform: translateY(1px);
+    }
+
+    .search svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    .notice {
+      background: rgba(114, 210, 122, 0.18);
+      color: var(--text);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(114, 210, 122, 0.3);
+    }
+
+    main {
+      flex: 1;
+      width: min(1200px, 92vw);
+      margin: 28px auto 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .section-sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .vorsorge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .vorsorge-card {
+      position: relative;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e6e8ef;
+      transition: border 0.2s ease, transform 0.2s ease;
+    }
+
+    .vorsorge-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(114, 210, 122, 0.6);
+    }
+
+    .vorsorge-card.rank-1 {
+      border: 2px solid var(--accent);
+      box-shadow: 0 8px 22px rgba(114, 210, 122, 0.18);
+    }
+
+    .vorsorge-card h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .vorsorge-card p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .meta span {
+      background: #f7f9fb;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #edf0f5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(114, 210, 122, 0.15);
+      color: #1c3a2c;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      margin-bottom: 8px;
+    }
+
+    .vorsorge-card a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #0f1a2a;
+      background: var(--accent-strong);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .vorsorge-card a:hover {
+      background: var(--accent-hover);
+    }
+
+    .vorsorge-card a:active {
+      transform: translateY(1px);
+    }
+
+    .tab-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .tab-buttons button {
+      border: 1px solid #dfe3ec;
+      background: #f8fafc;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: border 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .tab-buttons button.active {
+      background: var(--accent-strong);
+      border-color: var(--accent);
+      color: #0f1a2a;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .portfolio-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .portfolio-item {
+      background: #f8fafc;
+      border: 1px solid #edf0f5;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .portfolio-item h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .portfolio-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px #edf0f5;
+      background: #f8fafc;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    th {
+      background: #eef2f8;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) td {
+      background: #ffffff;
+    }
+
+    tr:nth-child(odd) td {
+      background: #fdfefe;
+    }
+
+    td:first-child {
+      text-align: left;
+      font-weight: 600;
+    }
+
+    @media (max-width: 720px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .search {
+        width: 100%;
+      }
+
+      .section-heading {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      table,
+      th,
+      td {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="title" data-editable="true">Vemo Übersicht</div>
+      <form class="search" id="searchForm">
+        <input type="text" id="searchInput" placeholder="Suchen..." aria-label="Suche" />
+        <button type="submit" aria-label="Suchen">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
+          </svg>
+        </button>
+      </form>
+    </header>
+    <div id="adminNotice" class="notice" style="display: none;">Admin Modus aktiv.</div>
+
+    <main>
+      <section class="card" id="vorsorge">
+        <div class="section-heading">
+          <h2 data-editable="true">Vorsorge</h2>
+          <p class="section-sub" data-editable="true">Ihre passenden Vorsorgeoptionen auf einen Blick.</p>
+        </div>
+        <div class="vorsorge-grid">
+          <article class="vorsorge-card rank-1">
+            <div class="pill" data-editable="true">Ranking 1</div>
+            <h3 data-editable="true">Nachhaltige Zukunft Plus</h3>
+            <p data-editable="true">Ausgewogene Strategie mit Fokus auf nachhaltige Investments für langfristigen Vermögensaufbau.</p>
+            <div class="meta">
+              <span data-editable="true"><strong>Produktkosten:</strong> 0,48% p.a.</span>
+              <span data-editable="true"><strong>Weitere Gebühren:</strong> 0,10% p.a.</span>
+            </div>
+            <a href="#" aria-label="Mehr erfahren zu Nachhaltige Zukunft Plus">Mehr erfahren</a>
+          </article>
+
+          <article class="vorsorge-card">
+            <div class="pill" data-editable="true">Ranking 2</div>
+            <h3 data-editable="true">Stabilität & Balance</h3>
+            <p data-editable="true">Klassische Ausrichtung mit Schwerpunkt auf stabilen Erträgen und moderater Risikosteuerung.</p>
+            <div class="meta">
+              <span data-editable="true"><strong>Produktkosten:</strong> 0,38% p.a.</span>
+              <span data-editable="true"><strong>Weitere Gebühren:</strong> 0,08% p.a.</span>
+            </div>
+            <a href="#" aria-label="Mehr erfahren zu Stabilität & Balance">Mehr erfahren</a>
+          </article>
+
+          <article class="vorsorge-card">
+            <div class="pill" data-editable="true">Ranking 3</div>
+            <h3 data-editable="true">Wachstum Dynamik</h3>
+            <p data-editable="true">Chancenorientierter Ansatz für Anlegerinnen und Anleger mit höherer Renditeerwartung.</p>
+            <div class="meta">
+              <span data-editable="true"><strong>Produktkosten:</strong> 0,54% p.a.</span>
+              <span data-editable="true"><strong>Weitere Gebühren:</strong> 0,12% p.a.</span>
+            </div>
+            <a href="#" aria-label="Mehr erfahren zu Wachstum Dynamik">Mehr erfahren</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="card" id="portfolios">
+        <div class="section-heading">
+          <h2 data-editable="true">Portfolios</h2>
+          <p class="section-sub" data-editable="true">Wählen Sie einen Portfolio-Typ, um Details zu sehen.</p>
+        </div>
+        <div class="tab-buttons">
+          <button type="button" class="active" data-portfolio-tab="factor">Factor</button>
+          <button type="button" data-portfolio-tab="marketcap">Marketcap</button>
+          <button type="button" data-portfolio-tab="bip">BIP</button>
+          <button type="button" data-portfolio-tab="obligationen">Obligationen</button>
+        </div>
+        <div class="portfolio-list" id="portfolioList"></div>
+      </section>
+
+      <section class="card" id="ablaufmanagement">
+        <div class="section-heading">
+          <h2 data-editable="true">Ablaufmanagement</h2>
+          <p class="section-sub" data-editable="true">Planung über die nächsten fünf Jahre nach Assetklassen.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Assetklasse</th>
+                <th>Jahr 1</th>
+                <th>Jahr 2</th>
+                <th>Jahr 3</th>
+                <th>Jahr 4</th>
+                <th>Jahr 5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-editable="true">Aktien</td>
+                <td data-editable="true">40%</td>
+                <td data-editable="true">38%</td>
+                <td data-editable="true">35%</td>
+                <td data-editable="true">32%</td>
+                <td data-editable="true">30%</td>
+              </tr>
+              <tr>
+                <td data-editable="true">Obligationen</td>
+                <td data-editable="true">35%</td>
+                <td data-editable="true">36%</td>
+                <td data-editable="true">38%</td>
+                <td data-editable="true">39%</td>
+                <td data-editable="true">40%</td>
+              </tr>
+              <tr>
+                <td data-editable="true">Liquidität</td>
+                <td data-editable="true">25%</td>
+                <td data-editable="true">26%</td>
+                <td data-editable="true">27%</td>
+                <td data-editable="true">29%</td>
+                <td data-editable="true">30%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const adminCode = 'Vemokorrektur20954.';
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const adminNotice = document.getElementById('adminNotice');
+    const editableNodes = Array.from(document.querySelectorAll('[data-editable]'));
+    let adminMode = false;
+
+    const portfolioData = {
+      factor: [
+        { title: 'Faktor Plus Global', desc: 'Stark diversifiziertes Faktorportfolio mit Fokus auf Qualität und niedrige Volatilität.' },
+        { title: 'Smart Beta Europa', desc: 'Betont Value- und Size-Prämien in europäischen Kernmärkten.' },
+      ],
+      marketcap: [
+        { title: 'Global Market Leaders', desc: 'Breit gestreute Großkonzerne mit robuster Bilanzstruktur.' },
+        { title: 'MidCap Chancen', desc: 'Wachstumsstarke Unternehmen mit solidem Track Record.' },
+      ],
+      bip: [
+        { title: 'GDP Balanced', desc: 'Regionale Gewichtung entsprechend Wirtschaftsleistung für stabile Allokation.' },
+        { title: 'Emerging Focus', desc: 'Zusatzschwerpunkt auf aufstrebenden Volkswirtschaften.' },
+      ],
+      obligationen: [
+        { title: 'Euro Bonds Core', desc: 'Staats- und Unternehmensanleihen mit Investment-Grade-Rating.' },
+        { title: 'Green Bonds Select', desc: 'Nachhaltigkeitsorientierte Anleihen mit zertifizierten Projekten.' },
+      ],
+    };
+
+    function renderPortfolios(type) {
+      const list = document.getElementById('portfolioList');
+      list.innerHTML = '';
+      portfolioData[type].forEach((item) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'portfolio-item';
+
+        const title = document.createElement('h4');
+        title.textContent = item.title;
+        title.dataset.editable = 'true';
+
+        const desc = document.createElement('p');
+        desc.textContent = item.desc;
+        desc.dataset.editable = 'true';
+
+        wrapper.appendChild(title);
+        wrapper.appendChild(desc);
+        list.appendChild(wrapper);
+      });
+      refreshEditableState();
+    }
+
+    function toggleAdminMode() {
+      adminMode = !adminMode;
+      adminNotice.style.display = adminMode ? 'block' : 'none';
+      refreshEditableState();
+    }
+
+    function refreshEditableState() {
+      const elements = document.querySelectorAll('[data-editable]');
+      elements.forEach((el) => {
+        el.contentEditable = adminMode ? 'true' : 'false';
+        el.setAttribute('aria-label', adminMode ? 'Bearbeitbarer Inhalt' : '');
+      });
+    }
+
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const value = searchInput.value.trim();
+      if (value === adminCode) {
+        toggleAdminMode();
+      }
+    });
+
+    document.querySelectorAll('[data-portfolio-tab]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-portfolio-tab]').forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        const type = button.getAttribute('data-portfolio-tab');
+        renderPortfolios(type);
+      });
+    });
+
+    // Initial render
+    renderPortfolios('factor');
+    refreshEditableState();
+  </script>
+</body>
+</html>
