@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vemo Übersicht</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: #f4f7fb;
+      --card-bg: #ffffff;
+      --text: #282f47;
+      --accent: #72d27a;
+      --accent-strong: #7ed957;
+      --accent-hover: #6ac66e;
+      --muted: #6b7080;
+      --shadow: 0 10px 30px rgba(40, 47, 71, 0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(114, 210, 122, 0.16), transparent 32%),
+        radial-gradient(circle at 85% 10%, rgba(91, 142, 255, 0.14), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 251, 0.92));
+      color: var(--text);
+    }
+
+    a:hover {
+      color: var(--text);
+    }
+
+    .pill,
+    .section-meta,
+    .portfolio-actions .secondary-btn,
+    .notice {
+      color: #0f1a2a !important;
+    }
+
+    .tab-buttons button:not(.active):hover,
+    .mode-tabs button:not(.active):hover,
+    .secondary-btn:hover,
+    .toggle-details:hover,
+    .advisor-actions a:hover {
+      background: #eef6ef !important;
+      border-color: rgba(114, 210, 122, 0.45) !important;
+      color: #0f1a2a !important;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notice {
+      background: rgba(114, 210, 122, 0.18);
+      color: var(--text);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(114, 210, 122, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .notice .exit-admin {
+      border: 1px solid rgba(114, 210, 122, 0.6);
+      background: #f7fbf9;
+      color: #1c3a2c;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(114, 210, 122, 0.15);
+      display: none;
+    }
+
+    main {
+      flex: 1;
+      width: min(1200px, 92vw);
+      margin: 28px auto 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .section-sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #eef6ef;
+      border-radius: 999px;
+      color: #1c3a2c;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
+    }
+
+    .vorsorge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .vorsorge-card {
+      position: relative;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e6e8ef;
+      transition: border 0.2s ease, transform 0.2s ease;
+    }
+
+    .vorsorge-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(114, 210, 122, 0.6);
+    }
+
+    .vorsorge-card.rank-1 {
+      border: 2px solid var(--accent);
+      box-shadow: 0 8px 22px rgba(114, 210, 122, 0.18);
+    }
+
+    .vorsorge-card h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .vorsorge-card p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--text);
+      align-items: start;
+    }
+
+    .meta span {
+      background: #f7f9fb;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #edf0f5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(114, 210, 122, 0.15);
+      color: #1c3a2c;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      margin-bottom: 8px;
+    }
+
+    .vorsorge-card a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffffff;
+      background: var(--accent-strong);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .vorsorge-card a:hover {
+      background: var(--accent-hover);
+    }
+
+    .vorsorge-card a:active {
+      transform: translateY(1px);
+    }
+
+    .details {
+      margin-top: 12px;
+      background: #f7fbf9;
+      border: 1px solid #e3e9f2;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: none;
+      box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.1);
+    }
+
+    .details h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .details ul {
+      padding-left: 18px;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .tab-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .portfolio-actions {
+      display: none;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .secondary-btn {
+      border: 1px dashed var(--accent);
+      background: #f7fbf9;
+      color: #0f1a2a;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease, border 0.2s ease;
+    }
+
+    .secondary-btn:hover {
+      background: #eef6ef;
+      border-style: solid;
+    }
+
+    .tab-buttons button {
+      border: 1px solid #dfe3ec;
+      background: #f8fafc;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: border 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .tab-buttons button.active {
+      background: var(--accent-strong);
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .portfolio-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .portfolio-shell {
+      background: #f8fafc;
+      border: 1px solid #edf0f5;
+      padding: 14px;
+      border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.08);
+    }
+
+    .portfolio-toggle {
+      width: 100%;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text);
+      padding: 4px 0 6px;
+    }
+
+    .portfolio-shell.open {
+      border-color: rgba(114, 210, 122, 0.6);
+      box-shadow: 0 10px 26px rgba(114, 210, 122, 0.12);
+    }
+
+    .portfolio-shell .chevron {
+      transition: transform 0.2s ease;
+    }
+
+    .portfolio-shell.open .chevron {
+      transform: rotate(90deg);
+    }
+
+    .portfolio-summary {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 10px;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid #e3e9f2;
+      border-radius: 12px;
+    }
+
+    .portfolio-info {
+      display: grid;
+      gap: 10px;
+    }
+
+    .portfolio-info p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .portfolio-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .portfolio-meta .chip {
+      background: #eef6ef;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-weight: 600;
+      font-size: 12px;
+      color: #1c3a2c;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
+    }
+
+    .chart-wrap {
+      position: relative;
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .chart-visual {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      display: grid;
+      place-items: center;
+    }
+
+    .chart-visual canvas {
+      width: 170px;
+      height: 170px;
+    }
+
+    .chart-legend {
+      display: grid;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chart-center-label {
+      position: absolute;
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 108px;
+      height: 108px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-weight: 700;
+      color: #0f1a2a;
+      font-size: 13px;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(244, 247, 251, 0.96), rgba(255, 255, 255, 0.95));
+      border-radius: 50%;
+      box-shadow: 0 12px 26px rgba(21, 49, 58, 0.08), inset 0 0 0 1px rgba(114, 210, 122, 0.2);
+    }
+
+    .chart-center-label .label-top {
+      font-size: 11px;
+      letter-spacing: 0.2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .chart-center-label .label-value {
+      font-size: 18px;
+      color: #1a7340;
+    }
+
+    .chart-center-label .label-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .funds-wrapper {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .allocation-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .allocation-input {
+      width: 90px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #dfe3ec;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .delete-btn {
+      border: none;
+      background: #ffe8e6;
+      color: #b04137;
+      padding: 6px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      display: none;
+    }
+
+    .portfolio-shell.admin .delete-btn {
+      display: inline-flex;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 16px;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 18px;
+      width: min(360px, 100%);
+      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e3e9f2;
+      display: grid;
+      gap: 12px;
+    }
+
+    .modal h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .modal input {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dfe3ec;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .modal .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .modal .primary {
+      background: var(--accent-strong);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+      color: #ffffff;
+    }
+
+    .modal .ghost {
+      background: #f1f3f8;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .mode-tabs button {
+      border: 1px solid #dfe3ec;
+      background: #f8fafc;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: border 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .mode-tabs button.active {
+      background: var(--accent-strong);
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .portfolio-item {
+      background: #f8fafc;
+      border: 1px solid #edf0f5;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .portfolio-item h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .portfolio-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .portfolio-item .sublist {
+      margin-top: 8px;
+    }
+
+    .portfolio-item .sublist h5 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .portfolio-item .sublist ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12.5px;
+      display: grid;
+      gap: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px #edf0f5;
+      background: #f8fafc;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    th {
+      background: #eef2f8;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) td {
+      background: #ffffff;
+    }
+
+    tr:nth-child(odd) td {
+      background: #fdfefe;
+    }
+
+    td:first-child {
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .progress-cell {
+      position: relative;
+      overflow: hidden;
+      border-left: 1px solid #eef1f7;
+    }
+
+    .progress-cell::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(114, 210, 122, 0.25), rgba(114, 210, 122, 0.05));
+      transform: scaleX(var(--fill, 0));
+      transform-origin: left;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .progress-cell span {
+      position: relative;
+      font-variant-numeric: tabular-nums;
+    }
+
+    footer {
+      margin: 10px auto 36px;
+      width: min(1200px, 92vw);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .footer-card {
+      background: linear-gradient(145deg, #f7fbf9, #ffffff);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid #e3e9f2;
+    }
+
+    .info-panel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border: 1px solid #e8ecf4;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.08);
+    }
+
+    .info-panel strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .advisor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .advisor-card {
+      border: 1px solid #e3e9f2;
+      border-radius: 14px;
+      padding: 16px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+    }
+
+    .advisor-header {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #e8f8ec, #dfe9ff);
+      border: 1px solid #dbe5f0;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
+      border-radius: 16px;
+      pointer-events: none;
+    }
+
+    .avatar-input-wrap {
+      display: grid;
+      gap: 4px;
+    }
+
+    .avatar-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .avatar-input {
+      display: none;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d6dce7;
+      background: #f8fbff;
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .advisor-meta h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .advisor-meta .role {
+      display: inline-flex;
+      padding: 5px 10px;
+      background: #eef6ef;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1c3a2c;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
+      margin-top: 4px;
+    }
+
+    .advisor-meta p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .advisor-qualifications h5 {
+      margin: 0 0 6px 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--text);
+    }
+
+    .advisor-qualifications ul {
+      margin: 0 0 10px 16px;
+      padding: 0;
+      color: var(--muted);
+      font-size: 13px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .advisor-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .advisor-actions a {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      background: var(--accent-strong);
+      color: #ffffff;
+      font-weight: 700;
+      border-radius: 12px;
+      box-shadow: 0 12px 24px rgba(114, 210, 122, 0.25);
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .advisor-actions a:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(114, 210, 122, 0.35);
+    }
+
+    .advisor-actions .note {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .info-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--text);
+      background: #eef2f8;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid #dfe3ec;
+    }
+
+    @media (max-width: 720px) {
+      .portfolio-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      table,
+      th,
+      td {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div id="adminNotice" class="notice" style="display: none;">
+      <span>Admin Modus aktiv.</span>
+      <button type="button" class="exit-admin" id="exitAdmin">Modus verlassen</button>
+    </div>
+
+    <main>
+      <section class="card" id="vorsorge">
+        <div class="section-heading">
+          <h2 data-editable="true">Vorsorge Mantel</h2>
+          <p class="section-sub" data-editable="true">Ihre passenden Vorsorgeoptionen auf einen Blick.</p>
+          <span class="section-meta" id="lastUpdateTrigger" data-editable="true">Letztes Update: 12.09.2024</span>
+        </div>
+        <div class="vorsorge-grid">
+          <article class="vorsorge-card rank-1">
+            <div class="pill" data-editable="true">Ranking 1</div>
+            <h3 data-editable="true">Nachhaltige Zukunft Plus</h3>
+            <p data-editable="true">Ausgewogene Strategie mit Fokus auf nachhaltige Investments für langfristigen Vermögensaufbau.</p>
+            <div class="meta">
+              <span data-editable="true"><strong>Produktkosten:</strong> 0,48% p.a.</span>
+              <span data-editable="true"><strong>Weitere Gebühren:</strong> 0,10% p.a.</span>
+            </div>
+            <a href="#" class="toggle-details" aria-expanded="false" aria-label="Mehr erfahren zu Nachhaltige Zukunft Plus">Mehr erfahren</a>
+            <div class="details" hidden>
+              <h4 data-editable="true">Vorteile</h4>
+              <ul>
+                <li data-editable="true">Starker ESG-Fokus mit klaren Ausschlusskriterien.</li>
+                <li data-editable="true">Breite Diversifikation über Regionen und Branchen.</li>
+              </ul>
+              <h4 data-editable="true">Nachteile</h4>
+              <ul>
+                <li data-editable="true">Kurzfristig höhere Volatilität möglich.</li>
+                <li data-editable="true">Performance abhängig von nachhaltigen Sektoren.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="vorsorge-card">
+            <div class="pill" data-editable="true">Ranking 2</div>
+            <h3 data-editable="true">Stabilität & Balance</h3>
+            <p data-editable="true">Klassische Ausrichtung mit Schwerpunkt auf stabilen Erträgen und moderater Risikosteuerung.</p>
+            <div class="meta">
+              <span data-editable="true"><strong>Produktkosten:</strong> 0,38% p.a.</span>
+              <span data-editable="true"><strong>Weitere Gebühren:</strong> 0,08% p.a.</span>
+            </div>
+            <a href="#" class="toggle-details" aria-expanded="false" aria-label="Mehr erfahren zu Stabilität & Balance">Mehr erfahren</a>
+            <div class="details" hidden>
+              <h4 data-editable="true">Vorteile</h4>
+              <ul>
+                <li data-editable="true">Konstante Ausschüttungen für planbare Erträge.</li>
+                <li data-editable="true">Ausgewogener Mix aus defensiven und Wachstumswerten.</li>
+              </ul>
+              <h4 data-editable="true">Nachteile</h4>
+              <ul>
+                <li data-editable="true">Geringere Chance auf Überrenditen in Hausse-Phasen.</li>
+                <li data-editable="true">Begrenztes Exposure zu alternativen Anlagen.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="vorsorge-card">
+            <div class="pill" data-editable="true">Ranking 3</div>
+            <h3 data-editable="true">Wachstum Dynamik</h3>
+            <p data-editable="true">Chancenorientierter Ansatz für Anlegerinnen und Anleger mit höherer Renditeerwartung.</p>
+            <div class="meta">
+              <span data-editable="true"><strong>Produktkosten:</strong> 0,54% p.a.</span>
+              <span data-editable="true"><strong>Weitere Gebühren:</strong> 0,12% p.a.</span>
+            </div>
+            <a href="#" class="toggle-details" aria-expanded="false" aria-label="Mehr erfahren zu Wachstum Dynamik">Mehr erfahren</a>
+            <div class="details" hidden>
+              <h4 data-editable="true">Vorteile</h4>
+              <ul>
+                <li data-editable="true">Höhere Aktienquote für langfristige Wachstumschancen.</li>
+                <li data-editable="true">Fokus auf Innovations- und Zukunftsthemen.</li>
+              </ul>
+              <h4 data-editable="true">Nachteile</h4>
+              <ul>
+                <li data-editable="true">Deutlich erhöhte Schwankungen möglich.</li>
+                <li data-editable="true">Erfordert längeren Anlagehorizont.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="card" id="portfolios">
+        <div class="section-heading">
+          <h2 data-editable="true">Portfolios</h2>
+          <p class="section-sub" data-editable="true">Wählen Sie einen Portfolio-Typ, um Details zu sehen.</p>
+        </div>
+        <div class="tab-buttons">
+          <button type="button" class="active" data-portfolio-tab="factor">Factor</button>
+          <button type="button" data-portfolio-tab="marketcap">Marketcap</button>
+          <button type="button" data-portfolio-tab="bip">BIP</button>
+          <button type="button" data-portfolio-tab="obligationen">Obligationen</button>
+        </div>
+        <div class="portfolio-actions" id="portfolioActions">
+          <button type="button" id="addFund" class="secondary-btn">+ Fonds hinzufügen</button>
+          <span class="section-sub" data-editable="true">Eigene Fonds können im Admin-Modus ergänzt werden.</span>
+        </div>
+        <div class="portfolio-list" id="portfolioList"></div>
+      </section>
+
+      <section class="card" id="ablaufmanagement">
+        <div class="section-heading">
+          <h2 data-editable="true">Ablaufmanagement</h2>
+          <p class="section-sub" data-editable="true">Planung über die nächsten zehn Jahre nach Assetklassen.</p>
+          <span class="section-meta" data-editable="true">Strategie wählen: konservativ / mittel / aggressiv</span>
+        </div>
+        <div class="mode-tabs" aria-label="Risikoprofil wählen">
+          <button type="button" class="active" data-risk="konservativ">Konservativ</button>
+          <button type="button" data-risk="mittel">Mittel</button>
+          <button type="button" data-risk="aggressiv">Aggressiv</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Assetklasse</th>
+                <th>Jahr 1</th>
+                <th>Jahr 2</th>
+                <th>Jahr 3</th>
+                <th>Jahr 4</th>
+                <th>Jahr 5</th>
+                <th>Jahr 6</th>
+                <th>Jahr 7</th>
+                <th>Jahr 8</th>
+                <th>Jahr 9</th>
+                <th>Jahr 10</th>
+              </tr>
+            </thead>
+            <tbody id="ablaufBody"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card" id="advisorSection">
+        <div class="section-heading">
+          <h2 data-editable="true">Telefontermin mit Honorarberater:in</h2>
+          <p class="section-sub" data-editable="true">In der Beschreibung sind Fragen zu deiner 3-Jahr- bzw. Altersvorsorge gratis verfügbar. Buche einen kurzen Telefontermin, um mit einem Honorarberater zu sprechen.</p>
+          <span class="section-meta" data-editable="true">Direkt buchbar</span>
+        </div>
+        <div class="advisor-grid">
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-diego" aria-label="Profilbild Diego Berchtold"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label">Profilbild-URL</span>
+                <input class="avatar-input" type="url" data-target="avatar-diego" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Diego Berchtold</h4>
+                <span class="role" data-editable="true">Honorarberater</span>
+                <p data-editable="true">Berät dich persönlich zu Vorsorge Mantel, Portfolios und Ablaufmanagement.</p>
+              </div>
+            </div>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Professional/academic degree(s)</li>
+                <li data-editable="true">Bachelor-Abschluss: Betriebsökonomie</li>
+                <li data-editable="true">Professional knowledge</li>
+                <li data-editable="true">Other Certificate(s) / Diploma(s): VBV - Versicherung &amp; Vorsorge</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">Code of conduct trainings: Mendo – FIDLEG Kompakt – Kenntnisnachweis Verhaltensregeln</li>
+              </ul>
+            </div>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchung: https://calendly.com/diego-vemo/telefontermin</span>
+            </div>
+          </div>
+
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-lara" aria-label="Profilbild Lara Steiner"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label">Profilbild-URL</span>
+                <input class="avatar-input" type="url" data-target="avatar-lara" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Lara Steiner</h4>
+                <span class="role" data-editable="true">Senior Honorarberaterin</span>
+                <p data-editable="true">Spezialisiert auf nachhaltige Portfolios und steueroptimierte Auszahlungspfade.</p>
+              </div>
+            </div>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Master: Finance &amp; Risk Management</li>
+                <li data-editable="true">CAS Sustainable Finance</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">MIFID &amp; FIDLEG Refresh 2024</li>
+              </ul>
+            </div>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchungslink bitte im Admin-Modus anpassen.</span>
+            </div>
+          </div>
+
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-marco" aria-label="Profilbild Marco Keller"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label">Profilbild-URL</span>
+                <input class="avatar-input" type="url" data-target="avatar-marco" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Marco Keller</h4>
+                <span class="role" data-editable="true">Honorarberater</span>
+                <p data-editable="true">Fokus auf Auszahlungsszenarien, Risikoabsicherung und Liquiditätsplanung.</p>
+              </div>
+            </div>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Bachelor: Banking &amp; Finance</li>
+                <li data-editable="true">Dipl. Finanzplanungsexperte</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">Compliance &amp; Ethik Update 2024</li>
+              </ul>
+            </div>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchungslink bitte im Admin-Modus anpassen.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="footer-card">
+        <p data-editable="true"><strong>Haftungsausschluss:</strong> Diese Übersicht stellt keine Anlageberatung dar und dient ausschließlich Informationszwecken.</p>
+        <p data-editable="true">Die Inhalte richten sich nur an berechtigte Personen und dürfen ohne Zustimmung nicht weitergegeben werden.</p>
+        <div class="info-panel">
+          <div>
+            <strong data-editable="true">Hinweis:</strong> <span data-editable="true">Aktuelle Informationen und Produktupdates sind für alle Kundinnen und Kunden sichtbar.</span>
+          </div>
+          <div class="info-time"><span aria-hidden="true">🕒</span><span data-editable="true">Stand: 12.09.2024, 10:18</span></div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="modal-backdrop" id="adminModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
+      <h3 id="adminModalTitle">Admin-Zugang</h3>
+      <p style="margin:0;color:var(--muted);font-size:13px;">Bitte Code eingeben, um den Bearbeitungsmodus zu aktivieren oder zu verlassen.</p>
+      <input type="password" id="adminCodeInput" placeholder="Code eingeben" />
+      <div class="actions">
+        <button class="ghost" type="button" id="closeModal">Abbrechen</button>
+        <button class="primary" type="button" id="submitCode">Bestätigen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const adminCode = 'Vemokorrektur20954.';
+    const adminNotice = document.getElementById('adminNotice');
+    const addFundBtn = document.getElementById('addFund');
+    const updateTrigger = document.getElementById('lastUpdateTrigger');
+    const modal = document.getElementById('adminModal');
+    const codeInput = document.getElementById('adminCodeInput');
+    const closeModalBtn = document.getElementById('closeModal');
+    const submitCodeBtn = document.getElementById('submitCode');
+    const avatarInputs = document.querySelectorAll('.avatar-input');
+    const exitAdminBtn = document.getElementById('exitAdmin');
+    const STORAGE_KEYS = {
+      editable: 'vemo-editable-fields',
+      portfolios: 'vemo-portfolio-data',
+      ablauf: 'vemo-ablauf-data',
+      avatars: 'vemo-avatar-urls',
+    };
+    let adminMode = false;
+    let updateClickCount = 0;
+    let updateTimer;
+    let editableIndex = 0;
+    const savedEdits = loadJson(STORAGE_KEYS.editable, {});
+    const savedAvatars = loadJson(STORAGE_KEYS.avatars, {});
+
+    function deepClone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function loadJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : deepClone(fallback);
+      } catch (error) {
+        console.warn('Konnte gespeicherte Daten nicht laden', error);
+        return deepClone(fallback);
+      }
+    }
+
+    function persistJson(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.warn('Konnte Daten nicht speichern', error);
+      }
+    }
+
+    function bindEditableSync(el, type, index, field, rerender = false) {
+      if (!el) return;
+      const key = `portfolio-${type}-${index}-${field}`;
+      attachEditable(el, key, (value) => {
+        portfolioData[type][index][field] = value;
+        persistPortfolioData();
+        if (rerender) {
+          renderPortfolios(type);
+        }
+      });
+    }
+
+    function attachEditable(el, key, onChange) {
+      if (!el) return;
+      const storageKey = key || el.dataset.storageKey || `editable-${editableIndex++}`;
+      el.dataset.storageKey = storageKey;
+      el.dataset.editable = 'true';
+      if (savedEdits[storageKey]) {
+        el.textContent = savedEdits[storageKey];
+      }
+      const apply = () => {
+        const value = el.textContent.trim();
+        savedEdits[storageKey] = value;
+        persistJson(STORAGE_KEYS.editable, savedEdits);
+        if (typeof onChange === 'function') onChange(value);
+      };
+      el.addEventListener('blur', apply);
+      el.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          el.blur();
+        }
+      });
+    }
+
+    function hydrateStaticEditables() {
+      document.querySelectorAll('[data-editable]').forEach((el) => {
+        if (!el.dataset.storageKey) {
+          el.dataset.storageKey = `static-${editableIndex++}`;
+        }
+        attachEditable(el, el.dataset.storageKey);
+      });
+    }
+
+    const portfolioMeta = {
+      factor: {
+        title: 'Faktorportfolio',
+        summary: 'Smart-Beta-Strategien mit Qualitäts- und Value-Fokus, fein austariert nach Volatilität.',
+        since: 'Rendite seit 2018: +36,4%',
+        info: 'Dynamisches Rebalancing zwischen Qualitäts- und Momentum-Faktoren.',
+      },
+      marketcap: {
+        title: 'Marketcap Mix',
+        summary: 'Globale Marktführer kombiniert mit wachstumsstarken MidCaps für robuste Marktabdeckung.',
+        since: 'Rendite seit 2017: +41,2%',
+        info: 'Schwerpunkt auf Bilanzstärke, Cashflow-Qualität und Dividendenhistorie.',
+      },
+      bip: {
+        title: 'BIP Allokation',
+        summary: 'Regionale Gewichtung nach Wirtschaftsleistung für kontinuierliche Partizipation am Wachstum.',
+        since: 'Rendite seit 2016: +32,1%',
+        info: 'Systematische Anpassung an makroökonomische Verschiebungen mit minimalem Turnover.',
+      },
+      obligationen: {
+        title: 'Obligationen Fokus',
+        summary: 'Nachhaltige und klassische Anleihen-Bausteine für Stabilität und laufende Erträge.',
+        since: 'Rendite seit 2015: +18,7%',
+        info: 'Diversifikation über Laufzeiten und ESG-zertifizierte Emissionen.',
+      },
+    };
+
+    const defaultPortfolioData = {
+      factor: [
+        {
+          title: 'Faktor Plus Global',
+          desc: 'Stark diversifiziertes Faktorportfolio mit Fokus auf Qualität und niedrige Volatilität.',
+          returns5: 'Ø Rendite 5 Jahre: 5,2% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,1% p.a.',
+          allocation: 32,
+          since: 'Rendite seit Start: +24,1%',
+          pros: ['Breite Diversifikation über Stilfaktoren.', 'Geringere Schwankung gegenüber Einzelfaktoren.'],
+          cons: ['Kann Phasen relativer Unterperformance haben.', 'Rebalancing-Kosten können anfallen.'],
+        },
+        {
+          title: 'Smart Beta Europa',
+          desc: 'Betont Value- und Size-Prämien in europäischen Kernmärkten.',
+          returns5: 'Ø Rendite 5 Jahre: 4,4% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 5,8% p.a.',
+          allocation: 28,
+          since: 'Rendite seit Start: +18,6%',
+          pros: ['Erhöhtes Exposure zu Value- und Size-Faktoren.', 'Transparente, regelbasierte Selektion.'],
+          cons: ['Höhere Faktorrotation möglich.', 'Kann in Wachstumsphasen zurückfallen.'],
+        },
+        {
+          title: 'Quality Momentum Blend',
+          desc: 'Gezielter Mix aus Qualitätsunternehmen mit Momentum-Overlay.',
+          returns5: 'Ø Rendite 5 Jahre: 5,6% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,5% p.a.',
+          allocation: 40,
+          since: 'Rendite seit Start: +27,4%',
+          pros: ['Kombiniert defensive und offensive Stile.', 'Klare Faktorregeln mit monatlichem Review.'],
+          cons: ['Tracking Error zum Gesamtmarkt möglich.', 'Kann bei Faktor-Umbrüchen schwanken.'],
+        },
+      ],
+      marketcap: [
+        {
+          title: 'Global Market Leaders',
+          desc: 'Breit gestreute Großkonzerne mit robuster Bilanzstruktur.',
+          returns5: 'Ø Rendite 5 Jahre: 5,9% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 7,2% p.a.',
+          allocation: 45,
+          since: 'Rendite seit Start: +29,3%',
+          pros: ['Hohe Liquidität und Transparenz.', 'Stabile Dividendenhistorie.'],
+          cons: ['Geringerer Small-Cap-Anteil.', 'Stärker an globale Konjunktur gekoppelt.'],
+        },
+        {
+          title: 'MidCap Chancen',
+          desc: 'Wachstumsstarke Unternehmen mit solidem Track Record.',
+          returns5: 'Ø Rendite 5 Jahre: 6,4% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 8,0% p.a.',
+          allocation: 35,
+          since: 'Rendite seit Start: +33,0%',
+          pros: ['Höheres Wachstumspotenzial.', 'Breite Sektorstreuung.'],
+          cons: ['Teilweise geringere Liquidität.', 'Höhere Schwankungen möglich.'],
+        },
+        {
+          title: 'SmallCap Satellit',
+          desc: 'Selektive Beimischung innovativer Small Caps.',
+          returns5: 'Ø Rendite 5 Jahre: 7,1% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 8,6% p.a.',
+          allocation: 20,
+          since: 'Rendite seit Start: +22,8%',
+          pros: ['Skalierbare Wachstumschancen.', 'Gezieltes Risikobudget.'],
+          cons: ['Höhere Volatilität.', 'Begrenzte Liquidität in Stressphasen.'],
+        },
+      ],
+      bip: [
+        {
+          title: 'GDP Balanced',
+          desc: 'Regionale Gewichtung entsprechend Wirtschaftsleistung für stabile Allokation.',
+          returns5: 'Ø Rendite 5 Jahre: 4,8% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,0% p.a.',
+          allocation: 42,
+          since: 'Rendite seit Start: +21,3%',
+          pros: ['Stabile Allokation nach Wirtschaftskraft.', 'Geringe Klumpenrisiken.'],
+          cons: ['Langsame Anpassung an Markttrends.', 'Weniger taktische Chancen.'],
+        },
+        {
+          title: 'Emerging Focus',
+          desc: 'Zusatzschwerpunkt auf aufstrebenden Volkswirtschaften.',
+          returns5: 'Ø Rendite 5 Jahre: 6,9% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 7,7% p.a.',
+          allocation: 33,
+          since: 'Rendite seit Start: +25,0%',
+          pros: ['Partizipation an höherem Wachstum.', 'Breite Länderdiversifikation.'],
+          cons: ['Währungs- und Liquiditätsrisiken.', 'Höhere geopolitische Unsicherheit.'],
+        },
+        {
+          title: 'Developed Core',
+          desc: 'Kernmärkte nach Wirtschaftskraft, stabilisiert durch taktische Korridore.',
+          returns5: 'Ø Rendite 5 Jahre: 4,5% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 5,9% p.a.',
+          allocation: 25,
+          since: 'Rendite seit Start: +19,8%',
+          pros: ['Geringer Turnover.', 'Hohe Planbarkeit.'],
+          cons: ['Begrenzt opportunistisch.', 'Abweichungen zu kapitalgewichteten Indizes.'],
+        },
+      ],
+      obligationen: [
+        {
+          title: 'Euro Bonds Core',
+          desc: 'Staats- und Unternehmensanleihen mit Investment-Grade-Rating.',
+          returns5: 'Ø Rendite 5 Jahre: 2,3% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 3,1% p.a.',
+          allocation: 50,
+          since: 'Rendite seit Start: +11,4%',
+          pros: ['Solide Bonität.', 'Geringere Volatilität.'],
+          cons: ['Begrenztes Renditepotenzial.', 'Zinsänderungsrisiko.'],
+        },
+        {
+          title: 'Green Bonds Select',
+          desc: 'Nachhaltigkeitsorientierte Anleihen mit zertifizierten Projekten.',
+          returns5: 'Ø Rendite 5 Jahre: 2,7% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 3,4% p.a.',
+          allocation: 30,
+          since: 'Rendite seit Start: +12,1%',
+          pros: ['Nachhaltigkeitsfokus.', 'Transparente Mittelverwendung.'],
+          cons: ['Begrenzte Historie.', 'Teilweise geringere Liquidität.'],
+        },
+        {
+          title: 'Inflation Linkers',
+          desc: 'Anleihen mit Inflationsschutz zur Stabilisierung der Kaufkraft.',
+          returns5: 'Ø Rendite 5 Jahre: 2,1% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 2,9% p.a.',
+          allocation: 20,
+          since: 'Rendite seit Start: +9,7%',
+          pros: ['Inflationsabsicherung.', 'Defensive Ausrichtung.'],
+          cons: ['Begrenztes Upside.', 'Abhängig von Inflationspfad.'],
+        },
+      ],
+    };
+
+    const defaultAblaufData = {
+      konservativ: [
+        ['Aktien', '25%', '24%', '23%', '22%', '21%', '20%', '19%', '18%', '17%', '16%'],
+        ['Obligationen', '55%', '56%', '57%', '58%', '59%', '60%', '61%', '62%', '63%', '64%'],
+        ['Liquidität', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%'],
+      ],
+      mittel: [
+        ['Aktien', '40%', '39%', '38%', '37%', '36%', '35%', '34%', '33%', '32%', '31%'],
+        ['Obligationen', '40%', '41%', '42%', '43%', '44%', '45%', '46%', '47%', '48%', '49%'],
+        ['Liquidität', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%'],
+      ],
+      aggressiv: [
+        ['Aktien', '60%', '59%', '58%', '57%', '56%', '55%', '54%', '53%', '52%', '51%'],
+        ['Obligationen', '25%', '26%', '27%', '28%', '29%', '30%', '31%', '32%', '33%', '34%'],
+        ['Liquidität', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%'],
+      ],
+    };
+
+    let portfolioData = loadJson(STORAGE_KEYS.portfolios, defaultPortfolioData);
+    let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
+
+    function drawDonut(canvas, allocations) {
+      const ctx = canvas.getContext('2d');
+      const total = allocations.reduce((sum, item) => sum + item.value, 0) || 1;
+      const radius = Math.min(canvas.width, canvas.height) / 2 - 8;
+      let startAngle = -Math.PI / 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      allocations.forEach((slice, index) => {
+        const angle = (slice.value / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height / 2);
+        ctx.arc(canvas.width / 2, canvas.height / 2, radius, startAngle, startAngle + angle);
+        ctx.closePath();
+        ctx.fillStyle = slice.color;
+        ctx.fill();
+        startAngle += angle;
+      });
+      ctx.beginPath();
+      ctx.fillStyle = '#ffffff';
+      ctx.arc(canvas.width / 2, canvas.height / 2, radius * 0.65, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function persistPortfolioData() {
+      persistJson(STORAGE_KEYS.portfolios, portfolioData);
+    }
+
+    function persistAblaufData() {
+      persistJson(STORAGE_KEYS.ablauf, ablaufData);
+    }
+
+    function renderPortfolios(type) {
+      const list = document.getElementById('portfolioList');
+      list.innerHTML = '';
+      const meta = portfolioMeta[type];
+
+      const shell = document.createElement('div');
+      shell.className = 'portfolio-shell';
+      const toggle = document.createElement('button');
+      toggle.className = 'portfolio-toggle';
+      toggle.innerHTML = `<span data-editable="true">${meta.title}</span><span class="chevron" aria-hidden="true">›</span>`;
+      const content = document.createElement('div');
+      content.style.display = 'block';
+      shell.classList.add('open');
+
+      toggle.addEventListener('click', () => {
+        const open = content.style.display === 'block';
+        content.style.display = open ? 'none' : 'block';
+        shell.classList.toggle('open', !open);
+      });
+
+      const summary = document.createElement('div');
+      summary.className = 'portfolio-summary';
+      const info = document.createElement('div');
+      info.className = 'portfolio-info';
+      const summaryText = document.createElement('p');
+      summaryText.textContent = meta.summary;
+      attachEditable(summaryText, `${type}-summary`, (value) => {
+        portfolioMeta[type].summary = value;
+      });
+      const infoText = document.createElement('p');
+      infoText.textContent = meta.info;
+      attachEditable(infoText, `${type}-info`, (value) => {
+        portfolioMeta[type].info = value;
+      });
+      const chips = document.createElement('div');
+      chips.className = 'portfolio-meta';
+      const sinceChip = document.createElement('span');
+      sinceChip.className = 'chip';
+      sinceChip.textContent = meta.since;
+      attachEditable(sinceChip, `${type}-since`, (value) => {
+        portfolioMeta[type].since = value;
+        renderPortfolios(type);
+      });
+      chips.appendChild(sinceChip);
+      info.appendChild(summaryText);
+      info.appendChild(infoText);
+      info.appendChild(chips);
+
+      const chartWrap = document.createElement('div');
+      chartWrap.className = 'chart-wrap';
+      const chartVisual = document.createElement('div');
+      chartVisual.className = 'chart-visual';
+      const canvas = document.createElement('canvas');
+      canvas.width = 170;
+      canvas.height = 170;
+      const legend = document.createElement('div');
+      legend.className = 'chart-legend';
+
+      const colors = ['#5ac8fa', '#7ed957', '#ffb347', '#a78bfa', '#4ad66d', '#ff6b6b'];
+      const allocations = portfolioData[type].map((item, index) => ({
+        label: item.title,
+        value: item.allocation,
+        color: colors[index % colors.length],
+        index,
+      }));
+
+      allocations.forEach((entry) => {
+        const li = document.createElement('div');
+        li.className = 'legend-item';
+        const left = document.createElement('div');
+        left.style.display = 'flex';
+        left.style.alignItems = 'center';
+        left.style.gap = '8px';
+        const dot = document.createElement('span');
+        dot.className = 'legend-dot';
+        dot.style.background = entry.color;
+        const label = document.createElement('span');
+        label.textContent = entry.label;
+        label.dataset.editable = 'true';
+        bindEditableSync(label, type, entry.index, 'title', true);
+        left.appendChild(dot);
+        left.appendChild(label);
+        const value = document.createElement('span');
+        value.textContent = `${entry.value}%`;
+        li.appendChild(left);
+        li.appendChild(value);
+        legend.appendChild(li);
+      });
+
+      chartVisual.appendChild(canvas);
+      chartWrap.appendChild(chartVisual);
+      chartWrap.appendChild(legend);
+
+      summary.appendChild(info);
+      summary.appendChild(chartWrap);
+
+      const fundsWrapper = document.createElement('div');
+      fundsWrapper.className = 'funds-wrapper';
+
+      portfolioData[type].forEach((item, index) => {
+        const fund = document.createElement('div');
+        fund.className = 'portfolio-item';
+
+        const title = document.createElement('h4');
+        title.textContent = item.title;
+        bindEditableSync(title, type, index, 'title', true);
+
+        const desc = document.createElement('p');
+        desc.textContent = item.desc;
+        bindEditableSync(desc, type, index, 'desc');
+
+        const returns = document.createElement('div');
+        returns.className = 'meta';
+        const five = document.createElement('span');
+        five.textContent = item.returns5;
+        bindEditableSync(five, type, index, 'returns5');
+        const ten = document.createElement('span');
+        ten.textContent = item.returns10;
+        bindEditableSync(ten, type, index, 'returns10');
+        returns.appendChild(five);
+        returns.appendChild(ten);
+
+        const since = document.createElement('span');
+        since.className = 'section-sub';
+        since.textContent = item.since;
+        bindEditableSync(since, type, index, 'since');
+
+        const allocationRow = document.createElement('div');
+        allocationRow.className = 'allocation-row';
+        const allocationLabel = document.createElement('div');
+        allocationLabel.innerHTML = `<strong>Allokation:</strong> <span class="allocation-value">${item.allocation}%</span>`;
+        const allocationInput = document.createElement('input');
+        allocationInput.type = 'number';
+        allocationInput.className = 'allocation-input';
+        allocationInput.value = item.allocation;
+        allocationInput.min = 0;
+        allocationInput.max = 100;
+        allocationInput.step = 1;
+        allocationInput.style.display = adminMode ? 'block' : 'none';
+        allocationInput.addEventListener('input', () => {
+          const newVal = Number(allocationInput.value) || 0;
+          portfolioData[type][index].allocation = newVal;
+          persistPortfolioData();
+          renderPortfolios(type);
+        });
+        allocationRow.appendChild(allocationLabel);
+        allocationRow.appendChild(allocationInput);
+
+        const pros = document.createElement('div');
+        pros.className = 'sublist';
+        const prosTitle = document.createElement('h5');
+        prosTitle.textContent = 'Vorteile';
+        prosTitle.dataset.editable = 'true';
+        const prosList = document.createElement('ul');
+        item.pros.forEach((text, prosIndex) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          attachEditable(li, `portfolio-${type}-${index}-pro-${prosIndex}`, (value) => {
+            portfolioData[type][index].pros[prosIndex] = value;
+            persistPortfolioData();
+          });
+          prosList.appendChild(li);
+        });
+        pros.appendChild(prosTitle);
+        pros.appendChild(prosList);
+
+        const cons = document.createElement('div');
+        cons.className = 'sublist';
+        const consTitle = document.createElement('h5');
+        consTitle.textContent = 'Nachteile';
+        consTitle.dataset.editable = 'true';
+        const consList = document.createElement('ul');
+        item.cons.forEach((text, consIndex) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          attachEditable(li, `portfolio-${type}-${index}-con-${consIndex}`, (value) => {
+            portfolioData[type][index].cons[consIndex] = value;
+            persistPortfolioData();
+          });
+          consList.appendChild(li);
+        });
+        cons.appendChild(consTitle);
+        cons.appendChild(consList);
+
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.justifyContent = 'space-between';
+        actions.style.alignItems = 'center';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = 'Entfernen';
+        deleteBtn.addEventListener('click', () => {
+          portfolioData[type].splice(index, 1);
+          persistPortfolioData();
+          renderPortfolios(type);
+        });
+        actions.appendChild(deleteBtn);
+
+        fund.appendChild(title);
+        fund.appendChild(desc);
+        fund.appendChild(returns);
+        fund.appendChild(since);
+        fund.appendChild(allocationRow);
+        fund.appendChild(pros);
+        fund.appendChild(cons);
+        fund.appendChild(actions);
+        fundsWrapper.appendChild(fund);
+      });
+
+      content.appendChild(summary);
+      content.appendChild(fundsWrapper);
+      shell.appendChild(toggle);
+      shell.appendChild(content);
+      list.appendChild(shell);
+
+      drawDonut(canvas, allocations);
+      shell.classList.toggle('admin', adminMode);
+      refreshEditableState();
+    }
+
+    function renderAblauf(risk) {
+      const body = document.getElementById('ablaufBody');
+      body.innerHTML = '';
+      ablaufData[risk].forEach((row, rowIndex) => {
+        const tr = document.createElement('tr');
+        row.forEach((cell, idx) => {
+          const td = document.createElement('td');
+          if (idx === 0) {
+            td.textContent = cell;
+            td.style.fontWeight = '600';
+            attachEditable(td, `ablauf-${risk}-${rowIndex}-label`, (value) => {
+              ablaufData[risk][rowIndex][0] = value;
+              persistAblaufData();
+            });
+          } else {
+            td.classList.add('progress-cell');
+            const span = document.createElement('span');
+            span.textContent = cell;
+            attachEditable(span, `ablauf-${risk}-${rowIndex}-${idx}`, (value) => {
+              ablaufData[risk][rowIndex][idx] = value;
+              persistAblaufData();
+            });
+            const numeric = parseInt(cell, 10);
+            td.style.setProperty('--fill', Math.max(0, Math.min(100, numeric)) / 100);
+            td.appendChild(span);
+          }
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+      refreshEditableState();
+    }
+
+    function bindDetailsToggles() {
+      document.querySelectorAll('.toggle-details').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          const details = link.nextElementSibling;
+          const isOpen = !details.hasAttribute('hidden');
+          if (isOpen) {
+            details.setAttribute('hidden', '');
+          } else {
+            details.removeAttribute('hidden');
+          }
+          details.style.display = isOpen ? 'none' : 'block';
+          link.setAttribute('aria-expanded', String(!isOpen));
+        });
+      });
+    }
+
+    function getActivePortfolioType() {
+      const activeBtn = document.querySelector('[data-portfolio-tab].active');
+      return activeBtn ? activeBtn.getAttribute('data-portfolio-tab') : 'factor';
+    }
+
+    function addNewFund() {
+      if (!adminMode) return;
+      const current = getActivePortfolioType();
+      portfolioData[current].push({
+        title: 'Neuer Fonds',
+        desc: 'Eigene Beschreibung hinzufügen.',
+        returns5: 'Ø Rendite 5 Jahre: Wert ergänzen',
+        returns10: 'Ø Rendite 10 Jahre: Wert ergänzen',
+        allocation: 15,
+        since: 'Rendite seit Start: +11,4%',
+        pros: ['Vorteil hinzufügen'],
+        cons: ['Nachteil hinzufügen'],
+      });
+      persistPortfolioData();
+      renderPortfolios(current);
+    }
+
+    function toggleAdminMode() {
+      adminMode = !adminMode;
+      adminNotice.style.display = adminMode ? 'block' : 'none';
+      exitAdminBtn.style.display = adminMode ? 'inline-flex' : 'none';
+      refreshEditableState();
+    }
+
+    function refreshEditableState() {
+      const elements = document.querySelectorAll('[data-editable]');
+      elements.forEach((el) => {
+        el.contentEditable = adminMode ? 'true' : 'false';
+        el.setAttribute('aria-label', adminMode ? 'Bearbeitbarer Inhalt' : '');
+      });
+      addFundBtn.disabled = !adminMode;
+      addFundBtn.style.opacity = adminMode ? '1' : '0.6';
+      addFundBtn.style.cursor = adminMode ? 'pointer' : 'not-allowed';
+      document.getElementById('portfolioActions').style.display = adminMode ? 'flex' : 'none';
+      document.querySelectorAll('.allocation-input').forEach((input) => {
+        input.style.display = adminMode ? 'block' : 'none';
+      });
+      avatarInputs.forEach((input) => {
+        input.style.display = adminMode ? 'block' : 'none';
+      });
+      document.querySelectorAll('.delete-btn').forEach((btn) => {
+        btn.style.display = adminMode ? 'inline-flex' : 'none';
+      });
+      document.querySelectorAll('.portfolio-shell').forEach((shell) => {
+        shell.classList.toggle('admin', adminMode);
+      });
+      if (exitAdminBtn) {
+        exitAdminBtn.style.display = adminMode ? 'inline-flex' : 'none';
+      }
+    }
+
+    avatarInputs.forEach((input) => {
+      const target = document.getElementById(input.dataset.target);
+      if (savedAvatars[input.dataset.target]) {
+        input.value = savedAvatars[input.dataset.target];
+      }
+      const applyImage = () => {
+        if (!target) return;
+        const url = input.value.trim();
+        if (url) {
+          target.style.backgroundImage = `url('${url}')`;
+          target.classList.add('has-image');
+          savedAvatars[input.dataset.target] = url;
+        } else {
+          target.style.backgroundImage = '';
+          target.classList.remove('has-image');
+          delete savedAvatars[input.dataset.target];
+        }
+        persistJson(STORAGE_KEYS.avatars, savedAvatars);
+      };
+      input.addEventListener('change', applyImage);
+      input.addEventListener('blur', applyImage);
+      applyImage();
+    });
+
+    function openModal() {
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      codeInput.value = '';
+      codeInput.focus();
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    hydrateStaticEditables();
+
+    updateTrigger?.addEventListener('click', () => {
+      updateClickCount += 1;
+      clearTimeout(updateTimer);
+      if (updateClickCount >= 5) {
+        updateClickCount = 0;
+        openModal();
+      }
+      updateTimer = setTimeout(() => {
+        updateClickCount = 0;
+      }, 1200);
+    });
+
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+    submitCodeBtn.addEventListener('click', () => {
+      if (codeInput.value.trim() === adminCode) {
+        toggleAdminMode();
+        closeModal();
+      }
+    });
+    codeInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        submitCodeBtn.click();
+      }
+    });
+
+    document.querySelectorAll('[data-portfolio-tab]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-portfolio-tab]').forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        const type = button.getAttribute('data-portfolio-tab');
+        renderPortfolios(type);
+      });
+    });
+
+    document.querySelectorAll('[data-risk]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-risk]').forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        const risk = button.getAttribute('data-risk');
+        renderAblauf(risk);
+      });
+    });
+
+    addFundBtn.addEventListener('click', addNewFund);
+    exitAdminBtn.addEventListener('click', () => {
+      if (adminMode) toggleAdminMode();
+    });
+    bindDetailsToggles();
+
+    // Initial render
+    renderPortfolios('factor');
+    renderAblauf('konservativ');
+    refreshEditableState();
+  </script>
+</body>
+</html>
