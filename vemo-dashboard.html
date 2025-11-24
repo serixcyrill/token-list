@@ -1168,17 +1168,66 @@
     const submitCodeBtn = document.getElementById('submitCode');
     const avatarInputs = document.querySelectorAll('.avatar-input');
     const exitAdminBtn = document.getElementById('exitAdmin');
+    const STORAGE_KEYS = {
+      editable: 'vemo-editable-fields',
+      portfolios: 'vemo-portfolio-data',
+      ablauf: 'vemo-ablauf-data',
+      avatars: 'vemo-avatar-urls',
+    };
     let adminMode = false;
     let updateClickCount = 0;
     let updateTimer;
+    let editableIndex = 0;
+    const savedEdits = loadJson(STORAGE_KEYS.editable, {});
+    const savedAvatars = loadJson(STORAGE_KEYS.avatars, {});
+
+    function deepClone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function loadJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : deepClone(fallback);
+      } catch (error) {
+        console.warn('Konnte gespeicherte Daten nicht laden', error);
+        return deepClone(fallback);
+      }
+    }
+
+    function persistJson(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.warn('Konnte Daten nicht speichern', error);
+      }
+    }
 
     function bindEditableSync(el, type, index, field, rerender = false) {
       if (!el) return;
-      const apply = () => {
-        portfolioData[type][index][field] = el.textContent.trim();
+      const key = `portfolio-${type}-${index}-${field}`;
+      attachEditable(el, key, (value) => {
+        portfolioData[type][index][field] = value;
+        persistPortfolioData();
         if (rerender) {
           renderPortfolios(type);
         }
+      });
+    }
+
+    function attachEditable(el, key, onChange) {
+      if (!el) return;
+      const storageKey = key || el.dataset.storageKey || `editable-${editableIndex++}`;
+      el.dataset.storageKey = storageKey;
+      el.dataset.editable = 'true';
+      if (savedEdits[storageKey]) {
+        el.textContent = savedEdits[storageKey];
+      }
+      const apply = () => {
+        const value = el.textContent.trim();
+        savedEdits[storageKey] = value;
+        persistJson(STORAGE_KEYS.editable, savedEdits);
+        if (typeof onChange === 'function') onChange(value);
       };
       el.addEventListener('blur', apply);
       el.addEventListener('keydown', (event) => {
@@ -1186,6 +1235,15 @@
           event.preventDefault();
           el.blur();
         }
+      });
+    }
+
+    function hydrateStaticEditables() {
+      document.querySelectorAll('[data-editable]').forEach((el) => {
+        if (!el.dataset.storageKey) {
+          el.dataset.storageKey = `static-${editableIndex++}`;
+        }
+        attachEditable(el, el.dataset.storageKey);
       });
     }
 
@@ -1216,7 +1274,7 @@
       },
     };
 
-    const portfolioData = {
+    const defaultPortfolioData = {
       factor: [
         {
           title: 'Faktor Plus Global',
@@ -1347,7 +1405,7 @@
       ],
     };
 
-    const ablaufData = {
+    const defaultAblaufData = {
       konservativ: [
         ['Aktien', '25%', '24%', '23%', '22%', '21%', '20%', '19%', '18%', '17%', '16%'],
         ['Obligationen', '55%', '56%', '57%', '58%', '59%', '60%', '61%', '62%', '63%', '64%'],
@@ -1364,6 +1422,9 @@
         ['Liquidität', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%'],
       ],
     };
+
+    let portfolioData = loadJson(STORAGE_KEYS.portfolios, defaultPortfolioData);
+    let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
 
     function drawDonut(canvas, allocations) {
       const ctx = canvas.getContext('2d');
@@ -1385,6 +1446,14 @@
       ctx.fillStyle = '#ffffff';
       ctx.arc(canvas.width / 2, canvas.height / 2, radius * 0.65, 0, Math.PI * 2);
       ctx.fill();
+    }
+
+    function persistPortfolioData() {
+      persistJson(STORAGE_KEYS.portfolios, portfolioData);
+    }
+
+    function persistAblaufData() {
+      persistJson(STORAGE_KEYS.ablauf, ablaufData);
     }
 
     function renderPortfolios(type) {
@@ -1413,16 +1482,23 @@
       info.className = 'portfolio-info';
       const summaryText = document.createElement('p');
       summaryText.textContent = meta.summary;
-      summaryText.dataset.editable = 'true';
+      attachEditable(summaryText, `${type}-summary`, (value) => {
+        portfolioMeta[type].summary = value;
+      });
       const infoText = document.createElement('p');
       infoText.textContent = meta.info;
-      infoText.dataset.editable = 'true';
+      attachEditable(infoText, `${type}-info`, (value) => {
+        portfolioMeta[type].info = value;
+      });
       const chips = document.createElement('div');
       chips.className = 'portfolio-meta';
       const sinceChip = document.createElement('span');
       sinceChip.className = 'chip';
       sinceChip.textContent = meta.since;
-      sinceChip.dataset.editable = 'true';
+      attachEditable(sinceChip, `${type}-since`, (value) => {
+        portfolioMeta[type].since = value;
+        renderPortfolios(type);
+      });
       chips.appendChild(sinceChip);
       info.appendChild(summaryText);
       info.appendChild(infoText);
@@ -1502,28 +1578,27 @@
 
         const title = document.createElement('h4');
         title.textContent = item.title;
-        title.dataset.editable = 'true';
         bindEditableSync(title, type, index, 'title', true);
 
         const desc = document.createElement('p');
         desc.textContent = item.desc;
-        desc.dataset.editable = 'true';
+        bindEditableSync(desc, type, index, 'desc');
 
         const returns = document.createElement('div');
         returns.className = 'meta';
         const five = document.createElement('span');
         five.textContent = item.returns5;
-        five.dataset.editable = 'true';
+        bindEditableSync(five, type, index, 'returns5');
         const ten = document.createElement('span');
         ten.textContent = item.returns10;
-        ten.dataset.editable = 'true';
+        bindEditableSync(ten, type, index, 'returns10');
         returns.appendChild(five);
         returns.appendChild(ten);
 
         const since = document.createElement('span');
         since.className = 'section-sub';
         since.textContent = item.since;
-        since.dataset.editable = 'true';
+        bindEditableSync(since, type, index, 'since');
 
         const allocationRow = document.createElement('div');
         allocationRow.className = 'allocation-row';
@@ -1540,6 +1615,7 @@
         allocationInput.addEventListener('input', () => {
           const newVal = Number(allocationInput.value) || 0;
           portfolioData[type][index].allocation = newVal;
+          persistPortfolioData();
           renderPortfolios(type);
         });
         allocationRow.appendChild(allocationLabel);
@@ -1551,10 +1627,13 @@
         prosTitle.textContent = 'Vorteile';
         prosTitle.dataset.editable = 'true';
         const prosList = document.createElement('ul');
-        item.pros.forEach((text) => {
+        item.pros.forEach((text, prosIndex) => {
           const li = document.createElement('li');
           li.textContent = text;
-          li.dataset.editable = 'true';
+          attachEditable(li, `portfolio-${type}-${index}-pro-${prosIndex}`, (value) => {
+            portfolioData[type][index].pros[prosIndex] = value;
+            persistPortfolioData();
+          });
           prosList.appendChild(li);
         });
         pros.appendChild(prosTitle);
@@ -1566,10 +1645,13 @@
         consTitle.textContent = 'Nachteile';
         consTitle.dataset.editable = 'true';
         const consList = document.createElement('ul');
-        item.cons.forEach((text) => {
+        item.cons.forEach((text, consIndex) => {
           const li = document.createElement('li');
           li.textContent = text;
-          li.dataset.editable = 'true';
+          attachEditable(li, `portfolio-${type}-${index}-con-${consIndex}`, (value) => {
+            portfolioData[type][index].cons[consIndex] = value;
+            persistPortfolioData();
+          });
           consList.appendChild(li);
         });
         cons.appendChild(consTitle);
@@ -1584,6 +1666,7 @@
         deleteBtn.textContent = 'Entfernen';
         deleteBtn.addEventListener('click', () => {
           portfolioData[type].splice(index, 1);
+          persistPortfolioData();
           renderPortfolios(type);
         });
         actions.appendChild(deleteBtn);
@@ -1613,19 +1696,25 @@
     function renderAblauf(risk) {
       const body = document.getElementById('ablaufBody');
       body.innerHTML = '';
-      ablaufData[risk].forEach((row) => {
+      ablaufData[risk].forEach((row, rowIndex) => {
         const tr = document.createElement('tr');
         row.forEach((cell, idx) => {
           const td = document.createElement('td');
           if (idx === 0) {
-            td.dataset.editable = 'true';
             td.textContent = cell;
             td.style.fontWeight = '600';
+            attachEditable(td, `ablauf-${risk}-${rowIndex}-label`, (value) => {
+              ablaufData[risk][rowIndex][0] = value;
+              persistAblaufData();
+            });
           } else {
             td.classList.add('progress-cell');
             const span = document.createElement('span');
             span.textContent = cell;
-            span.dataset.editable = 'true';
+            attachEditable(span, `ablauf-${risk}-${rowIndex}-${idx}`, (value) => {
+              ablaufData[risk][rowIndex][idx] = value;
+              persistAblaufData();
+            });
             const numeric = parseInt(cell, 10);
             td.style.setProperty('--fill', Math.max(0, Math.min(100, numeric)) / 100);
             td.appendChild(span);
@@ -1672,6 +1761,7 @@
         pros: ['Vorteil hinzufügen'],
         cons: ['Nachteil hinzufügen'],
       });
+      persistPortfolioData();
       renderPortfolios(current);
     }
 
@@ -1711,16 +1801,22 @@
 
     avatarInputs.forEach((input) => {
       const target = document.getElementById(input.dataset.target);
+      if (savedAvatars[input.dataset.target]) {
+        input.value = savedAvatars[input.dataset.target];
+      }
       const applyImage = () => {
         if (!target) return;
         const url = input.value.trim();
         if (url) {
           target.style.backgroundImage = `url('${url}')`;
           target.classList.add('has-image');
+          savedAvatars[input.dataset.target] = url;
         } else {
           target.style.backgroundImage = '';
           target.classList.remove('has-image');
+          delete savedAvatars[input.dataset.target];
         }
+        persistJson(STORAGE_KEYS.avatars, savedAvatars);
       };
       input.addEventListener('change', applyImage);
       input.addEventListener('blur', applyImage);
@@ -1738,6 +1834,8 @@
       modal.style.display = 'none';
       modal.setAttribute('aria-hidden', 'true');
     }
+
+    hydrateStaticEditables();
 
     updateTrigger?.addEventListener('click', () => {
       updateClickCount += 1;
