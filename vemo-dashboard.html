@@ -27,7 +27,9 @@
     body {
       margin: 0;
       font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--background);
+      background: radial-gradient(circle at 20% 20%, rgba(114, 210, 122, 0.16), transparent 32%),
+        radial-gradient(circle at 85% 10%, rgba(91, 142, 255, 0.14), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 251, 0.92));
       color: var(--text);
     }
 
@@ -35,107 +37,6 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-    }
-
-    header {
-      background: var(--card-bg);
-      box-shadow: var(--shadow);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .title {
-      font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 0.4px;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .status-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      background: #e8f8ec;
-      color: #1c3a2c;
-      border-radius: 999px;
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: 0.2px;
-      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.45);
-    }
-
-    .live-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #27c965;
-      position: relative;
-      box-shadow: 0 0 0 0 rgba(39, 201, 101, 0.5);
-      animation: pulse 1.8s infinite;
-    }
-
-    @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(39, 201, 101, 0.4);
-      }
-      70% {
-        box-shadow: 0 0 0 10px rgba(39, 201, 101, 0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(39, 201, 101, 0);
-      }
-    }
-
-    .admin-hotspot {
-      min-width: 120px;
-      height: 54px;
-      border-radius: 14px;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      border: 1.5px dashed rgba(114, 210, 122, 0.4);
-      transition: border 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-      background: linear-gradient(120deg, rgba(114, 210, 122, 0.12), rgba(91, 142, 255, 0.08));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 14px;
-    }
-
-    .admin-hotspot:hover {
-      border-color: rgba(114, 210, 122, 0.6);
-      background: linear-gradient(120deg, rgba(114, 210, 122, 0.18), rgba(91, 142, 255, 0.12));
-      box-shadow: 0 10px 22px rgba(114, 210, 122, 0.18);
-    }
-
-    .admin-hotspot .dots {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      opacity: 0.6;
-      color: var(--text);
-      font-weight: 700;
-      letter-spacing: 2px;
-      font-size: 16px;
-    }
-
-    .admin-hotspot .hint {
-      margin-left: 8px;
-      color: #1c3a2c;
-      font-weight: 700;
-      font-size: 12px;
-      opacity: 0.8;
     }
 
     .notice {
@@ -907,12 +808,6 @@
     }
 
     @media (max-width: 720px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
-
       .portfolio-summary {
         grid-template-columns: 1fr;
       }
@@ -936,16 +831,6 @@
 </head>
 <body>
   <div class="page">
-    <header>
-      <div class="header-left">
-        <div class="title" data-editable="true">Vemo Übersicht</div>
-        <div class="status-chip"><span class="live-dot" aria-hidden="true"></span><span data-editable="true">Live</span></div>
-      </div>
-      <div class="admin-hotspot" id="adminHotspot" aria-label="versteckter Admin Schalter">
-        <span class="dots">···</span>
-        <span class="hint">Admin</span>
-      </div>
-    </header>
     <div id="adminNotice" class="notice" style="display: none;">Admin Modus aktiv.</div>
 
     <main>
@@ -953,7 +838,7 @@
         <div class="section-heading">
           <h2 data-editable="true">Vorsorge Mantel</h2>
           <p class="section-sub" data-editable="true">Ihre passenden Vorsorgeoptionen auf einen Blick.</p>
-          <span class="section-meta" data-editable="true">Letztes Update: 12.09.2024</span>
+          <span class="section-meta" id="lastUpdateTrigger" data-editable="true">Letztes Update: 12.09.2024</span>
         </div>
         <div class="vorsorge-grid">
           <article class="vorsorge-card rank-1">
@@ -1208,15 +1093,15 @@
     const adminCode = 'Vemokorrektur20954.';
     const adminNotice = document.getElementById('adminNotice');
     const addFundBtn = document.getElementById('addFund');
-    const hotspot = document.getElementById('adminHotspot');
+    const updateTrigger = document.getElementById('lastUpdateTrigger');
     const modal = document.getElementById('adminModal');
     const codeInput = document.getElementById('adminCodeInput');
     const closeModalBtn = document.getElementById('closeModal');
     const submitCodeBtn = document.getElementById('submitCode');
     const avatarInputs = document.querySelectorAll('.avatar-input');
     let adminMode = false;
-    let hotspotCount = 0;
-    let hotspotTimer;
+    let updateClickCount = 0;
+    let updateTimer;
 
     const portfolioMeta = {
       factor: {
@@ -1741,15 +1626,15 @@
       modal.setAttribute('aria-hidden', 'true');
     }
 
-    hotspot.addEventListener('click', () => {
-      hotspotCount += 1;
-      clearTimeout(hotspotTimer);
-      if (hotspotCount >= 5) {
-        hotspotCount = 0;
+    updateTrigger?.addEventListener('click', () => {
+      updateClickCount += 1;
+      clearTimeout(updateTimer);
+      if (updateClickCount >= 5) {
+        updateClickCount = 0;
         openModal();
       }
-      hotspotTimer = setTimeout(() => {
-        hotspotCount = 0;
+      updateTimer = setTimeout(() => {
+        updateClickCount = 0;
       }, 1200);
     });
 
