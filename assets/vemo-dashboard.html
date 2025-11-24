@@ -780,6 +780,7 @@
       font-size: 11px;
       color: var(--muted);
       font-weight: 600;
+      display: none;
     }
 
     .avatar-input {
@@ -981,7 +982,7 @@
             <div class="advisor-header">
               <div class="avatar" id="avatar-diego" aria-label="Profilbild Diego Berchtold"></div>
               <div class="avatar-input-wrap">
-                <span class="avatar-label">Profilbild-URL</span>
+                <span class="avatar-label"></span>
                 <input class="avatar-input" type="url" data-target="avatar-diego" placeholder="https://..." />
               </div>
               <div class="advisor-meta">
@@ -1013,7 +1014,7 @@
             <div class="advisor-header">
               <div class="avatar" id="avatar-lara" aria-label="Profilbild Lara Steiner"></div>
               <div class="avatar-input-wrap">
-                <span class="avatar-label">Profilbild-URL</span>
+                <span class="avatar-label"></span>
                 <input class="avatar-input" type="url" data-target="avatar-lara" placeholder="https://..." />
               </div>
               <div class="advisor-meta">
@@ -1043,7 +1044,7 @@
             <div class="advisor-header">
               <div class="avatar" id="avatar-marco" aria-label="Profilbild Marco Keller"></div>
               <div class="avatar-input-wrap">
-                <span class="avatar-label">Profilbild-URL</span>
+                <span class="avatar-label"></span>
                 <input class="avatar-input" type="url" data-target="avatar-marco" placeholder="https://..." />
               </div>
               <div class="advisor-meta">
@@ -1109,6 +1110,7 @@
     const exitAdminBtn = document.getElementById('exitAdmin');
     const advisorGrid = document.querySelector('.advisor-grid');
     let avatarInputs = [];
+    let avatarLabels = [];
 
     const STORAGE_KEYS = {
       editable: 'vemo-editable-fields',
@@ -2297,7 +2299,7 @@
         avatarWrap.className = 'avatar-input-wrap';
         const avatarLabel = document.createElement('span');
         avatarLabel.className = 'avatar-label';
-        avatarLabel.textContent = 'Profilbild-URL';
+        avatarLabel.textContent = '';
         const avatarInput = document.createElement('input');
         avatarInput.className = 'avatar-input';
         avatarInput.type = 'url';
@@ -2404,6 +2406,7 @@
       });
 
       avatarInputs = advisorGrid.querySelectorAll('.avatar-input');
+      avatarLabels = advisorGrid.querySelectorAll('.avatar-label');
       bindAvatarInputs();
       refreshEditableState();
     }
@@ -2473,6 +2476,9 @@
       });
       avatarInputs.forEach((input) => {
         input.style.display = adminMode ? 'block' : 'none';
+      });
+      avatarLabels.forEach((label) => {
+        label.style.display = adminMode ? 'block' : 'none';
       });
       document.querySelectorAll('.delete-btn').forEach((btn) => {
         btn.style.display = adminMode ? 'inline-flex' : 'none';
