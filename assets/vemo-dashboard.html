@@ -1098,8 +1098,9 @@
     const codeInput = document.getElementById('adminCodeInput');
     const closeModalBtn = document.getElementById('closeModal');
     const submitCodeBtn = document.getElementById('submitCode');
-    const avatarInputs = document.querySelectorAll('.avatar-input');
     const exitAdminBtn = document.getElementById('exitAdmin');
+    const advisorGrid = document.querySelector('.advisor-grid');
+    let avatarInputs = [];
 
     const STORAGE_KEYS = {
       editable: 'vemo-editable-fields',
@@ -1113,6 +1114,12 @@
     // https://docs.google.com/spreadsheets/d/e/2PACX-1vQg29x92Do82OV6r7f19UCrbTBZURRu305Nu-GMH9UlnqvcBhe44-8oqMJBTLFaRUNhKXeG8JKDBDYc/pubhtml
     const SHEET_BASE_ID = '2PACX-1vQg29x92Do82OV6r7f19UCrbTBZURRu305Nu-GMH9UlnqvcBhe44-8oqMJBTLFaRUNhKXeG8JKDBDYc';
     const SHEET_CSV_BASE = `https://docs.google.com/spreadsheets/d/e/${SHEET_BASE_ID}/pub`;
+    const SHEET_GIDS = {
+      vorsorge: '0',
+      portfolios: '1655243596',
+      fonds: '1811690173',
+      berater: '832064159',
+    };
 
     let adminMode = false;
     let updateClickCount = 0;
@@ -1244,7 +1251,7 @@
 
     let vorsorgeData = deepClone(defaultVorsorgeCards);
 
-    const portfolioMeta = {
+    const defaultPortfolioMeta = {
       factor: {
         title: 'Faktorportfolio',
         summary: 'Smart-Beta-Strategien mit Qualitäts- und Value-Fokus, fein austariert nach Volatilität.',
@@ -1419,14 +1426,52 @@
         ['Liquidität', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%'],
       ],
     };
+    const defaultAdvisors = [
+      {
+        key: 'diego',
+        name: 'Diego Berchtold',
+        role: 'Honorarberater',
+        description: 'Berät dich persönlich zu Vorsorge Mantel, Portfolios und Ablaufmanagement.',
+        educationText: 'Professional/academic degree(s); Bachelor-Abschluss: Betriebsökonomie; VBV - Versicherung & Vorsorge',
+        codeOfConductText: 'Mendo – FIDLEG Kompakt – Kenntnisnachweis Verhaltensregeln',
+        terminLink: 'https://calendly.com/diego-vemo/telefontermin',
+        terminHinweis: 'Terminbuchung: https://calendly.com/diego-vemo/telefontermin',
+        avatarUrl: '',
+      },
+      {
+        key: 'lara',
+        name: 'Lara Steiner',
+        role: 'Senior Honorarberaterin',
+        description: 'Spezialisiert auf nachhaltige Portfolios und steueroptimierte Auszahlungspfade.',
+        educationText: 'Master: Finance & Risk Management; CAS Sustainable Finance',
+        codeOfConductText: 'MIFID & FIDLEG Refresh 2024',
+        terminLink: 'https://calendly.com/diego-vemo/telefontermin',
+        terminHinweis: 'Terminbuchungslink bitte im Admin-Modus anpassen.',
+        avatarUrl: '',
+      },
+      {
+        key: 'marco',
+        name: 'Marco Keller',
+        role: 'Honorarberater',
+        description: 'Fokus auf Auszahlungsszenarien, Risikoabsicherung und Liquiditätsplanung.',
+        educationText: 'Bachelor: Banking & Finance; Dipl. Finanzplanungsexperte',
+        codeOfConductText: 'Compliance & Ethik Update 2024',
+        terminLink: 'https://calendly.com/diego-vemo/telefontermin',
+        terminHinweis: 'Terminbuchungslink bitte im Admin-Modus anpassen.',
+        avatarUrl: '',
+      },
+    ];
 
+    let portfolioMeta = deepClone(defaultPortfolioMeta);
     let portfolioData = loadJson(STORAGE_KEYS.portfolios, defaultPortfolioData);
+    let advisorData = deepClone(defaultAdvisors);
     let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
 
-    function buildCsvUrl(sheetName) {
+    function buildCsvUrl(gid) {
       const params = new URLSearchParams({
+        gid,
+        single: 'true',
         output: 'csv',
-        sheet: sheetName,
       });
       return `${SHEET_CSV_BASE}?${params.toString()}`;
     }
@@ -1466,8 +1511,8 @@
       return rows.map((cols) => cols.map((cell) => cell.trim()));
     }
 
-    async function fetchSheetCsv(sheetName) {
-      const url = buildCsvUrl(sheetName);
+    async function fetchSheetCsv(gid) {
+      const url = buildCsvUrl(gid);
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Sheet Request fehlgeschlagen: ${res.status}`);
       return res.text();
@@ -1475,7 +1520,7 @@
 
     async function loadVorsorgeFromSheet() {
       try {
-        const csvText = await fetchSheetCsv('Vorsorge');
+        const csvText = await fetchSheetCsv(SHEET_GIDS.vorsorge);
         const rows = parseCsv(csvText).filter((r) => r.length);
         if (!rows.length) throw new Error('Keine Vorsorge-Zeilen');
 
@@ -1539,6 +1584,157 @@
       } catch (error) {
         console.warn('Vorsorge Sheet konnte nicht geladen werden, nutze Fallback', error);
         vorsorgeData = deepClone(defaultVorsorgeCards);
+      }
+    }
+
+    async function loadPortfolioMetaFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.portfolios);
+        const rows = parseCsv(csvText).filter((r) => r.length);
+        if (!rows.length) return;
+
+        const header = rows[0].slice(1).map((v) => v.trim().toLowerCase());
+        const nextMeta = deepClone(defaultPortfolioMeta);
+
+        rows.forEach((row) => {
+          const [fieldRaw, ...values] = row;
+          const field = (fieldRaw || '').toLowerCase();
+          values.forEach((value, idx) => {
+            const typeKey = header[idx];
+            if (!typeKey || !nextMeta[typeKey]) return;
+            switch (field) {
+              case 'titel':
+                nextMeta[typeKey].title = value;
+                break;
+              case 'summary':
+                nextMeta[typeKey].summary = value;
+                break;
+              case 'since':
+                nextMeta[typeKey].since = value;
+                break;
+              case 'info':
+                nextMeta[typeKey].info = value;
+                break;
+              default:
+                break;
+            }
+          });
+        });
+
+        portfolioMeta = nextMeta;
+      } catch (error) {
+        console.warn('Portfolio-Meta Sheet konnte nicht geladen werden, nutze Fallback', error);
+        portfolioMeta = deepClone(defaultPortfolioMeta);
+      }
+    }
+
+    function normalizeListValue(value) {
+      if (!value) return '';
+      const trimmed = String(value).trim();
+      if (!trimmed || trimmed === '—' || trimmed === '-') return '';
+      return trimmed;
+    }
+
+    async function loadFondsFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.fonds);
+        const rows = parseCsv(csvText).filter((r) => r.length);
+        if (rows.length < 2) throw new Error('Zu wenige Fonds-Zeilen');
+
+        const header = rows[0];
+        const fieldRows = rows.slice(1);
+        const strategyRow = fieldRows.find((r) => (r[0] || '').toLowerCase() === 'strategie');
+        const sortRow = fieldRows.find((r) => (r[0] || '').toLowerCase() === 'sortierung');
+        const nextData = {
+          factor: [],
+          marketcap: [],
+          bip: [],
+          obligationen: [],
+        };
+
+        const getFieldRow = (name) =>
+          fieldRows.find((r) => (r[0] || '').toLowerCase() === name.toLowerCase()) || [];
+
+        const prosRows = fieldRows.filter((r) => (r[0] || '').toLowerCase().startsWith('pro'));
+        const consRows = fieldRows.filter((r) => (r[0] || '').toLowerCase().startsWith('con'));
+
+        header.slice(1).forEach((_, colIdx) => {
+          const col = colIdx + 1;
+          const strategy = (strategyRow?.[col] || '').toLowerCase();
+          if (!nextData[strategy]) return;
+
+          const title = getFieldRow('fondsname')[col] || '';
+          if (!title) return;
+
+          const sortOrder = parseInt(sortRow?.[col] || '', 10) || colIdx + 1;
+
+          const fund = {
+            title,
+            desc: getFieldRow('beschreibung')[col] || '',
+            returns5: getFieldRow('rendite5')[col] || '',
+            returns10: getFieldRow('rendite10')[col] || '',
+            allocation: Number(getFieldRow('allocation')[col] || 0),
+            since: getFieldRow('since')[col] || '',
+            pros: prosRows
+              .map((row) => normalizeListValue(row[col]))
+              .filter(Boolean),
+            cons: consRows
+              .map((row) => normalizeListValue(row[col]))
+              .filter(Boolean),
+            sortOrder,
+          };
+
+          nextData[strategy].push(fund);
+        });
+
+        Object.keys(nextData).forEach((key) => {
+          nextData[key].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+          nextData[key].forEach((item) => delete item.sortOrder);
+        });
+
+        const hasAny = Object.values(nextData).some((arr) => arr.length);
+        if (hasAny) {
+          portfolioData = nextData;
+          persistPortfolioData();
+        }
+      } catch (error) {
+        console.warn('Fonds Sheet konnte nicht geladen werden, nutze Fallback/LocalStorage', error);
+      }
+    }
+
+    async function loadBeraterFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.berater);
+        const rows = parseCsv(csvText).filter((r) => r.length);
+        if (rows.length < 2) throw new Error('Keine Berater-Zeilen');
+
+        const header = rows[0].slice(1);
+        const fieldRows = rows.slice(1);
+        const advisors = header.map((key) => ({ key: key.toLowerCase() }));
+
+        const fieldMap = {};
+        fieldRows.forEach(([field, ...values]) => {
+          fieldMap[(field || '').toLowerCase()] = values;
+        });
+
+        advisors.forEach((advisor, idx) => {
+          advisor.name = fieldMap.name?.[idx] || '';
+          advisor.role = fieldMap.rolle?.[idx] || '';
+          advisor.description = fieldMap.kurzbeschreibung?.[idx] || '';
+          advisor.educationText = fieldMap.educationtext?.[idx] || '';
+          advisor.codeOfConductText = fieldMap.codeofconducttext?.[idx] || '';
+          advisor.terminLink = fieldMap.terminlink?.[idx] || '';
+          advisor.terminHinweis = fieldMap.terminhinweis?.[idx] || '';
+          advisor.avatarUrl = fieldMap.avatarurl?.[idx] || '';
+        });
+
+        const filtered = advisors.filter((a) => a.name);
+        if (filtered.length) {
+          advisorData = filtered;
+        }
+      } catch (error) {
+        console.warn('Berater Sheet konnte nicht geladen werden, nutze Fallback', error);
+        advisorData = deepClone(defaultAdvisors);
       }
     }
 
@@ -1641,103 +1837,12 @@
       bindDetailsToggles();
     }
 
-    async function loadPortfoliosFromSheet() {
-      try {
-        const csvText = await fetchSheetCsv('Portfolios');
-        const rows = parseCsv(csvText).filter((r) => r.some((cell) => cell));
-        if (!rows.length) return;
-
-        const header = rows[0].map((h) => h.toLowerCase());
-        const typeIdx = header.findIndex((h) => h === 'typ' || h === 'type');
-        const titleIdx = header.findIndex((h) => h === 'titel' || h === 'title');
-        const descIdx = header.findIndex((h) => h === 'beschreibung' || h === 'desc');
-        const r5Idx = header.findIndex((h) => h.includes('5')); // Rendite 5 Jahre
-        const r10Idx = header.findIndex((h) => h.includes('10')); // Rendite 10 Jahre
-        const allocIdx = header.findIndex((h) => h.includes('allokation') || h === 'allocation');
-        const sinceIdx = header.findIndex((h) => h.includes('start') || h.includes('rendite seit'));
-        const prosIdx = header.findIndex((h) => h.startsWith('vorteile'));
-        const consIdx = header.findIndex((h) => h.startsWith('nachteile'));
-
-        if (typeIdx === -1 || titleIdx === -1) {
-          console.warn('Portfolios Sheet Header unvollständig, verwende Fallback');
-          return;
-        }
-
-        const nextData = { factor: [], marketcap: [], bip: [], obligationen: [] };
-
-        rows.slice(1).forEach((row) => {
-          const typeRaw = row[typeIdx];
-          if (!typeRaw) return;
-          const type = String(typeRaw).trim().toLowerCase();
-          if (!nextData[type]) return;
-
-          const pros = prosIdx !== -1 && row[prosIdx]
-            ? String(row[prosIdx]).split(';').map((s) => s.trim()).filter(Boolean)
-            : [];
-          const cons = consIdx !== -1 && row[consIdx]
-            ? String(row[consIdx]).split(';').map((s) => s.trim()).filter(Boolean)
-            : [];
-
-          nextData[type].push({
-            title: row[titleIdx] || '',
-            desc: descIdx !== -1 ? row[descIdx] || '' : '',
-            returns5: r5Idx !== -1 ? row[r5Idx] || '' : '',
-            returns10: r10Idx !== -1 ? row[r10Idx] || '' : '',
-            allocation: allocIdx !== -1 ? Number(row[allocIdx] || 0) : 0,
-            since: sinceIdx !== -1 ? row[sinceIdx] || '' : '',
-            pros,
-            cons,
-          });
-        });
-
-        const hasAny = Object.values(nextData).some((arr) => arr.length);
-        if (hasAny) {
-          portfolioData = nextData;
-          persistPortfolioData();
-        }
-      } catch (error) {
-        console.warn('Portfolios Sheet konnte nicht geladen werden, nutze Fallback', error);
-      }
-    }
-
-    async function loadAblaufFromSheet() {
-      try {
-        const csvText = await fetchSheetCsv('Ablaufmanagement');
-        const rows = parseCsv(csvText).filter((r) => r.some((cell) => cell));
-        if (!rows.length) return;
-
-        const header = rows[0].map((h) => h.toLowerCase());
-        const riskIdx = header.findIndex((h) => h === 'risiko' || h === 'risk');
-        const assetIdx = header.findIndex((h) => h === 'assetklasse' || h === 'asset' || h === 'klasse');
-        if (riskIdx === -1 || assetIdx === -1) {
-          console.warn('Ablaufmanagement Header unvollständig');
-          return;
-        }
-
-        const next = { konservativ: [], mittel: [], aggressiv: [] };
-
-        rows.slice(1).forEach((row) => {
-          const riskKey = String(row[riskIdx] || '').toLowerCase();
-          const asset = row[assetIdx];
-          if (!next[riskKey] || !asset) return;
-          const values = row.slice(assetIdx + 1).filter(Boolean);
-          next[riskKey].push([String(asset), ...values]);
-        });
-
-        if (Object.values(next).some((arr) => arr.length)) {
-          ablaufData = next;
-          persistAblaufData();
-        }
-      } catch (error) {
-        console.warn('Ablaufmanagement Sheet konnte nicht geladen werden, nutze Fallback', error);
-      }
-    }
-
     async function loadFromSheets() {
       await Promise.all([
         loadVorsorgeFromSheet(),
-        loadPortfoliosFromSheet(),
-        loadAblaufFromSheet(),
+        loadPortfolioMetaFromSheet(),
+        loadFondsFromSheet(),
+        loadBeraterFromSheet(),
       ]);
     }
 
@@ -2024,6 +2129,170 @@
       refreshEditableState();
     }
 
+    function bindAvatarInputs() {
+      avatarInputs.forEach((input) => {
+        const target = document.getElementById(input.dataset.target);
+        if (savedAvatars[input.dataset.target]) {
+          input.value = savedAvatars[input.dataset.target];
+        } else if (input.dataset.defaultUrl) {
+          input.value = input.dataset.defaultUrl;
+        }
+
+        const applyImage = () => {
+          if (!target) return;
+          const url = input.value.trim();
+          if (url) {
+            target.style.backgroundImage = `url('${url}')`;
+            target.classList.add('has-image');
+            savedAvatars[input.dataset.target] = url;
+          } else {
+            target.style.backgroundImage = '';
+            target.classList.remove('has-image');
+            delete savedAvatars[input.dataset.target];
+          }
+          persistJson(STORAGE_KEYS.avatars, savedAvatars);
+        };
+
+        input.removeEventListener('change', applyImage);
+        input.removeEventListener('blur', applyImage);
+        input.addEventListener('change', applyImage);
+        input.addEventListener('blur', applyImage);
+        applyImage();
+      });
+    }
+
+    function renderAdvisors(list) {
+      if (!advisorGrid) return;
+      advisorGrid.innerHTML = '';
+
+      list.forEach((advisor, idx) => {
+        const card = document.createElement('div');
+        card.className = 'advisor-card';
+
+        const header = document.createElement('div');
+        header.className = 'advisor-header';
+
+        const avatar = document.createElement('div');
+        const avatarId = `avatar-${advisor.key || idx}`;
+        avatar.id = avatarId;
+        avatar.className = 'avatar';
+        header.appendChild(avatar);
+
+        const avatarWrap = document.createElement('div');
+        avatarWrap.className = 'avatar-input-wrap';
+        const avatarLabel = document.createElement('span');
+        avatarLabel.className = 'avatar-label';
+        avatarLabel.textContent = 'Profilbild-URL';
+        const avatarInput = document.createElement('input');
+        avatarInput.className = 'avatar-input';
+        avatarInput.type = 'url';
+        avatarInput.dataset.target = avatarId;
+        avatarInput.dataset.defaultUrl = advisor.avatarUrl || '';
+        avatarInput.placeholder = 'https://...';
+        avatarWrap.appendChild(avatarLabel);
+        avatarWrap.appendChild(avatarInput);
+
+        const meta = document.createElement('div');
+        meta.className = 'advisor-meta';
+        const nameEl = document.createElement('h4');
+        nameEl.textContent = advisor.name;
+        attachEditable(nameEl, `advisor-${advisor.key}-name`, (value) => {
+          advisorData[idx].name = value;
+        });
+        const roleEl = document.createElement('span');
+        roleEl.className = 'role';
+        roleEl.textContent = advisor.role;
+        attachEditable(roleEl, `advisor-${advisor.key}-role`, (value) => {
+          advisorData[idx].role = value;
+        });
+        const descEl = document.createElement('p');
+        descEl.textContent = advisor.description;
+        attachEditable(descEl, `advisor-${advisor.key}-desc`, (value) => {
+          advisorData[idx].description = value;
+        });
+        meta.appendChild(nameEl);
+        meta.appendChild(roleEl);
+        meta.appendChild(descEl);
+
+        header.appendChild(avatarWrap);
+        header.appendChild(meta);
+
+        const qual = document.createElement('div');
+        qual.className = 'advisor-qualifications';
+        const eduTitle = document.createElement('h5');
+        eduTitle.textContent = 'EDUCATION AND PROFESSIONAL TRAINING';
+        attachEditable(eduTitle, `advisor-${advisor.key}-edu-title`);
+        const eduList = document.createElement('ul');
+        (advisor.educationText || '')
+          .split(';')
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .forEach((text, eduIdx) => {
+            const li = document.createElement('li');
+            li.textContent = text;
+            attachEditable(li, `advisor-${advisor.key}-edu-${eduIdx}`, (value) => {
+              const parts = advisorData[idx].educationText
+                ? advisorData[idx].educationText.split(';').map((s) => s.trim()).filter(Boolean)
+                : [];
+              parts[eduIdx] = value;
+              advisorData[idx].educationText = parts.join('; ');
+            });
+            eduList.appendChild(li);
+          });
+        qual.appendChild(eduTitle);
+        qual.appendChild(eduList);
+
+        const codeTitle = document.createElement('h5');
+        codeTitle.textContent = 'Code of conduct training';
+        attachEditable(codeTitle, `advisor-${advisor.key}-code-title`);
+        const codeList = document.createElement('ul');
+        (advisor.codeOfConductText || '')
+          .split(';')
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .forEach((text, codeIdx) => {
+            const li = document.createElement('li');
+            li.textContent = text;
+            attachEditable(li, `advisor-${advisor.key}-code-${codeIdx}`, (value) => {
+              const parts = advisorData[idx].codeOfConductText
+                ? advisorData[idx].codeOfConductText.split(';').map((s) => s.trim()).filter(Boolean)
+                : [];
+              parts[codeIdx] = value;
+              advisorData[idx].codeOfConductText = parts.join('; ');
+            });
+            codeList.appendChild(li);
+          });
+        qual.appendChild(codeTitle);
+        qual.appendChild(codeList);
+
+        const actions = document.createElement('div');
+        actions.className = 'advisor-actions';
+        const link = document.createElement('a');
+        link.href = advisor.terminLink || '#';
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        link.textContent = 'Termin buchen';
+        const note = document.createElement('span');
+        note.className = 'note';
+        note.textContent = advisor.terminHinweis || advisor.terminLink || '';
+        attachEditable(note, `advisor-${advisor.key}-note`, (value) => {
+          advisorData[idx].terminHinweis = value;
+        });
+        actions.appendChild(link);
+        actions.appendChild(note);
+
+        card.appendChild(header);
+        card.appendChild(qual);
+        card.appendChild(actions);
+
+        advisorGrid.appendChild(card);
+      });
+
+      avatarInputs = advisorGrid.querySelectorAll('.avatar-input');
+      bindAvatarInputs();
+      refreshEditableState();
+    }
+
     function bindDetailsToggles() {
       document.querySelectorAll('.toggle-details').forEach((link) => {
         if (link.dataset.bound === 'true') return;
@@ -2101,30 +2370,6 @@
       }
     }
 
-    avatarInputs.forEach((input) => {
-      const target = document.getElementById(input.dataset.target);
-      if (savedAvatars[input.dataset.target]) {
-        input.value = savedAvatars[input.dataset.target];
-      }
-      const applyImage = () => {
-        if (!target) return;
-        const url = input.value.trim();
-        if (url) {
-          target.style.backgroundImage = `url('${url}')`;
-          target.classList.add('has-image');
-          savedAvatars[input.dataset.target] = url;
-        } else {
-          target.style.backgroundImage = '';
-          target.classList.remove('has-image');
-          delete savedAvatars[input.dataset.target];
-        }
-        persistJson(STORAGE_KEYS.avatars, savedAvatars);
-      };
-      input.addEventListener('change', applyImage);
-      input.addEventListener('blur', applyImage);
-      applyImage();
-    });
-
     function openModal() {
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden', 'false');
@@ -2200,6 +2445,7 @@
         renderVorsorgeCards(vorsorgeData);
         renderPortfolios('factor');
         renderAblauf('konservativ');
+        renderAdvisors(advisorData);
         refreshEditableState();
       });
   </script>
