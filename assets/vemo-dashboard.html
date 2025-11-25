@@ -479,7 +479,7 @@
     .funds-wrapper {
       margin-top: 14px;
       display: grid;
-      gap: 18px;
+      gap: 20px;
     }
 
     .allocation-row {
@@ -600,22 +600,23 @@
     }
 
     .portfolio-item {
-      padding: 12px 14px;
-      border-radius: 12px;
+      padding: 14px;
+      border-radius: 14px;
       transition: transform 0.15s ease, box-shadow 0.2s ease;
-      color: #ffffff;
+      color: #0f1a2a;
       position: relative;
       overflow: hidden;
-      border: 1px solid transparent;
+      border: 1px solid rgba(17, 24, 39, 0.08);
       box-shadow: 0 12px 22px rgba(32, 42, 68, 0.08);
       margin: 6px 0;
+      backdrop-filter: blur(6px);
     }
 
     .portfolio-item::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.12));
       pointer-events: none;
     }
 
@@ -627,26 +628,26 @@
       margin: 0 0 6px;
       font-size: 14px;
       font-weight: 700;
-      color: #ffffff;
+      color: #0f1a2a;
     }
 
     .portfolio-item p {
       margin: 0;
-      color: #f7fbff;
+      color: #3b4256;
       font-size: 13px;
     }
 
     .portfolio-item .meta span {
-      background: rgba(255, 255, 255, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.32);
-      color: #ffffff;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(17, 24, 39, 0.1);
+      color: #0f1a2a;
     }
 
     .portfolio-item .allocation-row,
     .portfolio-item strong,
     .portfolio-item .allocation-value,
     .portfolio-item .section-sub {
-      color: #ffffff;
+      color: #0f1a2a;
     }
 
     .fund-toggle {
@@ -655,15 +656,15 @@
       gap: 6px;
       padding: 8px 12px;
       border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      background: rgba(17, 24, 39, 0.04);
+      color: #0f1a2a;
       font-weight: 700;
       cursor: pointer;
     }
 
     .fund-toggle:hover {
-      background: rgba(255, 255, 255, 0.16);
+      background: rgba(17, 24, 39, 0.08);
     }
 
     .fund-details {
@@ -695,8 +696,8 @@
       overflow: auto;
       padding: 14px;
       border-radius: 18px;
-      background: linear-gradient(135deg, #fdfdff 0%, #f4f6fb 100%);
-      box-shadow: 0 14px 32px rgba(36, 48, 77, 0.08);
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(36, 48, 77, 0.06);
       border: 1px solid #e6e9f2;
       -webkit-overflow-scrolling: touch;
       max-height: 500px;
@@ -708,8 +709,9 @@
       border-spacing: 0;
       overflow: hidden;
       border-radius: 14px;
-      box-shadow: 0 10px 24px rgba(32, 42, 68, 0.05);
+      box-shadow: 0 6px 16px rgba(32, 42, 68, 0.05);
       background: #ffffff;
+      border: 1px solid #e5e8f0;
     }
 
     th,
@@ -722,17 +724,14 @@
     }
 
     th {
-      background: linear-gradient(180deg, #f3f5fb 0%, #eef1f7 100%);
+      background: #f5f7fb;
       font-weight: 700;
       color: #1f2a44;
+      border-bottom: 1px solid #e8ecf4;
     }
 
-    tr:nth-child(even) td {
+    tr td {
       background: #ffffff;
-    }
-
-    tr:nth-child(odd) td {
-      background: #f9faff;
     }
 
     tbody tr:last-child td {
@@ -749,19 +748,12 @@
     .progress-cell {
       position: relative;
       overflow: hidden;
-      border-left: 1px solid #edf1fb;
-      background: linear-gradient(135deg, rgba(140, 160, 255, 0.08), rgba(189, 207, 255, 0.06));
+      border-left: 1px solid #eef1f7;
+      background: #ffffff;
     }
 
     .progress-cell::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(140, 160, 255, 0.28), rgba(140, 160, 255, 0.08));
-      transform: scaleX(var(--fill, 0));
-      transform-origin: left;
-      transition: transform 0.3s ease;
-      pointer-events: none;
+      content: none;
     }
 
     .progress-cell span {
@@ -2156,7 +2148,7 @@
       const legend = document.createElement('div');
       legend.className = 'chart-legend';
 
-      const colors = ['#15b2ff', '#2cd67e', '#ff9f1c', '#a05bff', '#2ac5d8', '#ff5f7a'];
+      const colors = ['#15b2ff', '#7ed957', '#ffb347', '#9b8cf5', '#2ac5d8', '#ff6b81'];
       const allocations = portfolioData[type].map((item, index) => ({
         label: item.title,
         value: item.allocation,
@@ -2203,9 +2195,10 @@
 
         const colorEntry = allocations.find((entry) => entry.index === index);
         const tintColor = colorEntry ? colorEntry.color : '#eef2f8';
-        fund.style.background = `linear-gradient(135deg, ${hexToRgba(tintColor, 0.88)}, ${hexToRgba(tintColor, 0.72)})`;
-        fund.style.border = `1px solid ${hexToRgba(tintColor, 0.36)}`;
-        fund.style.boxShadow = `0 10px 20px ${hexToRgba(tintColor, 0.18)}`;
+        fund.style.background = `linear-gradient(145deg, ${hexToRgba(tintColor, 0.24)}, ${hexToRgba(tintColor, 0.12)}), rgba(255, 255, 255, 0.9)`;
+        fund.style.border = `1px solid ${hexToRgba(tintColor, 0.32)}`;
+        fund.style.boxShadow = `0 12px 24px ${hexToRgba(tintColor, 0.18)}`;
+        fund.style.color = '#0f1a2a';
 
         const title = document.createElement('h4');
         title.textContent = item.title;
