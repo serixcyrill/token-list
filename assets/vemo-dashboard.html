@@ -598,10 +598,13 @@
     }
 
     .portfolio-item {
-      background: #f8fafc;
-      border: 1px solid #edf0f5;
       padding: 12px;
       border-radius: 12px;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .portfolio-item:hover {
+      transform: translateY(-2px);
     }
 
     .portfolio-item h4 {
@@ -635,14 +638,24 @@
       gap: 4px;
     }
 
+    .table-wrap {
+      overflow-x: auto;
+      padding: 10px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #f7fbf9, #ffffff);
+      box-shadow: 0 14px 32px rgba(40, 47, 71, 0.08);
+      backdrop-filter: blur(4px);
+      -webkit-overflow-scrolling: touch;
+    }
+
     table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       overflow: hidden;
       border-radius: 12px;
-      box-shadow: inset 0 0 0 1px #edf0f5;
-      background: #f8fafc;
+      box-shadow: inset 0 0 0 1px #edf0f5, 0 10px 20px rgba(40, 47, 71, 0.05);
+      background: linear-gradient(180deg, #fdfefe 0%, #f7fbf9 100%);
     }
 
     th,
@@ -651,6 +664,7 @@
       text-align: center;
       font-size: 13px;
       color: var(--text);
+      border-bottom: 1px solid #e6ebf3;
     }
 
     th {
@@ -659,22 +673,29 @@
     }
 
     tr:nth-child(even) td {
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.9);
     }
 
     tr:nth-child(odd) td {
-      background: #fdfefe;
+      background: rgba(247, 251, 249, 0.95);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
     }
 
     td:first-child {
       text-align: left;
       font-weight: 600;
+      color: #0f1a2a;
+      letter-spacing: 0.1px;
     }
 
     .progress-cell {
       position: relative;
       overflow: hidden;
       border-left: 1px solid #eef1f7;
+      background: linear-gradient(135deg, rgba(114, 210, 122, 0.05), rgba(91, 142, 255, 0.04));
     }
 
     .progress-cell::before {
@@ -912,8 +933,8 @@
     <main>
       <section class="card" id="vorsorge">
         <div class="section-heading">
-          <h2 data-editable="true">Vorsorge Mantel</h2>
-          <p class="section-sub" data-editable="true">Ihre passenden Vorsorgeoptionen auf einen Blick.</p>
+          <h2 data-editable="true">Vorsorgemantel</h2>
+          <p class="section-sub" data-editable="true">Deine passenden Vorsorgeoptionen auf einen Blick.</p>
           <span class="section-meta" id="lastUpdateTrigger" data-editable="true">Letztes Update: 12.09.2024</span>
         </div>
         <div class="vorsorge-grid" id="vorsorgeGrid">
@@ -924,7 +945,7 @@
       <section class="card" id="portfolios">
         <div class="section-heading">
           <h2 data-editable="true">Portfolios</h2>
-          <p class="section-sub" data-editable="true">Wählen Sie einen Portfolio-Typ, um Details zu sehen.</p>
+          <p class="section-sub" data-editable="true">Wähle einen Portfolio-Typ, um Details zu sehen.</p>
         </div>
         <div class="tab-buttons">
           <button type="button" class="active" data-portfolio-tab="factor">Factor</button>
@@ -974,7 +995,7 @@
       <section class="card" id="advisorSection">
         <div class="section-heading">
           <h2 data-editable="true">Telefontermin mit Honorarberater:in</h2>
-          <p class="section-sub" data-editable="true">In der Beschreibung sind Fragen zu deiner 3-Jahr- bzw. Altersvorsorge gratis verfügbar. Buche einen kurzen Telefontermin, um mit einem Honorarberater zu sprechen.</p>
+          <p class="section-sub" data-editable="true">Buche einen Termin mit deinem Honorarberater, wenn du Fragen zu deiner Altersvorsorge hast oder Unterstützung brauchst. Bitte wähle den Berater, mit dem du den Anlageberatungsvertrag abgeschlossen hast.</p>
           <span class="section-meta" data-editable="true">Direkt buchbar</span>
         </div>
         <div class="advisor-grid">
@@ -1488,6 +1509,7 @@
     let advisorData = deepClone(defaultAdvisors);
     let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
     let updatesData = deepClone(defaultUpdatesData);
+    let vorsorgeLastUpdate = '';
 
     function buildCsvUrl(gid) {
       const params = new URLSearchParams({
@@ -1534,6 +1556,15 @@
       return rows.map((cols) => cols.map((cell) => cell.trim()));
     }
 
+    function hexToRgba(hex, alpha = 0.12) {
+      const normalized = hex.replace('#', '');
+      const bigint = parseInt(normalized, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
     async function fetchSheetCsv(gid) {
       const url = buildCsvUrl(gid);
       const res = await fetch(url, { cache: 'no-store' });
@@ -1562,9 +1593,18 @@
           nachteile: [],
         }));
 
+        let updateCandidate = '';
+
         rows.forEach((row) => {
           const [field, ...values] = row;
-          const key = (field || '').toLowerCase();
+          const keyRaw = (field || '').trim();
+          const key = keyRaw.toLowerCase();
+
+          if (key.includes('letztes') && key.includes('update')) {
+            updateCandidate = values[0] || updateCandidate;
+            return;
+          }
+
           values.forEach((value, idx) => {
             const card = cards[idx];
             if (!card || !value) return;
@@ -1599,6 +1639,14 @@
             }
           });
         });
+
+        if (!updateCandidate && rows[17] && rows[17][1]) {
+          updateCandidate = rows[17][1];
+        }
+
+        if (updateCandidate) {
+          vorsorgeLastUpdate = updateCandidate;
+        }
 
         const filtered = cards.filter((card) => card.title);
         if (filtered.length) {
@@ -1843,13 +1891,15 @@
       if (infoNotice) {
         infoNotice.textContent = updatesData.infoNotice;
       }
-      if (infoTimeText) {
-        const normalized = updatesData.infoTimestamp.replace(/^🕒\s*/, '').trim();
-        infoTimeText.textContent = normalized;
-        if (updateTrigger) {
-          const lastUpdate = normalized.replace(/^Stand:\s*/i, '').trim();
-          updateTrigger.textContent = `Letztes Update: ${lastUpdate}`;
-        }
+      const chosenTimestamp = (vorsorgeLastUpdate || updatesData.infoTimestamp || '').replace(/^🕒\s*/, '').trim();
+
+      if (infoTimeText && chosenTimestamp) {
+        infoTimeText.textContent = chosenTimestamp;
+      }
+
+      if (updateTrigger && chosenTimestamp) {
+        const lastUpdate = chosenTimestamp.replace(/^Stand:\s*/i, '').trim();
+        updateTrigger.textContent = `Letztes Update: ${lastUpdate}`;
       }
     }
 
@@ -2051,7 +2101,7 @@
       const legend = document.createElement('div');
       legend.className = 'chart-legend';
 
-      const colors = ['#5ac8fa', '#7ed957', '#ffb347', '#a78bfa', '#4ad66d', '#ff6b6b'];
+      const colors = ['#7fcfa6', '#9cc5f4', '#f7c89c', '#cab8f9', '#7bd3e2', '#f5a8c3'];
       const allocations = portfolioData[type].map((item, index) => ({
         label: item.title,
         value: item.allocation,
@@ -2095,6 +2145,12 @@
       portfolioData[type].forEach((item, index) => {
         const fund = document.createElement('div');
         fund.className = 'portfolio-item';
+
+        const colorEntry = allocations.find((entry) => entry.index === index);
+        const tintColor = colorEntry ? colorEntry.color : '#eef2f8';
+        fund.style.background = `linear-gradient(145deg, ${hexToRgba(tintColor, 0.14)}, ${hexToRgba(tintColor, 0.28)})`;
+        fund.style.border = `1px solid ${hexToRgba(tintColor, 0.35)}`;
+        fund.style.boxShadow = `0 12px 28px ${hexToRgba(tintColor, 0.18)}`;
 
         const title = document.createElement('h4');
         title.textContent = item.title;
