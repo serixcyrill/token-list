@@ -27,9 +27,11 @@
     body {
       margin: 0;
       font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
-      background: radial-gradient(circle at 20% 20%, rgba(114, 210, 122, 0.16), transparent 32%),
-        radial-gradient(circle at 85% 10%, rgba(91, 142, 255, 0.14), transparent 34%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 251, 0.92));
+      /* Vemo Background Shimmer */
+      background:
+        radial-gradient(circle at 15% 20%, rgba(118, 208, 98, 0.12), transparent 32%),
+        radial-gradient(circle at 85% 10%, rgba(125, 211, 252, 0.14), transparent 28%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
       color: var(--text);
     }
 
@@ -598,11 +600,23 @@
     }
 
     .portfolio-item {
-      padding: 14px 16px;
-      border-radius: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
       transition: transform 0.15s ease, box-shadow 0.2s ease;
       color: #ffffff;
-      backdrop-filter: blur(6px);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid transparent;
+      box-shadow: 0 12px 22px rgba(32, 42, 68, 0.08);
+      margin: 6px 0;
+    }
+
+    .portfolio-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+      pointer-events: none;
     }
 
     .portfolio-item:hover {
@@ -622,29 +636,9 @@
       font-size: 13px;
     }
 
-    .portfolio-item .sublist {
-      margin-top: 8px;
-    }
-
-    .portfolio-item .sublist h5 {
-      margin: 0 0 6px 0;
-      font-size: 13px;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .portfolio-item .sublist ul {
-      margin: 0;
-      padding-left: 18px;
-      color: #f7fbff;
-      font-size: 12.5px;
-      display: grid;
-      gap: 4px;
-    }
-
     .portfolio-item .meta span {
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.32);
       color: #ffffff;
     }
 
@@ -655,16 +649,57 @@
       color: #ffffff;
     }
 
+    .fund-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .fund-toggle:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .fund-details {
+      margin-top: 10px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid rgba(28, 35, 58, 0.08);
+      padding: 12px 14px;
+      box-shadow: 0 8px 18px rgba(33, 41, 68, 0.06);
+      color: #1f2a44;
+    }
+
+    .fund-details .sublist {
+      margin-top: 6px;
+    }
+
+    .fund-details .sublist h5 {
+      color: #1f2a44;
+    }
+
+    .fund-details .sublist ul {
+      color: #4a5568;
+      padding-left: 18px;
+      display: grid;
+      gap: 4px;
+    }
+
     .table-wrap {
       overflow: auto;
-      padding: 12px;
-      border-radius: 16px;
-      background: #ffffff;
-      box-shadow: 0 12px 26px rgba(40, 47, 71, 0.06);
-      border: 1px solid #e7ebf3;
-      backdrop-filter: blur(6px);
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #fdfdff 0%, #f4f6fb 100%);
+      box-shadow: 0 14px 32px rgba(36, 48, 77, 0.08);
+      border: 1px solid #e6e9f2;
       -webkit-overflow-scrolling: touch;
-      max-height: 480px;
+      max-height: 500px;
     }
 
     table {
@@ -672,22 +707,22 @@
       border-collapse: separate;
       border-spacing: 0;
       overflow: hidden;
-      border-radius: 12px;
-      box-shadow: inset 0 0 0 1px #edf0f5, 0 8px 18px rgba(40, 47, 71, 0.04);
-      background: linear-gradient(180deg, #ffffff 0%, #f6f8ff 100%);
+      border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(32, 42, 68, 0.05);
+      background: #ffffff;
     }
 
     th,
     td {
-      padding: 12px 14px;
+      padding: 13px 14px;
       text-align: center;
       font-size: 13px;
-      color: var(--text);
-      border-bottom: 1px solid #e6ebf3;
+      color: #1f2a44;
+      border-bottom: 1px solid #eef1f7;
     }
 
     th {
-      background: #f1f4fb;
+      background: linear-gradient(180deg, #f3f5fb 0%, #eef1f7 100%);
       font-weight: 700;
       color: #1f2a44;
     }
@@ -706,7 +741,7 @@
 
     td:first-child {
       text-align: left;
-      font-weight: 600;
+      font-weight: 700;
       color: #1f2a44;
       letter-spacing: 0.1px;
     }
@@ -714,15 +749,15 @@
     .progress-cell {
       position: relative;
       overflow: hidden;
-      border-left: 1px solid #eceff7;
-      background: linear-gradient(135deg, rgba(130, 144, 255, 0.06), rgba(207, 216, 255, 0.05));
+      border-left: 1px solid #edf1fb;
+      background: linear-gradient(135deg, rgba(140, 160, 255, 0.08), rgba(189, 207, 255, 0.06));
     }
 
     .progress-cell::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, rgba(123, 143, 255, 0.22), rgba(123, 143, 255, 0.06));
+      background: linear-gradient(90deg, rgba(140, 160, 255, 0.28), rgba(140, 160, 255, 0.08));
       transform: scaleX(var(--fill, 0));
       transform-origin: left;
       transition: transform 0.3s ease;
@@ -2121,7 +2156,7 @@
       const legend = document.createElement('div');
       legend.className = 'chart-legend';
 
-      const colors = ['#3db2ff', '#34c759', '#ff9f0a', '#a55eea', '#20c997', '#ff6b81'];
+      const colors = ['#15b2ff', '#2cd67e', '#ff9f1c', '#a05bff', '#2ac5d8', '#ff5f7a'];
       const allocations = portfolioData[type].map((item, index) => ({
         label: item.title,
         value: item.allocation,
@@ -2168,9 +2203,9 @@
 
         const colorEntry = allocations.find((entry) => entry.index === index);
         const tintColor = colorEntry ? colorEntry.color : '#eef2f8';
-        fund.style.background = `linear-gradient(135deg, ${hexToRgba(tintColor, 0.82)}, ${hexToRgba(tintColor, 0.68)})`;
-        fund.style.border = `1px solid ${hexToRgba(tintColor, 0.28)}`;
-        fund.style.boxShadow = `0 8px 18px ${hexToRgba(tintColor, 0.16)}`;
+        fund.style.background = `linear-gradient(135deg, ${hexToRgba(tintColor, 0.88)}, ${hexToRgba(tintColor, 0.72)})`;
+        fund.style.border = `1px solid ${hexToRgba(tintColor, 0.36)}`;
+        fund.style.boxShadow = `0 10px 20px ${hexToRgba(tintColor, 0.18)}`;
 
         const title = document.createElement('h4');
         title.textContent = item.title;
@@ -2253,6 +2288,24 @@
         cons.appendChild(consTitle);
         cons.appendChild(consList);
 
+        const detailsWrapper = document.createElement('div');
+        detailsWrapper.className = 'fund-details';
+        detailsWrapper.style.display = 'none';
+        detailsWrapper.appendChild(pros);
+        detailsWrapper.appendChild(cons);
+
+        const toggleDetails = document.createElement('button');
+        toggleDetails.type = 'button';
+        toggleDetails.className = 'fund-toggle';
+        toggleDetails.setAttribute('aria-expanded', 'false');
+        toggleDetails.textContent = 'Details anzeigen';
+        toggleDetails.addEventListener('click', () => {
+          const open = detailsWrapper.style.display === 'block';
+          detailsWrapper.style.display = open ? 'none' : 'block';
+          toggleDetails.setAttribute('aria-expanded', String(!open));
+          toggleDetails.textContent = open ? 'Details anzeigen' : 'Details ausblenden';
+        });
+
         const actions = document.createElement('div');
         actions.style.display = 'flex';
         actions.style.justifyContent = 'space-between';
@@ -2272,8 +2325,8 @@
         fund.appendChild(returns);
         fund.appendChild(since);
         fund.appendChild(allocationRow);
-        fund.appendChild(pros);
-        fund.appendChild(cons);
+        fund.appendChild(toggleDetails);
+        fund.appendChild(detailsWrapper);
         fund.appendChild(actions);
         fundsWrapper.appendChild(fund);
       });
