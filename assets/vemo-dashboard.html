@@ -692,78 +692,102 @@
       gap: 4px;
     }
 
-    .table-wrap {
-      overflow: auto;
-      padding: 14px;
-      border-radius: 20px;
-      background: linear-gradient(145deg, #ffffff, #f6f8fb);
-      box-shadow: 0 12px 28px rgba(17, 24, 39, 0.06);
-      border: 1px solid #e6e9f2;
-      -webkit-overflow-scrolling: touch;
-      max-height: 500px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      overflow: hidden;
+    .ablauf-shell {
+      margin-top: 6px;
+      background: linear-gradient(145deg, #f9fbff, #f4f6fb);
+      border: 1px solid #e6eaf3;
       border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(17, 24, 39, 0.05);
-      background: #ffffff;
-      border: 1px solid #e7ebf3;
+      box-shadow: 0 20px 48px rgba(28, 42, 76, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      padding: 14px;
     }
 
-    th,
-    td {
-      padding: 14px 16px;
+    .ablauf-scroll {
+      overflow-x: auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .ablauf-head-row,
+    .ablauf-row {
+      display: grid;
+      align-items: stretch;
+      gap: 8px;
+      min-width: 720px;
+    }
+
+    .ablauf-head-row {
+      background: linear-gradient(180deg, #f7f9fd, #f0f4fb);
+      border: 1px solid #e5e9f3;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      color: #102341;
+      font-weight: 700;
+      font-size: 12.5px;
+      letter-spacing: 0.2px;
+    }
+
+    .ablauf-body {
+      display: grid;
+      gap: 10px;
+    }
+
+    .ablauf-row {
+      background: #ffffff;
+      border: 1px solid #e8ecf4;
+      border-radius: 12px;
+      box-shadow: 0 16px 40px rgba(17, 38, 62, 0.06);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .ablauf-row:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 46px rgba(17, 38, 62, 0.08);
+    }
+
+    .ablauf-cell {
+      padding: 12px 14px;
       text-align: center;
       font-size: 13px;
-      color: #1d2432;
-      border-bottom: 1px solid #eef1f6;
+      color: #1e2a3c;
     }
 
-    th {
-      background: linear-gradient(180deg, #f7f9fc, #f2f4f8);
-      font-weight: 700;
-      color: #131a27;
-      border-bottom: 1px solid #e8ebf3;
-      letter-spacing: 0.1px;
-    }
-
-    tr td {
-      background: #ffffff;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    tbody tr:hover td {
-      background: #f9fbff;
-    }
-
-    td:first-child {
+    .ablauf-label {
       text-align: left;
       font-weight: 700;
-      color: #101827;
-      letter-spacing: 0.08px;
+      color: #0f213c;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .progress-cell {
-      position: relative;
-      overflow: hidden;
-      border-left: 1px solid #eef1f6;
-      background: transparent;
+    .ablauf-label::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8bcdf4, #b4e6c1);
+      box-shadow: 0 4px 10px rgba(140, 200, 230, 0.4);
+      flex-shrink: 0;
     }
 
-    .progress-cell::before {
-      content: none;
-    }
-
-    .progress-cell span {
-      position: relative;
+    .ablauf-value span {
+      display: block;
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid #e8ecf5;
+      border-radius: 10px;
+      padding: 8px 10px;
       font-variant-numeric: tabular-nums;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .ablauf-cell[data-editable="true"] {
+      cursor: text;
+    }
+
+    .ablauf-cell:focus-within span {
+      outline: 2px solid rgba(126, 217, 87, 0.25);
+      outline-offset: 2px;
     }
 
     footer {
@@ -1023,25 +1047,11 @@
           <button type="button" data-risk="mittel">Mittel</button>
           <button type="button" data-risk="aggressiv">Aggressiv</button>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Assetklasse</th>
-                <th>Jahr 1</th>
-                <th>Jahr 2</th>
-                <th>Jahr 3</th>
-                <th>Jahr 4</th>
-                <th>Jahr 5</th>
-                <th>Jahr 6</th>
-                <th>Jahr 7</th>
-                <th>Jahr 8</th>
-                <th>Jahr 9</th>
-                <th>Jahr 10</th>
-              </tr>
-            </thead>
-            <tbody id="ablaufBody"></tbody>
-          </table>
+        <div class="ablauf-shell">
+          <div class="ablauf-scroll">
+            <div class="ablauf-head-row" id="ablaufHead"></div>
+            <div class="ablauf-body" id="ablaufBody"></div>
+          </div>
         </div>
       </section>
       <section class="card" id="advisorSection">
@@ -2344,34 +2354,58 @@
 
     function renderAblauf(risk) {
       const body = document.getElementById('ablaufBody');
+      const head = document.getElementById('ablaufHead');
+      if (!body || !head) return;
+
       body.innerHTML = '';
-      ablaufData[risk].forEach((row, rowIndex) => {
-        const tr = document.createElement('tr');
-        row.forEach((cell, idx) => {
-          const td = document.createElement('td');
-          if (idx === 0) {
-            td.textContent = cell;
-            td.style.fontWeight = '600';
-            attachEditable(td, `ablauf-${risk}-${rowIndex}-label`, (value) => {
-              ablaufData[risk][rowIndex][0] = value;
-              persistAblaufData();
-            });
-          } else {
-            td.classList.add('progress-cell');
-            const span = document.createElement('span');
-            span.textContent = cell;
-            attachEditable(span, `ablauf-${risk}-${rowIndex}-${idx}`, (value) => {
-              ablaufData[risk][rowIndex][idx] = value;
-              persistAblaufData();
-            });
-            const numeric = parseInt(cell, 10);
-            td.style.setProperty('--fill', Math.max(0, Math.min(100, numeric)) / 100);
-            td.appendChild(span);
-          }
-          tr.appendChild(td);
+      head.innerHTML = '';
+
+      const rows = ablaufData[risk] || [];
+      const yearCount = Math.max(10, ...rows.map((row) => Math.max(0, row.length - 1)));
+      const gridTemplate = `160px repeat(${yearCount}, minmax(72px, 1fr))`;
+
+      head.style.gridTemplateColumns = gridTemplate;
+      const labelHead = document.createElement('div');
+      labelHead.className = 'ablauf-cell ablauf-label';
+      labelHead.textContent = 'Assetklasse';
+      head.appendChild(labelHead);
+      for (let i = 1; i <= yearCount; i++) {
+        const yearCell = document.createElement('div');
+        yearCell.className = 'ablauf-cell';
+        yearCell.textContent = `Jahr ${i}`;
+        head.appendChild(yearCell);
+      }
+
+      rows.forEach((row, rowIndex) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'ablauf-row';
+        rowEl.style.gridTemplateColumns = gridTemplate;
+
+        const label = document.createElement('div');
+        label.className = 'ablauf-cell ablauf-label';
+        label.textContent = row[0] || '';
+        attachEditable(label, `ablauf-${risk}-${rowIndex}-label`, (value) => {
+          ablaufData[risk][rowIndex][0] = value;
+          persistAblaufData();
         });
-        body.appendChild(tr);
+        rowEl.appendChild(label);
+
+        for (let i = 1; i <= yearCount; i++) {
+          const valueCell = document.createElement('div');
+          valueCell.className = 'ablauf-cell ablauf-value';
+          const span = document.createElement('span');
+          span.textContent = row[i] || '';
+          attachEditable(span, `ablauf-${risk}-${rowIndex}-${i}`, (value) => {
+            ablaufData[risk][rowIndex][i] = value;
+            persistAblaufData();
+          });
+          valueCell.appendChild(span);
+          rowEl.appendChild(valueCell);
+        }
+
+        body.appendChild(rowEl);
       });
+
       refreshEditableState();
     }
 
