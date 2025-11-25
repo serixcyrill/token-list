@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vemo Übersicht (Preview)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: #f4f7fb;
+      --card-bg: #ffffff;
+      --text: #282f47;
+      --accent: #72d27a;
+      --accent-strong: #7ed957;
+      --accent-hover: #6ac66e;
+      --muted: #6b7080;
+      --shadow: 0 10px 30px rgba(40, 47, 71, 0.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(118, 208, 98, 0.12), transparent 32%),
+        radial-gradient(circle at 85% 10%, rgba(125, 211, 252, 0.14), transparent 28%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--text);
+    }
+
+    .page { min-height: 100vh; display: flex; flex-direction: column; }
+
+    main {
+      flex: 1;
+      width: min(1200px, 92vw);
+      margin: 28px auto 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .section-heading h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.2px; }
+    .section-sub { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .section-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #eef6ef;
+      border-radius: 999px;
+      color: #1c3a2c;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
+    }
+
+    .vorsorge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+
+    .vorsorge-card {
+      position: relative;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e6e8ef;
+      transition: border 0.2s ease, transform 0.2s ease;
+      background: #ffffff;
+    }
+
+    .vorsorge-card:hover { transform: translateY(-2px); border-color: rgba(114, 210, 122, 0.6); }
+    .vorsorge-card.rank-1 { border: 2px solid var(--accent); box-shadow: 0 8px 22px rgba(114, 210, 122, 0.18); }
+    .vorsorge-card h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; }
+    .vorsorge-card p { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+
+    .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 12px; font-size: 13px; color: var(--text); align-items: start; }
+    .meta span { background: #f7f9fb; padding: 8px 10px; border-radius: 10px; border: 1px solid #edf0f5; display: flex; align-items: center; gap: 6px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(114, 210, 122, 0.15);
+      color: #1c3a2c;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      margin-bottom: 8px;
+    }
+
+    .toggle-details { display: inline-flex; align-items: center; gap: 8px; color: #ffffff; background: var(--accent-strong); text-decoration: none; font-weight: 600; font-size: 13px; padding: 10px 14px; border-radius: 10px; box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28); }
+    .toggle-details:hover { background: var(--accent-hover); }
+
+    .details { margin-top: 12px; background: #f7fbf9; border: 1px solid #e3e9f2; border-radius: 12px; padding: 12px 14px; display: none; box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.1); }
+    .details h4 { margin: 0 0 8px; font-size: 14px; font-weight: 700; }
+    .details ul { padding-left: 18px; margin: 0 0 8px; color: var(--muted); font-size: 13px; display: grid; gap: 4px; }
+
+    .tab-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .tab-buttons button { border: 1px solid #dfe3ec; background: #f8fafc; color: var(--text); padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: border 0.2s ease, background 0.2s ease, color 0.2s ease; }
+    .tab-buttons button.active { background: var(--accent-strong); border-color: var(--accent); color: #ffffff; box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28); }
+
+    .portfolio-list { display: grid; gap: 10px; }
+    .portfolio-shell { background: #f8fafc; border: 1px solid #edf0f5; padding: 14px; border-radius: 14px; box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.08); }
+    .portfolio-toggle { width: 100%; background: transparent; border: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; font-weight: 700; color: var(--text); padding: 4px 0 6px; }
+    .portfolio-shell.open { border-color: rgba(114, 210, 122, 0.6); box-shadow: 0 10px 26px rgba(114, 210, 122, 0.12); }
+    .portfolio-shell .chevron { transition: transform 0.2s ease; }
+    .portfolio-shell.open .chevron { transform: rotate(90deg); }
+
+    .portfolio-summary { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; align-items: stretch; margin-top: 10px; padding: 12px; background: #ffffff; border: 1px solid #e3e9f2; border-radius: 12px; }
+    .portfolio-info { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+    .portfolio-info p { margin: 0; color: var(--muted); font-size: 13px; }
+    .portfolio-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .portfolio-meta .chip { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 8px 14px; background: #eef6ef; border-radius: 999px; font-weight: 600; font-size: 12px; color: #1c3a2c; box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35); }
+
+    .chart-wrap { position: relative; display: grid; grid-template-columns: 190px 1fr; gap: 14px; align-items: center; }
+    .chart-visual { position: relative; width: 170px; height: 170px; display: grid; place-items: center; }
+    .chart-visual canvas { width: 170px; height: 170px; }
+    .chart-legend { display: grid; gap: 6px; font-size: 12.5px; color: #1c2436; }
+    .legend-item { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .chart-center-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 108px; height: 108px; display: flex; align-items: center; justify-content: center; flex-direction: column; font-weight: 700; color: #0f1a2a; font-size: 13px; pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(244, 247, 251, 0.96), rgba(255, 255, 255, 0.95)); border-radius: 50%; box-shadow: 0 12px 26px rgba(21, 49, 58, 0.08), inset 0 0 0 1px rgba(114, 210, 122, 0.2); }
+
+    .funds-wrapper { margin-top: 14px; display: grid; gap: 20px; }
+    .portfolio-item { padding: 14px; border-radius: 14px; transition: transform 0.15s ease, box-shadow 0.2s ease; color: #0f1a2a; position: relative; overflow: hidden; border: 1px solid rgba(17, 24, 39, 0.08); box-shadow: 0 12px 22px rgba(32, 42, 68, 0.08); margin: 6px 0; backdrop-filter: blur(6px); background: linear-gradient(145deg, rgba(255,255,255,0.32), rgba(255,255,255,0.12)); }
+    .portfolio-item:hover { transform: translateY(-1px); }
+    .portfolio-item h4 { margin: 0 0 6px; font-size: 14px; font-weight: 700; color: #0f1a2a; }
+    .portfolio-item p { margin: 0; color: #3b4256; font-size: 13px; }
+    .fund-details { margin-top: 10px; background: #ffffff; border-radius: 12px; border: 1px solid rgba(28, 35, 58, 0.08); padding: 12px 14px; box-shadow: 0 8px 18px rgba(33, 41, 68, 0.06); color: #1f2a44; display: none; }
+    .fund-details .sublist ul { color: #4a5568; padding-left: 18px; display: grid; gap: 4px; }
+    .fund-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(17, 24, 39, 0.08); background: rgba(17, 24, 39, 0.04); color: #0f1a2a; font-weight: 700; cursor: pointer; }
+    .fund-toggle:hover { background: rgba(17, 24, 39, 0.08); }
+
+    .mode-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .mode-tabs button { border: 1px solid #dfe3ec; background: #f8fafc; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: border 0.2s ease, background 0.2s ease, color 0.2s ease; }
+    .mode-tabs button.active { background: var(--accent-strong); border-color: var(--accent); color: #ffffff; box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28); }
+
+    .ablauf-shell { margin-top: 6px; background: linear-gradient(145deg, #f9fbff, #f4f6fb); border: 1px solid #e6eaf3; border-radius: 16px; box-shadow: 0 20px 48px rgba(28, 42, 76, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.7); padding: 14px; }
+    .ablauf-scroll { overflow-x: auto; display: grid; gap: 10px; }
+    .ablauf-head-row, .ablauf-row { display: grid; align-items: stretch; gap: 8px; min-width: 720px; }
+    .ablauf-head-row { background: linear-gradient(180deg, #f7f9fd, #f0f4fb); border: 1px solid #e5e9f3; border-radius: 12px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8); color: #102341; font-weight: 700; font-size: 12.5px; letter-spacing: 0.2px; }
+    .ablauf-row { background: #ffffff; border: 1px solid #e8ecf4; border-radius: 12px; box-shadow: 0 16px 40px rgba(17, 38, 62, 0.06); }
+    .ablauf-cell { padding: 12px 14px; text-align: center; font-size: 13px; color: #1e2a3c; }
+    .ablauf-label { text-align: left; font-weight: 700; color: #0f213c; display: flex; align-items: center; gap: 10px; }
+    .ablauf-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #8bcdf4, #b4e6c1); box-shadow: 0 4px 10px rgba(140, 200, 230, 0.4); flex-shrink: 0; }
+    .ablauf-value span { display: block; width: 100%; background: #f8fafc; border: 1px solid #e8ecf5; border-radius: 10px; padding: 8px 10px; font-variant-numeric: tabular-nums; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8); }
+
+    footer { margin: 10px auto 36px; width: min(1200px, 92vw); color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .footer-card { background: linear-gradient(145deg, #f7fbf9, #ffffff); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); border: 1px solid #e3e9f2; }
+    .info-panel { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin-top: 10px; padding: 14px 16px; background: #f8fafc; border: 1px solid #e8ecf4; border-radius: 12px; box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.08); }
+    .info-panel strong { color: var(--text); font-size: 13px; }
+    .info-time { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--text); background: #eef2f8; padding: 6px 10px; border-radius: 10px; border: 1px solid #dfe3ec; }
+
+    .advisor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .advisor-card { border: 1px solid #e3e9f2; border-radius: 14px; padding: 16px; background: #ffffff; box-shadow: var(--shadow); display: grid; gap: 12px; }
+    .advisor-header { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+    .avatar { width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, #e8f8ec, #dfe9ff); border: 1px solid #dbe5f0; background-size: cover; background-position: center; position: relative; overflow: hidden; }
+    .avatar::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35); border-radius: 16px; pointer-events: none; }
+    .advisor-meta h4 { margin: 0; font-size: 16px; font-weight: 700; }
+    .advisor-meta .role { display: inline-flex; padding: 5px 10px; background: #eef6ef; border-radius: 999px; font-size: 12px; font-weight: 700; color: #1c3a2c; box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4); margin-top: 4px; }
+    .advisor-meta p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .advisor-qualifications h5 { margin: 0 0 6px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text); }
+    .advisor-qualifications ul { margin: 0 0 10px 16px; padding: 0; color: var(--muted); font-size: 13px; display: grid; gap: 4px; }
+    .advisor-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .advisor-actions a { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 10px 14px; background: var(--accent-strong); color: #ffffff; font-weight: 700; border-radius: 12px; box-shadow: 0 12px 24px rgba(114, 210, 122, 0.25); transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease; }
+    .advisor-actions a:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(114, 210, 122, 0.35); }
+    .advisor-actions .note { font-size: 12px; color: var(--muted); }
+
+    @media (max-width: 720px) {
+      .portfolio-summary { grid-template-columns: 1fr; }
+      .chart-wrap { grid-template-columns: 1fr; }
+      .section-heading { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main>
+      <section class="card" id="vorsorge">
+        <div class="section-heading">
+          <h2>Vorsorgemantel</h2>
+          <p class="section-sub">Preview-Daten zur Demonstration des Interfaces.</p>
+          <span class="section-meta">Letztes Update: Vorschau</span>
+        </div>
+        <div class="vorsorge-grid" id="vorsorgeGrid"></div>
+      </section>
+
+      <section class="card" id="portfolios">
+        <div class="section-heading">
+          <h2>Portfolios</h2>
+          <p class="section-sub">Beispielhafte Portfolio-Tabs ohne Live-Daten.</p>
+        </div>
+        <div class="tab-buttons">
+          <button type="button" class="active" data-portfolio-tab="factor">Factor</button>
+          <button type="button" data-portfolio-tab="marketcap">Marketcap</button>
+          <button type="button" data-portfolio-tab="bip">BIP</button>
+          <button type="button" data-portfolio-tab="obligationen">Obligationen</button>
+        </div>
+        <div class="portfolio-list" id="portfolioList"></div>
+      </section>
+
+      <section class="card" id="ablaufmanagement">
+        <div class="section-heading">
+          <h2>Ablaufmanagement</h2>
+          <p class="section-sub">Statische Beispielwerte für drei Risikoprofile.</p>
+          <span class="section-meta">Preview – keine echten Produktdaten</span>
+        </div>
+        <div class="mode-tabs" aria-label="Risikoprofil wählen">
+          <button type="button" class="active" data-risk="konservativ">Konservativ</button>
+          <button type="button" data-risk="mittel">Mittel</button>
+          <button type="button" data-risk="aggressiv">Aggressiv</button>
+        </div>
+        <div class="ablauf-shell">
+          <div class="ablauf-scroll">
+            <div class="ablauf-head-row" id="ablaufHead"></div>
+            <div class="ablauf-body" id="ablaufBody"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="advisorSection">
+        <div class="section-heading">
+          <h2>Telefontermin mit Honorarberater:in</h2>
+          <p class="section-sub">Platzhalterprofile zur Visualisierung des Buchungsbereichs.</p>
+          <span class="section-meta">Preview</span>
+        </div>
+        <div class="advisor-grid" id="advisorGrid"></div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-card">
+        <p><strong>Haftungsausschluss:</strong> Dieses Preview zeigt ein Layout-Beispiel ohne Produkt- oder Kundendaten.</p>
+        <p>Alle Inhalte sind Platzhalter und dienen nur der Veranschaulichung.</p>
+        <div class="info-panel">
+          <div>
+            <strong>Hinweis:</strong> Keine Verbindung zu externen Datenquellen – reine UI-Vorschau.
+          </div>
+          <div class="info-time"><span aria-hidden="true">🕒</span><span>Stand: Preview-Version</span></div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const SHIMMER_COLORS = ['#6fd9b5', '#6abef5', '#9fb5ff', '#ffc87c', '#8fd8ff', '#ffb3d6'];
+
+    const vorsorgeData = [
+      {
+        ranking: '1',
+        rankingLabel: 'Beispiel 1',
+        title: 'Nachhaltige Zukunft (Preview)',
+        description: 'Platzhaltertext für eine nachhaltige Strategie im Vorsorgemantel.',
+        produktkosten: '0,48% p.a. (Beispiel)',
+        weitereGebuehren: '0,10% p.a. (Beispiel)',
+        link: '#',
+        vorteile: ['Beispielhafter Vorteil A', 'Beispielhafter Vorteil B'],
+        nachteile: ['Beispielhafter Nachteil A', 'Beispielhafter Nachteil B'],
+      },
+      {
+        ranking: '2',
+        rankingLabel: 'Beispiel 2',
+        title: 'Stabilität & Balance (Preview)',
+        description: 'Statischer Text für eine ausgewogene Vorschau-Lösung.',
+        produktkosten: '0,38% p.a. (Beispiel)',
+        weitereGebuehren: '0,08% p.a. (Beispiel)',
+        link: '#',
+        vorteile: ['Vorteil Platzhalter', 'Diversifikation als Platzhalter'],
+        nachteile: ['Geringere Chance auf Überrendite (Beispiel)'],
+      },
+      {
+        ranking: '3',
+        rankingLabel: 'Beispiel 3',
+        title: 'Wachstum Dynamik (Preview)',
+        description: 'Demo-Inhalt für wachstumsorientierte Anleger.',
+        produktkosten: '0,54% p.a. (Beispiel)',
+        weitereGebuehren: '0,12% p.a. (Beispiel)',
+        link: '#',
+        vorteile: ['Fokus auf Innovation (Platzhalter)'],
+        nachteile: ['Höhere Schwankungen möglich (Platzhalter)'],
+      },
+    ];
+
+    const portfolioMeta = {
+      factor: { title: 'Faktorportfolio', summary: 'UI-Vorschau für faktorbasierte Strategien.', since: 'Rendite seit Start: Preview', info: 'Statischer Beschreibungstext.' },
+      marketcap: { title: 'Marketcap Mix', summary: 'Preview-Daten für kapitalgewichtete Allokation.', since: 'Rendite seit Start: Preview', info: 'Keine Echtzeitdaten.' },
+      bip: { title: 'BIP Allokation', summary: 'Beispielhafte Darstellung einer BIP-Gewichtung.', since: 'Rendite seit Start: Preview', info: 'Nur visuelle Darstellung.' },
+      obligationen: { title: 'Obligationen Fokus', summary: 'Layout-Vorschau für Anleihenportfolios.', since: 'Rendite seit Start: Preview', info: 'Demodaten ohne Anbindung.' },
+    };
+
+    const portfolioData = {
+      factor: [
+        { title: 'Faktor Plus Global', desc: 'Statische Beschreibung zur Vorschau.', returns5: 'Ø Rendite 5 Jahre: Beispiel', returns10: 'Ø Rendite 10 Jahre: Beispiel', allocation: 32, since: 'Rendite seit Start: Beispiel', pros: ['Vorteil 1 (Preview)'], cons: ['Nachteil 1 (Preview)'] },
+        { title: 'Smart Beta Europa', desc: 'Dummy-Text für das Interface.', returns5: 'Ø Rendite 5 Jahre: Beispiel', returns10: 'Ø Rendite 10 Jahre: Beispiel', allocation: 28, since: 'Rendite seit Start: Beispiel', pros: ['Vorteil 2 (Preview)'], cons: ['Nachteil 2 (Preview)'] },
+        { title: 'Quality Momentum Blend', desc: 'UI-Beispiel für einen Fonds.', returns5: 'Ø Rendite 5 Jahre: Beispiel', returns10: 'Ø Rendite 10 Jahre: Beispiel', allocation: 40, since: 'Rendite seit Start: Beispiel', pros: ['Vorteil 3 (Preview)'], cons: ['Nachteil 3 (Preview)'] },
+      ],
+      marketcap: [
+        { title: 'Global Market Leaders', desc: 'Layout-Platzhalter für Großkonzerne.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 45, since: 'Seit Start: Beispiel', pros: ['Stabiler Platzhalter'], cons: ['Kein Live-Datenzugriff'] },
+        { title: 'MidCap Chancen', desc: 'Beispieltext für MidCaps.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 35, since: 'Seit Start: Beispiel', pros: ['Beispielhaftes Wachstum'], cons: ['Nur Vorschau'] },
+        { title: 'SmallCap Satellit', desc: 'Demo-Beschreibung für Small Caps.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 20, since: 'Seit Start: Beispiel', pros: ['Beispielchance'], cons: ['Volatilität als Platzhalter'] },
+      ],
+      bip: [
+        { title: 'GDP Balanced', desc: 'Statisches BIP-Beispiel.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 42, since: 'Seit Start: Beispiel', pros: ['Planbare Darstellung'], cons: ['Keine Echtzeitdaten'] },
+        { title: 'Emerging Focus', desc: 'Placeholder für Schwellenländeranteil.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 33, since: 'Seit Start: Beispiel', pros: ['Vorschau für Wachstum'], cons: ['Demodaten'] },
+        { title: 'Developed Core', desc: 'Demo für Kernmärkte.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 25, since: 'Seit Start: Beispiel', pros: ['Stabile Anzeige'], cons: ['Keine echte Rendite'] },
+      ],
+      obligationen: [
+        { title: 'Euro Bonds Core', desc: 'Beispielhafter Anleiheblock.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 50, since: 'Seit Start: Beispiel', pros: ['Solider Placeholder'], cons: ['Keine Marktdaten'] },
+        { title: 'Green Bonds Select', desc: 'Nachhaltiger Placeholder.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 30, since: 'Seit Start: Beispiel', pros: ['Nachhaltigkeits-Preview'], cons: ['Nur Vorschau'] },
+        { title: 'Inflation Linkers', desc: 'Preview für Inflationsschutz.', returns5: '5 Jahre: Beispielwert', returns10: '10 Jahre: Beispielwert', allocation: 20, since: 'Seit Start: Beispiel', pros: ['Schutz als Beispiel'], cons: ['Kein Echtzeitbezug'] },
+      ],
+    };
+
+    const ablaufData = {
+      konservativ: [
+        ['Aktien', '25%', '24%', '23%', '22%', '21%', '20%', '19%', '18%', '17%', '16%'],
+        ['Obligationen', '55%', '56%', '57%', '58%', '59%', '60%', '61%', '62%', '63%', '64%'],
+        ['Liquidität', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%'],
+      ],
+      mittel: [
+        ['Aktien', '40%', '39%', '38%', '37%', '36%', '35%', '34%', '33%', '32%', '31%'],
+        ['Obligationen', '40%', '41%', '42%', '43%', '44%', '45%', '46%', '47%', '48%', '49%'],
+        ['Liquidität', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%'],
+      ],
+      aggressiv: [
+        ['Aktien', '60%', '59%', '58%', '57%', '56%', '55%', '54%', '53%', '52%', '51%'],
+        ['Obligationen', '25%', '26%', '27%', '28%', '29%', '30%', '31%', '32%', '33%', '34%'],
+        ['Liquidität', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%'],
+      ],
+    };
+
+    const advisorData = [
+      {
+        name: 'Diego Berchtold (Preview)',
+        role: 'Honorarberater',
+        description: 'Beispieltext für persönliche Beratung.',
+        educationText: ['Bachelor (Beispiel)', 'Versicherung & Vorsorge (Platzhalter)'],
+        codeOfConductText: ['FIDLEG Kompakt (Platzhalter)'],
+        terminLink: '#',
+        terminHinweis: 'Terminlink als Beispiel',
+      },
+      {
+        name: 'Lara Steiner (Preview)',
+        role: 'Senior Honorarberaterin',
+        description: 'Platzhalter für nachhaltige Portfolios.',
+        educationText: ['Master Finance (Beispiel)', 'CAS Sustainable Finance (Preview)'],
+        codeOfConductText: ['Training 2024 (Beispiel)'],
+        terminLink: '#',
+        terminHinweis: 'Terminlink als Beispiel',
+      },
+      {
+        name: 'Marco Keller (Preview)',
+        role: 'Honorarberater',
+        description: 'Fokus auf Auszahlungsszenarien (Preview).',
+        educationText: ['Bachelor Banking & Finance (Beispiel)'],
+        codeOfConductText: ['Compliance Update (Beispiel)'],
+        terminLink: '#',
+        terminHinweis: 'Terminlink als Beispiel',
+      },
+    ];
+
+    function renderVorsorgeCards() {
+      const grid = document.getElementById('vorsorgeGrid');
+      grid.innerHTML = '';
+      vorsorgeData.forEach((card) => {
+        const article = document.createElement('article');
+        article.className = 'vorsorge-card';
+        if (card.ranking === '1') article.classList.add('rank-1');
+
+        article.innerHTML = `
+          <div class="pill">${card.rankingLabel}</div>
+          <h3>${card.title}</h3>
+          <p>${card.description}</p>
+          <div class="meta">
+            <span><strong>Produktkosten:</strong> ${card.produktkosten}</span>
+            <span><strong>Weitere Gebühren:</strong> ${card.weitereGebuehren}</span>
+          </div>
+          <a href="${card.link}" class="toggle-details" aria-expanded="false">Mehr erfahren</a>
+          <div class="details" aria-hidden="true">
+            <h4>Vorteile</h4>
+            <ul>${card.vorteile.map((v) => `<li>${v}</li>`).join('')}</ul>
+            <h4>Nachteile</h4>
+            <ul>${card.nachteile.map((n) => `<li>${n}</li>`).join('')}</ul>
+          </div>
+        `;
+
+        const toggle = article.querySelector('.toggle-details');
+        const details = article.querySelector('.details');
+        toggle.addEventListener('click', (event) => {
+          event.preventDefault();
+          const open = details.style.display === 'block';
+          details.style.display = open ? 'none' : 'block';
+          details.setAttribute('aria-hidden', open ? 'true' : 'false');
+          toggle.setAttribute('aria-expanded', String(!open));
+        });
+
+        grid.appendChild(article);
+      });
+    }
+
+    function hexToRgba(hex, alpha = 0.12) {
+      const normalized = hex.replace('#', '');
+      const bigint = parseInt(normalized, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function drawDonut(canvas, allocations) {
+      const ctx = canvas.getContext('2d');
+      const total = allocations.reduce((sum, item) => sum + item.value, 0) || 1;
+      const radius = Math.min(canvas.width, canvas.height) / 2 - 8;
+      let startAngle = -Math.PI / 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      allocations.forEach((slice) => {
+        const angle = (slice.value / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height / 2);
+        ctx.arc(canvas.width / 2, canvas.height / 2, radius, startAngle, startAngle + angle);
+        ctx.closePath();
+        ctx.fillStyle = slice.color;
+        ctx.fill();
+        startAngle += angle;
+      });
+      ctx.beginPath();
+      ctx.fillStyle = '#ffffff';
+      ctx.arc(canvas.width / 2, canvas.height / 2, radius * 0.65, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function renderPortfolios(type) {
+      const list = document.getElementById('portfolioList');
+      list.innerHTML = '';
+      const meta = portfolioMeta[type];
+
+      const shell = document.createElement('div');
+      shell.className = 'portfolio-shell open';
+      const toggle = document.createElement('button');
+      toggle.className = 'portfolio-toggle';
+      toggle.innerHTML = `<span>${meta.title}</span><span class="chevron" aria-hidden="true">›</span>`;
+      const content = document.createElement('div');
+      content.style.display = 'block';
+
+      toggle.addEventListener('click', () => {
+        const open = content.style.display === 'block';
+        content.style.display = open ? 'none' : 'block';
+        shell.classList.toggle('open', !open);
+      });
+
+      const summary = document.createElement('div');
+      summary.className = 'portfolio-summary';
+      summary.innerHTML = `
+        <div class="portfolio-info">
+          <p>${meta.summary}</p>
+          <p>${meta.info}</p>
+          <div class="portfolio-meta"><span class="chip">${meta.since}</span></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-visual"><canvas width="170" height="170"></canvas></div>
+          <div class="chart-legend"></div>
+        </div>
+      `;
+
+      const chartCanvas = summary.querySelector('canvas');
+      const legend = summary.querySelector('.chart-legend');
+
+      const allocations = portfolioData[type].map((item, index) => ({
+        label: item.title,
+        value: item.allocation,
+        color: SHIMMER_COLORS[index % SHIMMER_COLORS.length],
+        index,
+      }));
+
+      allocations.forEach((entry) => {
+        const li = document.createElement('div');
+        li.className = 'legend-item';
+        li.innerHTML = `<div style="display:flex;align-items:center;gap:8px;"><span class="legend-dot" style="background:${entry.color}"></span><span>${entry.label}</span></div><span>${entry.value}%</span>`;
+        legend.appendChild(li);
+      });
+
+      drawDonut(chartCanvas, allocations);
+
+      const fundsWrapper = document.createElement('div');
+      fundsWrapper.className = 'funds-wrapper';
+
+      portfolioData[type].forEach((item, index) => {
+        const fund = document.createElement('div');
+        fund.className = 'portfolio-item';
+        const tintColor = allocations[index].color;
+        fund.style.background = `linear-gradient(145deg, ${hexToRgba(tintColor, 0.24)}, ${hexToRgba(tintColor, 0.12)}), rgba(255, 255, 255, 0.9)`;
+        fund.style.border = `1px solid ${hexToRgba(tintColor, 0.32)}`;
+        fund.style.boxShadow = `0 12px 24px ${hexToRgba(tintColor, 0.18)}`;
+
+        fund.innerHTML = `
+          <h4>${item.title}</h4>
+          <p>${item.desc}</p>
+          <div class="meta">
+            <span>${item.returns5}</span>
+            <span>${item.returns10}</span>
+          </div>
+          <span class="section-sub">${item.since}</span>
+          <div class="allocation-row" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+            <strong>Allokation:</strong><span>${item.allocation}%</span>
+          </div>
+          <button type="button" class="fund-toggle" aria-expanded="false">Details anzeigen</button>
+          <div class="fund-details" aria-hidden="true">
+            <div class="sublist">
+              <h5>Vorteile</h5>
+              <ul>${item.pros.map((p) => `<li>${p}</li>`).join('')}</ul>
+            </div>
+            <div class="sublist">
+              <h5>Nachteile</h5>
+              <ul>${item.cons.map((c) => `<li>${c}</li>`).join('')}</ul>
+            </div>
+          </div>
+        `;
+
+        const toggleBtn = fund.querySelector('.fund-toggle');
+        const details = fund.querySelector('.fund-details');
+        toggleBtn.addEventListener('click', () => {
+          const open = details.style.display === 'block';
+          details.style.display = open ? 'none' : 'block';
+          details.setAttribute('aria-hidden', open ? 'true' : 'false');
+          toggleBtn.setAttribute('aria-expanded', String(!open));
+          toggleBtn.textContent = open ? 'Details anzeigen' : 'Details ausblenden';
+        });
+
+        fundsWrapper.appendChild(fund);
+      });
+
+      content.appendChild(summary);
+      content.appendChild(fundsWrapper);
+      shell.appendChild(toggle);
+      shell.appendChild(content);
+      list.appendChild(shell);
+    }
+
+    function renderAblauf(risk) {
+      const body = document.getElementById('ablaufBody');
+      const head = document.getElementById('ablaufHead');
+      body.innerHTML = '';
+      head.innerHTML = '';
+
+      const rows = ablaufData[risk] || [];
+      const yearCount = Math.max(10, ...rows.map((row) => Math.max(0, row.length - 1)));
+      const gridTemplate = `160px repeat(${yearCount}, minmax(72px, 1fr))`;
+      head.style.gridTemplateColumns = gridTemplate;
+
+      const labelHead = document.createElement('div');
+      labelHead.className = 'ablauf-cell ablauf-label';
+      labelHead.textContent = 'Assetklasse';
+      head.appendChild(labelHead);
+      for (let i = 1; i <= yearCount; i++) {
+        const yearCell = document.createElement('div');
+        yearCell.className = 'ablauf-cell';
+        yearCell.textContent = `Jahr ${i}`;
+        head.appendChild(yearCell);
+      }
+
+      rows.forEach((row) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'ablauf-row';
+        rowEl.style.gridTemplateColumns = gridTemplate;
+
+        const label = document.createElement('div');
+        label.className = 'ablauf-cell ablauf-label';
+        label.textContent = row[0];
+        rowEl.appendChild(label);
+
+        for (let i = 1; i <= yearCount; i++) {
+          const valueCell = document.createElement('div');
+          valueCell.className = 'ablauf-cell ablauf-value';
+          const span = document.createElement('span');
+          span.textContent = row[i] || '';
+          valueCell.appendChild(span);
+          rowEl.appendChild(valueCell);
+        }
+        body.appendChild(rowEl);
+      });
+    }
+
+    function renderAdvisors() {
+      const grid = document.getElementById('advisorGrid');
+      grid.innerHTML = '';
+      advisorData.forEach((advisor, idx) => {
+        const card = document.createElement('div');
+        card.className = 'advisor-card';
+        card.innerHTML = `
+          <div class="advisor-header">
+            <div class="avatar" style="background-image:url('https://picsum.photos/seed/${idx}/200');"></div>
+            <div class="advisor-meta">
+              <h4>${advisor.name}</h4>
+              <span class="role">${advisor.role}</span>
+              <p>${advisor.description}</p>
+            </div>
+          </div>
+          <div class="advisor-qualifications">
+            <h5>Education & Training</h5>
+            <ul>${advisor.educationText.map((item) => `<li>${item}</li>`).join('')}</ul>
+            <h5>Code of conduct training</h5>
+            <ul>${advisor.codeOfConductText.map((item) => `<li>${item}</li>`).join('')}</ul>
+          </div>
+          <div class="advisor-actions">
+            <a href="${advisor.terminLink}">Termin buchen</a>
+            <span class="note">${advisor.terminHinweis}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    document.querySelectorAll('[data-portfolio-tab]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-portfolio-tab]').forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        renderPortfolios(button.getAttribute('data-portfolio-tab'));
+      });
+    });
+
+    document.querySelectorAll('[data-risk]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-risk]').forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        renderAblauf(button.getAttribute('data-risk'));
+      });
+    });
+
+    renderVorsorgeCards();
+    renderPortfolios('factor');
+    renderAblauf('konservativ');
+    renderAdvisors();
+  </script>
+</body>
+</html>
