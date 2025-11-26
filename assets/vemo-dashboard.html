@@ -481,7 +481,7 @@
 
     .chart-legend {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: 1fr;
       gap: 12px;
       font-size: 12.5px;
       color: #1c2436;
@@ -1888,7 +1888,10 @@
         .toLowerCase()
         .replace(/\s+/g, '')
         .replace(/[^a-z0-9]/g, '');
-      if (normalized === 'faktor' || normalized === 'faktoren') return 'factor';
+      if (normalized.includes('faktor')) return 'factor';
+      if (normalized.includes('marketcap') || normalized.includes('marktkap')) return 'marketcap';
+      if (normalized.includes('bip')) return 'bip';
+      if (normalized.includes('obligation')) return 'obligationen';
       return normalized;
     }
 
@@ -1904,7 +1907,7 @@
           .map((key) => (key === 'faktor' ? 'factor' : key));
         const nextMeta = deepClone(defaultPortfolioMeta);
 
-        rows.forEach((row) => {
+        rows.forEach((row, rowIdx) => {
           const [fieldRaw, ...values] = row;
           const normalized = (fieldRaw || '')
             .toLowerCase()
@@ -1951,6 +1954,10 @@
                   nextMeta[typeKey].info = value;
                 }
                 break;
+            }
+
+            if (!nextMeta[typeKey].info && rowIdx === 4) {
+              nextMeta[typeKey].info = value;
             }
           });
         });
