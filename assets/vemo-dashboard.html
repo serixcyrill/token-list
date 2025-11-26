@@ -443,33 +443,35 @@
 
     .portfolio-summary {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 16px;
-      align-items: stretch;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 20px;
+      align-items: center;
       margin-top: 10px;
-      padding: 12px;
-      background: #ffffff;
-      border: 1px solid #e3e9f2;
-      border-radius: 12px;
+      padding: 18px 20px;
+      background: linear-gradient(145deg, #fdfefe, #f6f8ff);
+      border: 1px solid #e6ebf5;
+      border-radius: 16px;
+      box-shadow: 0 18px 32px rgba(21, 45, 58, 0.08);
     }
 
     .portfolio-info {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       justify-content: center;
     }
 
     .portfolio-info p {
       margin: 0;
-      color: var(--muted);
-      font-size: 13px;
+      color: #41495c;
+      font-size: 13.5px;
+      line-height: 1.6;
     }
 
     .portfolio-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
     }
 
@@ -477,41 +479,48 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 36px;
-      padding: 8px 14px;
-      background: #eef6ef;
+      min-height: 38px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, rgba(114, 210, 122, 0.16), rgba(114, 210, 122, 0.04));
       border-radius: 999px;
-      font-weight: 600;
-      font-size: 12px;
-      color: #1c3a2c;
+      font-weight: 700;
+      font-size: 12.5px;
+      color: #0f1a2a;
       text-align: center;
-      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.28);
     }
 
     .chart-wrap {
       position: relative;
       display: grid;
-      grid-template-columns: 190px 1fr;
-      gap: 14px;
+      grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+      gap: 16px;
       align-items: center;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, #f9fbff, #f2f5fd);
+      border: 1px solid #e5ebf5;
+      border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 18px rgba(26, 50, 64, 0.08);
     }
 
     .chart-visual {
       position: relative;
-      width: 170px;
-      height: 170px;
+      width: 180px;
+      height: 180px;
       display: grid;
       place-items: center;
+      margin: 0 auto;
     }
 
     .chart-visual canvas {
-      width: 170px;
-      height: 170px;
+      width: 180px;
+      height: 180px;
     }
 
     .chart-legend {
       display: grid;
-      gap: 6px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
       font-size: 12.5px;
       color: #1c2436;
     }
@@ -521,6 +530,11 @@
       align-items: center;
       gap: 8px;
       justify-content: space-between;
+      padding: 10px 12px;
+      background: #ffffff;
+      border: 1px solid #e6eaf3;
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(26, 50, 64, 0.06);
     }
 
     .legend-dot {
@@ -528,6 +542,7 @@
       height: 12px;
       border-radius: 50%;
       flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
     }
 
     .chart-center-label {
@@ -536,8 +551,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 108px;
-      height: 108px;
+      width: 112px;
+      height: 112px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -546,9 +561,9 @@
       color: #0f1a2a;
       font-size: 13px;
       pointer-events: none;
-      background: radial-gradient(circle at 50% 50%, rgba(244, 247, 251, 0.96), rgba(255, 255, 255, 0.95));
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.98), rgba(245, 248, 255, 0.96));
       border-radius: 50%;
-      box-shadow: 0 12px 26px rgba(21, 49, 58, 0.08), inset 0 0 0 1px rgba(114, 210, 122, 0.2);
+      box-shadow: 0 12px 26px rgba(21, 49, 58, 0.08), inset 0 0 0 1px rgba(114, 210, 122, 0.16);
     }
 
     .chart-center-label .label-top {
@@ -559,7 +574,7 @@
     }
 
     .chart-center-label .label-value {
-      font-size: 18px;
+      font-size: 17px;
       color: #1a7340;
     }
 
@@ -570,9 +585,9 @@
     }
 
     .funds-wrapper {
-      margin-top: 14px;
+      margin-top: 16px;
       display: grid;
-      gap: 20px;
+      gap: 22px;
     }
 
     .allocation-row {
@@ -2335,8 +2350,8 @@
       const chartVisual = document.createElement('div');
       chartVisual.className = 'chart-visual';
       const canvas = document.createElement('canvas');
-      canvas.width = 170;
-      canvas.height = 170;
+      canvas.width = 180;
+      canvas.height = 180;
       const legend = document.createElement('div');
       legend.className = 'chart-legend';
 
@@ -2371,7 +2386,24 @@
         legend.appendChild(li);
       });
 
+      const centerLabel = document.createElement('div');
+      centerLabel.className = 'chart-center-label';
+      const topLabel = document.createElement('div');
+      topLabel.className = 'label-top';
+      topLabel.textContent = 'Gesamtrendite';
+      const mainLabel = document.createElement('div');
+      mainLabel.className = 'label-value';
+      const sinceClean = meta.since.replace(/^Rendite\s+seit\s*/i, '').trim();
+      mainLabel.textContent = sinceClean || meta.since;
+      const subLabel = document.createElement('div');
+      subLabel.className = 'label-sub';
+      subLabel.textContent = 'seit Start';
+      centerLabel.appendChild(topLabel);
+      centerLabel.appendChild(mainLabel);
+      centerLabel.appendChild(subLabel);
+
       chartVisual.appendChild(canvas);
+      chartVisual.appendChild(centerLabel);
       chartWrap.appendChild(chartVisual);
       chartWrap.appendChild(legend);
 
