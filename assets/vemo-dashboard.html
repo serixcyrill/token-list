@@ -256,7 +256,29 @@
       color: var(--muted);
       font-size: 13px;
       display: grid;
-      gap: 4px;
+      gap: 6px;
+    }
+
+    .details li.benefit,
+    .fund-details li.benefit {
+      list-style: disc;
+      background: linear-gradient(135deg, rgba(111, 217, 181, 0.18), rgba(111, 217, 181, 0.08));
+      border: 1px solid rgba(111, 217, 181, 0.35);
+      color: #0f2a24;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-left: 4px;
+    }
+
+    .details li.drawback,
+    .fund-details li.drawback {
+      list-style: disc;
+      background: linear-gradient(135deg, rgba(255, 179, 214, 0.18), rgba(255, 179, 214, 0.08));
+      border: 1px solid rgba(255, 179, 214, 0.36);
+      color: #4a1c25;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-left: 4px;
     }
 
     .tab-buttons {
@@ -686,25 +708,25 @@
     }
 
     .fund-details .sublist ul {
-      color: #4a5568;
+      color: #1f2a44;
       padding-left: 18px;
       display: grid;
-      gap: 4px;
+      gap: 6px;
     }
 
     .ablauf-shell {
       margin-top: 6px;
-      background: linear-gradient(145deg, #f9fbff, #f4f6fb);
+      background: linear-gradient(180deg, #ffffff, #f7f9fd);
       border: 1px solid #e6eaf3;
       border-radius: 16px;
-      box-shadow: 0 20px 48px rgba(28, 42, 76, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      box-shadow: 0 14px 34px rgba(27, 38, 64, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8);
       padding: 14px;
     }
 
     .ablauf-scroll {
       overflow-x: auto;
       display: grid;
-      gap: 10px;
+      gap: 12px;
     }
 
     .ablauf-head-row,
@@ -716,11 +738,11 @@
     }
 
     .ablauf-head-row {
-      background: linear-gradient(180deg, #f7f9fd, #f0f4fb);
-      border: 1px solid #e5e9f3;
+      background: linear-gradient(180deg, #f9fbff, #eef3fb);
+      border: 1px solid #e7ebf5;
       border-radius: 12px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-      color: #102341;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      color: #0f1f33;
       font-weight: 700;
       font-size: 12.5px;
       letter-spacing: 0.2px;
@@ -728,20 +750,20 @@
 
     .ablauf-body {
       display: grid;
-      gap: 10px;
+      gap: 12px;
     }
 
     .ablauf-row {
-      background: #ffffff;
+      background: linear-gradient(180deg, #ffffff, #f9fbff);
       border: 1px solid #e8ecf4;
       border-radius: 12px;
-      box-shadow: 0 16px 40px rgba(17, 38, 62, 0.06);
+      box-shadow: 0 12px 28px rgba(17, 38, 62, 0.06);
       transition: transform 0.15s ease, box-shadow 0.2s ease;
     }
 
     .ablauf-row:hover {
       transform: translateY(-1px);
-      box-shadow: 0 18px 46px rgba(17, 38, 62, 0.08);
+      box-shadow: 0 16px 38px rgba(17, 38, 62, 0.08);
     }
 
     .ablauf-cell {
@@ -760,25 +782,15 @@
       gap: 10px;
     }
 
-    .ablauf-label::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #8bcdf4, #b4e6c1);
-      box-shadow: 0 4px 10px rgba(140, 200, 230, 0.4);
-      flex-shrink: 0;
-    }
-
     .ablauf-value span {
       display: block;
       width: 100%;
-      background: #f8fafc;
+      background: #ffffff;
       border: 1px solid #e8ecf5;
       border-radius: 10px;
       padding: 8px 10px;
       font-variant-numeric: tabular-nums;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
     .ablauf-cell[data-editable="true"] {
@@ -2028,6 +2040,7 @@
         const vList = document.createElement('ul');
         (card.vorteile || []).forEach((vText, vIdx) => {
           const li = document.createElement('li');
+          li.className = 'benefit';
           li.textContent = vText;
           attachEditable(li, `vorsorge-${index}-vorteil-${vIdx}`, (value) => {
             vorsorgeData[index].vorteile[vIdx] = value;
@@ -2041,6 +2054,7 @@
         const nList = document.createElement('ul');
         (card.nachteile || []).forEach((nText, nIdx) => {
           const li = document.createElement('li');
+          li.className = 'drawback';
           li.textContent = nText;
           attachEditable(li, `vorsorge-${index}-nachteil-${nIdx}`, (value) => {
             vorsorgeData[index].nachteile[nIdx] = value;
@@ -2270,6 +2284,7 @@
         const prosList = document.createElement('ul');
         (item.pros || []).forEach((text, prosIndex) => {
           const li = document.createElement('li');
+          li.className = 'benefit';
           li.textContent = text;
           attachEditable(li, `portfolio-${type}-${index}-pro-${prosIndex}`, (value) => {
             portfolioData[type][index].pros[prosIndex] = value;
@@ -2288,6 +2303,7 @@
         const consList = document.createElement('ul');
         (item.cons || []).forEach((text, consIndex) => {
           const li = document.createElement('li');
+          li.className = 'drawback';
           li.textContent = text;
           attachEditable(li, `portfolio-${type}-${index}-con-${consIndex}`, (value) => {
             portfolioData[type][index].cons[consIndex] = value;
@@ -2584,12 +2600,27 @@
           const details = link.nextElementSibling;
           if (!details) return;
           const isOpen = !details.hasAttribute('hidden');
+
+          document.querySelectorAll('.details').forEach((panel) => {
+            if (panel === details) return;
+            panel.setAttribute('hidden', '');
+            panel.style.display = 'none';
+            const trigger = panel.previousElementSibling;
+            if (trigger?.classList.contains('toggle-details')) {
+              trigger.setAttribute('aria-expanded', 'false');
+              trigger.textContent = 'Mehr erfahren';
+            }
+          });
+
           if (isOpen) {
             details.setAttribute('hidden', '');
+            details.style.display = 'none';
+            link.textContent = 'Mehr erfahren';
           } else {
             details.removeAttribute('hidden');
+            details.style.display = 'block';
+            link.textContent = 'Weniger anzeigen';
           }
-          details.style.display = isOpen ? 'none' : 'block';
           link.setAttribute('aria-expanded', String(!isOpen));
         });
       });
