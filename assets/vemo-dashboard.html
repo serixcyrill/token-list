@@ -2270,14 +2270,14 @@
         const avatarRow = getFieldValues('avatarurl', ['avatar', 'avatarurl', 'profilbild', 'bildurl']);
 
         advisors.forEach((advisor, idx) => {
-          advisor.name = nameRow[idx] || '';
-          advisor.role = roleRow[idx] || '';
-          advisor.description = descRow[idx] || '';
-          advisor.educationText = eduRow[idx] || '';
-          advisor.codeOfConductText = codeRow[idx] || '';
-          advisor.terminLink = terminLinkRow[idx] || '';
-          advisor.terminHinweis = terminHinweisRow[idx] || '';
-          advisor.avatarUrl = avatarRow[idx] || '';
+          advisor.name = (nameRow[idx] || '').trim();
+          advisor.role = (roleRow[idx] || '').trim();
+          advisor.description = (descRow[idx] || '').trim();
+          advisor.educationText = (eduRow[idx] || '').trim();
+          advisor.codeOfConductText = (codeRow[idx] || '').trim();
+          advisor.terminLink = (terminLinkRow[idx] || '').trim();
+          advisor.terminHinweis = (terminHinweisRow[idx] || '').trim();
+          advisor.avatarUrl = (avatarRow[idx] || '').trim();
         });
 
         const filtered = advisors.filter((a) => a.name);
@@ -3062,6 +3062,7 @@
     function renderAdvisors(list) {
       if (!advisorGrid) return;
       advisorGrid.innerHTML = '';
+      let avatarsPatched = false;
 
       list.forEach((advisor, idx) => {
         const card = document.createElement('div');
@@ -3087,6 +3088,11 @@
         avatarInput.dataset.target = avatarId;
         avatarInput.dataset.defaultUrl = advisor.avatarUrl || '';
         avatarInput.placeholder = 'https://...';
+
+        if (advisor.avatarUrl && !savedAvatars[avatarId]) {
+          savedAvatars[avatarId] = advisor.avatarUrl.trim();
+          avatarsPatched = true;
+        }
         avatarWrap.appendChild(avatarLabel);
         avatarWrap.appendChild(avatarInput);
 
@@ -3188,6 +3194,9 @@
 
       avatarInputs = advisorGrid.querySelectorAll('.avatar-input');
       avatarLabels = advisorGrid.querySelectorAll('.avatar-label');
+      if (avatarsPatched) {
+        persistJson(STORAGE_KEYS.avatars, savedAvatars);
+      }
       bindAvatarInputs();
       refreshEditableState();
     }
