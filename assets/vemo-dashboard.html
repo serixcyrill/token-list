@@ -734,6 +734,32 @@
       background: rgba(17, 24, 39, 0.08);
     }
 
+    .fund-action-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .fund-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(17, 24, 39, 0.12);
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.04), rgba(17, 24, 39, 0.02));
+      color: #0f1a2a;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 6px 14px rgba(15, 26, 42, 0.08);
+    }
+
+    .fund-link:hover {
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.08), rgba(17, 24, 39, 0.04));
+    }
+
     .fund-details {
       margin-top: 10px;
       background: #ffffff;
@@ -1444,6 +1470,7 @@
           returns10: 'Ø Rendite 10 Jahre: 6,1% p.a.',
           allocation: 32,
           since: 'Rendite seit Start: +24,1%',
+          factsheet: '',
           pros: ['Breite Diversifikation über Stilfaktoren.', 'Geringere Schwankung gegenüber Einzelfaktoren.'],
           cons: ['Kann Phasen relativer Unterperformance haben.', 'Rebalancing-Kosten können anfallen.'],
         },
@@ -1454,6 +1481,7 @@
           returns10: 'Ø Rendite 10 Jahre: 5,8% p.a.',
           allocation: 28,
           since: 'Rendite seit Start: +18,6%',
+          factsheet: '',
           pros: ['Erhöhtes Exposure zu Value- und Size-Faktoren.', 'Transparente, regelbasierte Selektion.'],
           cons: ['Höhere Faktorrotation möglich.', 'Kann in Wachstumsphasen zurückfallen.'],
         },
@@ -1464,6 +1492,7 @@
           returns10: 'Ø Rendite 10 Jahre: 6,5% p.a.',
           allocation: 40,
           since: 'Rendite seit Start: +27,4%',
+          factsheet: '',
           pros: ['Kombiniert defensive und offensive Stile.', 'Klare Faktorregeln mit monatlichem Review.'],
           cons: ['Tracking Error zum Gesamtmarkt möglich.', 'Kann bei Faktor-Umbrüchen schwanken.'],
         },
@@ -1476,6 +1505,7 @@
           returns10: 'Ø Rendite 10 Jahre: 7,2% p.a.',
           allocation: 45,
           since: 'Rendite seit Start: +29,3%',
+          factsheet: '',
           pros: ['Hohe Liquidität und Transparenz.', 'Stabile Dividendenhistorie.'],
           cons: ['Geringerer Small-Cap-Anteil.', 'Stärker an globale Konjunktur gekoppelt.'],
         },
@@ -1486,6 +1516,7 @@
           returns10: 'Ø Rendite 10 Jahre: 8,0% p.a.',
           allocation: 35,
           since: 'Rendite seit Start: +33,0%',
+          factsheet: '',
           pros: ['Höheres Wachstumspotenzial.', 'Breite Sektorstreuung.'],
           cons: ['Teilweise geringere Liquidität.', 'Höhere Schwankungen möglich.'],
         },
@@ -1496,6 +1527,7 @@
           returns10: 'Ø Rendite 10 Jahre: 8,6% p.a.',
           allocation: 20,
           since: 'Rendite seit Start: +22,8%',
+          factsheet: '',
           pros: ['Skalierbare Wachstumschancen.', 'Gezieltes Risikobudget.'],
           cons: ['Höhere Volatilität.', 'Begrenzte Liquidität in Stressphasen.'],
         },
@@ -1508,6 +1540,7 @@
           returns10: 'Ø Rendite 10 Jahre: 6,0% p.a.',
           allocation: 42,
           since: 'Rendite seit Start: +21,3%',
+          factsheet: '',
           pros: ['Stabile Allokation nach Wirtschaftskraft.', 'Geringe Klumpenrisiken.'],
           cons: ['Langsame Anpassung an Markttrends.', 'Weniger taktische Chancen.'],
         },
@@ -1518,6 +1551,7 @@
           returns10: 'Ø Rendite 10 Jahre: 7,7% p.a.',
           allocation: 33,
           since: 'Rendite seit Start: +25,0%',
+          factsheet: '',
           pros: ['Partizipation an höherem Wachstum.', 'Breite Länderdiversifikation.'],
           cons: ['Währungs- und Liquiditätsrisiken.', 'Höhere geopolitische Unsicherheit.'],
         },
@@ -1528,6 +1562,7 @@
           returns10: 'Ø Rendite 10 Jahre: 5,9% p.a.',
           allocation: 25,
           since: 'Rendite seit Start: +19,8%',
+          factsheet: '',
           pros: ['Geringer Turnover.', 'Hohe Planbarkeit.'],
           cons: ['Begrenzt opportunistisch.', 'Abweichungen zu kapitalgewichteten Indizes.'],
         },
@@ -1540,6 +1575,7 @@
           returns10: 'Ø Rendite 10 Jahre: 3,1% p.a.',
           allocation: 50,
           since: 'Rendite seit Start: +11,4%',
+          factsheet: '',
           pros: ['Solide Bonität.', 'Geringere Volatilität.'],
           cons: ['Begrenztes Renditepotenzial.', 'Zinsänderungsrisiko.'],
         },
@@ -1550,6 +1586,7 @@
           returns10: 'Ø Rendite 10 Jahre: 3,4% p.a.',
           allocation: 30,
           since: 'Rendite seit Start: +12,1%',
+          factsheet: '',
           pros: ['Nachhaltigkeitsfokus.', 'Transparente Mittelverwendung.'],
           cons: ['Begrenzte Historie.', 'Teilweise geringere Liquidität.'],
         },
@@ -1560,6 +1597,7 @@
           returns10: 'Ø Rendite 10 Jahre: 2,9% p.a.',
           allocation: 20,
           since: 'Rendite seit Start: +9,7%',
+          factsheet: '',
           pros: ['Inflationsabsicherung.', 'Defensive Ausrichtung.'],
           cons: ['Begrenztes Upside.', 'Abhängig von Inflationspfad.'],
         },
@@ -1881,6 +1919,7 @@
             returns10: getFieldRow('rendite10')[col] || '',
             allocation: Number(getFieldRow('allocation')[col] || 0),
             since: getFieldRow('since')[col] || '',
+            factsheet: getFieldRow('factsheet')[col] || '',
             pros: prosRows
               .map((row) => normalizeListValue(row[col]))
               .filter(Boolean),
@@ -2409,6 +2448,21 @@
           toggleDetails.textContent = open ? 'Details anzeigen' : 'Details ausblenden';
         });
 
+        const fundActionRow = document.createElement('div');
+        fundActionRow.className = 'fund-action-row';
+        fundActionRow.appendChild(toggleDetails);
+
+        const factsheetLink = (item.factsheet || '').trim();
+        if (factsheetLink) {
+          const factsheetBtn = document.createElement('a');
+          factsheetBtn.className = 'fund-link';
+          factsheetBtn.href = factsheetLink;
+          factsheetBtn.target = '_blank';
+          factsheetBtn.rel = 'noreferrer';
+          factsheetBtn.textContent = 'Factsheet';
+          fundActionRow.appendChild(factsheetBtn);
+        }
+
         const actions = document.createElement('div');
         actions.style.display = 'flex';
         actions.style.justifyContent = 'space-between';
@@ -2428,7 +2482,7 @@
         fund.appendChild(returns);
         fund.appendChild(since);
         fund.appendChild(allocationRow);
-        fund.appendChild(toggleDetails);
+        fund.appendChild(fundActionRow);
         fund.appendChild(detailsWrapper);
         fund.appendChild(actions);
         fundsWrapper.appendChild(fund);
@@ -2719,6 +2773,7 @@
         returns10: 'Ø Rendite 10 Jahre: Wert ergänzen',
         allocation: 15,
         since: 'Rendite seit Start: Wert ergänzen',
+        factsheet: '',
         pros: ['Vorteil hinzufügen'],
         cons: ['Nachteil hinzufügen'],
       });
