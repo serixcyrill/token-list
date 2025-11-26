@@ -2979,6 +2979,7 @@
       const rows = ablaufData[risk] || [];
       const yearCount = Math.max(10, ...rows.map((row) => Math.max(0, row.length - 1)));
       const gridTemplate = `160px repeat(${yearCount}, minmax(72px, 1fr))`;
+      const startAge = 55;
 
       head.style.gridTemplateColumns = gridTemplate;
       const labelHead = document.createElement('div');
@@ -2988,7 +2989,7 @@
       for (let i = 1; i <= yearCount; i++) {
         const yearCell = document.createElement('div');
         yearCell.className = 'ablauf-cell';
-        yearCell.textContent = `Jahr ${i}`;
+        yearCell.textContent = `Alter ${startAge + i - 1}`;
         head.appendChild(yearCell);
       }
 
@@ -3028,8 +3029,9 @@
     function bindAvatarInputs() {
       avatarInputs.forEach((input) => {
         const target = document.getElementById(input.dataset.target);
-        if (savedAvatars[input.dataset.target]) {
-          input.value = savedAvatars[input.dataset.target];
+        const stored = savedAvatars[input.dataset.target];
+        if (stored) {
+          input.value = stored;
         } else if (input.dataset.defaultUrl) {
           input.value = input.dataset.defaultUrl;
         }
