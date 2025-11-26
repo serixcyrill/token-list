@@ -360,16 +360,26 @@
     }
 
     .krypto-toggle {
-      background: linear-gradient(145deg, #ffb26b, #ff9248);
-      color: #ffffff;
-      border-color: rgba(255, 146, 72, 0.9);
-      box-shadow: 0 10px 22px rgba(255, 146, 72, 0.35);
+      margin-left: auto;
+      background: transparent;
+      color: #f97316;
+      border-color: rgba(249, 115, 22, 0.55);
+      box-shadow: none;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .krypto-toggle:hover,
+    .krypto-toggle:focus-visible {
+      background: rgba(249, 115, 22, 0.12);
+      border-color: rgba(249, 115, 22, 0.78);
+      color: #c85a0f;
     }
 
     .krypto-toggle.active {
-      background: linear-gradient(145deg, #ff9248, #ff7c1f);
-      border-color: rgba(255, 124, 31, 0.95);
-      box-shadow: 0 12px 26px rgba(255, 124, 31, 0.45);
+      background: rgba(249, 115, 22, 0.18);
+      border-color: rgba(249, 115, 22, 0.9);
+      color: #c85a0f;
+      box-shadow: none;
     }
 
     .portfolio-actions {
@@ -2046,8 +2056,18 @@
         };
         let nextKrypto = null;
 
-        const getFieldRow = (name) =>
-          fieldRows.find((r) => (r[0] || '').toLowerCase() === name.toLowerCase()) || [];
+        const getFieldRow = (name, aliases = []) => {
+          const targets = [name, ...aliases].map((entry) => entry.toLowerCase());
+          return (
+            fieldRows.find((r) => targets.includes((r[0] || '').toLowerCase())) || []
+          );
+        };
+
+        const rendite5Row = getFieldRow('rendite5', [
+          'durchschnittsrendite 5 jahre',
+          'durchschnittsrendite5jahre',
+          'durchschnittsrendite5 jahr',
+        ]);
 
         const prosRows = fieldRows.filter((r) => (r[0] || '').toLowerCase().startsWith('pro'));
         const consRows = fieldRows.filter((r) => (r[0] || '').toLowerCase().startsWith('con'));
@@ -2057,7 +2077,8 @@
           const strategy = (strategyRow?.[col] || '').toLowerCase();
           if (!nextData[strategy]) {
             if (strategy === 'krypto') {
-              const kFund = { title, desc: getFieldRow('beschreibung')[col] || '', returns5: getFieldRow('rendite5')[col] || '', returns10: getFieldRow('rendite10')[col] || '', allocation: Number(getFieldRow('allocation')[col] || 5), since: getFieldRow('since')[col] || '', factsheet: getFieldRow('factsheet')[col] || '', pros: prosRows
+              const title = getFieldRow('fondsname')[col] || 'Krypto (Bitcoin)';
+              const kFund = { title, desc: getFieldRow('beschreibung')[col] || '', returns5: rendite5Row[col] || '', returns10: getFieldRow('rendite10')[col] || '', allocation: Number(getFieldRow('allocation')[col] || 5), since: getFieldRow('since')[col] || '', factsheet: getFieldRow('factsheet')[col] || '', pros: prosRows
                   .map((row) => normalizeListValue(row[col]))
                   .filter(Boolean), cons: consRows
                   .map((row) => normalizeListValue(row[col]))
@@ -2075,7 +2096,7 @@
           const fund = {
             title,
             desc: getFieldRow('beschreibung')[col] || '',
-            returns5: getFieldRow('rendite5')[col] || '',
+            returns5: rendite5Row[col] || '',
             returns10: getFieldRow('rendite10')[col] || '',
             allocation: Number(getFieldRow('allocation')[col] || 0),
             since: getFieldRow('since')[col] || '',
@@ -2413,22 +2434,19 @@
       if (!kryptoActive) return baseList;
 
       const deductionTotal = 5;
-      const count = baseList.length;
-      const adjusted = [];
+      const adjusted = baseList.map((item) => ({ ...item }));
+      let remaining = deductionTotal;
 
-      if (count > 0) {
-        const baseDeduct = Math.floor(deductionTotal / count);
-        let remainder = deductionTotal - baseDeduct * count;
-        baseList.forEach((item) => {
-          const deduction = baseDeduct + (remainder > 0 ? 1 : 0);
-          remainder = Math.max(0, remainder - 1);
-          adjusted.push({
-            ...item,
-            allocation: Math.max(0, item.allocation - deduction),
-          });
+      // verteile Abzug nur auf Fonds mit mehr als 1 % Allokation, ohne sie unter 1 % zu drücken
+      const eligible = adjusted.filter((item) => item.allocation > 1);
+      while (remaining > 0 && eligible.some((f) => f.allocation > 1)) {
+        eligible.forEach((fund) => {
+          if (remaining <= 0) return;
+          if (fund.allocation > 1) {
+            fund.allocation = Math.max(1, fund.allocation - 1);
+            remaining -= 1;
+          }
         });
-      } else {
-        adjusted.push(...baseList);
       }
 
       adjusted.push({
