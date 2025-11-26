@@ -442,63 +442,47 @@
     }
 
     .portfolio-summary {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(320px, 1.05fr);
-      gap: 22px;
-      align-items: stretch;
+      display: block;
       margin-top: 10px;
-      padding: 18px 22px;
-      background: linear-gradient(145deg, #fdfefe, #f6f8ff);
-      border: 1px solid #e6ebf5;
-      border-radius: 16px;
-      box-shadow: 0 18px 32px rgba(21, 45, 58, 0.08);
-    }
-
-    .portfolio-info {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .portfolio-info p {
-      margin: 0;
-      color: #41495c;
-      font-size: 13.5px;
-      line-height: 1.6;
+      padding: 0;
     }
 
     .chart-wrap {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(240px, 280px) minmax(360px, 1fr);
-      gap: 22px;
+      grid-template-columns: minmax(260px, 340px) 1fr;
+      gap: 28px;
       align-items: center;
-      padding: 18px 22px;
-      background: linear-gradient(180deg, #f9fbff, #f2f5fd);
+      padding: 22px 24px;
+      background: linear-gradient(180deg, #fdfefe, #f6f8ff);
       border: 1px solid #e5ebf5;
-      border-radius: 14px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 18px rgba(26, 50, 64, 0.08);
+      border-radius: 16px;
+      box-shadow: 0 14px 28px rgba(21, 45, 58, 0.08);
     }
 
     .chart-visual {
       position: relative;
-      width: 180px;
-      height: 180px;
+      width: 220px;
+      height: 220px;
       display: grid;
       place-items: center;
       margin: 0 auto;
     }
 
     .chart-visual canvas {
-      width: 180px;
-      height: 180px;
+      width: 220px;
+      height: 220px;
+    }
+
+    .chart-legend-col {
+      display: grid;
+      gap: 14px;
     }
 
     .chart-legend {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 10px;
+      gap: 12px;
       font-size: 12.5px;
       color: #1c2436;
       padding-right: 6px;
@@ -522,6 +506,18 @@
       border-radius: 50%;
       flex-shrink: 0;
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+    }
+
+    .portfolio-meta-copy {
+      display: grid;
+      gap: 6px;
+    }
+
+    .portfolio-meta-copy p {
+      margin: 0;
+      color: #41495c;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .chart-center-label {
@@ -554,7 +550,7 @@
 
     .chart-center-label .label-value {
       font-size: 17px;
-      color: #1a7340;
+      color: #0f1a2a;
     }
 
     .chart-center-label .label-sub {
@@ -697,6 +693,22 @@
       box-shadow: 0 12px 22px rgba(32, 42, 68, 0.08);
       margin: 6px 0;
       backdrop-filter: blur(6px);
+    }
+
+    .portfolio-item.fund-highlight {
+      animation: fundPulse 0.9s ease;
+    }
+
+    @keyframes fundPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(86, 165, 255, 0.32);
+      }
+      70% {
+        box-shadow: 0 0 0 12px rgba(86, 165, 255, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(86, 165, 255, 0);
+      }
     }
 
     .portfolio-item::after {
@@ -1091,10 +1103,6 @@
     }
 
     @media (max-width: 720px) {
-      .portfolio-summary {
-        grid-template-columns: 1fr;
-      }
-
       .chart-wrap {
         grid-template-columns: 1fr;
       }
@@ -1470,27 +1478,31 @@
     const defaultPortfolioMeta = {
       factor: {
         title: 'Faktorportfolio',
-        summary: 'Smart-Beta-Strategien mit Qualitäts- und Value-Fokus, fein austariert nach Volatilität.',
-        since: 'Rendite seit 2018: +36,4%',
-        info: 'Dynamisches Rebalancing zwischen Qualitäts- und Momentum-Faktoren.',
+        summary: '',
+        renditePa: '',
+        seit: '',
+        info: '',
       },
       marketcap: {
         title: 'Marketcap Mix',
-        summary: 'Globale Marktführer kombiniert mit wachstumsstarken MidCaps für robuste Marktabdeckung.',
-        since: 'Rendite seit 2017: +41,2%',
-        info: 'Schwerpunkt auf Bilanzstärke, Cashflow-Qualität und Dividendenhistorie.',
+        summary: '',
+        renditePa: '',
+        seit: '',
+        info: '',
       },
       bip: {
         title: 'BIP Allokation',
-        summary: 'Regionale Gewichtung nach Wirtschaftsleistung für kontinuierliche Partizipation am Wachstum.',
-        since: 'Rendite seit 2016: +32,1%',
-        info: 'Systematische Anpassung an makroökonomische Verschiebungen mit minimalem Turnover.',
+        summary: '',
+        renditePa: '',
+        seit: '',
+        info: '',
       },
       obligationen: {
         title: 'Obligationen Fokus',
-        summary: 'Nachhaltige und klassische Anleihen-Bausteine für Stabilität und laufende Erträge.',
-        since: 'Rendite seit 2015: +18,7%',
-        info: 'Diversifikation über Laufzeiten und ESG-zertifizierte Emissionen.',
+        summary: '',
+        renditePa: '',
+        seit: '',
+        info: '',
       },
     };
 
@@ -1900,10 +1912,18 @@
               case 'desc':
                 nextMeta[typeKey].summary = value;
                 break;
+              case 'renditepa':
+              case 'renditep.a':
+              case 'renditeprojahr':
+                nextMeta[typeKey].renditePa = value;
+                break;
+              case 'seit':
+              case 'seitstart':
+              case 'renditeseit':
+              case 'seitjahr':
               case 'since':
               case 'rendite':
-              case 'renditeseit':
-                nextMeta[typeKey].since = value;
+                nextMeta[typeKey].seit = value;
                 break;
               case 'info':
               case 'infonebentitel':
@@ -2323,28 +2343,13 @@
 
       const summary = document.createElement('div');
       summary.className = 'portfolio-summary';
-      const info = document.createElement('div');
-      info.className = 'portfolio-info';
-      const summaryText = document.createElement('p');
-      summaryText.textContent = meta.summary;
-      attachEditable(summaryText, `${type}-summary`, (value) => {
-        portfolioMeta[type].summary = value;
-      });
-      const infoText = document.createElement('p');
-      infoText.textContent = meta.info;
-      attachEditable(infoText, `${type}-info`, (value) => {
-        portfolioMeta[type].info = value;
-      });
-      info.appendChild(summaryText);
-      info.appendChild(infoText);
-
       const chartWrap = document.createElement('div');
       chartWrap.className = 'chart-wrap';
       const chartVisual = document.createElement('div');
       chartVisual.className = 'chart-visual';
       const canvas = document.createElement('canvas');
-      canvas.width = 180;
-      canvas.height = 180;
+      canvas.width = 200;
+      canvas.height = 200;
       const legend = document.createElement('div');
       legend.className = 'chart-legend';
 
@@ -2374,6 +2379,15 @@
         left.appendChild(label);
         const value = document.createElement('span');
         value.textContent = `${entry.value}%`;
+        li.style.cursor = 'pointer';
+        li.addEventListener('click', () => {
+          const target = document.getElementById(`fund-${type}-${entry.index}`);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.classList.add('fund-highlight');
+            setTimeout(() => target.classList.remove('fund-highlight'), 900);
+          }
+        });
         li.appendChild(left);
         li.appendChild(value);
         legend.appendChild(li);
@@ -2383,18 +2397,23 @@
       centerLabel.className = 'chart-center-label';
       const topLabel = document.createElement('div');
       topLabel.className = 'label-top';
-      topLabel.textContent = 'Gesamtrendite';
+      topLabel.textContent = 'Rendite p.a.';
       const mainLabel = document.createElement('div');
       mainLabel.className = 'label-value';
-      const sinceClean = meta.since.replace(/^Rendite\s+seit\s*/i, '').trim();
-      mainLabel.textContent = sinceClean || meta.since;
-      attachEditable(mainLabel, `${type}-since`, (value) => {
-        portfolioMeta[type].since = value;
+      const paValue = (meta.renditePa || '').trim();
+      mainLabel.textContent = paValue || '—';
+      attachEditable(mainLabel, `${type}-renditepa`, (value) => {
+        portfolioMeta[type].renditePa = value;
         renderPortfolios(type);
       });
       const subLabel = document.createElement('div');
       subLabel.className = 'label-sub';
-      subLabel.textContent = 'seit Start';
+      const seitValue = (meta.seit || '').trim();
+      subLabel.textContent = seitValue ? `Seit ${seitValue.replace(/^seit\s*/i, '')}` : '';
+      attachEditable(subLabel, `${type}-seit`, (value) => {
+        portfolioMeta[type].seit = value;
+        renderPortfolios(type);
+      });
       centerLabel.appendChild(topLabel);
       centerLabel.appendChild(mainLabel);
       centerLabel.appendChild(subLabel);
@@ -2402,9 +2421,30 @@
       chartVisual.appendChild(canvas);
       chartVisual.appendChild(centerLabel);
       chartWrap.appendChild(chartVisual);
-      chartWrap.appendChild(legend);
+      const legendColumn = document.createElement('div');
+      legendColumn.className = 'chart-legend-col';
+      legendColumn.appendChild(legend);
+      const infoStack = document.createElement('div');
+      infoStack.className = 'portfolio-meta-copy';
+      if (meta.summary) {
+        const p = document.createElement('p');
+        p.textContent = meta.summary;
+        attachEditable(p, `${type}-summary`, (value) => {
+          portfolioMeta[type].summary = value;
+        });
+        infoStack.appendChild(p);
+      }
+      if (meta.info) {
+        const p = document.createElement('p');
+        p.textContent = meta.info;
+        attachEditable(p, `${type}-info`, (value) => {
+          portfolioMeta[type].info = value;
+        });
+        infoStack.appendChild(p);
+      }
+      legendColumn.appendChild(infoStack);
+      chartWrap.appendChild(legendColumn);
 
-      summary.appendChild(info);
       summary.appendChild(chartWrap);
 
       const fundsWrapper = document.createElement('div');
@@ -2413,6 +2453,7 @@
       portfolioData[type].forEach((item, index) => {
         const fund = document.createElement('div');
         fund.className = 'portfolio-item';
+        fund.id = `fund-${type}-${index}`;
 
         const colorEntry = allocations.find((entry) => entry.index === index);
         const tintColor = colorEntry ? colorEntry.color : '#eef2f8';
