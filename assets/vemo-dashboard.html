@@ -428,6 +428,27 @@
       padding: 4px 0 6px;
     }
 
+    .portfolio-toggle-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      text-align: left;
+    }
+
+    .portfolio-info-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(125, 211, 252, 0.24), rgba(118, 208, 98, 0.18));
+      color: #0f1a2a;
+      font-weight: 700;
+      font-size: 12px;
+      border: 1px solid rgba(15, 26, 42, 0.08);
+      box-shadow: 0 6px 16px rgba(15, 26, 42, 0.06);
+    }
+
     .portfolio-shell.open {
       border-color: rgba(114, 210, 122, 0.6);
       box-shadow: 0 10px 26px rgba(114, 210, 122, 0.12);
@@ -694,6 +715,7 @@
       box-shadow: 0 12px 22px rgba(32, 42, 68, 0.08);
       margin: 6px 0;
       backdrop-filter: blur(6px);
+      scroll-margin-top: 80px;
     }
 
     .portfolio-item.fund-highlight {
@@ -2314,13 +2336,13 @@
       ]);
     }
 
-    function drawDonut(canvas, allocations) {
+    function drawDonut(canvas, allocations, highlightIndex = null) {
       const ctx = canvas.getContext('2d');
       const total = allocations.reduce((sum, item) => sum + item.value, 0) || 1;
       const radius = Math.min(canvas.width, canvas.height) / 2 - 8;
       let startAngle = -Math.PI / 2;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      allocations.forEach((slice) => {
+      allocations.forEach((slice, idx) => {
         const angle = (slice.value / total) * Math.PI * 2;
         ctx.beginPath();
         ctx.moveTo(canvas.width / 2, canvas.height / 2);
@@ -2328,6 +2350,15 @@
         ctx.closePath();
         ctx.fillStyle = slice.color;
         ctx.fill();
+        if (highlightIndex === idx) {
+          ctx.save();
+          ctx.lineWidth = 8;
+          ctx.strokeStyle = hexToRgba(slice.color, 0.9);
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, canvas.height / 2, radius - 2, startAngle, startAngle + angle);
+          ctx.stroke();
+          ctx.restore();
+        }
         startAngle += angle;
       });
       ctx.beginPath();
@@ -2353,7 +2384,22 @@
       shell.className = 'portfolio-shell';
       const toggle = document.createElement('button');
       toggle.className = 'portfolio-toggle';
-      toggle.innerHTML = `<span data-editable="true">${meta.title}</span><span class="chevron" aria-hidden="true">›</span>`;
+      const infoChipHtml = meta.info
+        ? `<span class="portfolio-info-chip" data-editable="true">${meta.info}</span>`
+        : '';
+      toggle.innerHTML = `<div class="portfolio-toggle-text"><span class="portfolio-title" data-editable="true">${meta.title}</span>${infoChipHtml}</div><span class="chevron" aria-hidden="true">›</span>`;
+      const titleSpan = toggle.querySelector('.portfolio-title');
+      attachEditable(titleSpan, `${type}-title`, (value) => {
+        portfolioMeta[type].title = value;
+        renderPortfolios(type);
+      });
+      const infoChip = toggle.querySelector('.portfolio-info-chip');
+      if (infoChip) {
+        attachEditable(infoChip, `${type}-info`, (value) => {
+          portfolioMeta[type].info = value;
+          renderPortfolios(type);
+        });
+      }
       const content = document.createElement('div');
       content.style.display = 'block';
       shell.classList.add('open');
@@ -2384,6 +2430,11 @@
         index,
       }));
 
+      const flashSlice = (idx) => {
+        drawDonut(canvas, allocations, idx);
+        setTimeout(() => drawDonut(canvas, allocations), 900);
+      };
+
       allocations.forEach((entry) => {
         const li = document.createElement('div');
         li.className = 'legend-item';
@@ -2404,9 +2455,10 @@
         value.textContent = `${entry.value}%`;
         li.style.cursor = 'pointer';
         li.addEventListener('click', () => {
+          flashSlice(entry.index);
           const target = document.getElementById(`fund-${type}-${entry.index}`);
           if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
             target.classList.add('fund-highlight');
             setTimeout(() => target.classList.remove('fund-highlight'), 900);
           }
@@ -2457,14 +2509,6 @@
         });
         infoStack.appendChild(p);
       }
-      if (meta.info) {
-        const p = document.createElement('p');
-        p.textContent = meta.info;
-        attachEditable(p, `${type}-info`, (value) => {
-          portfolioMeta[type].info = value;
-        });
-        infoStack.appendChild(p);
-      }
       legendColumn.appendChild(infoStack);
       chartWrap.appendChild(legendColumn);
 
@@ -2484,6 +2528,13 @@
         fund.style.border = `1px solid ${hexToRgba(tintColor, 0.32)}`;
         fund.style.boxShadow = `0 12px 24px ${hexToRgba(tintColor, 0.18)}`;
         fund.style.color = '#0f1a2a';
+
+        fund.addEventListener('click', (event) => {
+          if (event.target.closest('button, a, input, textarea, select')) return;
+          flashSlice(index);
+          fund.classList.add('fund-highlight');
+          setTimeout(() => fund.classList.remove('fund-highlight'), 900);
+        });
 
         const header = document.createElement('div');
         header.className = 'fund-header';
