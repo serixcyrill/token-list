@@ -199,7 +199,7 @@
 
     .vorsorge-actions {
       display: grid;
-      grid-template-columns: repeat(2, minmax(150px, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
       gap: 10px;
       margin-top: 4px;
@@ -219,6 +219,7 @@
       white-space: nowrap;
       min-width: 0;
       width: 100%;
+      min-height: 44px;
       transition: background 0.2s ease, border 0.2s ease, color 0.2s ease, transform 0.1s ease;
     }
 
@@ -226,14 +227,14 @@
       position: absolute;
       top: 12px;
       right: 12px;
-      width: 70px;
-      height: 70px;
+      width: 56px;
+      height: 56px;
       object-fit: contain;
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.78);
       box-shadow: 0 10px 24px rgba(15, 26, 42, 0.12);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      padding: 4px;
     }
 
     .cta-primary {
@@ -259,6 +260,12 @@
       background: #f1f5fb;
       border-color: #cdd4e0;
       transform: translateY(-1px);
+    }
+
+    .cta-btn.is-disabled {
+      opacity: 0.55;
+      pointer-events: none;
+      border-style: dashed;
     }
 
     .pill {
@@ -2174,17 +2181,19 @@
         const websiteBtn = document.createElement('a');
         websiteBtn.className = 'cta-btn cta-secondary';
         websiteBtn.textContent = 'Website';
-        websiteBtn.href = card.website || card.link || '#';
+        const websiteHref = card.website || card.link;
+        websiteBtn.href = websiteHref || '#';
         websiteBtn.target = '_blank';
         websiteBtn.rel = 'noreferrer';
         websiteBtn.setAttribute('aria-label', `Website von ${card.title} öffnen`);
+        if (!websiteHref) {
+          websiteBtn.classList.add('is-disabled');
+        }
 
         const actionWrap = document.createElement('div');
         actionWrap.className = 'vorsorge-actions';
         actionWrap.appendChild(link);
-        if (card.website || card.link) {
-          actionWrap.appendChild(websiteBtn);
-        }
+        actionWrap.appendChild(websiteBtn);
 
         const vTitle = document.createElement('h4');
         vTitle.textContent = 'Vorteile';
