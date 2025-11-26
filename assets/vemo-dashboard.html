@@ -199,6 +199,7 @@
 
     .vorsorge-actions {
       display: flex;
+      align-items: center;
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 4px;
@@ -214,7 +215,25 @@
       font-size: 13px;
       text-decoration: none;
       cursor: pointer;
+      justify-content: center;
+      white-space: nowrap;
+      min-width: 132px;
+      width: 150px;
       transition: background 0.2s ease, border 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    }
+
+    .vorsorge-logo {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.75);
+      box-shadow: 0 10px 24px rgba(15, 26, 42, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 6px;
     }
 
     .cta-primary {
@@ -1385,6 +1404,7 @@
         weitereGebuehren: '0,10% p.a.',
         link: '',
         website: '',
+        logo: '',
         vorteile: [
           'Starker ESG-Fokus mit klaren Ausschlusskriterien.',
           'Breite Diversifikation über Regionen und Branchen.',
@@ -1403,6 +1423,7 @@
         weitereGebuehren: '0,08% p.a.',
         link: '',
         website: '',
+        logo: '',
         vorteile: [
           'Konstante Ausschüttungen für planbare Erträge.',
           'Ausgewogener Mix aus defensiven und Wachstumswerten.',
@@ -1421,6 +1442,7 @@
         weitereGebuehren: '0,12% p.a.',
         link: '',
         website: '',
+        logo: '',
         vorteile: [
           'Höhere Aktienquote für langfristige Wachstumschancen.',
           'Fokus auf Innovations- und Zukunftsthemen.',
@@ -1752,6 +1774,7 @@
           weitereGebuehren: '',
           link: '',
           website: '',
+          logo: '',
           vorteile: [],
           nachteile: [],
         }));
@@ -1794,6 +1817,9 @@
                 break;
               case 'website':
                 card.website = value;
+                break;
+              case 'logo':
+                card.logo = value;
                 break;
               default:
                 if (key.startsWith('vorteil')) {
@@ -2086,6 +2112,14 @@
         const article = document.createElement('article');
         article.className = 'vorsorge-card';
         if (card.ranking === '1') article.classList.add('rank-1');
+
+        if (card.logo) {
+          const logoImg = document.createElement('img');
+          logoImg.src = card.logo;
+          logoImg.alt = `${card.title} Logo`;
+          logoImg.className = 'vorsorge-logo';
+          article.appendChild(logoImg);
+        }
 
         const pill = document.createElement('div');
         pill.className = 'pill';
