@@ -2252,9 +2252,9 @@
         const rows = parseCsv(csvText).filter((r) => r.length);
         if (rows.length < 2) throw new Error('Keine Berater-Zeilen');
 
-        const header = rows[0].slice(1);
+        const header = rows[0].slice(1).map((key) => key.trim());
         const fieldRows = rows.slice(1);
-        const advisors = header.map((key) => ({ key: key.toLowerCase() }));
+        const advisors = header.map((key) => ({ key: key.toLowerCase().trim() }));
 
         const normalizeKey = (key) => String(key || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
         const fieldMap = {};
@@ -2277,7 +2277,12 @@
         const codeRow = getFieldValues('codeofconducttext', ['codeofconduct', 'conduct']);
         const terminLinkRow = getFieldValues('terminlink', ['calendly', 'termin']);
         const terminHinweisRow = getFieldValues('terminhinweis', ['hinweis']);
-        const avatarRow = getFieldValues('avatarurl', ['avatar', 'avatarurl', 'profilbild', 'bildurl']);
+        let avatarRow = getFieldValues('avatarurl', ['avatar', 'profilbild', 'bildurl']);
+        const avatarMissing = !avatarRow.length || avatarRow.every((cell) => !String(cell || '').trim());
+        // Fallback: feste Zeile 9 (Index 8) laut Vorgabe B/C/D
+        if (avatarMissing && rows[8]) {
+          avatarRow = rows[8].slice(1);
+        }
 
         advisors.forEach((advisor, idx) => {
           advisor.name = (nameRow[idx] || '').trim();
