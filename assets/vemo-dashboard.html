@@ -197,6 +197,51 @@
       gap: 6px;
     }
 
+    .vorsorge-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .vorsorge-actions .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s ease, border 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    }
+
+    .cta-primary {
+      color: #ffffff;
+      background: var(--accent-strong);
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+      border: 1px solid rgba(114, 210, 122, 0.5);
+    }
+
+    .cta-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .cta-secondary {
+      color: #0f1a2a;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #dfe3ec;
+      box-shadow: 0 6px 12px rgba(15, 26, 42, 0.06);
+    }
+
+    .cta-secondary:hover {
+      background: #f1f5fb;
+      border-color: #cdd4e0;
+      transform: translateY(-1px);
+    }
+
     .pill {
       display: inline-flex;
       align-items: center;
@@ -1313,6 +1358,7 @@
         produktkosten: '0,48% p.a.',
         weitereGebuehren: '0,10% p.a.',
         link: '',
+        website: '',
         vorteile: [
           'Starker ESG-Fokus mit klaren Ausschlusskriterien.',
           'Breite Diversifikation über Regionen und Branchen.',
@@ -1330,6 +1376,7 @@
         produktkosten: '0,38% p.a.',
         weitereGebuehren: '0,08% p.a.',
         link: '',
+        website: '',
         vorteile: [
           'Konstante Ausschüttungen für planbare Erträge.',
           'Ausgewogener Mix aus defensiven und Wachstumswerten.',
@@ -1347,6 +1394,7 @@
         produktkosten: '0,54% p.a.',
         weitereGebuehren: '0,12% p.a.',
         link: '',
+        website: '',
         vorteile: [
           'Höhere Aktienquote für langfristige Wachstumschancen.',
           'Fokus auf Innovations- und Zukunftsthemen.',
@@ -1665,6 +1713,7 @@
           produktkosten: '',
           weitereGebuehren: '',
           link: '',
+          website: '',
           vorteile: [],
           nachteile: [],
         }));
@@ -1703,6 +1752,10 @@
                 break;
               case 'link':
                 card.link = value;
+                card.website = value;
+                break;
+              case 'website':
+                card.website = value;
                 break;
               default:
                 if (key.startsWith('vorteil')) {
@@ -1714,6 +1767,12 @@
                 break;
             }
           });
+        });
+
+        cards.forEach((card) => {
+          if (!card.website && card.link) {
+            card.website = card.link;
+          }
         });
 
         if (!updateCandidate && rows[17] && rows[17][1]) {
@@ -2023,16 +2082,34 @@
         metaDiv.appendChild(spanProd);
         metaDiv.appendChild(spanGeb);
 
+        const details = document.createElement('div');
+        details.className = 'details';
+        details.hidden = true;
+        const detailsId = `vorsorge-details-${index}`;
+        details.id = detailsId;
+
         const link = document.createElement('a');
-        link.href = card.link || '#';
-        link.className = 'toggle-details';
+        link.href = '#';
+        link.className = 'toggle-details cta-btn cta-primary';
+        link.dataset.targetId = detailsId;
         link.setAttribute('aria-expanded', 'false');
         link.setAttribute('aria-label', `Mehr erfahren zu ${card.title}`);
         link.textContent = 'Mehr erfahren';
 
-        const details = document.createElement('div');
-        details.className = 'details';
-        details.hidden = true;
+        const websiteBtn = document.createElement('a');
+        websiteBtn.className = 'cta-btn cta-secondary';
+        websiteBtn.textContent = 'Website';
+        websiteBtn.href = card.website || card.link || '#';
+        websiteBtn.target = '_blank';
+        websiteBtn.rel = 'noreferrer';
+        websiteBtn.setAttribute('aria-label', `Website von ${card.title} öffnen`);
+
+        const actionWrap = document.createElement('div');
+        actionWrap.className = 'vorsorge-actions';
+        actionWrap.appendChild(link);
+        if (card.website || card.link) {
+          actionWrap.appendChild(websiteBtn);
+        }
 
         const vTitle = document.createElement('h4');
         vTitle.textContent = 'Vorteile';
@@ -2071,7 +2148,7 @@
         article.appendChild(h3);
         article.appendChild(desc);
         article.appendChild(metaDiv);
-        article.appendChild(link);
+        article.appendChild(actionWrap);
         article.appendChild(details);
 
         grid.appendChild(article);
@@ -2597,7 +2674,8 @@
 
         link.addEventListener('click', (event) => {
           event.preventDefault();
-          const details = link.nextElementSibling;
+          const targetId = link.dataset.targetId;
+          const details = targetId ? document.getElementById(targetId) : link.nextElementSibling;
           if (!details) return;
           const isOpen = !details.hasAttribute('hidden');
 
@@ -2605,8 +2683,8 @@
             if (panel === details) return;
             panel.setAttribute('hidden', '');
             panel.style.display = 'none';
-            const trigger = panel.previousElementSibling;
-            if (trigger?.classList.contains('toggle-details')) {
+            const trigger = document.querySelector(`.toggle-details[data-target-id="${panel.id}"]`);
+            if (trigger) {
               trigger.setAttribute('aria-expanded', 'false');
               trigger.textContent = 'Mehr erfahren';
             }
