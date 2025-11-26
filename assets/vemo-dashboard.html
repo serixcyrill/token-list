@@ -2138,9 +2138,11 @@
         const preferRow = (...candidates) => candidates.find((row) => Array.isArray(row) && row.length > 1 && row.some(Boolean)) || [];
 
         const fondsNameRow = getFieldRow('fondsname');
-        const isKryptoColumn = (strategyValue, titleValue) => {
+        const isKryptoColumn = (strategyValue, titleValue, columnLabel) => {
           const normalizedStrategy = String(strategyValue || '').toLowerCase();
           if (normalizedStrategy === 'krypto') return true;
+          const normalizedColumn = String(columnLabel || '').toLowerCase();
+          if (normalizedColumn.includes('krypto')) return true;
           const normalizedTitle = String(titleValue || '').toLowerCase();
           return normalizedTitle.includes('krypto') || normalizedTitle.includes('bitcoin');
         };
@@ -2164,11 +2166,11 @@
         const pro3Row = findRow('pro3');
         const con1Row = findRow('con1');
 
-        header.slice(1).forEach((_, colIdx) => {
+        header.slice(1).forEach((colLabel, colIdx) => {
           const col = colIdx + 1;
           const strategy = (strategyRow?.[col] || '').toLowerCase();
           const title = fondsNameRow[col] || '';
-          const isKrypto = isKryptoColumn(strategy, title);
+          const isKrypto = isKryptoColumn(strategy, title, colLabel);
 
           if (!nextData[strategy] && !isKrypto) {
             return;
@@ -2702,7 +2704,7 @@
       centerLabel.className = 'chart-center-label';
       const topLabel = document.createElement('div');
       topLabel.className = 'label-top';
-      topLabel.textContent = 'Rendite p.a.';
+      topLabel.textContent = 'Rendite';
       const mainLabel = document.createElement('div');
       mainLabel.className = 'label-value';
       const hasReturn = viewFunds.some((fund) => parseReturnNumber(fund.returns5));
