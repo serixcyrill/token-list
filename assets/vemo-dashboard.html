@@ -443,11 +443,11 @@
 
     .portfolio-summary {
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-      gap: 20px;
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 1.05fr);
+      gap: 22px;
+      align-items: stretch;
       margin-top: 10px;
-      padding: 18px 20px;
+      padding: 18px 22px;
       background: linear-gradient(145deg, #fdfefe, #f6f8ff);
       border: 1px solid #e6ebf5;
       border-radius: 16px;
@@ -457,7 +457,7 @@
     .portfolio-info {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       justify-content: center;
     }
 
@@ -468,35 +468,13 @@
       line-height: 1.6;
     }
 
-    .portfolio-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .portfolio-meta .chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 38px;
-      padding: 8px 16px;
-      background: linear-gradient(135deg, rgba(114, 210, 122, 0.16), rgba(114, 210, 122, 0.04));
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 12.5px;
-      color: #0f1a2a;
-      text-align: center;
-      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.28);
-    }
-
     .chart-wrap {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
-      gap: 16px;
+      grid-template-columns: minmax(240px, 280px) minmax(360px, 1fr);
+      gap: 22px;
       align-items: center;
-      padding: 14px 16px;
+      padding: 18px 22px;
       background: linear-gradient(180deg, #f9fbff, #f2f5fd);
       border: 1px solid #e5ebf5;
       border-radius: 14px;
@@ -519,10 +497,11 @@
 
     .chart-legend {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
       font-size: 12.5px;
       color: #1c2436;
+      padding-right: 6px;
     }
 
     .legend-item {
@@ -530,7 +509,7 @@
       align-items: center;
       gap: 8px;
       justify-content: space-between;
-      padding: 10px 12px;
+      padding: 12px 14px;
       background: #ffffff;
       border: 1px solid #e6eaf3;
       border-radius: 12px;
@@ -739,10 +718,20 @@
       color: #0f1a2a;
     }
 
-    .portfolio-item p {
+    .fund-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 2px;
+    }
+
+    .fund-desc {
       margin: 0;
-      color: #3b4256;
+      color: #2f3747;
       font-size: 13px;
+      line-height: 1.5;
+      max-width: 520px;
     }
 
     .portfolio-item .meta span {
@@ -2331,19 +2320,8 @@
       attachEditable(infoText, `${type}-info`, (value) => {
         portfolioMeta[type].info = value;
       });
-      const chips = document.createElement('div');
-      chips.className = 'portfolio-meta';
-      const sinceChip = document.createElement('span');
-      sinceChip.className = 'chip';
-      sinceChip.textContent = meta.since;
-      attachEditable(sinceChip, `${type}-since`, (value) => {
-        portfolioMeta[type].since = value;
-        renderPortfolios(type);
-      });
-      chips.appendChild(sinceChip);
       info.appendChild(summaryText);
       info.appendChild(infoText);
-      info.appendChild(chips);
 
       const chartWrap = document.createElement('div');
       chartWrap.className = 'chart-wrap';
@@ -2395,6 +2373,10 @@
       mainLabel.className = 'label-value';
       const sinceClean = meta.since.replace(/^Rendite\s+seit\s*/i, '').trim();
       mainLabel.textContent = sinceClean || meta.since;
+      attachEditable(mainLabel, `${type}-since`, (value) => {
+        portfolioMeta[type].since = value;
+        renderPortfolios(type);
+      });
       const subLabel = document.createElement('div');
       subLabel.className = 'label-sub';
       subLabel.textContent = 'seit Start';
@@ -2424,13 +2406,20 @@
         fund.style.boxShadow = `0 12px 24px ${hexToRgba(tintColor, 0.18)}`;
         fund.style.color = '#0f1a2a';
 
+        const header = document.createElement('div');
+        header.className = 'fund-header';
+
         const title = document.createElement('h4');
         title.textContent = item.title;
         bindEditableSync(title, type, index, 'title', true);
 
-        const desc = document.createElement('p');
+        const desc = document.createElement('span');
+        desc.className = 'fund-desc';
         desc.textContent = item.desc;
         bindEditableSync(desc, type, index, 'desc');
+
+        header.appendChild(title);
+        header.appendChild(desc);
 
         const returns = document.createElement('div');
         returns.className = 'meta';
@@ -2554,8 +2543,7 @@
         });
         actions.appendChild(deleteBtn);
 
-        fund.appendChild(title);
-        fund.appendChild(desc);
+        fund.appendChild(header);
         fund.appendChild(returns);
         fund.appendChild(since);
         fund.appendChild(allocationRow);
