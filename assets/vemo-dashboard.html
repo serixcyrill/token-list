@@ -2277,11 +2277,17 @@
         const codeRow = getFieldValues('codeofconducttext', ['codeofconduct', 'conduct']);
         const terminLinkRow = getFieldValues('terminlink', ['calendly', 'termin']);
         const terminHinweisRow = getFieldValues('terminhinweis', ['hinweis']);
-        let avatarRow = getFieldValues('avatarurl', ['avatar', 'profilbild', 'bildurl']);
-        const avatarMissing = !avatarRow.length || avatarRow.every((cell) => !String(cell || '').trim());
-        // Fallback: feste Zeile 9 (Index 8) laut Vorgabe B/C/D
-        if (avatarMissing && rows[8]) {
-          avatarRow = rows[8].slice(1);
+
+        // Primär: feste Zeile 9 (Index 8) Spalten B–D für Avatar-URLs
+        const avatarRowFromRow9 = rows[8] ? rows[8].slice(1).map((cell) => (cell || '').trim()) : [];
+        let avatarRow = avatarRowFromRow9;
+
+        // Fallback: explizite "Avatar URL"-Zeile falls Zeile 9 leer ist
+        const avatarRowFallback = getFieldValues('avatarurl', ['avatar', 'profilbild', 'bildurl']);
+        const avatarRowFallbackTrimmed = avatarRowFallback.map((cell) => (cell || '').trim());
+        const row9HasData = avatarRowFromRow9.some((val) => val);
+        if (!row9HasData && avatarRowFallbackTrimmed.length) {
+          avatarRow = avatarRowFallbackTrimmed;
         }
 
         advisors.forEach((advisor, idx) => {
@@ -3104,7 +3110,7 @@
         avatarInput.dataset.defaultUrl = advisor.avatarUrl || '';
         avatarInput.placeholder = 'https://...';
 
-        if (advisor.avatarUrl && !savedAvatars[avatarId]) {
+        if (advisor.avatarUrl) {
           savedAvatars[avatarId] = advisor.avatarUrl.trim();
           avatarsPatched = true;
         }
