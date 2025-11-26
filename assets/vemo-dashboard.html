@@ -2061,10 +2061,17 @@
         const rows = parseCsv(csvText).filter((r) => r.length);
         if (rows.length < 2) throw new Error('Zu wenige Fonds-Zeilen');
 
+        const normalizeFieldKey = (name) => String(name || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+
         const header = rows[0];
         const fieldRows = rows.slice(1);
-        const strategyRow = fieldRows.find((r) => (r[0] || '').toLowerCase() === 'strategie');
-        const sortRow = fieldRows.find((r) => (r[0] || '').toLowerCase() === 'sortierung');
+        const findRow = (key, aliases = []) => {
+          const targets = [key, ...aliases].map(normalizeFieldKey);
+          return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0])));
+        };
+
+        const strategyRow = findRow('strategie');
+        const sortRow = findRow('sortierung');
         const nextData = {
           factor: [],
           marketcap: [],
@@ -2074,10 +2081,8 @@
         let nextKrypto = null;
 
         const getFieldRow = (name, aliases = []) => {
-          const targets = [name, ...aliases].map((entry) => entry.toLowerCase());
-          return (
-            fieldRows.find((r) => targets.includes((r[0] || '').toLowerCase())) || []
-          );
+          const targets = [name, ...aliases].map(normalizeFieldKey);
+          return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0]))) || [];
         };
 
         const rendite5Row = getFieldRow('rendite5', [
