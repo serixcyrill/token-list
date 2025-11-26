@@ -2085,13 +2085,21 @@
           return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0]))) || [];
         };
 
-        const rendite5Row = getFieldRow('rendite5', [
-          'durchschnittsrendite 5 jahre',
-          'durchschnittsrendite5jahre',
-          'durchschnittsrendite5 jahr',
-        ]);
+        const preferRow = (...candidates) => candidates.find((row) => Array.isArray(row) && row.length > 1 && row.some(Boolean)) || [];
 
-        const rendite10Row = getFieldRow('rendite10', ['durchschnittsrendite 10 jahre']);
+        const rendite5Row = preferRow(
+          fieldRows[4], // Tabellenzeile 6 (1-basiert)
+          getFieldRow('rendite5', [
+            'durchschnittsrendite 5 jahre',
+            'durchschnittsrendite5jahre',
+            'durchschnittsrendite5 jahr',
+          ]),
+        );
+
+        const rendite10Row = preferRow(
+          fieldRows[5], // Tabellenzeile 7 (1-basiert)
+          getFieldRow('rendite10', ['durchschnittsrendite 10 jahre']),
+        );
 
         const prosRows = fieldRows.filter((r) => (r[0] || '').toLowerCase().startsWith('pro'));
         const consRows = fieldRows.filter((r) => (r[0] || '').toLowerCase().startsWith('con'));
