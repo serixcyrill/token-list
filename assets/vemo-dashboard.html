@@ -2435,9 +2435,9 @@
 
     function parseReturnNumber(text) {
       if (!text) return 0;
-      const match = String(text).match(/(-?\d+[\d.,]*)/);
-      if (!match) return 0;
-      const normalized = match[1].replace(/[^\d.,-]/g, '').replace(',', '.');
+      const matches = String(text).match(/-?\d[\d.,]*/g);
+      if (!matches || !matches.length) return 0;
+      const normalized = matches[matches.length - 1].replace(/[^\d.,-]/g, '').replace(',', '.');
       const value = Number(normalized);
       return Number.isFinite(value) ? value : 0;
     }
