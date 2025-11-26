@@ -359,6 +359,19 @@
       margin-bottom: 12px;
     }
 
+    .krypto-toggle {
+      background: linear-gradient(145deg, #ffb26b, #ff9248);
+      color: #ffffff;
+      border-color: rgba(255, 146, 72, 0.9);
+      box-shadow: 0 10px 22px rgba(255, 146, 72, 0.35);
+    }
+
+    .krypto-toggle.active {
+      background: linear-gradient(145deg, #ff9248, #ff7c1f);
+      border-color: rgba(255, 124, 31, 0.95);
+      box-shadow: 0 12px 26px rgba(255, 124, 31, 0.45);
+    }
+
     .portfolio-actions {
       display: none;
       gap: 10px;
@@ -1172,6 +1185,7 @@
           <button type="button" data-portfolio-tab="marketcap">Marketcap</button>
           <button type="button" data-portfolio-tab="bip">BIP</button>
           <button type="button" data-portfolio-tab="obligationen">Obligationen</button>
+          <button type="button" id="kryptoToggle" class="krypto-toggle">+ 5% Krypto</button>
         </div>
         <div class="portfolio-actions" id="portfolioActions">
           <button type="button" id="addFund" class="secondary-btn">+ Fonds hinzufügen</button>
@@ -1329,6 +1343,7 @@
     const adminCode = 'Vemokorrektur20954.';
     const adminNotice = document.getElementById('adminNotice');
     const addFundBtn = document.getElementById('addFund');
+    const kryptoToggle = document.getElementById('kryptoToggle');
     const updateTrigger = document.getElementById('lastUpdateTrigger');
     const modal = document.getElementById('adminModal');
     const codeInput = document.getElementById('adminCodeInput');
@@ -1347,6 +1362,7 @@
     };
 
     const SHIMMER_COLORS = ['#6fd9b5', '#6abef5', '#9fb5ff', '#ffc87c', '#8fd8ff', '#ffb3d6'];
+    const KRYPT0_COLOR = '#f97316';
 
     // *** Google Sheet Konfiguration ***
     // Basis-ID aus deinem Link:
@@ -1672,6 +1688,18 @@
       ],
     };
 
+    const defaultKryptoFund = {
+      title: 'Krypto (Bitcoin)',
+      desc: 'Digitaler Baustein mit begrenztem Angebot.',
+      returns5: 'Ø Rendite 5 Jahre: 45% p.a.',
+      returns10: 'Ø Rendite 10 Jahre: 70% p.a.',
+      allocation: 5,
+      since: 'Seit 2015',
+      factsheet: '',
+      pros: ['Begrenztes Angebot, hohe Liquidität.'],
+      cons: ['Hohe Volatilität, regulatorische Risiken.'],
+    };
+
     const defaultAblaufData = {
       konservativ: [
         ['Aktien', '25%', '24%', '23%', '22%', '21%', '20%', '19%', '18%', '17%', '16%'],
@@ -1736,10 +1764,12 @@
 
     let portfolioMeta = deepClone(defaultPortfolioMeta);
     let portfolioData = loadJson(STORAGE_KEYS.portfolios, defaultPortfolioData);
+    let kryptoFund = deepClone(defaultKryptoFund);
     let advisorData = deepClone(defaultAdvisors);
     let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
     let updatesData = deepClone(defaultUpdatesData);
     let vorsorgeLastUpdate = '';
+    let kryptoActive = false;
 
     function buildCsvUrl(gid) {
       const params = new URLSearchParams({
@@ -2014,6 +2044,7 @@
           bip: [],
           obligationen: [],
         };
+        let nextKrypto = null;
 
         const getFieldRow = (name) =>
           fieldRows.find((r) => (r[0] || '').toLowerCase() === name.toLowerCase()) || [];
@@ -2024,7 +2055,17 @@
         header.slice(1).forEach((_, colIdx) => {
           const col = colIdx + 1;
           const strategy = (strategyRow?.[col] || '').toLowerCase();
-          if (!nextData[strategy]) return;
+          if (!nextData[strategy]) {
+            if (strategy === 'krypto') {
+              const kFund = { title, desc: getFieldRow('beschreibung')[col] || '', returns5: getFieldRow('rendite5')[col] || '', returns10: getFieldRow('rendite10')[col] || '', allocation: Number(getFieldRow('allocation')[col] || 5), since: getFieldRow('since')[col] || '', factsheet: getFieldRow('factsheet')[col] || '', pros: prosRows
+                  .map((row) => normalizeListValue(row[col]))
+                  .filter(Boolean), cons: consRows
+                  .map((row) => normalizeListValue(row[col]))
+                  .filter(Boolean), sortOrder };
+              nextKrypto = kFund;
+            }
+            return;
+          }
 
           const title = getFieldRow('fondsname')[col] || '';
           if (!title) return;
@@ -2060,6 +2101,9 @@
         if (hasAny) {
           portfolioData = nextData;
           persistPortfolioData();
+        }
+        if (nextKrypto) {
+          kryptoFund = nextKrypto;
         }
       } catch (error) {
         console.warn('Fonds Sheet konnte nicht geladen werden, nutze Fallback/LocalStorage', error);
@@ -2336,6 +2380,67 @@
       ]);
     }
 
+    function parseReturnNumber(text) {
+      if (!text) return 0;
+      const match = String(text).match(/(-?\d+[\d.,]*)/);
+      if (!match) return 0;
+      const normalized = match[1].replace(/[^\d.,-]/g, '').replace(',', '.');
+      const value = Number(normalized);
+      return Number.isFinite(value) ? value : 0;
+    }
+
+    function computeWeightedReturn(funds) {
+      const totals = funds.reduce(
+        (acc, item) => {
+          const val = parseReturnNumber(item.returns5);
+          acc.weighted += val * (item.allocation || 0);
+          acc.total += item.allocation || 0;
+          return acc;
+        },
+        { weighted: 0, total: 0 }
+      );
+      if (!totals.total) return 0;
+      return totals.weighted / totals.total;
+    }
+
+    function buildPortfolioView(type) {
+      const baseList = (portfolioData[type] || []).map((item, idx) => ({
+        ...item,
+        __idx: idx,
+        isKrypto: false,
+      }));
+
+      if (!kryptoActive) return baseList;
+
+      const deductionTotal = 5;
+      const count = baseList.length;
+      const adjusted = [];
+
+      if (count > 0) {
+        const baseDeduct = Math.floor(deductionTotal / count);
+        let remainder = deductionTotal - baseDeduct * count;
+        baseList.forEach((item) => {
+          const deduction = baseDeduct + (remainder > 0 ? 1 : 0);
+          remainder = Math.max(0, remainder - 1);
+          adjusted.push({
+            ...item,
+            allocation: Math.max(0, item.allocation - deduction),
+          });
+        });
+      } else {
+        adjusted.push(...baseList);
+      }
+
+      adjusted.push({
+        ...kryptoFund,
+        allocation: deductionTotal,
+        __idx: -1,
+        isKrypto: true,
+      });
+
+      return adjusted;
+    }
+
     function drawDonut(canvas, allocations, highlightIndex = null) {
       const ctx = canvas.getContext('2d');
       const total = allocations.reduce((sum, item) => sum + item.value, 0) || 1;
@@ -2422,13 +2527,22 @@
       const legend = document.createElement('div');
       legend.className = 'chart-legend';
 
-      const colors = SHIMMER_COLORS;
-      const allocations = portfolioData[type].map((item, index) => ({
-        label: item.title,
-        value: item.allocation,
-        color: colors[index % colors.length],
-        index,
-      }));
+      const viewFunds = buildPortfolioView(type);
+      let paletteIndex = 0;
+      const allocations = viewFunds.map((item, index) => {
+        const color = item.isKrypto ? KRYPT0_COLOR : SHIMMER_COLORS[paletteIndex % SHIMMER_COLORS.length];
+        if (!item.isKrypto) paletteIndex += 1;
+        return {
+          label: item.title,
+          value: item.allocation,
+          color,
+          index,
+          baseIndex: item.__idx,
+          isKrypto: item.isKrypto,
+        };
+      });
+
+      const weightedReturn = computeWeightedReturn(viewFunds);
 
       const flashSlice = (idx) => {
         drawDonut(canvas, allocations, idx);
@@ -2447,8 +2561,10 @@
         dot.style.background = entry.color;
         const label = document.createElement('span');
         label.textContent = entry.label;
-        label.dataset.editable = 'true';
-        bindEditableSync(label, type, entry.index, 'title', true);
+        if (entry.baseIndex >= 0) {
+          label.dataset.editable = 'true';
+          bindEditableSync(label, type, entry.baseIndex, 'title', true);
+        }
         left.appendChild(dot);
         left.appendChild(label);
         const value = document.createElement('span');
@@ -2456,7 +2572,7 @@
         li.style.cursor = 'pointer';
         li.addEventListener('click', () => {
           flashSlice(entry.index);
-          const target = document.getElementById(`fund-${type}-${entry.index}`);
+          const target = document.getElementById(`fund-${type}-${entry.baseIndex >= 0 ? entry.baseIndex : 'krypto'}`);
           if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'center' });
             target.classList.add('fund-highlight');
@@ -2476,7 +2592,8 @@
       const mainLabel = document.createElement('div');
       mainLabel.className = 'label-value';
       const paValue = (meta.renditePa || '').trim();
-      mainLabel.textContent = paValue || '—';
+      const computedLabel = weightedReturn ? `${weightedReturn.toFixed(1)}% p.a.` : paValue || '—';
+      mainLabel.textContent = computedLabel;
       attachEditable(mainLabel, `${type}-renditepa`, (value) => {
         portfolioMeta[type].renditePa = value;
         renderPortfolios(type);
@@ -2517,12 +2634,13 @@
       const fundsWrapper = document.createElement('div');
       fundsWrapper.className = 'funds-wrapper';
 
-      portfolioData[type].forEach((item, index) => {
+      viewFunds.forEach((item, index) => {
         const fund = document.createElement('div');
         fund.className = 'portfolio-item';
-        fund.id = `fund-${type}-${index}`;
+        const fundId = item.__idx >= 0 ? `fund-${type}-${item.__idx}` : `fund-${type}-krypto`;
+        fund.id = fundId;
 
-        const colorEntry = allocations.find((entry) => entry.index === index);
+        const colorEntry = allocations[index];
         const tintColor = colorEntry ? colorEntry.color : '#eef2f8';
         fund.style.background = `linear-gradient(145deg, ${hexToRgba(tintColor, 0.24)}, ${hexToRgba(tintColor, 0.12)}), rgba(255, 255, 255, 0.9)`;
         fund.style.border = `1px solid ${hexToRgba(tintColor, 0.32)}`;
@@ -2541,12 +2659,24 @@
 
         const title = document.createElement('h4');
         title.textContent = item.title;
-        bindEditableSync(title, type, index, 'title', true);
+        if (item.__idx >= 0) {
+          bindEditableSync(title, type, item.__idx, 'title', true);
+        } else {
+          attachEditable(title, 'krypto-title', (value) => {
+            kryptoFund.title = value;
+          });
+        }
 
         const desc = document.createElement('span');
         desc.className = 'fund-desc';
         desc.textContent = item.desc;
-        bindEditableSync(desc, type, index, 'desc');
+        if (item.__idx >= 0) {
+          bindEditableSync(desc, type, item.__idx, 'desc');
+        } else {
+          attachEditable(desc, 'krypto-desc', (value) => {
+            kryptoFund.desc = value;
+          });
+        }
 
         header.appendChild(title);
         header.appendChild(desc);
@@ -2555,17 +2685,35 @@
         returns.className = 'meta';
         const five = document.createElement('span');
         five.textContent = item.returns5;
-        bindEditableSync(five, type, index, 'returns5');
+        if (item.__idx >= 0) {
+          bindEditableSync(five, type, item.__idx, 'returns5');
+        } else {
+          attachEditable(five, 'krypto-returns5', (value) => {
+            kryptoFund.returns5 = value;
+          });
+        }
         const ten = document.createElement('span');
         ten.textContent = item.returns10;
-        bindEditableSync(ten, type, index, 'returns10');
+        if (item.__idx >= 0) {
+          bindEditableSync(ten, type, item.__idx, 'returns10');
+        } else {
+          attachEditable(ten, 'krypto-returns10', (value) => {
+            kryptoFund.returns10 = value;
+          });
+        }
         returns.appendChild(five);
         returns.appendChild(ten);
 
         const since = document.createElement('span');
         since.className = 'section-sub';
         since.textContent = item.since;
-        bindEditableSync(since, type, index, 'since');
+        if (item.__idx >= 0) {
+          bindEditableSync(since, type, item.__idx, 'since');
+        } else {
+          attachEditable(since, 'krypto-since', (value) => {
+            kryptoFund.since = value;
+          });
+        }
 
         const allocationRow = document.createElement('div');
         allocationRow.className = 'allocation-row';
@@ -2578,10 +2726,11 @@
         allocationInput.min = 0;
         allocationInput.max = 100;
         allocationInput.step = 1;
-        allocationInput.style.display = adminMode ? 'block' : 'none';
+        allocationInput.style.display = adminMode && item.__idx >= 0 ? 'block' : 'none';
+        allocationInput.disabled = kryptoActive;
         allocationInput.addEventListener('input', () => {
           const newVal = Number(allocationInput.value) || 0;
-          portfolioData[type][index].allocation = newVal;
+          portfolioData[type][item.__idx].allocation = newVal;
           persistPortfolioData();
           renderPortfolios(type);
         });
@@ -2598,10 +2747,16 @@
           const li = document.createElement('li');
           li.className = 'benefit';
           li.textContent = text;
-          attachEditable(li, `portfolio-${type}-${index}-pro-${prosIndex}`, (value) => {
-            portfolioData[type][index].pros[prosIndex] = value;
-            persistPortfolioData();
-          });
+          if (item.__idx >= 0) {
+            attachEditable(li, `portfolio-${type}-${item.__idx}-pro-${prosIndex}`, (value) => {
+              portfolioData[type][item.__idx].pros[prosIndex] = value;
+              persistPortfolioData();
+            });
+          } else {
+            attachEditable(li, `krypto-pro-${prosIndex}`, (value) => {
+              kryptoFund.pros[prosIndex] = value;
+            });
+          }
           prosList.appendChild(li);
         });
         pros.appendChild(prosTitle);
@@ -2617,10 +2772,16 @@
           const li = document.createElement('li');
           li.className = 'drawback';
           li.textContent = text;
-          attachEditable(li, `portfolio-${type}-${index}-con-${consIndex}`, (value) => {
-            portfolioData[type][index].cons[consIndex] = value;
-            persistPortfolioData();
-          });
+          if (item.__idx >= 0) {
+            attachEditable(li, `portfolio-${type}-${item.__idx}-con-${consIndex}`, (value) => {
+              portfolioData[type][item.__idx].cons[consIndex] = value;
+              persistPortfolioData();
+            });
+          } else {
+            attachEditable(li, `krypto-con-${consIndex}`, (value) => {
+              kryptoFund.cons[consIndex] = value;
+            });
+          }
           consList.appendChild(li);
         });
         cons.appendChild(consTitle);
@@ -2666,8 +2827,10 @@
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
         deleteBtn.textContent = 'Entfernen';
+        deleteBtn.style.display = item.__idx >= 0 ? 'inline-flex' : 'none';
         deleteBtn.addEventListener('click', () => {
-          portfolioData[type].splice(index, 1);
+          if (item.__idx < 0) return;
+          portfolioData[type].splice(item.__idx, 1);
           persistPortfolioData();
           renderPortfolios(type);
         });
@@ -3074,6 +3237,12 @@
     });
 
     addFundBtn.addEventListener('click', addNewFund);
+    kryptoToggle.addEventListener('click', () => {
+      kryptoActive = !kryptoActive;
+      kryptoToggle.classList.toggle('active', kryptoActive);
+      kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
+      renderPortfolios(getActivePortfolioType());
+    });
     exitAdminBtn.addEventListener('click', () => {
       if (adminMode) toggleAdminMode();
     });
