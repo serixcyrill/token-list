@@ -562,6 +562,7 @@
     .funds-wrapper {
       margin-top: 16px;
       display: grid;
+      grid-template-columns: minmax(0, 1fr);
       gap: 22px;
     }
 
@@ -1882,13 +1883,25 @@
       }
     }
 
+    function normalizePortfolioType(value) {
+      const normalized = (value || '')
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/[^a-z0-9]/g, '');
+      if (normalized === 'faktor' || normalized === 'faktoren') return 'factor';
+      return normalized;
+    }
+
     async function loadPortfolioMetaFromSheet() {
       try {
         const csvText = await fetchSheetCsv(SHEET_GIDS.portfolios);
         const rows = parseCsv(csvText).filter((r) => r.length);
         if (!rows.length) return;
 
-        const header = rows[0].slice(1).map((v) => v.trim().toLowerCase());
+        const header = rows[0]
+          .slice(1)
+          .map((v) => normalizePortfolioType(v))
+          .map((key) => (key === 'faktor' ? 'factor' : key));
         const nextMeta = deepClone(defaultPortfolioMeta);
 
         rows.forEach((row) => {
@@ -1898,8 +1911,10 @@
             .replace(/[^a-z0-9]/g, '');
 
           values.forEach((value, idx) => {
-            const typeKey = header[idx];
+            const typeKey = normalizePortfolioType(header[idx]);
             if (!typeKey || !nextMeta[typeKey]) return;
+
+            if (!value) return;
 
             switch (normalized) {
               case 'title':
@@ -1912,6 +1927,7 @@
               case 'desc':
                 nextMeta[typeKey].summary = value;
                 break;
+              case 'rendite':
               case 'renditepa':
               case 'renditep.a':
               case 'renditeprojahr':
@@ -1922,12 +1938,12 @@
               case 'renditeseit':
               case 'seitjahr':
               case 'since':
-              case 'rendite':
                 nextMeta[typeKey].seit = value;
                 break;
               case 'info':
               case 'infonebentitel':
               case 'infonebentitle':
+              case 'infonebentittel':
                 nextMeta[typeKey].info = value;
                 break;
               default:
