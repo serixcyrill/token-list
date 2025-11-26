@@ -2093,8 +2093,14 @@
       return cleaned || '';
     }
 
+    function normalizePercentPa(raw) {
+      const percent = normalizePercentText(raw);
+      if (!percent) return '';
+      return /p\.?a\.?$/i.test(percent.trim()) ? percent.trim() : `${percent.trim()} p.a.`;
+    }
+
     function formatReturnLabel(raw, yearsLabel) {
-      const percentText = normalizePercentText(raw);
+      const percentText = normalizePercentPa(raw);
       const suffix = percentText || '—';
       return `Ø Rendite ${yearsLabel} Jahre: ${suffix}`;
     }
@@ -2172,16 +2178,17 @@
 
           if (isKrypto) {
             const kFund = {
-              title: title || 'Krypto (Bitcoin)',
-              desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || '',
-              fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
-              positionen: normalizeListValue(pro2Row?.[col]) || '',
-              auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
-              returns5: normalizePercentText(rendite5Row[col] || ''),
-              returns10: normalizePercentText(rendite10Row[col] || ''),
+              ...deepClone(defaultKryptoFund),
+              title: title || defaultKryptoFund.title,
+              desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || defaultKryptoFund.desc,
+              fondsvolumen: normalizeListValue(pro1Row?.[col]) || defaultKryptoFund.fondsvolumen,
+              positionen: normalizeListValue(pro2Row?.[col]) || defaultKryptoFund.positionen,
+              auflageSeit: normalizeListValue(pro3Row?.[col]) || defaultKryptoFund.auflageSeit,
+              returns5: normalizePercentPa(rendite5Row[col] || defaultKryptoFund.returns5),
+              returns10: normalizePercentPa(rendite10Row[col] || defaultKryptoFund.returns10),
               allocation: 5,
-              since: getFieldRow('since')[col] || '',
-              factsheet: getFieldRow('factsheet')[col] || '',
+              since: getFieldRow('since')[col] || defaultKryptoFund.since,
+              factsheet: getFieldRow('factsheet')[col] || defaultKryptoFund.factsheet,
               sortOrder,
               isKrypto: true,
             };
@@ -2197,8 +2204,8 @@
             fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
             positionen: normalizeListValue(pro2Row?.[col]) || '',
             auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
-            returns5: normalizePercentText(rendite5Row[col] || ''),
-            returns10: normalizePercentText(rendite10Row[col] || ''),
+            returns5: normalizePercentPa(rendite5Row[col] || ''),
+            returns10: normalizePercentPa(rendite10Row[col] || ''),
             allocation: Number(getFieldRow('allocation')[col] || 0),
             since: getFieldRow('since')[col] || '',
             factsheet: getFieldRow('factsheet')[col] || '',
