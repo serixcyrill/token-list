@@ -858,6 +858,42 @@
       color: #1f2a44;
     }
 
+    .fund-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .fund-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.06), rgba(17, 24, 39, 0.03));
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      color: #0f1a2a;
+    }
+
+    .fund-stat strong {
+      font-size: 12px;
+      color: #1f2a44;
+    }
+
+    .fund-description {
+      color: #1f2a44;
+      font-size: 13px;
+      line-height: 1.5;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(241, 244, 250, 0.9));
+      border: 1px solid rgba(17, 24, 39, 0.06);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
     .fund-details .sublist {
       margin-top: 6px;
     }
@@ -1560,140 +1596,152 @@
         {
           title: 'Faktor Plus Global',
           desc: 'Stark diversifiziertes Faktorportfolio mit Fokus auf Qualität und niedrige Volatilität.',
+          fondsvolumen: 'CHF 1.2 Mrd.',
+          positionen: '120 Positionen',
+          auflageSeit: 'Auflage seit 2015',
           returns5: 'Ø Rendite 5 Jahre: 5,2% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 6,1% p.a.',
           allocation: 32,
           since: 'Rendite seit Start: +24,1%',
           factsheet: '',
-          pros: ['Breite Diversifikation über Stilfaktoren.', 'Geringere Schwankung gegenüber Einzelfaktoren.'],
-          cons: ['Kann Phasen relativer Unterperformance haben.', 'Rebalancing-Kosten können anfallen.'],
         },
         {
           title: 'Smart Beta Europa',
           desc: 'Betont Value- und Size-Prämien in europäischen Kernmärkten.',
+          fondsvolumen: 'CHF 930 Mio.',
+          positionen: '85 Positionen',
+          auflageSeit: 'Auflage seit 2014',
           returns5: 'Ø Rendite 5 Jahre: 4,4% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 5,8% p.a.',
           allocation: 28,
           since: 'Rendite seit Start: +18,6%',
           factsheet: '',
-          pros: ['Erhöhtes Exposure zu Value- und Size-Faktoren.', 'Transparente, regelbasierte Selektion.'],
-          cons: ['Höhere Faktorrotation möglich.', 'Kann in Wachstumsphasen zurückfallen.'],
         },
         {
           title: 'Quality Momentum Blend',
           desc: 'Gezielter Mix aus Qualitätsunternehmen mit Momentum-Overlay.',
+          fondsvolumen: 'CHF 760 Mio.',
+          positionen: '95 Positionen',
+          auflageSeit: 'Auflage seit 2016',
           returns5: 'Ø Rendite 5 Jahre: 5,6% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 6,5% p.a.',
           allocation: 40,
           since: 'Rendite seit Start: +27,4%',
           factsheet: '',
-          pros: ['Kombiniert defensive und offensive Stile.', 'Klare Faktorregeln mit monatlichem Review.'],
-          cons: ['Tracking Error zum Gesamtmarkt möglich.', 'Kann bei Faktor-Umbrüchen schwanken.'],
         },
       ],
       marketcap: [
         {
           title: 'Global Market Leaders',
           desc: 'Breit gestreute Großkonzerne mit robuster Bilanzstruktur.',
+          fondsvolumen: 'CHF 2.1 Mrd.',
+          positionen: '140 Positionen',
+          auflageSeit: 'Auflage seit 2013',
           returns5: 'Ø Rendite 5 Jahre: 5,9% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 7,2% p.a.',
           allocation: 45,
           since: 'Rendite seit Start: +29,3%',
           factsheet: '',
-          pros: ['Hohe Liquidität und Transparenz.', 'Stabile Dividendenhistorie.'],
-          cons: ['Geringerer Small-Cap-Anteil.', 'Stärker an globale Konjunktur gekoppelt.'],
         },
         {
           title: 'MidCap Chancen',
           desc: 'Wachstumsstarke Unternehmen mit solidem Track Record.',
+          fondsvolumen: 'CHF 880 Mio.',
+          positionen: '110 Positionen',
+          auflageSeit: 'Auflage seit 2012',
           returns5: 'Ø Rendite 5 Jahre: 6,4% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 8,0% p.a.',
           allocation: 35,
           since: 'Rendite seit Start: +33,0%',
           factsheet: '',
-          pros: ['Höheres Wachstumspotenzial.', 'Breite Sektorstreuung.'],
-          cons: ['Teilweise geringere Liquidität.', 'Höhere Schwankungen möglich.'],
         },
         {
           title: 'SmallCap Satellit',
           desc: 'Selektive Beimischung innovativer Small Caps.',
+          fondsvolumen: 'CHF 420 Mio.',
+          positionen: '70 Positionen',
+          auflageSeit: 'Auflage seit 2017',
           returns5: 'Ø Rendite 5 Jahre: 7,1% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 8,6% p.a.',
           allocation: 20,
           since: 'Rendite seit Start: +22,8%',
           factsheet: '',
-          pros: ['Skalierbare Wachstumschancen.', 'Gezieltes Risikobudget.'],
-          cons: ['Höhere Volatilität.', 'Begrenzte Liquidität in Stressphasen.'],
         },
       ],
       bip: [
         {
           title: 'GDP Balanced',
           desc: 'Regionale Gewichtung entsprechend Wirtschaftsleistung für stabile Allokation.',
+          fondsvolumen: 'CHF 1.0 Mrd.',
+          positionen: '105 Positionen',
+          auflageSeit: 'Auflage seit 2011',
           returns5: 'Ø Rendite 5 Jahre: 4,8% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 6,0% p.a.',
           allocation: 42,
           since: 'Rendite seit Start: +21,3%',
           factsheet: '',
-          pros: ['Stabile Allokation nach Wirtschaftskraft.', 'Geringe Klumpenrisiken.'],
-          cons: ['Langsame Anpassung an Markttrends.', 'Weniger taktische Chancen.'],
         },
         {
           title: 'Emerging Focus',
           desc: 'Zusatzschwerpunkt auf aufstrebenden Volkswirtschaften.',
+          fondsvolumen: 'CHF 640 Mio.',
+          positionen: '90 Positionen',
+          auflageSeit: 'Auflage seit 2013',
           returns5: 'Ø Rendite 5 Jahre: 6,9% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 7,7% p.a.',
           allocation: 33,
           since: 'Rendite seit Start: +25,0%',
           factsheet: '',
-          pros: ['Partizipation an höherem Wachstum.', 'Breite Länderdiversifikation.'],
-          cons: ['Währungs- und Liquiditätsrisiken.', 'Höhere geopolitische Unsicherheit.'],
         },
         {
           title: 'Developed Core',
           desc: 'Kernmärkte nach Wirtschaftskraft, stabilisiert durch taktische Korridore.',
+          fondsvolumen: 'CHF 780 Mio.',
+          positionen: '100 Positionen',
+          auflageSeit: 'Auflage seit 2010',
           returns5: 'Ø Rendite 5 Jahre: 4,5% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 5,9% p.a.',
           allocation: 25,
           since: 'Rendite seit Start: +19,8%',
           factsheet: '',
-          pros: ['Geringer Turnover.', 'Hohe Planbarkeit.'],
-          cons: ['Begrenzt opportunistisch.', 'Abweichungen zu kapitalgewichteten Indizes.'],
         },
       ],
       obligationen: [
         {
           title: 'Euro Bonds Core',
           desc: 'Staats- und Unternehmensanleihen mit Investment-Grade-Rating.',
+          fondsvolumen: 'CHF 2.4 Mrd.',
+          positionen: '160 Positionen',
+          auflageSeit: 'Auflage seit 2009',
           returns5: 'Ø Rendite 5 Jahre: 2,3% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 3,1% p.a.',
           allocation: 50,
           since: 'Rendite seit Start: +11,4%',
           factsheet: '',
-          pros: ['Solide Bonität.', 'Geringere Volatilität.'],
-          cons: ['Begrenztes Renditepotenzial.', 'Zinsänderungsrisiko.'],
         },
         {
           title: 'Green Bonds Select',
           desc: 'Nachhaltigkeitsorientierte Anleihen mit zertifizierten Projekten.',
+          fondsvolumen: 'CHF 1.1 Mrd.',
+          positionen: '130 Positionen',
+          auflageSeit: 'Auflage seit 2018',
           returns5: 'Ø Rendite 5 Jahre: 2,7% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 3,4% p.a.',
           allocation: 30,
           since: 'Rendite seit Start: +12,1%',
           factsheet: '',
-          pros: ['Nachhaltigkeitsfokus.', 'Transparente Mittelverwendung.'],
-          cons: ['Begrenzte Historie.', 'Teilweise geringere Liquidität.'],
         },
         {
           title: 'Inflation Linkers',
           desc: 'Anleihen mit Inflationsschutz zur Stabilisierung der Kaufkraft.',
+          fondsvolumen: 'CHF 540 Mio.',
+          positionen: '75 Positionen',
+          auflageSeit: 'Auflage seit 2019',
           returns5: 'Ø Rendite 5 Jahre: 2,1% p.a.',
           returns10: 'Ø Rendite 10 Jahre: 2,9% p.a.',
           allocation: 20,
           since: 'Rendite seit Start: +9,7%',
           factsheet: '',
-          pros: ['Inflationsabsicherung.', 'Defensive Ausrichtung.'],
-          cons: ['Begrenztes Upside.', 'Abhängig von Inflationspfad.'],
         },
       ],
     };
@@ -1701,13 +1749,14 @@
     const defaultKryptoFund = {
       title: 'Krypto (Bitcoin)',
       desc: 'Digitaler Baustein mit begrenztem Angebot.',
+      fondsvolumen: 'USD 20+ Mrd. Marktwert',
+      positionen: '1 Position',
+      auflageSeit: 'Seit 2015',
       returns5: 'Ø Rendite 5 Jahre: 45% p.a.',
       returns10: 'Ø Rendite 10 Jahre: 70% p.a.',
       allocation: 5,
       since: 'Seit 2015',
       factsheet: '',
-      pros: ['Begrenztes Angebot, hohe Liquidität.'],
-      cons: ['Hohe Volatilität, regulatorische Risiken.'],
     };
 
     const defaultAblaufData = {
@@ -2087,22 +2136,24 @@
 
         const preferRow = (...candidates) => candidates.find((row) => Array.isArray(row) && row.length > 1 && row.some(Boolean)) || [];
 
-        const rendite5Row = preferRow(
-          fieldRows[4], // Tabellenzeile 6 (1-basiert)
-          getFieldRow('rendite5', [
-            'durchschnittsrendite 5 jahre',
-            'durchschnittsrendite5jahre',
-            'durchschnittsrendite5 jahr',
-          ]),
-        );
+        const rendite5Row =
+          (fieldRows[4] && fieldRows[4].some(Boolean))
+            ? fieldRows[4]
+            : getFieldRow('rendite5', [
+                'durchschnittsrendite 5 jahre',
+                'durchschnittsrendite5jahre',
+                'durchschnittsrendite5 jahr',
+              ]);
 
-        const rendite10Row = preferRow(
-          fieldRows[5], // Tabellenzeile 7 (1-basiert)
-          getFieldRow('rendite10', ['durchschnittsrendite 10 jahre']),
-        );
+        const rendite10Row =
+          (fieldRows[5] && fieldRows[5].some(Boolean))
+            ? fieldRows[5]
+            : getFieldRow('rendite10', ['durchschnittsrendite 10 jahre']);
 
-        const prosRows = fieldRows.filter((r) => (r[0] || '').toLowerCase().startsWith('pro'));
-        const consRows = fieldRows.filter((r) => (r[0] || '').toLowerCase().startsWith('con'));
+        const pro1Row = findRow('pro1');
+        const pro2Row = findRow('pro2');
+        const pro3Row = findRow('pro3');
+        const con1Row = findRow('con1');
 
         header.slice(1).forEach((_, colIdx) => {
           const col = colIdx + 1;
@@ -2110,11 +2161,19 @@
           if (!nextData[strategy]) {
             if (strategy === 'krypto') {
               const title = getFieldRow('fondsname')[col] || 'Krypto (Bitcoin)';
-              const kFund = { title, desc: getFieldRow('beschreibung')[col] || '', returns5: formatReturnLabel(rendite5Row[col] || '', 5), returns10: formatReturnLabel(rendite10Row[col] || '', 10), allocation: Number(getFieldRow('allocation')[col] || 5), since: getFieldRow('since')[col] || '', factsheet: getFieldRow('factsheet')[col] || '', pros: prosRows
-                  .map((row) => normalizeListValue(row[col]))
-                  .filter(Boolean), cons: consRows
-                  .map((row) => normalizeListValue(row[col]))
-                  .filter(Boolean), sortOrder };
+              const kFund = {
+                title,
+                desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || '',
+                fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
+                positionen: normalizeListValue(pro2Row?.[col]) || '',
+                auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
+                returns5: formatReturnLabel(rendite5Row[col] || '', 5),
+                returns10: formatReturnLabel(rendite10Row[col] || '', 10),
+                allocation: Number(getFieldRow('allocation')[col] || 5),
+                since: getFieldRow('since')[col] || '',
+                factsheet: getFieldRow('factsheet')[col] || '',
+                sortOrder,
+              };
               nextKrypto = kFund;
             }
             return;
@@ -2127,18 +2186,15 @@
 
           const fund = {
             title,
-            desc: getFieldRow('beschreibung')[col] || '',
+            desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || '',
+            fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
+            positionen: normalizeListValue(pro2Row?.[col]) || '',
+            auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
             returns5: formatReturnLabel(rendite5Row[col] || '', 5),
             returns10: formatReturnLabel(rendite10Row[col] || '', 10),
             allocation: Number(getFieldRow('allocation')[col] || 0),
             since: getFieldRow('since')[col] || '',
             factsheet: getFieldRow('factsheet')[col] || '',
-            pros: prosRows
-              .map((row) => normalizeListValue(row[col]))
-              .filter(Boolean),
-            cons: consRows
-              .map((row) => normalizeListValue(row[col]))
-              .filter(Boolean),
             sortOrder,
           };
 
@@ -2787,61 +2843,50 @@
         allocationRow.appendChild(allocationLabel);
         allocationRow.appendChild(allocationInput);
 
-        const pros = document.createElement('div');
-        pros.className = 'sublist';
-        const prosTitle = document.createElement('h5');
-        prosTitle.textContent = 'Vorteile';
-        prosTitle.dataset.editable = 'true';
-        const prosList = document.createElement('ul');
-        (item.pros || []).forEach((text, prosIndex) => {
-          const li = document.createElement('li');
-          li.className = 'benefit';
-          li.textContent = text;
+        const stats = document.createElement('div');
+        stats.className = 'fund-stats';
+        const statEntries = [
+          { label: 'Fondsvolumen', key: 'fondsvolumen' },
+          { label: 'Positionen', key: 'positionen' },
+          { label: 'Auflage seit', key: 'auflageSeit' },
+        ];
+        statEntries.forEach((entry) => {
+          const value = item[entry.key] || '';
+          if (!value) return;
+          const stat = document.createElement('div');
+          stat.className = 'fund-stat';
+          const strong = document.createElement('strong');
+          strong.textContent = `${entry.label}:`;
+          const span = document.createElement('span');
+          span.textContent = value;
           if (item.__idx >= 0) {
-            attachEditable(li, `portfolio-${type}-${item.__idx}-pro-${prosIndex}`, (value) => {
-              portfolioData[type][item.__idx].pros[prosIndex] = value;
-              persistPortfolioData();
-            });
+            bindEditableSync(span, type, item.__idx, entry.key);
           } else {
-            attachEditable(li, `krypto-pro-${prosIndex}`, (value) => {
-              kryptoFund.pros[prosIndex] = value;
+            attachEditable(span, `krypto-${entry.key}`, (val) => {
+              kryptoFund[entry.key] = val;
             });
           }
-          prosList.appendChild(li);
+          stat.appendChild(strong);
+          stat.appendChild(span);
+          stats.appendChild(stat);
         });
-        pros.appendChild(prosTitle);
-        pros.appendChild(prosList);
 
-        const cons = document.createElement('div');
-        cons.className = 'sublist';
-        const consTitle = document.createElement('h5');
-        consTitle.textContent = 'Nachteile';
-        consTitle.dataset.editable = 'true';
-        const consList = document.createElement('ul');
-        (item.cons || []).forEach((text, consIndex) => {
-          const li = document.createElement('li');
-          li.className = 'drawback';
-          li.textContent = text;
-          if (item.__idx >= 0) {
-            attachEditable(li, `portfolio-${type}-${item.__idx}-con-${consIndex}`, (value) => {
-              portfolioData[type][item.__idx].cons[consIndex] = value;
-              persistPortfolioData();
-            });
-          } else {
-            attachEditable(li, `krypto-con-${consIndex}`, (value) => {
-              kryptoFund.cons[consIndex] = value;
-            });
-          }
-          consList.appendChild(li);
-        });
-        cons.appendChild(consTitle);
-        cons.appendChild(consList);
+        const descrBlock = document.createElement('div');
+        descrBlock.className = 'fund-description';
+        descrBlock.textContent = item.desc || '';
+        if (item.__idx >= 0) {
+          bindEditableSync(descrBlock, type, item.__idx, 'desc');
+        } else {
+          attachEditable(descrBlock, 'krypto-desc', (value) => {
+            kryptoFund.desc = value;
+          });
+        }
 
         const detailsWrapper = document.createElement('div');
         detailsWrapper.className = 'fund-details';
         detailsWrapper.style.display = 'none';
-        detailsWrapper.appendChild(pros);
-        detailsWrapper.appendChild(cons);
+        detailsWrapper.appendChild(stats);
+        detailsWrapper.appendChild(descrBlock);
 
         const toggleDetails = document.createElement('button');
         toggleDetails.type = 'button';
@@ -2852,7 +2897,7 @@
           const open = detailsWrapper.style.display === 'block';
           detailsWrapper.style.display = open ? 'none' : 'block';
           toggleDetails.setAttribute('aria-expanded', String(!open));
-          toggleDetails.textContent = open ? 'Details anzeigen' : 'Details ausblenden';
+          toggleDetails.textContent = open ? 'Details anzeigen' : 'Schliessen';
         });
 
         const fundActionRow = document.createElement('div');
@@ -3177,13 +3222,14 @@
       portfolioData[current].push({
         title: 'Neuer Fonds',
         desc: 'Eigene Beschreibung hinzufügen.',
+        fondsvolumen: 'Fondsvolumen ergänzen',
+        positionen: 'Positionen ergänzen',
+        auflageSeit: 'Auflage seit ergänzen',
         returns5: 'Ø Rendite 5 Jahre: Wert ergänzen',
         returns10: 'Ø Rendite 10 Jahre: Wert ergänzen',
         allocation: 15,
         since: 'Rendite seit Start: Wert ergänzen',
         factsheet: '',
-        pros: ['Vorteil hinzufügen'],
-        cons: ['Nachteil hinzufügen'],
       });
       persistPortfolioData();
       renderPortfolios(current);
