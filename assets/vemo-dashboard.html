@@ -2115,6 +2115,7 @@
 
         const header = rows[0];
         const fieldRows = rows.slice(1);
+        const rowAt = (index1Based) => fieldRows[index1Based - 2] || [];
         const findRow = (key, aliases = []) => {
           const targets = [key, ...aliases].map(normalizeFieldKey);
           return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0])));
@@ -2147,24 +2148,24 @@
           return normalizedTitle.includes('krypto') || normalizedTitle.includes('bitcoin');
         };
 
-        const rendite5Row =
-          (fieldRows[4] && fieldRows[4].some(Boolean))
-            ? fieldRows[4]
-            : getFieldRow('rendite5', [
-                'durchschnittsrendite 5 jahre',
-                'durchschnittsrendite5jahre',
-                'durchschnittsrendite5 jahr',
-              ]);
+        const rendite5Row = preferRow(
+          rowAt(6),
+          getFieldRow('rendite5', [
+            'durchschnittsrendite 5 jahre',
+            'durchschnittsrendite5jahre',
+            'durchschnittsrendite5 jahr',
+          ])
+        );
 
-        const rendite10Row =
-          (fieldRows[5] && fieldRows[5].some(Boolean))
-            ? fieldRows[5]
-            : getFieldRow('rendite10', ['durchschnittsrendite 10 jahre']);
+        const rendite10Row = preferRow(
+          rowAt(7),
+          getFieldRow('rendite10', ['durchschnittsrendite 10 jahre'])
+        );
 
-        const pro1Row = findRow('pro1');
-        const pro2Row = findRow('pro2');
-        const pro3Row = findRow('pro3');
-        const con1Row = findRow('con1');
+        const pro1Row = preferRow(rowAt(9), findRow('pro1'), getFieldRow('fondsvolumen'));
+        const pro2Row = preferRow(rowAt(10), findRow('pro2'), getFieldRow('positionen'));
+        const pro3Row = preferRow(rowAt(11), findRow('pro3'), getFieldRow('auflage seit'));
+        const con1Row = preferRow(rowAt(12), findRow('con1'), getFieldRow('beschreibung'));
 
         header.slice(1).forEach((colLabel, colIdx) => {
           const col = colIdx + 1;
@@ -2245,20 +2246,38 @@
         const fieldRows = rows.slice(1);
         const advisors = header.map((key) => ({ key: key.toLowerCase() }));
 
+        const normalizeKey = (key) => String(key || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
         const fieldMap = {};
         fieldRows.forEach(([field, ...values]) => {
-          fieldMap[(field || '').toLowerCase()] = values;
+          fieldMap[normalizeKey(field)] = values;
         });
 
+        const getFieldValues = (name, aliases = []) => {
+          const keys = [name, ...aliases].map(normalizeKey);
+          for (const key of keys) {
+            if (fieldMap[key]) return fieldMap[key];
+          }
+          return [];
+        };
+
+        const nameRow = getFieldValues('name');
+        const roleRow = getFieldValues('rolle', ['funktion', 'role']);
+        const descRow = getFieldValues('kurzbeschreibung', ['beschreibung']);
+        const eduRow = getFieldValues('educationtext', ['education', 'ausbildung']);
+        const codeRow = getFieldValues('codeofconducttext', ['codeofconduct', 'conduct']);
+        const terminLinkRow = getFieldValues('terminlink', ['calendly', 'termin']);
+        const terminHinweisRow = getFieldValues('terminhinweis', ['hinweis']);
+        const avatarRow = getFieldValues('avatarurl', ['avatar', 'avatarurl', 'profilbild', 'bildurl']);
+
         advisors.forEach((advisor, idx) => {
-          advisor.name = fieldMap.name?.[idx] || '';
-          advisor.role = fieldMap.rolle?.[idx] || '';
-          advisor.description = fieldMap.kurzbeschreibung?.[idx] || '';
-          advisor.educationText = fieldMap.educationtext?.[idx] || '';
-          advisor.codeOfConductText = fieldMap.codeofconducttext?.[idx] || '';
-          advisor.terminLink = fieldMap.terminlink?.[idx] || '';
-          advisor.terminHinweis = fieldMap.terminhinweis?.[idx] || '';
-          advisor.avatarUrl = fieldMap.avatarurl?.[idx] || '';
+          advisor.name = nameRow[idx] || '';
+          advisor.role = roleRow[idx] || '';
+          advisor.description = descRow[idx] || '';
+          advisor.educationText = eduRow[idx] || '';
+          advisor.codeOfConductText = codeRow[idx] || '';
+          advisor.terminLink = terminLinkRow[idx] || '';
+          advisor.terminHinweis = terminHinweisRow[idx] || '';
+          advisor.avatarUrl = avatarRow[idx] || '';
         });
 
         const filtered = advisors.filter((a) => a.name);
