@@ -1881,24 +1881,39 @@
 
         rows.forEach((row) => {
           const [fieldRaw, ...values] = row;
-          const field = (fieldRaw || '').toLowerCase();
+          const normalized = (fieldRaw || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '');
+
           values.forEach((value, idx) => {
             const typeKey = header[idx];
             if (!typeKey || !nextMeta[typeKey]) return;
-            switch (field) {
+
+            switch (normalized) {
+              case 'title':
               case 'titel':
+              case 'name':
                 nextMeta[typeKey].title = value;
                 break;
               case 'summary':
+              case 'beschreibung':
+              case 'desc':
                 nextMeta[typeKey].summary = value;
                 break;
               case 'since':
+              case 'rendite':
+              case 'renditeseit':
                 nextMeta[typeKey].since = value;
                 break;
               case 'info':
+              case 'infonebentitel':
+              case 'infonebentitle':
                 nextMeta[typeKey].info = value;
                 break;
               default:
+                if (normalized.startsWith('info')) {
+                  nextMeta[typeKey].info = value;
+                }
                 break;
             }
           });
