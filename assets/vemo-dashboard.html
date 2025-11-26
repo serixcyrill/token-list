@@ -443,9 +443,8 @@
       border: none;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 10px;
-      cursor: pointer;
       font-weight: 700;
       color: var(--text);
       padding: 4px 0 6px;
@@ -478,11 +477,7 @@
     }
 
     .portfolio-shell .chevron {
-      transition: transform 0.2s ease;
-    }
-
-    .portfolio-shell.open .chevron {
-      transform: rotate(90deg);
+      display: none;
     }
 
     .portfolio-summary {
@@ -2136,6 +2131,14 @@
 
         const preferRow = (...candidates) => candidates.find((row) => Array.isArray(row) && row.length > 1 && row.some(Boolean)) || [];
 
+        const fondsNameRow = getFieldRow('fondsname');
+        const isKryptoColumn = (strategyValue, titleValue) => {
+          const normalizedStrategy = String(strategyValue || '').toLowerCase();
+          if (normalizedStrategy === 'krypto') return true;
+          const normalizedTitle = String(titleValue || '').toLowerCase();
+          return normalizedTitle.includes('krypto') || normalizedTitle.includes('bitcoin');
+        };
+
         const rendite5Row =
           (fieldRows[4] && fieldRows[4].some(Boolean))
             ? fieldRows[4]
@@ -2158,31 +2161,35 @@
         header.slice(1).forEach((_, colIdx) => {
           const col = colIdx + 1;
           const strategy = (strategyRow?.[col] || '').toLowerCase();
-          if (!nextData[strategy]) {
-            if (strategy === 'krypto') {
-              const title = getFieldRow('fondsname')[col] || 'Krypto (Bitcoin)';
-              const kFund = {
-                title,
-                desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || '',
-                fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
-                positionen: normalizeListValue(pro2Row?.[col]) || '',
-                auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
-                returns5: formatReturnLabel(rendite5Row[col] || '', 5),
-                returns10: formatReturnLabel(rendite10Row[col] || '', 10),
-                allocation: Number(getFieldRow('allocation')[col] || 5),
-                since: getFieldRow('since')[col] || '',
-                factsheet: getFieldRow('factsheet')[col] || '',
-                sortOrder,
-              };
-              nextKrypto = kFund;
-            }
+          const title = fondsNameRow[col] || '';
+          const isKrypto = isKryptoColumn(strategy, title);
+
+          if (!nextData[strategy] && !isKrypto) {
             return;
           }
 
-          const title = getFieldRow('fondsname')[col] || '';
-          if (!title) return;
-
           const sortOrder = parseInt(sortRow?.[col] || '', 10) || colIdx + 1;
+
+          if (isKrypto) {
+            const kFund = {
+              title: title || 'Krypto (Bitcoin)',
+              desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || '',
+              fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
+              positionen: normalizeListValue(pro2Row?.[col]) || '',
+              auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
+              returns5: normalizePercentText(rendite5Row[col] || ''),
+              returns10: normalizePercentText(rendite10Row[col] || ''),
+              allocation: 5,
+              since: getFieldRow('since')[col] || '',
+              factsheet: getFieldRow('factsheet')[col] || '',
+              sortOrder,
+              isKrypto: true,
+            };
+            nextKrypto = kFund;
+            return;
+          }
+
+          if (!title) return;
 
           const fund = {
             title,
@@ -2190,8 +2197,8 @@
             fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
             positionen: normalizeListValue(pro2Row?.[col]) || '',
             auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
-            returns5: formatReturnLabel(rendite5Row[col] || '', 5),
-            returns10: formatReturnLabel(rendite10Row[col] || '', 10),
+            returns5: normalizePercentText(rendite5Row[col] || ''),
+            returns10: normalizePercentText(rendite10Row[col] || ''),
             allocation: Number(getFieldRow('allocation')[col] || 0),
             since: getFieldRow('since')[col] || '',
             factsheet: getFieldRow('factsheet')[col] || '',
@@ -2593,12 +2600,12 @@
 
       const shell = document.createElement('div');
       shell.className = 'portfolio-shell';
-      const toggle = document.createElement('button');
+      const toggle = document.createElement('div');
       toggle.className = 'portfolio-toggle';
       const infoChipHtml = meta.info
         ? `<span class="portfolio-info-chip" data-editable="true">${meta.info}</span>`
         : '';
-      toggle.innerHTML = `<div class="portfolio-toggle-text"><span class="portfolio-title" data-editable="true">${meta.title}</span>${infoChipHtml}</div><span class="chevron" aria-hidden="true">›</span>`;
+      toggle.innerHTML = `<div class="portfolio-toggle-text"><span class="portfolio-title" data-editable="true">${meta.title}</span>${infoChipHtml}</div>`;
       const titleSpan = toggle.querySelector('.portfolio-title');
       attachEditable(titleSpan, `${type}-title`, (value) => {
         portfolioMeta[type].title = value;
@@ -2614,12 +2621,6 @@
       const content = document.createElement('div');
       content.style.display = 'block';
       shell.classList.add('open');
-
-      toggle.addEventListener('click', () => {
-        const open = content.style.display === 'block';
-        content.style.display = open ? 'none' : 'block';
-        shell.classList.toggle('open', !open);
-      });
 
       const summary = document.createElement('div');
       summary.className = 'portfolio-summary';
@@ -2770,20 +2771,7 @@
             kryptoFund.title = value;
           });
         }
-
-        const desc = document.createElement('span');
-        desc.className = 'fund-desc';
-        desc.textContent = item.desc;
-        if (item.__idx >= 0) {
-          bindEditableSync(desc, type, item.__idx, 'desc');
-        } else {
-          attachEditable(desc, 'krypto-desc', (value) => {
-            kryptoFund.desc = value;
-          });
-        }
-
         header.appendChild(title);
-        header.appendChild(desc);
 
         const returns = document.createElement('div');
         returns.className = 'meta';
