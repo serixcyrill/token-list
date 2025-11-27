@@ -381,6 +381,18 @@
       }
     }
 
+    .collapsible {
+      overflow: hidden;
+      height: 0;
+      opacity: 0;
+      transition: height 0.32s ease, opacity 0.24s ease;
+      will-change: height, opacity;
+    }
+
+    .collapsible.is-open {
+      opacity: 1;
+    }
+
     .animate-in {
       animation: fade-slide-in 0.35s ease;
     }
@@ -2494,7 +2506,7 @@
         metaDiv.appendChild(spanGeb);
 
         const details = document.createElement('div');
-        details.className = 'details';
+        details.className = 'details collapsible';
         details.hidden = true;
         const detailsId = `vorsorge-details-${index}`;
         details.id = detailsId;
@@ -2621,6 +2633,59 @@
 
     function pulseElement(el) {
       playAnimation(el, 'pulse-once');
+    }
+
+    function animateCollapsible(panel, open, onDone) {
+      if (!panel) return;
+      panel.classList.add('collapsible');
+      const alreadyOpen = !panel.hasAttribute('hidden');
+      if (open === alreadyOpen) {
+        if (open) panel.classList.add('is-open');
+        if (typeof onDone === 'function') onDone();
+        return;
+      }
+
+      const startHeight = panel.getBoundingClientRect().height || 0;
+      let targetHeight = panel.scrollHeight;
+
+      const finish = (event) => {
+        if (event && event.propertyName !== 'height') return;
+        if (open) {
+          panel.style.height = 'auto';
+          panel.classList.add('is-open');
+        } else {
+          panel.setAttribute('hidden', '');
+          panel.style.display = 'none';
+          panel.style.height = '';
+          panel.classList.remove('is-open');
+        }
+        panel.removeEventListener('transitionend', finish);
+        if (typeof onDone === 'function') onDone();
+      };
+
+      if (open) {
+        panel.removeAttribute('hidden');
+        panel.style.display = 'block';
+        targetHeight = panel.scrollHeight;
+        panel.style.height = '0px';
+        panel.style.opacity = '0';
+        requestAnimationFrame(() => {
+          panel.style.height = `${targetHeight}px`;
+          panel.style.opacity = '1';
+          panel.classList.add('is-open');
+        });
+      } else {
+        const fromHeight = startHeight || targetHeight;
+        panel.style.height = `${fromHeight}px`;
+        panel.style.opacity = '1';
+        requestAnimationFrame(() => {
+          panel.style.height = '0px';
+          panel.style.opacity = '0';
+          panel.classList.remove('is-open');
+        });
+      }
+
+      panel.addEventListener('transitionend', finish);
     }
 
     function buildPortfolioView(type) {
@@ -2989,8 +3054,8 @@
         }
 
         const detailsWrapper = document.createElement('div');
-        detailsWrapper.className = 'fund-details';
-        detailsWrapper.style.display = 'none';
+        detailsWrapper.className = 'fund-details collapsible';
+        detailsWrapper.hidden = true;
         detailsWrapper.appendChild(stats);
         detailsWrapper.appendChild(descrBlock);
 
@@ -3000,10 +3065,11 @@
         toggleDetails.setAttribute('aria-expanded', 'false');
         toggleDetails.textContent = 'Details anzeigen';
         toggleDetails.addEventListener('click', () => {
-          const open = detailsWrapper.style.display === 'block';
-          detailsWrapper.style.display = open ? 'none' : 'block';
+          const open = !detailsWrapper.hasAttribute('hidden');
+          animateCollapsible(detailsWrapper, !open, () => {
+            toggleDetails.textContent = open ? 'Details anzeigen' : 'Schliessen';
+          });
           toggleDetails.setAttribute('aria-expanded', String(!open));
-          toggleDetails.textContent = open ? 'Details anzeigen' : 'Schliessen';
         });
 
         const fundActionRow = document.createElement('div');
@@ -3311,8 +3377,7 @@
 
           document.querySelectorAll('.details').forEach((panel) => {
             if (panel === details) return;
-            panel.setAttribute('hidden', '');
-            panel.style.display = 'none';
+            animateCollapsible(panel, false);
             const trigger = document.querySelector(`.toggle-details[data-target-id="${panel.id}"]`);
             if (trigger) {
               trigger.setAttribute('aria-expanded', 'false');
@@ -3320,15 +3385,9 @@
             }
           });
 
-          if (isOpen) {
-            details.setAttribute('hidden', '');
-            details.style.display = 'none';
-            link.textContent = 'Mehr erfahren';
-          } else {
-            details.removeAttribute('hidden');
-            details.style.display = 'block';
-            link.textContent = 'Schliessen';
-          }
+          animateCollapsible(details, !isOpen, () => {
+            link.textContent = isOpen ? 'Mehr erfahren' : 'Schliessen';
+          });
           link.setAttribute('aria-expanded', String(!isOpen));
         });
       });
