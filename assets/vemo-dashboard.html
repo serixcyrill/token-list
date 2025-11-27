@@ -2666,6 +2666,16 @@
       return totals.weighted / totals.total;
     }
 
+    let editableRefreshQueued = false;
+    function queueRefreshEditableState() {
+      if (editableRefreshQueued) return;
+      editableRefreshQueued = true;
+      requestAnimationFrame(() => {
+        editableRefreshQueued = false;
+        refreshEditableState();
+      });
+    }
+
     function playAnimation(el, className = 'animate-in') {
       if (!el) return;
       el.classList.remove(className);
@@ -2862,7 +2872,22 @@
       persistJson(STORAGE_KEYS.ablauf, ablaufData);
     }
 
+    let pendingPortfolioType = null;
+    let portfolioRenderScheduled = false;
+
     function renderPortfolios(type) {
+      pendingPortfolioType = type;
+      if (portfolioRenderScheduled) return;
+      portfolioRenderScheduled = true;
+      requestAnimationFrame(() => {
+        portfolioRenderScheduled = false;
+        const nextType = pendingPortfolioType || type;
+        pendingPortfolioType = null;
+        renderPortfoliosNow(nextType);
+      });
+    }
+
+    function renderPortfoliosNow(type) {
       const list = document.getElementById('portfolioList');
       list.innerHTML = '';
       const meta = portfolioMeta[type];
@@ -3215,10 +3240,25 @@
         pulseElement(chartWrap);
       }
       shell.classList.toggle('admin', adminMode);
-      refreshEditableState();
+      queueRefreshEditableState();
     }
 
+    let pendingAblaufRisk = null;
+    let ablaufRenderScheduled = false;
+
     function renderAblauf(risk) {
+      pendingAblaufRisk = risk;
+      if (ablaufRenderScheduled) return;
+      ablaufRenderScheduled = true;
+      requestAnimationFrame(() => {
+        ablaufRenderScheduled = false;
+        const nextRisk = pendingAblaufRisk || risk;
+        pendingAblaufRisk = null;
+        renderAblaufNow(nextRisk);
+      });
+    }
+
+    function renderAblaufNow(risk) {
       const body = document.getElementById('ablaufBody');
       const head = document.getElementById('ablaufHead');
       if (!body || !head) return;
@@ -3273,7 +3313,7 @@
         body.appendChild(rowEl);
       });
 
-      refreshEditableState();
+      queueRefreshEditableState();
       const shell = document.querySelector('.ablauf-shell');
       playAnimation(shell);
     }
@@ -3450,7 +3490,7 @@
         persistJson(STORAGE_KEYS.avatars, savedAvatars);
       }
       bindAvatarInputs();
-      refreshEditableState();
+      queueRefreshEditableState();
     }
 
     function bindDetailsToggles() {
@@ -3521,7 +3561,7 @@
       adminMode = !adminMode;
       adminNotice.style.display = adminMode ? 'block' : 'none';
       exitAdminBtn.style.display = adminMode ? 'inline-flex' : 'none';
-      refreshEditableState();
+      queueRefreshEditableState();
     }
 
     function refreshEditableState() {
@@ -3642,7 +3682,7 @@
         renderAblauf('konservativ');
         renderAdvisors(advisorData);
         applyUpdatesData();
-        refreshEditableState();
+        queueRefreshEditableState();
       });
   </script>
 </body>
