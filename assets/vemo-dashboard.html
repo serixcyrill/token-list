@@ -268,6 +268,16 @@
       border-style: dashed;
     }
 
+    .toggle-details {
+      white-space: nowrap;
+      transition: width 0.28s ease, padding 0.28s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .label-animating {
+      overflow: hidden;
+    }
+
     .pill {
       display: inline-flex;
       align-items: center;
@@ -859,6 +869,9 @@
       color: #0f1a2a;
       font-weight: 700;
       cursor: pointer;
+      white-space: nowrap;
+      transition: width 0.28s ease, padding 0.28s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .fund-toggle:hover {
@@ -2517,7 +2530,10 @@
         link.dataset.targetId = detailsId;
         link.setAttribute('aria-expanded', 'false');
         link.setAttribute('aria-label', `Mehr erfahren zu ${card.title}`);
-        link.textContent = 'Mehr erfahren';
+        const linkLabel = document.createElement('span');
+        linkLabel.className = 'btn-label';
+        linkLabel.textContent = 'Mehr erfahren';
+        link.appendChild(linkLabel);
 
         const websiteBtn = document.createElement('a');
         websiteBtn.className = 'cta-btn cta-secondary';
@@ -2633,6 +2649,43 @@
 
     function pulseElement(el) {
       playAnimation(el, 'pulse-once');
+    }
+
+    function animateLabelSwap(button, nextText) {
+      if (!button) return;
+      const label = button.querySelector('.btn-label') || button;
+      const currentText = label.textContent;
+      if (currentText === nextText) return;
+
+      const ghost = button.cloneNode(true);
+      ghost.style.visibility = 'hidden';
+      ghost.style.position = 'absolute';
+      ghost.style.width = 'auto';
+      ghost.style.whiteSpace = 'nowrap';
+      const ghostLabel = ghost.querySelector('.btn-label') || ghost;
+      ghostLabel.textContent = currentText;
+      document.body.appendChild(ghost);
+      const currentWidth = ghost.getBoundingClientRect().width;
+      ghostLabel.textContent = nextText;
+      const targetWidth = ghost.getBoundingClientRect().width;
+      document.body.removeChild(ghost);
+
+      button.classList.add('label-animating');
+      button.style.width = `${currentWidth}px`;
+
+      requestAnimationFrame(() => {
+        label.textContent = nextText;
+        button.style.width = `${targetWidth}px`;
+      });
+
+      const cleanup = (event) => {
+        if (event && event.propertyName !== 'width') return;
+        button.style.width = '';
+        button.classList.remove('label-animating');
+        button.removeEventListener('transitionend', cleanup);
+      };
+
+      button.addEventListener('transitionend', cleanup);
     }
 
     function animateCollapsible(panel, open, onDone) {
@@ -3063,11 +3116,14 @@
         toggleDetails.type = 'button';
         toggleDetails.className = 'fund-toggle';
         toggleDetails.setAttribute('aria-expanded', 'false');
-        toggleDetails.textContent = 'Details anzeigen';
+        const toggleLabel = document.createElement('span');
+        toggleLabel.className = 'btn-label';
+        toggleLabel.textContent = 'Details anzeigen';
+        toggleDetails.appendChild(toggleLabel);
         toggleDetails.addEventListener('click', () => {
           const open = !detailsWrapper.hasAttribute('hidden');
           animateCollapsible(detailsWrapper, !open, () => {
-            toggleDetails.textContent = open ? 'Details anzeigen' : 'Schliessen';
+            animateLabelSwap(toggleDetails, open ? 'Details anzeigen' : 'Schliessen');
           });
           toggleDetails.setAttribute('aria-expanded', String(!open));
         });
@@ -3381,12 +3437,12 @@
             const trigger = document.querySelector(`.toggle-details[data-target-id="${panel.id}"]`);
             if (trigger) {
               trigger.setAttribute('aria-expanded', 'false');
-              trigger.textContent = 'Mehr erfahren';
+              animateLabelSwap(trigger, 'Mehr erfahren');
             }
           });
 
           animateCollapsible(details, !isOpen, () => {
-            link.textContent = isOpen ? 'Mehr erfahren' : 'Schliessen';
+            animateLabelSwap(link, isOpen ? 'Mehr erfahren' : 'Schliessen');
           });
           link.setAttribute('aria-expanded', String(!isOpen));
         });
