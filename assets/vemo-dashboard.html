@@ -49,7 +49,6 @@
     .tab-buttons button:not(.active):hover,
     .mode-tabs button:not(.active):hover,
     .secondary-btn:hover,
-    .toggle-details:hover,
     .advisor-actions a:hover {
       background: #eef6ef !important;
       border-color: rgba(114, 210, 122, 0.45) !important;
@@ -247,6 +246,12 @@
     .cta-primary:hover {
       background: var(--accent-hover);
       transform: translateY(-1px);
+    }
+
+    .toggle-details.cta-primary:hover {
+      background: var(--accent-hover) !important;
+      border-color: rgba(114, 210, 122, 0.6) !important;
+      color: #ffffff !important;
     }
 
     .cta-secondary {
@@ -3122,9 +3127,9 @@
         toggleDetails.appendChild(toggleLabel);
         toggleDetails.addEventListener('click', () => {
           const open = !detailsWrapper.hasAttribute('hidden');
-          animateCollapsible(detailsWrapper, !open, () => {
-            animateLabelSwap(toggleDetails, open ? 'Details anzeigen' : 'Schliessen');
-          });
+          const nextText = open ? 'Details anzeigen' : 'Schliessen';
+          animateLabelSwap(toggleDetails, nextText);
+          animateCollapsible(detailsWrapper, !open);
           toggleDetails.setAttribute('aria-expanded', String(!open));
         });
 
@@ -3441,9 +3446,8 @@
             }
           });
 
-          animateCollapsible(details, !isOpen, () => {
-            animateLabelSwap(link, isOpen ? 'Mehr erfahren' : 'Schliessen');
-          });
+          animateLabelSwap(link, isOpen ? 'Mehr erfahren' : 'Schliessen');
+          animateCollapsible(details, !isOpen);
           link.setAttribute('aria-expanded', String(!isOpen));
         });
       });
