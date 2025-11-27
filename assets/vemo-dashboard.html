@@ -273,6 +273,26 @@
       border-style: dashed;
     }
 
+    .cta-btn:focus,
+    .cta-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(114, 210, 122, 0.28), 0 8px 18px rgba(126, 217, 87, 0.22);
+    }
+
+    .toggle-details.cta-primary:focus,
+    .toggle-details.cta-primary:focus-visible {
+      background: var(--accent-strong);
+      border-color: rgba(114, 210, 122, 0.5);
+      color: #ffffff;
+    }
+
+    .toggle-details.cta-secondary:focus,
+    .toggle-details.cta-secondary:focus-visible {
+      background: #f1f5fb;
+      border-color: #cdd4e0;
+      color: #0f1a2a;
+    }
+
     .toggle-details {
       white-space: nowrap;
       transition: width 0.28s ease, padding 0.28s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
