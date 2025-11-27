@@ -349,7 +349,7 @@
       ],
     };
 
-    const advisorData = [
+    let advisorData = [
       {
         name: 'Diego Berchtold (Preview)',
         role: 'Honorarberater',
@@ -378,6 +378,94 @@
         terminHinweis: 'Terminlink als Beispiel',
       },
     ];
+
+    const SHEET_BASE_ID = '2PACX-1vQg29x92Do82OV6r7f19UCrbTBZURRu305Nu-GMH9UlnqvcBhe44-8oqMJBTLFaRUNhKXeG8JKDBDYc';
+    const ADVISOR_GID = '832064159';
+
+    function buildCsvUrl(gid) {
+      const params = new URLSearchParams({ gid, single: 'true', output: 'csv', cacheBust: Date.now().toString() });
+      return `https://docs.google.com/spreadsheets/d/e/${SHEET_BASE_ID}/pub?${params.toString()}`;
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let current = '';
+      let inQuotes = false;
+      let row = [];
+
+      for (let i = 0; i < text.length; i += 1) {
+        const char = text[i];
+        if (char === '"') {
+          if (inQuotes && text[i + 1] === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(current);
+          current = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (current !== '' || row.length) {
+            row.push(current);
+            rows.push(row);
+            row = [];
+            current = '';
+          }
+        } else {
+          current += char;
+        }
+      }
+
+      if (current !== '' || row.length) {
+        row.push(current);
+        rows.push(row);
+      }
+
+      return rows.map((cols) => cols.map((cell) => cell.trim()));
+    }
+
+    async function loadAdvisorsFromSheet() {
+      try {
+        const res = await fetch(buildCsvUrl(ADVISOR_GID), { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Sheet Request fehlgeschlagen: ${res.status}`);
+        const rows = parseCsv(await res.text()).filter((r) => r.length);
+        if (rows.length < 2) return;
+
+        const header = rows[0].slice(1);
+        const fieldRows = rows.slice(1);
+        const advisors = header.map((key) => ({ key: key.toLowerCase() }));
+        const fieldMap = {};
+
+        fieldRows.forEach(([field, ...values]) => {
+          fieldMap[(field || '').toLowerCase()] = values;
+        });
+
+        advisors.forEach((advisor, idx) => {
+          advisor.name = fieldMap.name?.[idx] || advisor.name || '';
+          advisor.role = fieldMap.rolle?.[idx] || advisor.role || '';
+          advisor.description = fieldMap.kurzbeschreibung?.[idx] || advisor.description || '';
+          advisor.educationText = (fieldMap.educationtext?.[idx] || '')
+            .split(';')
+            .map((s) => s.trim())
+            .filter(Boolean);
+          advisor.codeOfConductText = (fieldMap.codeofconducttext?.[idx] || '')
+            .split(';')
+            .map((s) => s.trim())
+            .filter(Boolean);
+          advisor.terminLink = fieldMap.terminlink?.[idx] || advisor.terminLink || '#';
+          advisor.terminHinweis = fieldMap.terminhinweis?.[idx] || advisor.terminHinweis || '';
+          advisor.avatarUrl = fieldMap.avatarurl?.[idx] || '';
+        });
+
+        const filtered = advisors.filter((a) => a.name);
+        if (filtered.length) {
+          advisorData = filtered;
+        }
+      } catch (error) {
+        console.warn('Berater Sheet konnte nicht geladen werden, nutze Preview-Daten', error);
+      }
+    }
 
     function renderVorsorgeCards() {
       const grid = document.getElementById('vorsorgeGrid');
@@ -608,7 +696,7 @@
         card.className = 'advisor-card';
         card.innerHTML = `
           <div class="advisor-header">
-            <div class="avatar" style="background-image:url('https://picsum.photos/seed/${idx}/200');"></div>
+            <div class="avatar" style="background-image:url('${advisor.avatarUrl || `https://picsum.photos/seed/${idx}/200`}');"></div>
             <div class="advisor-meta">
               <h4>${advisor.name}</h4>
               <span class="role">${advisor.role}</span>
@@ -646,10 +734,13 @@
       });
     });
 
-    renderVorsorgeCards();
-    renderPortfolios('factor');
-    renderAblauf('konservativ');
-    renderAdvisors();
+    (async () => {
+      await loadAdvisorsFromSheet();
+      renderVorsorgeCards();
+      renderPortfolios('factor');
+      renderAblauf('konservativ');
+      renderAdvisors();
+    })();
   </script>
 </body>
 </html>
