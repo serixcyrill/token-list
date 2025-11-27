@@ -72,12 +72,13 @@
     }
 
     #zinseszins-app header{
-      padding:18px 24px 10px;
+      padding:14px 20px 8px;
       border-bottom:1px solid var(--ring);
       display:flex;
       flex-wrap:wrap;
       gap:8px 12px;
       align-items:flex-start;
+      justify-content:space-between;
       background:linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.22) 70%);
     }
     #zinseszins-app .head-left{ display:flex; flex-direction:column; gap:4px; }
@@ -98,19 +99,30 @@
     #zinseszins-app .dot{ width:8px; height:8px; border-radius:99px; background:var(--accent); box-shadow:none; }
     #zinseszins-app h1{
       margin:0;
-      font-size:30px;
+      font-size:28px;
       font-family:'Space Grotesk', 'Inter', system-ui;
-      letter-spacing:-0.25px;
+      letter-spacing:-0.2px;
       color:#0f172a;
     }
     #zinseszins-app p.lead{
       margin:0;
       color:#475569;
       max-width:720px;
-      line-height:1.6;
+      line-height:1.5;
     }
 
-    #zinseszins-app main{ padding:30px 32px 42px; }
+    #zinseszins-app .save-meta{
+      color:#475569;
+      font-weight:600;
+      font-size:13px;
+      background:rgba(255,255,255,.6);
+      border:1px solid var(--ring);
+      padding:8px 10px;
+      border-radius:12px;
+      box-shadow:0 8px 20px rgba(15,23,42,.06);
+    }
+
+    #zinseszins-app main{ padding:24px 28px 36px; }
     #zinseszins-app .grid{
       display:grid;
       gap:20px;
@@ -214,25 +226,6 @@
 
       #zinseszins-app .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; background:rgba(255,255,255,.36); }
 
-      #zinseszins-app .status-card{ display:flex; flex-direction:column; gap:8px; }
-      #zinseszins-app .status-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-      #zinseszins-app .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:7px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:800;
-      border:1px solid var(--ring);
-      color:#0f172a;
-      background:rgba(255,255,255,.5);
-    }
-      #zinseszins-app .pill.live{ border-color:rgba(91,124,250,.26); background:rgba(91,124,250,.12); }
-      #zinseszins-app .pill.saved{ border-color:rgba(22,163,74,.22); background:rgba(22,163,74,.08); color:#166534; opacity:0.28; transition:opacity .24s ease; }
-      #zinseszins-app .pill.saved.visible{ opacity:1; }
-      #zinseszins-app .status-meta{ color:#475569; font-weight:600; font-size:13px; line-height:1.45; }
-
     /* --- Mobile-first Optimierungen --- */
     @media (max-width: 760px){
       #zinseszins-app{ padding:22px 12px 44px; }
@@ -268,6 +261,7 @@
             <p class="lead">Plane deine Geldanlage mit einem klaren, reduzierten Interface. Wir berechnen Endkapital, Zinsen und zeigen eine Jahresprojektion.</p>
           </div>
         </div>
+        <div class="save-meta" id="status-meta">Speichert deine Eingaben automatisch.</div>
       </header>
       <main>
         <div class="grid cols-2">
@@ -322,13 +316,6 @@
                 <div class="kpi-label">Gesamteinzahlungen</div>
                 <div class="kpi-value" id="einzahlungen">–</div>
               </div>
-              <div class="kpi status-card">
-                <div class="status-row">
-                  <span class="pill live">Live</span>
-                  <span class="pill saved" id="status-saved">Gespeichert</span>
-                </div>
-                <div class="status-meta" id="status-meta">Speichert deine Eingaben automatisch.</div>
-              </div>
               <div class="kpi endcap">
                 <div>
                   <div class="kpi-label">Endkapital</div>
@@ -371,7 +358,6 @@
         interest: document.getElementById('zinsen'),
         deposits: document.getElementById('einzahlungen'),
         chart: document.getElementById('chart'),
-        saved: document.getElementById('status-saved'),
         statusMeta: document.getElementById('status-meta')
       };
 
@@ -550,9 +536,11 @@
           const totalH = depH + intH;
           const totalVal = Math.max(1, deposits[i] + interest[i]);
 
+          const holder = document.createElementNS('http://www.w3.org/2000/svg','g');
+          holder.setAttribute('transform', `translate(${x}, ${ih - totalH})`);
+
           const stack = document.createElementNS('http://www.w3.org/2000/svg','g');
           stack.setAttribute('class','bar-stack');
-          stack.setAttribute('transform', `translate(${x}, ${ih - totalH})`);
           stack.style.transform = 'scaleY(0.02)';
 
           const intRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
@@ -578,7 +566,8 @@
           depRect.setAttribute('title', `Einzahlungsanteil: ${depShare.toFixed(1)}%`);
           stack.appendChild(depRect);
 
-          g.appendChild(stack);
+          holder.appendChild(stack);
+          g.appendChild(holder);
 
           requestAnimationFrame(()=>{
             const delay = i * 16;
@@ -639,20 +628,8 @@
         };
         try{
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-          toggleSaved(true);
           updateStatusMeta(savedAt);
-          clearTimeout(persistState._timer);
-          persistState._timer = setTimeout(()=> toggleSaved(false), 1800);
         }catch(e){ console.warn('Konnte Daten nicht speichern', e); }
-      }
-
-      function toggleSaved(show){
-        if(!el.saved) return;
-        if(show){
-          el.saved.classList.add('visible');
-        }else{
-          el.saved.classList.remove('visible');
-        }
       }
 
       const formatSavedAt = (ts)=> new Intl.DateTimeFormat('de-CH',{ dateStyle:'short', timeStyle:'medium' }).format(ts);
