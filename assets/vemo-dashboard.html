@@ -359,8 +359,39 @@
       margin-bottom: 12px;
     }
 
+    @keyframes fade-slide-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.995);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes pulse-highlight {
+      from {
+        box-shadow: 0 0 0 0 rgba(114, 210, 122, 0.28);
+      }
+
+      to {
+        box-shadow: 0 0 0 12px rgba(114, 210, 122, 0);
+      }
+    }
+
+    .animate-in {
+      animation: fade-slide-in 0.35s ease;
+    }
+
+    .pulse-once {
+      animation: pulse-highlight 0.6s ease;
+    }
+
     .krypto-toggle {
       margin-left: auto;
+      margin-right: 2px;
       background: transparent;
       color: #f97316;
       border-color: rgba(249, 115, 22, 0.55);
@@ -380,6 +411,11 @@
       border-color: rgba(249, 115, 22, 0.9);
       color: #c85a0f;
       box-shadow: none;
+    }
+
+    .krypto-toggle:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
 
     .portfolio-actions {
@@ -2568,6 +2604,25 @@
       return totals.weighted / totals.total;
     }
 
+    function playAnimation(el, className = 'animate-in') {
+      if (!el) return;
+      el.classList.remove(className);
+      // force reflow so successive animations retrigger
+      void el.offsetWidth;
+      el.classList.add(className);
+      el.addEventListener(
+        'animationend',
+        () => {
+          el.classList.remove(className);
+        },
+        { once: true }
+      );
+    }
+
+    function pulseElement(el) {
+      playAnimation(el, 'pulse-once');
+    }
+
     function buildPortfolioView(type) {
       const baseList = (portfolioData[type] || []).map((item, idx) => ({
         ...item,
@@ -2646,6 +2701,7 @@
       const list = document.getElementById('portfolioList');
       list.innerHTML = '';
       const meta = portfolioMeta[type];
+      syncKryptoToggle(type);
 
       const shell = document.createElement('div');
       shell.className = 'portfolio-shell';
@@ -2985,6 +3041,10 @@
       list.appendChild(shell);
 
       drawDonut(canvas, allocations);
+      playAnimation(shell);
+      if (kryptoActive) {
+        pulseElement(chartWrap);
+      }
       shell.classList.toggle('admin', adminMode);
       refreshEditableState();
     }
@@ -3045,6 +3105,8 @@
       });
 
       refreshEditableState();
+      const shell = document.querySelector('.ablauf-shell');
+      playAnimation(shell);
     }
 
     function bindAvatarInputs() {
@@ -3264,6 +3326,17 @@
       return activeBtn ? activeBtn.getAttribute('data-portfolio-tab') : 'factor';
     }
 
+    function syncKryptoToggle(type) {
+      const blocked = type === 'obligationen';
+      kryptoToggle.disabled = blocked;
+      kryptoToggle.title = blocked ? 'Für Obligationen nicht verfügbar' : '5% Krypto hinzufügen';
+      if (blocked && kryptoActive) {
+        kryptoActive = false;
+        kryptoToggle.classList.remove('active');
+        kryptoToggle.textContent = '+ 5% Krypto';
+      }
+    }
+
     function addNewFund() {
       if (!adminMode) return;
       const current = getActivePortfolioType();
@@ -3382,10 +3455,15 @@
 
     addFundBtn.addEventListener('click', addNewFund);
     kryptoToggle.addEventListener('click', () => {
+      const type = getActivePortfolioType();
+      if (type === 'obligationen') return;
       kryptoActive = !kryptoActive;
       kryptoToggle.classList.toggle('active', kryptoActive);
       kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
-      renderPortfolios(getActivePortfolioType());
+      const currentType = getActivePortfolioType();
+      renderPortfolios(currentType);
+      const chartArea = document.querySelector('.chart-wrap');
+      pulseElement(chartArea);
     });
     exitAdminBtn.addEventListener('click', () => {
       if (adminMode) toggleAdminMode();
