@@ -81,7 +81,7 @@
       justify-content:space-between;
       background:linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.22) 70%);
     }
-    #zinseszins-app .head-left{ display:flex; flex-direction:column; gap:4px; }
+    #zinseszins-app .head-left{ display:flex; flex-direction:column; gap:2px; }
     #zinseszins-app .eyebrow{
       display:inline-flex;
       align-items:center;
@@ -99,17 +99,11 @@
     #zinseszins-app .dot{ width:8px; height:8px; border-radius:99px; background:var(--accent); box-shadow:none; }
     #zinseszins-app h1{
       margin:0;
-      font-size:28px;
+      font-size:30px;
       font-family:'Space Grotesk', 'Inter', system-ui;
-      font-weight:700;
-      letter-spacing:-0.2px;
+      font-weight:800;
+      letter-spacing:-0.25px;
       color:#0f172a;
-    }
-    #zinseszins-app p.lead{
-      margin:0;
-      color:#475569;
-      max-width:720px;
-      line-height:1.5;
     }
 
     #zinseszins-app .save-meta{
@@ -231,8 +225,7 @@
     @media (max-width: 760px){
       #zinseszins-app{ padding:22px 12px 44px; }
       #zinseszins-app header{ padding:14px 16px 8px; gap:6px 8px; }
-      #zinseszins-app h1{ font-size:24px; letter-spacing:-0.15px; }
-      #zinseszins-app p.lead{ font-size:13px; line-height:1.55; }
+        #zinseszins-app h1{ font-size:24px; letter-spacing:-0.15px; }
       #zinseszins-app main{ padding:18px 18px 28px; }
       #zinseszins-app .grid{ gap:16px; }
       #zinseszins-app .panel{ padding:16px; border-radius:18px; box-shadow:0 12px 26px rgba(15,23,42,.08); }
@@ -257,10 +250,7 @@
       <header>
         <div class="head-left">
           <div class="eyebrow"><span class="dot"></span> Projektions-Tool</div>
-          <div>
-            <h1>Zinseszinsrechner</h1>
-            <p class="lead">Plane deine Geldanlage mit einem klaren, reduzierten Interface. Wir berechnen Endkapital, Zinsen und zeigen eine Jahresprojektion.</p>
-          </div>
+          <h1>Zinseszinsrechner</h1>
         </div>
         <div class="save-meta" id="status-meta">Speichert deine Eingaben automatisch.</div>
       </header>
