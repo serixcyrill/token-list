@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finanzielle Freiheit Rechner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    :root {
+      --primary: #6248f6;
+      --primary-dark: #5138dd;
+      --background: #f7f7fb;
+      --border: #e6e7ec;
+      --text: #0f172a;
+      --muted: #64748b;
+      --card: #ffffff;
+      --orange: #ff9b48;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .breadcrumbs span:last-child {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      margin: 12px 0 8px;
+      color: var(--text);
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--background);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    input, select, button {
+      font-family: inherit;
+    }
+
+    .input {
+      padding: 14px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 15px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: #fff;
+    }
+
+    .input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(98, 72, 246, 0.15);
+      outline: none;
+    }
+
+    .button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 12px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 10px 24px rgba(98, 72, 246, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .results-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .link-btn {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .stat {
+      background: #f8f7ff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .stat small {
+      display: block;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .stat .value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .example-text {
+      margin-top: 14px;
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .highlight {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .chart-card {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fbfbff;
+    }
+
+    .newsletter {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      align-items: center;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(98, 72, 246, 0.08);
+      color: var(--primary);
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .email-input {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .email-input input {
+      flex: 1 1 200px;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 720px) {
+      .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .page {
+        padding: 16px 12px 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="breadcrumbs"><span>Home</span><span>/</span><span>Rechner</span><span>/</span><span>Finanzielle Freiheit</span></div>
+    <h1>Finanzielle Freiheit Rechner</h1>
+    <p class="lead">Wieviel brauchst du für deine finanzielle Freiheit? Mit unserem Rechner kannst du das nötige Kapital und deine Sparrate für deine zukünftige Unabhängigkeit errechnen. Anschließend senden wir dir deinen individuellen Plan zu. So kannst du dir finanzielle Freiheit eigenständig planen.</p>
+
+    <div class="card">
+      <div class="card-header">💰 Finanzielle Freiheit berechnen</div>
+
+      <div class="step-title">Schritt 1: Dein monatlicher Wunschbetrag</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Dein monatlicher Netto-Wunschbetrag <span class="info">?</span></label>
+          <input id="monthly-need" class="input" type="number" inputmode="decimal" value="5000" min="0" step="50" />
+        </div>
+      </div>
+
+      <div class="step-title">Schritt 2: Deine Angaben</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Erwartete Rendite p.a. <span class="info">?</span></label>
+          <input id="return-rate" class="input" type="number" inputmode="decimal" value="7" min="0" step="0.1" />
+        </div>
+        <div class="field">
+          <label>Inflation <span class="info">?</span></label>
+          <input id="inflation" class="input" type="number" inputmode="decimal" value="2" min="0" step="0.1" />
+        </div>
+        <div class="field">
+          <label>Steuersatz der Kapitalerträge? <span class="info">?</span></label>
+          <input id="tax-rate" class="input" type="number" inputmode="decimal" value="0" min="0" step="0.1" />
+          <span class="muted">Keine Steuerabzüge (Schweizer Kalkulation)</span>
+        </div>
+        <div class="field">
+          <label>Kapitalverzehr? <span class="info">?</span></label>
+          <select id="drawdown" class="input">
+            <option value="nein">Nein, Kapital erhalten</option>
+            <option value="ja">Ja, Kapitalverzehr</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Dein heutiges Alter <span class="info">?</span></label>
+          <input id="current-age" class="input" type="number" inputmode="decimal" value="25" min="0" step="1" />
+        </div>
+        <div class="field">
+          <label>Dein Wunschrenteneintrittsalter <span class="info">?</span></label>
+          <input id="retire-age" class="input" type="number" inputmode="decimal" value="45" min="0" step="1" />
+        </div>
+        <div class="field">
+          <label>Jahre bis zur finanziellen Freiheit <span class="info">?</span></label>
+          <input id="years" class="input" type="number" inputmode="decimal" value="20" min="1" step="1" />
+        </div>
+        <div class="field">
+          <label>Bereits vorhandenes Kapital <span class="info">?</span></label>
+          <input id="existing-capital" class="input" type="number" inputmode="decimal" value="10000" min="0" step="500" />
+        </div>
+      </div>
+
+      <button class="button" id="calculate">Berechnen</button>
+    </div>
+
+    <div class="card" id="results-card">
+      <div class="results-header">
+        <div class="results-title">📊 Berechnung</div>
+        <button class="link-btn" id="copy-link">Permalink kopieren</button>
+      </div>
+      <div class="result-grid">
+        <div class="stat">
+          <small>Benötigtes Endkapital</small>
+          <div class="value" id="target-capital">–</div>
+        </div>
+        <div class="stat">
+          <small>Monatliche Sparrate</small>
+          <div class="value" id="monthly-saving">–</div>
+        </div>
+      </div>
+      <p class="example-text" id="example-text"></p>
+
+      <div class="chart-card">
+        <div style="font-weight:700; margin-bottom:12px;">Diagramm</div>
+        <div id="chart" style="height:360px;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tag">💌 Bleib auf dem Laufenden!</div>
+      <div class="newsletter">
+        <div>
+          <div style="font-weight:700; font-size:18px; margin-bottom:6px;">Wir halten dich auf dem Laufenden!</div>
+          <div class="muted">Jede Woche auf den Punkt gebracht – genau dein Fachjargon. Kostenloser Newsletter, top relevante Artikel zu den heißesten Themen der Finanzwelt und praktische Tipps für deinen finanziellen Selbstbestimmung.</div>
+        </div>
+        <div>
+          <div class="email-input">
+            <input class="input" type="email" placeholder="Deine Email-Adresse" />
+            <button class="button" style="width:auto; padding:12px 18px; margin:0;">Anmelden</button>
+          </div>
+          <div class="footer-note">Mit deiner Anmeldung akzeptierst du unsere Datenschutzbestimmungen.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const currency = new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF', minimumFractionDigits: 2 });
+
+    function parseNumber(value) {
+      if (typeof value === 'number') return value;
+      return parseFloat(String(value).replace(/\./g, '').replace(',', '.')) || 0;
+    }
+
+    function round(value, digits = 2) {
+      const factor = Math.pow(10, digits);
+      return Math.round(value * factor) / factor;
+    }
+
+    function calculatePlan() {
+      const monthlyNeed = parseNumber(document.getElementById('monthly-need').value);
+      const returnRate = parseNumber(document.getElementById('return-rate').value) / 100;
+      const inflation = parseNumber(document.getElementById('inflation').value) / 100;
+      const taxRate = 0; // schweiz, keine steuern
+      const drawdown = document.getElementById('drawdown').value === 'ja';
+      const currentAge = parseNumber(document.getElementById('current-age').value);
+      const retireAge = parseNumber(document.getElementById('retire-age').value);
+      const yearsToFreedom = Math.max(1, parseNumber(document.getElementById('years').value));
+      const existingCapital = parseNumber(document.getElementById('existing-capital').value);
+
+      const months = Math.round(yearsToFreedom * 12);
+      const nominalMonthly = Math.pow(1 + returnRate, 1 / 12) - 1;
+      const realAnnual = ((1 + returnRate * (1 - taxRate)) / (1 + inflation)) - 1;
+      const realMonthly = Math.pow(1 + realAnnual, 1 / 12) - 1;
+      const inflationFactor = Math.pow(1 + inflation, yearsToFreedom);
+      const futureMonthlyNeed = monthlyNeed * inflationFactor;
+
+      const retireYears = Math.max(0, 90 - retireAge);
+      let requiredRealCapital;
+      if (drawdown) {
+        const periods = Math.max(1, Math.round(retireYears * 12));
+        requiredRealCapital = futureMonthlyNeed * (1 - Math.pow(1 + realMonthly, -periods)) / realMonthly;
+      } else {
+        requiredRealCapital = (futureMonthlyNeed * 12) / Math.max(realAnnual, 0.0001);
+      }
+
+      const targetNominal = requiredRealCapital * Math.pow(1 + inflation, yearsToFreedom);
+      const futureExisting = existingCapital * Math.pow(1 + nominalMonthly, months);
+      const savingDenominator = (Math.pow(1 + nominalMonthly, months) - 1) / nominalMonthly;
+      const monthlySaving = Math.max(0, (targetNominal - futureExisting) / savingDenominator);
+
+      updateResults(targetNominal, monthlySaving, yearsToFreedom, futureMonthlyNeed);
+      buildChart(existingCapital, monthlySaving, nominalMonthly, yearsToFreedom);
+    }
+
+    function updateResults(target, monthlySaving, years, futureNeed) {
+      document.getElementById('target-capital').textContent = currency.format(target);
+      document.getElementById('monthly-saving').textContent = currency.format(monthlySaving);
+
+      const example = `Bei einer monatlichen Sparrate von ${currency.format(monthlySaving)} hast du nach ${years.toLocaleString('de-CH')} Jahren ein Endkapital von ${currency.format(target)} aufgebaut. Mit ${round(((1 + parseNumber(document.getElementById('return-rate').value) / 100) / (1 + parseNumber(document.getElementById('inflation').value) / 100) - 1) * 100, 2)}% realer Rendite kannst du mit einer monatlichen Rente von ${currency.format(futureNeed)} rechnen.`;
+      document.getElementById('example-text').innerHTML = example.replace(/\./g, '.');
+    }
+
+    function buildChart(initialCapital, monthlySaving, monthlyRate, years) {
+      const categories = [];
+      const contributions = [];
+      const interests = [];
+      const totals = [];
+
+      let capital = initialCapital;
+
+      for (let year = 1; year <= years; year++) {
+        let contribYear = 0;
+        let interestYear = 0;
+        for (let m = 0; m < 12; m++) {
+          const interest = capital * monthlyRate;
+          interestYear += interest;
+          capital += interest;
+          capital += monthlySaving;
+          contribYear += monthlySaving;
+        }
+        categories.push(year.toString());
+        contributions.push(contribYear);
+        interests.push(interestYear);
+        totals.push(capital);
+      }
+
+      Highcharts.chart('chart', {
+        chart: { type: 'column', backgroundColor: 'transparent', spacing: [10, 10, 10, 10] },
+        title: { text: '' },
+        xAxis: {
+          categories,
+          title: { text: 'Jahre', style: { color: '#334155', fontWeight: '600' } },
+          labels: { style: { color: '#475569', fontSize: '12px' } }
+        },
+        yAxis: {
+          min: 0,
+          title: { text: 'Kapital', style: { color: '#334155', fontWeight: '600' } },
+          labels: {
+            formatter: function () { return currency.format(this.value); },
+            style: { color: '#475569', fontSize: '12px' }
+          },
+          gridLineColor: '#e2e8f0'
+        },
+        legend: { itemStyle: { fontWeight: '600', color: '#0f172a' } },
+        tooltip: {
+          shared: true,
+          backgroundColor: '#fff',
+          borderColor: '#e2e8f0',
+          borderRadius: 12,
+          useHTML: true,
+          formatter: function () {
+            let s = `<div style="font-weight:700; margin-bottom:6px;">Jahr ${this.x}</div>`;
+            this.points.forEach(point => {
+              s += `<div style="display:flex; justify-content:space-between; gap:12px;">` +
+                   `<span style="color:${point.color}; font-weight:600;">${point.series.name}</span>` +
+                   `<span>${currency.format(point.y)}</span></div>`;
+            });
+            return s;
+          }
+        },
+        plotOptions: {
+          column: {
+            stacking: 'normal',
+            borderRadius: 4,
+            pointPadding: 0.05,
+            groupPadding: 0.1
+          },
+          line: { lineWidth: 3, marker: { enabled: false } }
+        },
+        series: [
+          { name: 'Zinsen nach Steuern', data: interests, color: '#ff9b48' },
+          { name: 'Einzahlungen', data: contributions, color: '#6248f6' },
+          { type: 'line', name: 'Gesamtkapital', data: totals, color: '#1f2937' }
+        ],
+        credits: { enabled: false }
+      });
+    }
+
+    document.getElementById('calculate').addEventListener('click', calculatePlan);
+    document.getElementById('copy-link').addEventListener('click', () => {
+      const url = new URL(window.location);
+      const params = new URLSearchParams();
+      params.set('wunschbetrag', document.getElementById('monthly-need').value);
+      params.set('rendite', document.getElementById('return-rate').value);
+      params.set('inflation', document.getElementById('inflation').value);
+      params.set('steuer', document.getElementById('tax-rate').value);
+      params.set('drawdown', document.getElementById('drawdown').value);
+      params.set('alter', document.getElementById('current-age').value);
+      params.set('rente', document.getElementById('retire-age').value);
+      params.set('jahre', document.getElementById('years').value);
+      params.set('kapital', document.getElementById('existing-capital').value);
+      url.search = params.toString();
+      navigator.clipboard.writeText(url.toString());
+      const btn = document.getElementById('copy-link');
+      btn.textContent = 'Link kopiert!';
+      setTimeout(() => btn.textContent = 'Permalink kopieren', 1800);
+    });
+
+    function restoreFromParams() {
+      const params = new URLSearchParams(window.location.search);
+      const map = {
+        'wunschbetrag': 'monthly-need',
+        'rendite': 'return-rate',
+        'inflation': 'inflation',
+        'steuer': 'tax-rate',
+        'drawdown': 'drawdown',
+        'alter': 'current-age',
+        'rente': 'retire-age',
+        'jahre': 'years',
+        'kapital': 'existing-capital'
+      };
+      Object.entries(map).forEach(([key, id]) => {
+        if (params.has(key)) {
+          document.getElementById(id).value = params.get(key);
+        }
+      });
+    }
+
+    restoreFromParams();
+    calculatePlan();
+  </script>
+</body>
+</html>
