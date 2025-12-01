@@ -183,6 +183,36 @@
       flex-wrap: wrap;
     }
 
+    .msci-app .scale-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border-soft);
+      background: rgba(248, 250, 252, 0.8);
+      padding: 8px 10px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted-strong);
+    }
+
+    .msci-app .scale-toggle button {
+      border: 0;
+      background: transparent;
+      padding: 4px 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text-muted-strong);
+      transition: all 0.15s ease;
+    }
+
+    .msci-app .scale-toggle button.active {
+      background: rgba(126, 217, 87, 0.14);
+      color: var(--text-primary);
+      box-shadow: inset 0 0 0 1px var(--border-strong-accent);
+    }
+
     .msci-app .range-button {
       border: 1px solid var(--border-soft);
       background: rgba(248, 250, 252, 0.8);
@@ -251,12 +281,47 @@
       gap: 4px;
       cursor: pointer;
       transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+      position: relative;
     }
 
     .msci-app .index-card:hover {
       transform: translateY(-2px);
       border-color: rgba(91, 124, 250, 0.14);
       box-shadow: 0 18px 36px rgba(91, 124, 250, 0.08);
+    }
+
+    .msci-app .index-card .check {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: rgba(248, 250, 252, 0.86);
+      border: 1px solid var(--border-soft);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: var(--accent-green);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      opacity: 0;
+      transform: scale(0.92);
+      transition: all 0.12s ease;
+    }
+
+    .msci-app .index-card.active .check {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .msci-app .index-card.active {
+      border-color: var(--border-strong-accent);
+      box-shadow: 0 18px 36px rgba(126, 217, 87, 0.12);
+    }
+
+    .msci-app .index-card.global {
+      border-color: rgba(126, 217, 87, 0.7);
+      box-shadow: 0 18px 36px rgba(126, 217, 87, 0.16);
     }
 
     .msci-app .index-name {
@@ -284,7 +349,7 @@
 
     .msci-app .legend {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       flex-wrap: wrap;
       font-size: 12px;
@@ -296,6 +361,12 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
+      padding: 7px 10px;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
     }
 
     .msci-app .legend-dot {
@@ -349,25 +420,29 @@
           <div class="chart-header">
             <div>
               <div class="eyebrow" style="padding:6px 10px;font-size:10px;letter-spacing:0.8px;">Live Chart</div>
-              <h2 id="chartTitle" style="margin:6px 0 0;font-family:'Space Grotesk', 'Inter', sans-serif;font-size:22px;">MSCI All-Country World Index (ACWI)</h2>
-              <p id="chartSubtitle" style="margin:4px 0 0;color:var(--text-muted);font-weight:600;font-size:13px;">Kursverlauf (Demo-Daten)</p>
+              <h2 id="chartTitle" style="margin:6px 0 0;font-family:'Space Grotesk', 'Inter', sans-serif;font-size:22px;">Globale & Länderindizes übereinander</h2>
+              <p id="chartSubtitle" style="margin:4px 0 0;color:var(--text-muted);font-weight:600;font-size:13px;">Log-Skala · mehrere Indizes gleichzeitig</p>
             </div>
-            <div class="range-toggle" aria-label="Zeitraum wählen">
-              <button class="range-button active" data-range="1M">1M</button>
-              <button class="range-button" data-range="3M">3M</button>
-              <button class="range-button" data-range="6M">6M</button>
-              <button class="range-button" data-range="1Y">1J</button>
-              <button class="range-button" data-range="5Y">5J</button>
-              <button class="range-button" data-range="MAX">Max</button>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+              <div class="scale-toggle" aria-label="Skalierung">
+                <span style="font-size:12px;color:var(--text-muted);font-weight:700;">Skala</span>
+                <button class="active" data-scale="logarithmic" type="button">Log</button>
+                <button data-scale="linear" type="button">Linear</button>
+              </div>
+              <div class="range-toggle" aria-label="Zeitraum wählen">
+                <button class="range-button active" data-range="1M">1M</button>
+                <button class="range-button" data-range="3M">3M</button>
+                <button class="range-button" data-range="6M">6M</button>
+                <button class="range-button" data-range="1Y">1J</button>
+                <button class="range-button" data-range="5Y">5J</button>
+                <button class="range-button" data-range="MAX">Max</button>
+              </div>
             </div>
           </div>
           <div style="position:relative;height:340px;">
             <canvas id="chart"></canvas>
           </div>
-          <div class="legend" style="margin-top:12px;">
-            <span class="legend-item"><span class="legend-dot" style="background:linear-gradient(180deg,#a2f1a6,#7ed957);"></span>Index-Kurs</span>
-            <span class="legend-item"><span class="legend-dot" style="background:linear-gradient(180deg,#b3c6ff,#5b7cfa);"></span>Gleitender Schnitt (21 Tage)</span>
-          </div>
+          <div id="legendContainer" class="legend" style="margin-top:12px;"></div>
         </section>
       </div>
     </div>
@@ -377,41 +452,110 @@
     // Demo-Daten: real-time APIs wie Stooq (https://stooq.pl) liefern kostenlose CSV/JSON-Daten ohne API-Key.
     // Du kannst die Funktion loadFromStooq(symbol) nutzen, um echte Kursreihen einzubinden.
     const demoSeries = {
-      ACWI: generateSeries(365 * 3, 100, 0.0006),
-      DAX: generateSeries(365 * 2, 13000, 0.0008),
-      CAC40: generateSeries(365 * 2, 6500, 0.0007),
-      FTSE100: generateSeries(365 * 2, 7200, 0.0005),
-      IBOVESPA: generateSeries(365 * 2, 110000, 0.001),
-      NIFTY50: generateSeries(365 * 2, 17000, 0.0009),
-      NIKKEI: generateSeries(365 * 2, 28500, 0.0007),
-      SPX: generateSeries(365 * 3, 4300, 0.0008),
-      SMI: generateSeries(365 * 2, 11200, 0.0005),
-      ASX200: generateSeries(365 * 2, 6900, 0.0006)
+      ACWI: generateSeries(365 * 8, 100, 0.0006),
+      SPX: generateSeries(365 * 8, 4200, 0.00085),
+      NDX: generateSeries(365 * 8, 14000, 0.0011),
+      DAX: generateSeries(365 * 8, 13000, 0.0008),
+      CAC40: generateSeries(365 * 8, 6500, 0.0007),
+      FTSE100: generateSeries(365 * 8, 7200, 0.00055),
+      SMI: generateSeries(365 * 8, 11200, 0.00055),
+      IBEX35: generateSeries(365 * 8, 8200, 0.0006),
+      AEX: generateSeries(365 * 8, 720, 0.00075),
+      OMXC25: generateSeries(365 * 8, 1700, 0.00072),
+      OMX30: generateSeries(365 * 8, 2200, 0.00068),
+      FTSEMIB: generateSeries(365 * 8, 24000, 0.00064),
+      ATX: generateSeries(365 * 8, 3200, 0.00066),
+      PSI20: generateSeries(365 * 8, 5200, 0.00058),
+      IBOVESPA: generateSeries(365 * 8, 110000, 0.001),
+      TSX: generateSeries(365 * 8, 19500, 0.0007),
+      IPC: generateSeries(365 * 8, 51000, 0.00078),
+      IPSA: generateSeries(365 * 8, 5400, 0.00072),
+      NIFTY50: generateSeries(365 * 8, 17000, 0.00095),
+      NIKKEI: generateSeries(365 * 8, 28500, 0.00078),
+      HSI: generateSeries(365 * 8, 24000, 0.00064),
+      KOSPI: generateSeries(365 * 8, 2500, 0.00082),
+      TAIEX: generateSeries(365 * 8, 15000, 0.00088),
+      SHCOMP: generateSeries(365 * 8, 3400, 0.0006),
+      STI: generateSeries(365 * 8, 3300, 0.00058),
+      ASX200: generateSeries(365 * 8, 6900, 0.00066),
+      NZX50: generateSeries(365 * 8, 11500, 0.0006)
     };
 
     const indexCatalog = [
-      { id: 'ACWI', name: 'MSCI All-Country World Index', region: 'global', country: 'Worldwide' },
+      { id: 'ACWI', name: 'MSCI All-Country World Index', region: 'global', country: 'Weltweit' },
       { id: 'SPX', name: 'S&P 500 Index', region: 'americas', country: 'USA' },
+      { id: 'NDX', name: 'NASDAQ 100 Index', region: 'americas', country: 'USA (Tech)' },
+      { id: 'TSX', name: 'S&P/TSX Composite Index', region: 'americas', country: 'Kanada' },
+      { id: 'IBOVESPA', name: 'Bovespa Index', region: 'americas', country: 'Brasilien' },
+      { id: 'IPC', name: 'IPC México Index', region: 'americas', country: 'Mexiko' },
+      { id: 'IPSA', name: 'IPSA Index', region: 'americas', country: 'Chile' },
       { id: 'DAX', name: 'DAX 40 Performance Index', region: 'emea', country: 'Deutschland' },
       { id: 'CAC40', name: 'CAC 40 Index', region: 'emea', country: 'Frankreich' },
       { id: 'FTSE100', name: 'FTSE 100 Index', region: 'emea', country: 'Vereinigtes Königreich' },
-      { id: 'IBOVESPA', name: 'Bovespa Index', region: 'americas', country: 'Brasilien' },
+      { id: 'SMI', name: 'Swiss Market Index', region: 'emea', country: 'Schweiz' },
+      { id: 'IBEX35', name: 'IBEX 35 Index', region: 'emea', country: 'Spanien' },
+      { id: 'AEX', name: 'AEX Index', region: 'emea', country: 'Niederlande' },
+      { id: 'OMXC25', name: 'OMX Copenhagen 25', region: 'emea', country: 'Dänemark' },
+      { id: 'OMX30', name: 'OMX Stockholm 30', region: 'emea', country: 'Schweden' },
+      { id: 'FTSEMIB', name: 'FTSE MIB Index', region: 'emea', country: 'Italien' },
+      { id: 'ATX', name: 'ATX Index', region: 'emea', country: 'Österreich' },
+      { id: 'PSI20', name: 'PSI 20 Index', region: 'emea', country: 'Portugal' },
       { id: 'NIFTY50', name: 'NIFTY 50 Index', region: 'apac', country: 'Indien' },
       { id: 'NIKKEI', name: 'Nikkei 225 Index', region: 'apac', country: 'Japan' },
-      { id: 'SMI', name: 'Swiss Market Index', region: 'emea', country: 'Schweiz' },
-      { id: 'ASX200', name: 'S&P/ASX 200 Index', region: 'apac', country: 'Australien' }
+      { id: 'HSI', name: 'Hang Seng Index', region: 'apac', country: 'Hongkong' },
+      { id: 'KOSPI', name: 'KOSPI Index', region: 'apac', country: 'Südkorea' },
+      { id: 'TAIEX', name: 'TAIEX Index', region: 'apac', country: 'Taiwan' },
+      { id: 'SHCOMP', name: 'SSE Composite Index', region: 'apac', country: 'China' },
+      { id: 'STI', name: 'Straits Times Index', region: 'apac', country: 'Singapur' },
+      { id: 'ASX200', name: 'S&P/ASX 200 Index', region: 'apac', country: 'Australien' },
+      { id: 'NZX50', name: 'S&P/NZX 50 Index', region: 'apac', country: 'Neuseeland' }
     ];
+
+    const colorMap = {
+      ACWI: '#69c94a',
+      SPX: '#5b7cfa',
+      NDX: '#9f7aea',
+      DAX: '#3b82f6',
+      CAC40: '#38bdf8',
+      FTSE100: '#10b981',
+      SMI: '#22c55e',
+      IBEX35: '#f59e0b',
+      AEX: '#14b8a6',
+      OMXC25: '#0ea5e9',
+      OMX30: '#6366f1',
+      FTSEMIB: '#8b5cf6',
+      ATX: '#ef4444',
+      PSI20: '#f97316',
+      IBOVESPA: '#0f766e',
+      TSX: '#2563eb',
+      IPC: '#0891b2',
+      IPSA: '#c084fc',
+      NIFTY50: '#eab308',
+      NIKKEI: '#60a5fa',
+      HSI: '#22d3ee',
+      KOSPI: '#16a34a',
+      TAIEX: '#db2777',
+      SHCOMP: '#f43f5e',
+      STI: '#0d9488',
+      ASX200: '#4ade80',
+      NZX50: '#94a3b8'
+    };
+
+    const indexMap = Object.fromEntries(indexCatalog.map((i) => [i.id, i]));
 
     const indexContainer = document.getElementById('indexContainer');
     const emptyState = document.getElementById('emptyState');
     const searchInput = document.getElementById('search');
     const regionFilter = document.getElementById('regionFilter');
     const rangeButtons = Array.from(document.querySelectorAll('.range-button'));
+    const scaleButtons = Array.from(document.querySelectorAll('[data-scale]'));
     const chartTitle = document.getElementById('chartTitle');
     const chartSubtitle = document.getElementById('chartSubtitle');
+    const legendContainer = document.getElementById('legendContainer');
 
-    let currentId = 'ACWI';
+    let selectedIds = ['ACWI', 'SPX', 'DAX', 'NIKKEI'];
     let currentRange = '1M';
+    let scaleType = 'logarithmic';
     let chart;
 
     function generateSeries(days, start, drift) {
@@ -432,6 +576,14 @@
 
     function formatNumber(value) {
       return value.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
+    function lightenColor(hex, amount = 0.3) {
+      const num = parseInt(hex.replace('#', ''), 16);
+      const r = Math.min(255, Math.floor(((num >> 16) & 255) * (1 + amount)));
+      const g = Math.min(255, Math.floor(((num >> 8) & 255) * (1 + amount)));
+      const b = Math.min(255, Math.floor((num & 255) * (1 + amount)));
+      return `rgb(${r}, ${g}, ${b})`;
     }
 
     function movingAverage(series, window = 21) {
@@ -462,27 +614,35 @@
     }
 
     async function loadFromStooq(symbol) {
-      // Beispiel: https://stooq.pl/q/d/l/?s=^spx&i=d liefert tägliche SPX-Daten.
-      // Die Demo nutzt lokale Daten; passe diese Funktion an, um echte Daten einzubinden.
-      const url = `https://stooq.pl/q/l/?s=${symbol.toLowerCase()}&i=d`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Stooq nicht erreichbar');
-      const text = await res.text();
-      const rows = text.trim().split('\n').slice(1); // CSV ohne Kopfzeile
-      return rows.map((row) => {
-        const [date, open, high, low, close] = row.split(',');
-        return { date, close: Number(close) };
-      });
+      // Beispiel für echte Daten (CSV): https://stooq.pl/q/d/l/?s=spx&i=d
+      // const url = `https://stooq.pl/q/d/l/?s=${symbol.toLowerCase()}&i=d`;
+      // const res = await fetch(url);
+      // const csv = await res.text();
+      // return csv
+      //   .trim()
+      //   .split('\n')
+      //   .slice(1)
+      //   .map((row) => {
+      //     const [date, open, high, low, close] = row.split(',');
+      //     return { date, close: Number(close) };
+      //   });
+      return null;
     }
 
     function renderList() {
-      const query = searchInput.value.trim().toLowerCase();
+      const query = searchInput.value.toLowerCase();
       const region = regionFilter.value;
-      const filtered = indexCatalog.filter((item) => {
-        const matchesSearch = `${item.name} ${item.country} ${item.id}`.toLowerCase().includes(query);
-        const matchesRegion = region === 'all' || item.region === region;
-        return matchesSearch && matchesRegion;
-      });
+      const filtered = indexCatalog
+        .filter((item) => {
+          const matchesSearch = `${item.name} ${item.country} ${item.id}`.toLowerCase().includes(query);
+          const matchesRegion = region === 'all' || item.region === region;
+          return matchesSearch && matchesRegion;
+        })
+        .sort((a, b) => {
+          if (a.region === 'global') return -1;
+          if (b.region === 'global') return 1;
+          return a.name.localeCompare(b.name);
+        });
 
       indexContainer.innerHTML = '';
       if (!filtered.length) {
@@ -494,6 +654,8 @@
       filtered.forEach((item) => {
         const card = document.createElement('button');
         card.className = 'index-card';
+        if (item.region === 'global') card.classList.add('global');
+        if (selectedIds.includes(item.id)) card.classList.add('active');
         card.type = 'button';
         card.innerHTML = `
           <div class="index-name">${item.name}</div>
@@ -501,77 +663,124 @@
             <span class="pill">${item.country}</span>
             <span>${item.id}</span>
           </div>
+          <span class="check">✓</span>
         `;
-        card.addEventListener('click', () => selectIndex(item.id));
+        card.addEventListener('click', () => toggleIndex(item.id));
         indexContainer.appendChild(card);
       });
     }
 
-    function selectIndex(id) {
-      currentId = id;
-      chartTitle.textContent = indexCatalog.find((i) => i.id === id)?.name || id;
-      chartSubtitle.textContent = `${id} · Zeitraum ${currentRange}`;
+    function toggleIndex(id) {
+      if (selectedIds.includes(id)) {
+        if (selectedIds.length === 1) return;
+        selectedIds = selectedIds.filter((x) => x !== id);
+      } else {
+        selectedIds = [...selectedIds, id];
+      }
+      updateMeta();
       updateChart();
+      renderList();
     }
 
     function updateRange(range) {
       currentRange = range;
       rangeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.range === range));
-      chartSubtitle.textContent = `${currentId} · Zeitraum ${range}`;
+      updateMeta();
+      updateChart();
+    }
+
+    function updateScale(type) {
+      scaleType = type;
+      scaleButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.scale === type));
+      updateMeta();
       updateChart();
     }
 
     async function getSeries(id) {
-      // Ersetze demoSeries[id] durch await loadFromStooq(symbol) für Live-Daten.
-      const fallback = demoSeries[id] || demoSeries.ACWI;
-      return filterRange(fallback, currentRange === 'MAX' ? 'MAX' : currentRange);
+      const live = await loadFromStooq(id);
+      const base = live?.length ? live : demoSeries[id] || demoSeries.ACWI;
+      return filterRange(base, currentRange === 'MAX' ? 'MAX' : currentRange);
+    }
+
+    function updateMeta() {
+      if (selectedIds.length === 1) {
+        const id = selectedIds[0];
+        const item = indexMap[id];
+        chartTitle.textContent = item ? `${item.name}` : id;
+      } else {
+        chartTitle.textContent = `Overlay: ${selectedIds.length} Indizes`;
+      }
+      const regionText = selectedIds.map((id) => indexMap[id]?.country).filter(Boolean).join(' · ');
+      chartSubtitle.textContent = `${currentRange} · ${scaleType === 'logarithmic' ? 'Log-Skala' : 'Lineare Skala'} · ${regionText}`;
+    }
+
+    function renderLegend() {
+      legendContainer.innerHTML = '';
+      selectedIds.forEach((id) => {
+        const item = indexMap[id];
+        const color = colorMap[id] || '#5b7cfa';
+        const span = document.createElement('span');
+        span.className = 'legend-item';
+        span.innerHTML = `<span class="legend-dot" style="background:${color};"></span>${item?.name || id} (${item?.country || ''})`;
+        legendContainer.appendChild(span);
+      });
+      const sma = document.createElement('span');
+      sma.className = 'legend-item';
+      sma.innerHTML = '<span class="legend-dot" style="background:linear-gradient(180deg,#b3c6ff,#5b7cfa);"></span>SMA 21 (pro Index)';
+      legendContainer.appendChild(sma);
     }
 
     async function updateChart() {
-      const series = await getSeries(currentId);
-      const ma = movingAverage(series);
       const ctx = document.getElementById('chart');
-      const labels = series.map((p) => p.date);
-      const prices = series.map((p) => p.close);
-      const avg = ma.map((p) => p.value);
-
       const fill = ctx.getContext('2d').createLinearGradient(0, 0, 0, 320);
       fill.addColorStop(0, 'rgba(126, 217, 87, 0.32)');
       fill.addColorStop(1, 'rgba(126, 217, 87, 0.04)');
+
+      const datasets = [];
+      const labels = [];
+      const seriesList = await Promise.all(selectedIds.map(async (id) => ({ id, data: await getSeries(id) })));
+
+      seriesList.forEach(({ id, data }) => {
+        if (!labels.length) {
+          labels.push(...data.map((p) => p.date));
+        }
+        const color = colorMap[id] || '#5b7cfa';
+        const avg = movingAverage(data);
+
+        datasets.push({
+          label: `${indexMap[id]?.name || id}`,
+          data: data.map((p) => p.close),
+          borderColor: color,
+          backgroundColor: id === 'ACWI' ? fill : 'transparent',
+          fill: id === 'ACWI',
+          tension: 0.22,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 3,
+          pointHoverBorderWidth: 2,
+          pointHoverBackgroundColor: color,
+          pointHoverBorderColor: '#ffffff',
+          borderJoinStyle: 'round',
+        });
+
+        datasets.push({
+          label: `${indexMap[id]?.name || id} · SMA 21`,
+          data: avg.map((p) => p.value),
+          borderColor: lightenColor(color, 0.35),
+          backgroundColor: 'transparent',
+          borderWidth: 1.6,
+          tension: 0.18,
+          pointRadius: 0,
+          borderDash: [5, 4],
+          fill: false,
+        });
+      });
 
       if (chart) chart.destroy();
 
       chart = new Chart(ctx, {
         type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'Index',
-              data: prices,
-              borderColor: '#7ed957',
-              backgroundColor: fill,
-              borderWidth: 2,
-              tension: 0.25,
-              fill: true,
-              pointRadius: 0,
-              pointHoverRadius: 3,
-              pointHoverBorderWidth: 2,
-              pointHoverBackgroundColor: '#7ed957',
-              pointHoverBorderColor: '#ffffff',
-              borderJoinStyle: 'round',
-            },
-            {
-              label: 'SMA 21',
-              data: avg,
-              borderColor: '#5b7cfa',
-              backgroundColor: 'transparent',
-              borderWidth: 2,
-              tension: 0.2,
-              pointRadius: 0,
-            }
-          ]
-        },
+        data: { labels, datasets },
         options: {
           interaction: { intersect: false, mode: 'index' },
           responsive: true,
@@ -604,6 +813,7 @@
               }
             },
             y: {
+              type: scaleType,
               grid: { color: 'rgba(15,23,42,0.02)' },
               ticks: {
                 color: '#8fa3c0',
@@ -614,13 +824,17 @@
           }
         }
       });
+
+      renderLegend();
     }
 
     searchInput.addEventListener('input', renderList);
     regionFilter.addEventListener('change', renderList);
     rangeButtons.forEach((btn) => btn.addEventListener('click', () => updateRange(btn.dataset.range)));
+    scaleButtons.forEach((btn) => btn.addEventListener('click', () => updateScale(btn.dataset.scale)));
 
     renderList();
+    updateMeta();
     updateChart();
   </script>
 </body>
