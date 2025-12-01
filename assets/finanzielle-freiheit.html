@@ -372,6 +372,7 @@
               <div class="legend">
                 <span class="dot" style="background:var(--accent);"></span> Zinserträge
                 <span class="dot" style="background:var(--accent-2);"></span> Einzahlungen
+                <span class="dot" style="background:#0ea5e9;"></span> Kapitalverlauf
               </div>
             </div>
             <svg id="chart" viewBox="0 0 1080 360" aria-label="Kapitalverlauf"></svg>
@@ -450,8 +451,27 @@
         const totalDeposits = start + monthlySaving * months;
         const interestPortion = Math.max(0, finalBalance - totalDeposits);
 
+        const withdrawalPhase = buildWithdrawal({
+          startBalance: finalBalance,
+          monthlyNeed: futureMonthly,
+          rMonthly,
+          startYear: years,
+          durationYears: 10
+        });
+
+        const lineYears = projection.years.concat(withdrawalPhase.years);
+        const lineBalances = projection.balances.concat(withdrawalPhase.balances);
+
         renderKpis(requiredCapital, monthlySaving, totalDeposits, interestPortion);
-        renderChart(projection.years, projection.deposits, projection.interests);
+        renderChart({
+          accYears: projection.years,
+          deposits: projection.deposits,
+          interests: projection.interests,
+          lineYears,
+          lineBalances,
+          withdrawalStartYear: years,
+          withdrawalDuration: withdrawalPhase.duration
+        });
         persistState();
       }
 
@@ -472,6 +492,21 @@
           }
         }
         return { years, deposits, interests, balances };
+      }
+
+      function buildWithdrawal({ startBalance, monthlyNeed, rMonthly, startYear, durationYears }){
+        let balance = startBalance;
+        const years = [], balances = [];
+
+        const months = durationYears * 12;
+        for(let m=1; m<=months; m++){
+          balance = balance * (1 + rMonthly) - monthlyNeed;
+          if(m % 12 === 0){
+            years.push(startYear + m/12);
+            balances.push(balance);
+          }
+        }
+        return { years, balances, duration: durationYears };
       }
 
       function animateValue(elTarget, from, to, formatter, duration=520){
@@ -501,7 +536,7 @@
         lastValues.interest = interest;
       }
 
-      function renderChart(years, deposits, interest){
+      function renderChart({ accYears, deposits, interests, lineYears, lineBalances, withdrawalStartYear, withdrawalDuration }){
         const svg = el.chart;
         svg.innerHTML = '';
 
@@ -522,8 +557,9 @@
           </linearGradient>`;
         svg.appendChild(defs);
 
-        const totals = deposits.map((d,i)=> d + interest[i]);
-        const maxY = Math.max(...totals, 1) * 1.08;
+        const totals = deposits.map((d,i)=> d + interests[i]);
+        const maxBalance = Math.max(...lineBalances, 1);
+        const maxY = Math.max(...totals, maxBalance, 1) * 1.08;
         const steps = 5;
 
         const g = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -559,7 +595,10 @@
           g.appendChild(lbl);
         }
 
-        const n = years.length;
+        const totalYears = Math.max((lineYears[lineYears.length-1] || 0), withdrawalStartYear + withdrawalDuration);
+        const yearSpacing = totalYears > 1 ? iw / (totalYears - 1) : iw;
+
+        const n = accYears.length;
         if(n === 0){
           const empty = document.createElementNS('http://www.w3.org/2000/svg','text');
           empty.textContent = 'Noch keine Daten';
@@ -572,13 +611,12 @@
           return;
         }
 
-        const gap = 6;
-        const barW = Math.max(4, (iw - gap*(n-1))/n);
+        const barW = Math.max(6, yearSpacing * 0.5);
 
         for(let i=0;i<n;i++){
-          const x = i*(barW+gap);
+          const x = (accYears[i]-1) * yearSpacing - barW/2;
           const depH = ih * (deposits[i]/maxY);
-          const intH = ih * (interest[i]/maxY);
+          const intH = ih * (interests[i]/maxY);
           const totalH = depH + intH;
 
           const holder = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -616,9 +654,9 @@
           });
 
           const px = x + barW/2;
-          if((years[i] % 2 === 0) || i === n-1){
+          if((accYears[i] % 2 === 0) || i === n-1){
             const tx = document.createElementNS('http://www.w3.org/2000/svg','text');
-            tx.textContent = years[i];
+            tx.textContent = accYears[i];
             tx.setAttribute('x', px);
             tx.setAttribute('y', ih + 18);
             tx.setAttribute('fill','#8fa3c0');
@@ -626,6 +664,45 @@
             tx.setAttribute('text-anchor','middle');
             g.appendChild(tx);
           }
+        }
+
+        if(withdrawalDuration){
+          const xStart = (withdrawalStartYear - 1) * yearSpacing;
+          const wRect = withdrawalDuration * yearSpacing;
+          const overlay = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          overlay.setAttribute('x', pad.l + xStart);
+          overlay.setAttribute('y', pad.t);
+          overlay.setAttribute('width', wRect);
+          overlay.setAttribute('height', ih);
+          overlay.setAttribute('fill','rgba(14,165,233,0.08)');
+          overlay.setAttribute('stroke','rgba(14,165,233,0.18)');
+          overlay.setAttribute('stroke-dasharray','6 6');
+          svg.appendChild(overlay);
+        }
+
+        const lineGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+        lineGroup.setAttribute('transform', `translate(${pad.l},${pad.t})`);
+        svg.appendChild(lineGroup);
+
+        const linePts = lineYears.map((yr, idx)=>{
+          const x = (yr - 1) * yearSpacing;
+          const y = ih - (ih * (lineBalances[idx]/maxY));
+          return { x, y };
+        });
+
+        for(let i=1; i<linePts.length; i++){
+          const prev = linePts[i-1];
+          const cur = linePts[i];
+          const delta = lineBalances[i] - lineBalances[i-1];
+          const stroke = delta > 1e-6 ? '#16a34a' : delta < -1e-6 ? '#ef4444' : '#94a3b8';
+          const seg = document.createElementNS('http://www.w3.org/2000/svg','path');
+          seg.setAttribute('d', `M${prev.x},${prev.y} L${cur.x},${cur.y}`);
+          seg.setAttribute('fill','none');
+          seg.setAttribute('stroke', stroke);
+          seg.setAttribute('stroke-width','3');
+          seg.setAttribute('stroke-linecap','round');
+          seg.setAttribute('opacity','0.92');
+          lineGroup.appendChild(seg);
         }
 
         const xLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
