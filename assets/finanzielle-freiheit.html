@@ -551,11 +551,9 @@
           </linearGradient>`;
         svg.appendChild(defs);
 
-        const positiveHeights = barYears.map((_,i)=> Math.max(0, baseParts[i]) + Math.max(0, interests[i]));
-        const maxPositive = Math.max(...positiveHeights, 1);
-        const maxWithdrawal = Math.max(...withdrawals, 0);
-        const chartMax = maxPositive * 1.08;
-        const chartMin = maxWithdrawal > 0 ? -maxWithdrawal * 1.2 : 0;
+        const positiveHeights = barYears.map((_,i)=> Math.max(0, baseParts[i] + withdrawals[i]) + Math.max(0, interests[i]));
+        const chartMax = Math.max(...positiveHeights, 1) * 1.08;
+        const chartMin = 0;
         const chartRange = Math.max(1, chartMax - chartMin);
         const yScale = (val)=> ih - ((val - chartMin) / chartRange) * ih;
         const steps = 5;
@@ -616,9 +614,11 @@
         for(let i=0;i<n;i++){
           const x = (barYears[i]-1) * yearSpacing - barW/2;
           const zeroY = yScale(0);
-          const capTop = yScale(baseParts[i]);
-          const intTop = yScale(baseParts[i] + interests[i]);
-          const drawBottom = yScale(-withdrawals[i]);
+          const capRemaining = Math.max(0, baseParts[i]);
+          const capWithWithdrawal = Math.max(0, baseParts[i] + withdrawals[i]);
+          const intTop = yScale(capWithWithdrawal + Math.max(0, interests[i]));
+          const capTopFull = yScale(capWithWithdrawal);
+          const capTopRemain = yScale(capRemaining);
 
           const holder = document.createElementNS('http://www.w3.org/2000/svg','g');
           holder.setAttribute('transform', `translate(${x}, 0)`);
@@ -631,16 +631,16 @@
           intRect.setAttribute('x', 0);
           intRect.setAttribute('y', intTop);
           intRect.setAttribute('width', barW);
-          intRect.setAttribute('height', Math.max(0, capTop - intTop));
+          intRect.setAttribute('height', Math.max(0, capTopFull - intTop));
           intRect.setAttribute('fill', 'url(#green)');
           intRect.setAttribute('rx','3');
           stack.appendChild(intRect);
 
           const baseRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
           baseRect.setAttribute('x', 0);
-          baseRect.setAttribute('y', capTop);
+          baseRect.setAttribute('y', capTopRemain);
           baseRect.setAttribute('width', barW);
-          baseRect.setAttribute('height', Math.max(0, zeroY - capTop));
+          baseRect.setAttribute('height', Math.max(0, zeroY - capTopRemain));
           baseRect.setAttribute('fill', 'url(#blue)');
           baseRect.setAttribute('rx','3');
           baseRect.setAttribute('opacity','0.92');
@@ -649,9 +649,9 @@
           if(withdrawals[i] > 0){
             const drawRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
             drawRect.setAttribute('x', 0);
-            drawRect.setAttribute('y', zeroY);
+            drawRect.setAttribute('y', capTopFull);
             drawRect.setAttribute('width', barW);
-            drawRect.setAttribute('height', Math.max(0, drawBottom - zeroY));
+            drawRect.setAttribute('height', Math.max(0, capTopRemain - capTopFull));
             drawRect.setAttribute('fill', 'url(#red)');
             drawRect.setAttribute('rx','3');
             drawRect.setAttribute('opacity','0.95');
