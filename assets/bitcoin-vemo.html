@@ -288,6 +288,65 @@
         rgba(255, 255, 255, 0.02);
     }
 
+    .chart-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .range-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .range-buttons {
+      display: grid;
+      grid-auto-flow: column;
+      gap: 6px;
+    }
+
+    .range-btn {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .range-btn.active {
+      border-color: rgba(34, 197, 94, 0.6);
+      background: rgba(34, 197, 94, 0.14);
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.18);
+      color: #86efac;
+    }
+
+    .range-slider {
+      display: grid;
+      gap: 2px;
+      min-width: 200px;
+    }
+
+    .range-slider input[type='range'] {
+      accent-color: #22c55e;
+      cursor: pointer;
+    }
+
+    .range-slider small {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
     canvas {
       width: 100%;
       height: 100%;
@@ -417,7 +476,24 @@
     </section>
 
       <section class="card" aria-label="Performance und Sparkline">
-        <div class="pill">7 Tage Sparkline</div>
+        <div class="chart-header">
+          <div class="pill" id="chartTitle">Bitcoin Preisverlauf</div>
+          <div class="range-controls" aria-label="Zeitbereich wechseln">
+            <div class="range-buttons" role="group">
+              <button type="button" class="range-btn active" data-days="7">7T</button>
+              <button type="button" class="range-btn" data-days="30">30T</button>
+              <button type="button" class="range-btn" data-days="90">90T</button>
+              <button type="button" class="range-btn" data-days="365">1J</button>
+              <button type="button" class="range-btn" data-days="1825">5J</button>
+              <button type="button" class="range-btn" data-days="max">Max</button>
+            </div>
+            <label class="range-slider">
+              <span>Zoomen/Scrollen</span>
+              <input type="range" min="0" max="100" value="100" id="rangeSlider" />
+              <small id="rangeLabel">100% = aktuellster Ausschnitt</small>
+            </label>
+          </div>
+        </div>
         <div class="chart-wrap">
           <div class="chart-grid" aria-hidden="true"></div>
           <canvas id="sparkline" width="900" height="220"></canvas>
@@ -452,9 +528,17 @@
     const sparklineCanvas = document.getElementById('sparkline');
     const sparklineInfo = document.getElementById('sparklineInfo');
     const sparklineRange = document.getElementById('sparklineRange');
+    const chartTitle = document.getElementById('chartTitle');
+    const rangeButtons = document.querySelectorAll('.range-btn');
+    const rangeSlider = document.getElementById('rangeSlider');
+    const rangeLabel = document.getElementById('rangeLabel');
 
     let btcEurRate = null;
     let lastPrices = [];
+    let historyPrices = [];
+    let activeRange = '7';
+    let historyLoaded = false;
+    rangeSlider.disabled = true;
 
     const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const btc = (value) => Number(value).toFixed(8);
@@ -473,7 +557,22 @@
 
     amountInput.addEventListener('input', () => convert());
     convertButton.addEventListener('click', () => convert());
-    refreshButton.addEventListener('click', () => loadData(true));
+    refreshButton.addEventListener('click', () => {
+      loadData(true);
+      loadHistory(true);
+    });
+    rangeSlider.addEventListener('input', () => renderSparkline());
+    rangeButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeRange = btn.dataset.days;
+        rangeButtons.forEach((b) => b.classList.toggle('active', b === btn));
+        rangeSlider.disabled = activeRange === 'max' || historyPrices.length < 2;
+        if (rangeSlider.disabled) {
+          rangeSlider.value = 100;
+        }
+        renderSparkline();
+      });
+    });
 
     function setBadge(change) {
       const rounded = change.toFixed(2);
@@ -592,24 +691,6 @@
           lastPrices = [];
         }
 
-        if (lastPrices.length < 2) {
-          try {
-            const chartRes = await fetch(
-              'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=hourly',
-              { headers: { accept: 'application/json' } }
-            );
-            if (chartRes.ok) {
-              const chartData = await chartRes.json();
-              if (Array.isArray(chartData?.prices) && chartData.prices.length) {
-                lastPrices = chartData.prices;
-                sparklineInfo.textContent = 'Marktdaten (7 Tage, stündlich)';
-              }
-            }
-          } catch (chartErr) {
-            console.error('Sparkline-Fallback fehlgeschlagen', chartErr);
-          }
-        }
-
         priceElement.textContent = `€ ${euro(btcEurRate)}`;
         updatedElement.textContent = data?.last_updated
           ? new Date(data.last_updated).toLocaleString('de-DE')
@@ -620,19 +701,7 @@
         volumeElement.textContent = market.total_volume?.eur ? `€ ${euro(market.total_volume.eur)}` : '–';
         marketcapElement.textContent = market.market_cap?.eur ? `€ ${euro(market.market_cap.eur)}` : '–';
 
-        if (lastPrices.length > 1) {
-          const first = new Date(lastPrices[0][0]).toLocaleDateString('de-DE');
-          const last = new Date(lastPrices[lastPrices.length - 1][0]).toLocaleDateString('de-DE');
-          if (!sparklineInfo.textContent) {
-            sparklineInfo.textContent = 'Stündliche Daten (7 Tage)';
-          }
-          sparklineRange.textContent = `${first} – ${last}`;
-        } else {
-          sparklineInfo.textContent = 'Keine Zeitreihe gefunden';
-          sparklineRange.textContent = '–';
-        }
-
-        drawSparkline(lastPrices);
+        renderSparkline();
         convert();
         statusText.textContent = 'Live Preis geladen.';
       } catch (err) {
@@ -641,6 +710,77 @@
         await loadFallback();
       } finally {
         convertButton.disabled = !btcEurRate;
+      }
+    }
+
+    function computeWindowedPrices() {
+      const source = historyPrices.length ? historyPrices : lastPrices;
+      if (!source || source.length < 2) return [];
+
+      if (activeRange === 'max' || source.length < 3) {
+        return [...source];
+      }
+
+      const days = Number(activeRange) || 7;
+      const windowMs = days * 24 * 3600 * 1000;
+      const firstTs = source[0][0];
+      const lastTs = source[source.length - 1][0];
+      const spanMs = Math.max(lastTs - firstTs, 1);
+      const usableSpan = Math.max(spanMs - windowMs, 0);
+      const ratio = Math.min(Math.max(Number(rangeSlider.value) / 100, 0), 1);
+      const startCandidate = firstTs + usableSpan * ratio;
+      const startTs = Math.min(Math.max(startCandidate, firstTs), Math.max(lastTs - windowMs, firstTs));
+      const endTs = Math.min(startTs + windowMs, lastTs);
+
+      return source.filter(([ts]) => ts >= startTs && ts <= endTs);
+    }
+
+    function renderSparkline() {
+      const windowed = computeWindowedPrices();
+
+      if (windowed.length > 1) {
+        const first = new Date(windowed[0][0]).toLocaleDateString('de-DE');
+        const last = new Date(windowed[windowed.length - 1][0]).toLocaleDateString('de-DE');
+        sparklineRange.textContent = `${first} – ${last}`;
+        if (historyPrices.length) {
+          sparklineInfo.textContent = activeRange === 'max' ? 'Volle Historie (täglich)' : `Fenster: ${activeRange} Tage`;
+          chartTitle.textContent = 'Bitcoin Langfrist-Chart';
+          rangeLabel.textContent = rangeSlider.disabled
+            ? 'Gesamte Historie sichtbar'
+            : `${rangeSlider.value}% durchschnittene Historie`;
+        } else {
+          sparklineInfo.textContent = 'Stündliche Daten (7 Tage)';
+        }
+      } else {
+        sparklineInfo.textContent = 'Keine Zeitreihe gefunden';
+        sparklineRange.textContent = '–';
+        rangeLabel.textContent = 'Keine Historie verfügbar';
+      }
+
+      drawSparkline(windowed);
+    }
+
+    async function loadHistory(force = false) {
+      if (historyLoaded && !force) return;
+      try {
+        const chartRes = await fetch(
+          'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=max&interval=daily',
+          { headers: { accept: 'application/json' } }
+        );
+        if (!chartRes.ok) throw new Error(`Historie Fehler: ${chartRes.status}`);
+        const chartData = await chartRes.json();
+        if (Array.isArray(chartData?.prices) && chartData.prices.length) {
+          historyPrices = chartData.prices.map(([ts, price]) => [ts, price]);
+          historyLoaded = true;
+          rangeSlider.disabled = historyPrices.length < 2 || activeRange === 'max';
+          renderSparkline();
+        }
+      } catch (chartErr) {
+        console.error('Konnte volle Historie nicht laden', chartErr);
+        if (!historyPrices.length) {
+          sparklineInfo.textContent = 'Historische Daten fehlen, nutze 7-Tage-Ansicht';
+          renderSparkline();
+        }
       }
     }
 
@@ -683,6 +823,7 @@
     }
 
     loadData();
+    loadHistory();
   </script>
 </body>
 </html>
