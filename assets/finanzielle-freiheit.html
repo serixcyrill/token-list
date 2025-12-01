@@ -439,7 +439,7 @@
 
         const barYears = projection.years.concat(withdrawalPhase.years);
         const baseParts = projection.balances.map((b, i)=> Math.max(0, b - projection.interests[i]))
-          .concat(withdrawalPhase.balances.map((b, i)=> Math.max(0, b - withdrawalPhase.interests[i] + withdrawalPhase.withdrawals[i])));
+          .concat(withdrawalPhase.balances.map((b, i)=> Math.max(0, b - withdrawalPhase.interests[i])));
         const interestParts = projection.interests.concat(withdrawalPhase.interests);
         const withdrawalParts = projection.years.map(()=> 0).concat(withdrawalPhase.withdrawals);
 
@@ -551,10 +551,12 @@
           </linearGradient>`;
         svg.appendChild(defs);
 
-        const stackHeights = barYears.map((_,i)=> baseParts[i] + interests[i] + withdrawals[i]);
-        const chartMax = Math.max(...stackHeights, 1);
-        const chartMin = 0;
-        const chartRange = Math.max(1, (chartMax - chartMin) * 1.08);
+        const positiveHeights = barYears.map((_,i)=> Math.max(0, baseParts[i]) + Math.max(0, interests[i]));
+        const maxPositive = Math.max(...positiveHeights, 1);
+        const maxWithdrawal = Math.max(...withdrawals, 0);
+        const chartMax = maxPositive * 1.08;
+        const chartMin = maxWithdrawal > 0 ? -maxWithdrawal * 1.2 : 0;
+        const chartRange = Math.max(1, chartMax - chartMin);
         const yScale = (val)=> ih - ((val - chartMin) / chartRange) * ih;
         const steps = 5;
 
@@ -613,10 +615,10 @@
 
         for(let i=0;i<n;i++){
           const x = (barYears[i]-1) * yearSpacing - barW/2;
-          const baseY = yScale(0);
+          const zeroY = yScale(0);
           const capTop = yScale(baseParts[i]);
           const intTop = yScale(baseParts[i] + interests[i]);
-          const drawTop = yScale(baseParts[i] + interests[i] + withdrawals[i]);
+          const drawBottom = yScale(-withdrawals[i]);
 
           const holder = document.createElementNS('http://www.w3.org/2000/svg','g');
           holder.setAttribute('transform', `translate(${x}, 0)`);
@@ -636,9 +638,9 @@
 
           const baseRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
           baseRect.setAttribute('x', 0);
-          baseRect.setAttribute('y', baseY < capTop ? baseY : capTop);
+          baseRect.setAttribute('y', capTop);
           baseRect.setAttribute('width', barW);
-          baseRect.setAttribute('height', Math.max(0, baseY - capTop));
+          baseRect.setAttribute('height', Math.max(0, zeroY - capTop));
           baseRect.setAttribute('fill', 'url(#blue)');
           baseRect.setAttribute('rx','3');
           baseRect.setAttribute('opacity','0.92');
@@ -647,9 +649,9 @@
           if(withdrawals[i] > 0){
             const drawRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
             drawRect.setAttribute('x', 0);
-            drawRect.setAttribute('y', drawTop);
+            drawRect.setAttribute('y', zeroY);
             drawRect.setAttribute('width', barW);
-            drawRect.setAttribute('height', Math.max(0, intTop - drawTop));
+            drawRect.setAttribute('height', Math.max(0, drawBottom - zeroY));
             drawRect.setAttribute('fill', 'url(#red)');
             drawRect.setAttribute('rx','3');
             drawRect.setAttribute('opacity','0.95');
