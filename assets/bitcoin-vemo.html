@@ -315,6 +315,36 @@
       margin-top: 16px;
     }
 
+    .vemo-btc .chart-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+      margin-top: 6px;
+    }
+
+    .vemo-btc .stat-chip {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      display: grid;
+      gap: 4px;
+    }
+
+    .vemo-btc .stat-chip .label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .vemo-btc .stat-chip .value {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
     .vemo-btc .chart-header {
       display: flex;
       flex-wrap: wrap;
@@ -376,7 +406,7 @@
 
     .vemo-btc .chart-wrap {
       position: relative;
-      height: 240px;
+      height: 300px;
       margin-top: 6px;
       border-radius: 14px;
       overflow: hidden;
@@ -388,6 +418,26 @@
       width: 100%;
       height: 100%;
       display: block;
+    }
+
+    .vemo-btc .chart-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow-panel);
+      font-size: 13px;
+      color: var(--text);
+      display: none;
+      min-width: 160px;
+    }
+
+    .vemo-btc .chart-tooltip strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
     }
 
     .vemo-btc .chart-grid {
@@ -408,6 +458,24 @@
       margin-top: 10px;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    .vemo-btc .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .vemo-btc .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #7ed957, #5b7cfa);
+      display: inline-block;
+      margin-right: 6px;
     }
 
     .vemo-btc .status {
@@ -545,13 +613,44 @@
           </label>
         </div>
       </div>
+
+      <div class="chart-meta">
+        <div class="stat-chip">
+          <span class="label">Startwert</span>
+          <span class="value" id="windowStartValue">–</span>
+          <small id="windowStartTime" class="label"></small>
+        </div>
+        <div class="stat-chip">
+          <span class="label">Endwert</span>
+          <span class="value" id="windowEndValue">–</span>
+          <small id="windowEndTime" class="label"></small>
+        </div>
+        <div class="stat-chip">
+          <span class="label">Veränderung</span>
+          <span class="value" id="windowChange">–</span>
+          <small id="windowChangePct" class="label"></small>
+        </div>
+        <div class="stat-chip">
+          <span class="label">Spannweite</span>
+          <span class="value" id="windowRange">–</span>
+          <small id="windowRangeLabel" class="label"></small>
+        </div>
+      </div>
+
       <div class="chart-wrap">
         <div class="chart-grid" aria-hidden="true"></div>
         <canvas id="sparkline" width="900" height="220"></canvas>
+        <div class="chart-tooltip" id="chartTooltip"></div>
       </div>
       <div class="chart-footer">
         <span id="sparklineInfo">Lade Verlauf …</span>
         <span id="sparklineRange">–</span>
+      </div>
+
+      <div class="chart-legend">
+        <span><span class="legend-dot"></span>BTC Preis</span>
+        <span>Hover/Touch für genauen Wert &amp; Datum</span>
+        <span id="windowPointCount">– Datenpunkte</span>
       </div>
     </section>
 
@@ -583,6 +682,16 @@
     const rangeButtons = document.querySelectorAll('.range-btn');
     const rangeSlider = document.getElementById('rangeSlider');
     const rangeLabel = document.getElementById('rangeLabel');
+    const windowStartValue = document.getElementById('windowStartValue');
+    const windowStartTime = document.getElementById('windowStartTime');
+    const windowEndValue = document.getElementById('windowEndValue');
+    const windowEndTime = document.getElementById('windowEndTime');
+    const windowChange = document.getElementById('windowChange');
+    const windowChangePct = document.getElementById('windowChangePct');
+    const windowRangeValue = document.getElementById('windowRange');
+    const windowRangeLabel = document.getElementById('windowRangeLabel');
+    const windowPointCount = document.getElementById('windowPointCount');
+    const chartTooltip = document.getElementById('chartTooltip');
 
     let btcEurRate = null;
     let lastPrices = [];
@@ -590,10 +699,20 @@
     let activeRange = '7';
     let historyLoaded = false;
     let historyLabel = '';
+    let currentWindow = [];
+    let hoverTs = null;
     rangeSlider.disabled = true;
 
     const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const btc = (value) => Number(value).toFixed(8);
+    const formatDate = (ts, withTime = true) =>
+      new Date(ts).toLocaleString('de-DE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: withTime ? '2-digit' : undefined,
+        minute: withTime ? '2-digit' : undefined,
+      });
 
     function setDirection(direction) {
       directionSelect.value = direction;
@@ -626,6 +745,30 @@
       });
     });
 
+    function updateHoverFromClientX(clientX) {
+      if (!currentWindow.length) return;
+      const rect = sparklineCanvas.getBoundingClientRect();
+      const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+      const minTime = currentWindow[0][0];
+      const maxTime = currentWindow[currentWindow.length - 1][0];
+      hoverTs = minTime + ratio * Math.max(maxTime - minTime, 1);
+      drawSparkline(currentWindow);
+    }
+
+    sparklineCanvas.addEventListener('mousemove', (evt) => updateHoverFromClientX(evt.clientX));
+    sparklineCanvas.addEventListener('touchmove', (evt) => {
+      if (evt.touches?.[0]) updateHoverFromClientX(evt.touches[0].clientX);
+    });
+    sparklineCanvas.addEventListener('mouseleave', () => {
+      hoverTs = null;
+      chartTooltip.style.display = 'none';
+      drawSparkline(currentWindow);
+    });
+    sparklineCanvas.addEventListener('touchend', () => {
+      hoverTs = null;
+      chartTooltip.style.display = 'none';
+    });
+
     function setBadge(change) {
       const rounded = change.toFixed(2);
       changeBadge.textContent = `${rounded}% in 24h`;
@@ -656,6 +799,38 @@
       }
     }
 
+    function updateWindowStats(points) {
+      if (!points || points.length < 2) {
+        windowStartValue.textContent = '–';
+        windowEndValue.textContent = '–';
+        windowStartTime.textContent = '';
+        windowEndTime.textContent = '';
+        windowChange.textContent = '–';
+        windowChangePct.textContent = '';
+        windowRangeValue.textContent = '–';
+        windowRangeLabel.textContent = 'Keine Ansicht';
+        windowPointCount.textContent = '0 Datenpunkte';
+        return;
+      }
+
+      const start = points[0];
+      const end = points[points.length - 1];
+      const values = points.map((p) => p[1]);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const absChange = end[1] - start[1];
+      const pctChange = start[1] !== 0 ? (absChange / start[1]) * 100 : 0;
+      windowStartValue.textContent = `€ ${euro(start[1])}`;
+      windowEndValue.textContent = `€ ${euro(end[1])}`;
+      windowStartTime.textContent = formatDate(start[0]);
+      windowEndTime.textContent = formatDate(end[0]);
+      windowChange.textContent = `${absChange >= 0 ? '+' : ''}€ ${euro(absChange)}`;
+      windowChangePct.textContent = `${pctChange >= 0 ? '+' : ''}${pctChange.toFixed(2)}%`;
+      windowRangeValue.textContent = `€ ${euro(min)} – € ${euro(max)}`;
+      windowRangeLabel.textContent = activeRange === 'max' ? 'Gesamte Historie' : `${activeRange} Tage Fenster`;
+      windowPointCount.textContent = `${points.length} Datenpunkte`;
+    }
+
     function drawSparkline(points) {
       const ctx = sparklineCanvas.getContext('2d');
       const pixelRatio = window.devicePixelRatio || 1;
@@ -670,13 +845,20 @@
         ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
         ctx.font = '600 14px Inter, system-ui, sans-serif';
         ctx.fillText('Keine Zeitreihe verfügbar', 16, displayHeight / 2);
+        chartTooltip.style.display = 'none';
         return;
       }
 
+      const minTime = points[0][0];
+      const maxTime = points[points.length - 1][0];
+      const spanTime = Math.max(maxTime - minTime, 1);
       const values = points.map((p) => p[1]);
       const min = Math.min(...values);
       const max = Math.max(...values);
       const range = max - min || 1;
+
+      const xFor = (ts) => ((ts - minTime) / spanTime) * displayWidth;
+      const yFor = (val) => displayHeight - ((val - min) / range) * displayHeight;
 
       const gradient = ctx.createLinearGradient(0, 0, 0, displayHeight);
       gradient.addColorStop(0, 'rgba(34, 197, 94, 0.35)');
@@ -684,8 +866,8 @@
 
       ctx.beginPath();
       points.forEach((p, idx) => {
-        const x = (idx / Math.max(points.length - 1, 1)) * displayWidth;
-        const y = displayHeight - ((p[1] - min) / range) * displayHeight;
+        const x = xFor(p[0]);
+        const y = yFor(p[1]);
         if (idx === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       });
@@ -700,8 +882,8 @@
       ctx.fill();
 
       const lastPoint = points[points.length - 1];
-      const lastX = displayWidth;
-      const lastY = displayHeight - ((lastPoint[1] - min) / range) * displayHeight;
+      const lastX = xFor(lastPoint[0]);
+      const lastY = yFor(lastPoint[1]);
       ctx.fillStyle = '#22c55e';
       ctx.beginPath();
       ctx.arc(lastX, lastY, 4.5, 0, Math.PI * 2);
@@ -711,6 +893,51 @@
       ctx.beginPath();
       ctx.arc(lastX, lastY, 2, 0, Math.PI * 2);
       ctx.fill();
+
+      let hoverPoint = null;
+      if (hoverTs) {
+        hoverPoint = points.reduce((closest, point) => {
+          return Math.abs(point[0] - hoverTs) < Math.abs(closest[0] - hoverTs) ? point : closest;
+        }, points[0]);
+      }
+
+      if (hoverPoint) {
+        const hx = xFor(hoverPoint[0]);
+        const hy = yFor(hoverPoint[1]);
+        ctx.save();
+        ctx.setLineDash([4, 6]);
+        ctx.strokeStyle = 'rgba(91, 124, 250, 0.7)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(hx, 0);
+        ctx.lineTo(hx, displayHeight);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.fillStyle = '#5b7cfa';
+        ctx.beginPath();
+        ctx.arc(hx, hy, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        chartTooltip.style.display = 'block';
+        chartTooltip.innerHTML = `<strong>€ ${euro(hoverPoint[1])}</strong><div>${formatDate(
+          hoverPoint[0]
+        )}</div>`;
+
+        const wrapRect = sparklineCanvas.parentElement.getBoundingClientRect();
+        const tooltipWidth = chartTooltip.offsetWidth || 200;
+        const tooltipHeight = chartTooltip.offsetHeight || 80;
+        const relX = (hx / displayWidth) * wrapRect.width;
+        const relY = (hy / displayHeight) * wrapRect.height;
+        let left = relX - tooltipWidth / 2;
+        left = Math.min(Math.max(left, 8), wrapRect.width - tooltipWidth - 8);
+        const top = Math.max(relY - tooltipHeight - 10, 8);
+        chartTooltip.style.left = `${left}px`;
+        chartTooltip.style.top = `${top}px`;
+        chartTooltip.style.transform = 'none';
+      } else {
+        chartTooltip.style.display = 'none';
+      }
     }
 
     async function loadData(manual = false) {
@@ -789,6 +1016,7 @@
 
     function renderSparkline() {
       const windowed = computeWindowedPrices();
+      currentWindow = windowed;
 
       if (windowed.length > 1) {
         const first = new Date(windowed[0][0]).toLocaleDateString('de-DE');
@@ -800,7 +1028,7 @@
           chartTitle.textContent = 'Bitcoin Langfrist-Chart';
           rangeLabel.textContent = rangeSlider.disabled
             ? 'Gesamte Historie sichtbar'
-            : `${rangeSlider.value}% durchschnittene Historie`;
+            : `${rangeSlider.value}% der ausgewählten Historie`; 
         } else {
           sparklineInfo.textContent = 'Stündliche Daten (7 Tage)';
         }
@@ -810,6 +1038,7 @@
         rangeLabel.textContent = 'Keine Historie verfügbar';
       }
 
+      updateWindowStats(windowed);
       drawSparkline(windowed);
     }
 
@@ -889,6 +1118,7 @@
         marketcapElement.textContent = fallback?.eur_market_cap ? `€ ${euro(fallback.eur_market_cap)}` : '–';
         sparklineInfo.textContent = 'Fallback Preis ohne Zeitreihe';
         sparklineRange.textContent = 'Keine Zeitreihe geladen';
+        updateWindowStats([]);
         drawSparkline([]);
         convert();
         statusText.textContent = 'Einfacher Preis geladen (Fallback).';
