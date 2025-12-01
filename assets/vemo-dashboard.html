@@ -1335,10 +1335,10 @@
           <p class="section-sub" data-editable="true">Übersicht möglicher Modellstrategien zu Vorsorgeoptionen.</p>
           <span class="section-meta" id="lastUpdateTrigger" data-editable="true">Letztes Update: 12.09.2024</span>
         </div>
-        <p class="legal-note" data-editable="true">Diese Darstellung ist rein informativ und stellt keine Empfehlung im Sinne des FIDLEG dar.</p>
         <div class="vorsorge-grid" id="vorsorgeGrid">
           <!-- Wird über Google Sheet befüllt; Fallback-Daten im JS -->
         </div>
+        <p class="legal-note" data-editable="true">Diese Darstellung ist rein informativ und stellt keine Empfehlung im Sinne des FIDLEG dar.</p>
       </section>
 
       <section class="card" id="portfolios">
@@ -3029,10 +3029,6 @@
       centerLabel.appendChild(topLabel);
       centerLabel.appendChild(mainLabel);
       centerLabel.appendChild(subLabel);
-      const centerNote = document.createElement('div');
-      centerNote.className = 'performance-note';
-      centerNote.textContent = 'Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.';
-      centerLabel.appendChild(centerNote);
 
       chartVisual.appendChild(canvas);
       chartVisual.appendChild(centerLabel);
@@ -3096,7 +3092,7 @@
         returns.className = 'meta';
         const five = document.createElement('span');
         const displayR5 = formatReturnLabel(item.returns5, 5);
-        five.innerHTML = `${displayR5}<span class="performance-note">Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.</span>`;
+        five.textContent = displayR5;
         if (item.__idx >= 0) {
           bindEditableSync(five, type, item.__idx, 'returns5');
         } else {
@@ -3106,7 +3102,7 @@
         }
         const ten = document.createElement('span');
         const displayR10 = formatReturnLabel(item.returns10, 10);
-        ten.innerHTML = `${displayR10}<span class="performance-note">Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.</span>`;
+        ten.textContent = displayR10;
         if (item.__idx >= 0) {
           bindEditableSync(ten, type, item.__idx, 'returns10');
         } else {
@@ -3119,7 +3115,7 @@
 
         const since = document.createElement('span');
         since.className = 'section-sub';
-        since.innerHTML = `${item.since}<span class="performance-note">Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.</span>`;
+        since.textContent = item.since;
         if (item.__idx >= 0) {
           bindEditableSync(since, type, item.__idx, 'since');
         } else {
@@ -3229,7 +3225,7 @@
         const fundDisclaimer = document.createElement('p');
         fundDisclaimer.className = 'fund-disclaimer legal-note';
         fundDisclaimer.textContent =
-          'Hinweis: Diese Fondsbeschreibung dient ausschliesslich Informationszwecken und ist keine Empfehlung zum Kauf oder Verkauf. Keine Anlageberatung nach FIDLEG.';
+          'Hinweis: Diese Fondsbeschreibung dient ausschliesslich Informationszwecken und ist keine Empfehlung zum Kauf oder Verkauf. Keine Anlageberatung nach FIDLEG. Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.';
 
         const actions = document.createElement('div');
         actions.style.display = 'flex';
@@ -3261,7 +3257,7 @@
       const portfolioLegal = document.createElement('p');
       portfolioLegal.className = 'legal-note';
       portfolioLegal.textContent =
-        'Modellhafte Strategieübersicht. Keine Empfehlung, keine Beratung, keine persönliche Eignungsprüfung.';
+        'Modellhafte Strategieübersicht. Keine Empfehlung, keine Beratung, keine persönliche Eignungsprüfung. Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.';
 
       content.appendChild(summary);
       content.appendChild(fundsWrapper);
