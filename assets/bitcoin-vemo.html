@@ -7,7 +7,8 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@500;700;800&display=swap');
 
-    :root {
+    /* Scope everything to the widget container so WordPress layouts stay intact. */
+    .vemo-btc {
       --bg: #f7f8fb;
       --bg-soft: rgba(248, 250, 252, 0.58);
       --panel: rgba(255, 255, 255, 0.62);
@@ -30,28 +31,27 @@
       --radius-card: 18px;
       --radius-pill: 999px;
       --radius-input: 14px;
-    }
-
-    * {
       box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
       font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
       color: var(--text);
-      min-height: 100vh;
       background:
         radial-gradient(circle at 16% 24%, rgba(126, 217, 87, 0.1), transparent 42%),
         radial-gradient(circle at 86% 16%, rgba(91, 124, 250, 0.1), transparent 38%),
         linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
-      display: flex;
-      justify-content: center;
       padding: 28px 16px 60px;
+      width: 100%;
+      display: block;
     }
 
-    .app-shell {
+    .vemo-btc *,
+    .vemo-btc *::before,
+    .vemo-btc *::after {
+      box-sizing: border-box;
+    }
+
+    .vemo-btc .app-shell {
       width: min(1080px, 100%);
+      margin: 0 auto;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius-shell);
@@ -60,7 +60,7 @@
       padding: 22px 24px 32px;
     }
 
-    header.header {
+    .vemo-btc header.header {
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.22));
       border: 1px solid var(--border);
       border-radius: calc(var(--radius-shell) - 6px);
@@ -73,13 +73,13 @@
       margin-bottom: 18px;
     }
 
-    .title {
+    .vemo-btc .title {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .badge {
+    .vemo-btc .badge {
       padding: 8px 11px;
       border-radius: var(--radius-pill);
       background: rgba(248, 250, 252, 0.85);
@@ -94,7 +94,7 @@
       color: var(--text);
     }
 
-    .badge::before {
+    .vemo-btc .badge::before {
       content: '';
       display: inline-block;
       width: 8px;
@@ -103,7 +103,7 @@
       background: var(--accent);
     }
 
-    h1 {
+    .vemo-btc h1 {
       margin: 0;
       font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
       font-weight: 800;
@@ -112,19 +112,19 @@
       color: var(--text);
     }
 
-    .subtitle {
+    .vemo-btc .subtitle {
       color: var(--muted);
       margin-top: 4px;
       font-size: 14px;
     }
 
-    .card-grid {
+    .vemo-btc .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 16px;
     }
 
-    .card {
+    .vemo-btc .card {
       background: var(--panel-strong);
       border: 1px solid var(--border);
       border-radius: var(--radius-panel);
@@ -134,7 +134,7 @@
       box-shadow: var(--shadow-panel);
     }
 
-    .pill {
+    .vemo-btc .pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -148,19 +148,19 @@
       letter-spacing: 0.2px;
     }
 
-    .pill.positive {
+    .vemo-btc .pill.positive {
       color: var(--accent-text);
       border-color: var(--border-accent);
       background: linear-gradient(180deg, rgba(126, 217, 87, 0.12), rgba(126, 217, 87, 0.06));
     }
 
-    .pill.negative {
+    .vemo-btc .pill.negative {
       color: #b91c1c;
       border-color: rgba(248, 113, 113, 0.45);
       background: rgba(248, 113, 113, 0.08);
     }
 
-    .price {
+    .vemo-btc .price {
       font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
       font-size: clamp(34px, 5vw, 40px);
       font-weight: 800;
@@ -169,34 +169,34 @@
       color: var(--text);
     }
 
-    .meta-row {
+    .vemo-btc .meta-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       margin-top: 12px;
     }
 
-    .label {
+    .vemo-btc .label {
       font-size: 13px;
       color: var(--muted);
       margin-bottom: 2px;
       font-weight: 700;
     }
 
-    .value {
+    .vemo-btc .value {
       font-weight: 800;
       font-size: 16px;
       color: var(--text);
     }
 
-    .form-grid {
+    .vemo-btc .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 12px;
       margin-bottom: 12px;
     }
 
-    .input-group label {
+    .vemo-btc .input-group label {
       display: block;
       color: var(--text);
       font-size: 14px;
@@ -204,14 +204,14 @@
       margin-bottom: 6px;
     }
 
-    input,
-    select,
-    button {
+    .vemo-btc input,
+    .vemo-btc select,
+    .vemo-btc button {
       font: inherit;
     }
 
-    input,
-    select {
+    .vemo-btc input,
+    .vemo-btc select {
       width: 100%;
       padding: 13px 14px;
       border-radius: var(--radius-input);
@@ -223,21 +223,21 @@
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
-    input:focus,
-    select:focus {
+    .vemo-btc input:focus,
+    .vemo-btc select:focus {
       border-color: var(--border-accent);
       box-shadow: 0 0 0 4px rgba(126, 217, 87, 0.15);
       background: rgba(255, 255, 255, 0.78);
     }
 
-    .direction-toggle {
+    .vemo-btc .direction-toggle {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       margin-top: 8px;
     }
 
-    .toggle-btn {
+    .vemo-btc .toggle-btn {
       padding: 11px 12px;
       border-radius: var(--radius-input);
       border: 1px solid var(--border);
@@ -248,15 +248,15 @@
       font-weight: 700;
     }
 
-    .toggle-btn.active {
+    .vemo-btc .toggle-btn.active {
       border-color: var(--border-accent);
       background: linear-gradient(180deg, rgba(126, 217, 87, 0.12), rgba(126, 217, 87, 0.06));
       box-shadow: 0 12px 24px rgba(126, 217, 87, 0.12);
       color: var(--accent-text);
     }
 
-    .primary-btn,
-    .ghost-btn {
+    .vemo-btc .primary-btn,
+    .vemo-btc .ghost-btn {
       width: 100%;
       padding: 13px 14px;
       border-radius: 14px;
@@ -267,7 +267,7 @@
       font-size: 15px;
     }
 
-    .primary-btn {
+    .vemo-btc .primary-btn {
       background: linear-gradient(120deg, #7ed957, #5b7cfa);
       color: #052e16;
       box-shadow: 0 16px 45px rgba(91, 124, 250, 0.18);
@@ -275,17 +275,17 @@
       border-color: var(--border-blue);
     }
 
-    .primary-btn:disabled {
+    .vemo-btc .primary-btn:disabled {
       opacity: 0.65;
       cursor: not-allowed;
       box-shadow: none;
     }
 
-    .primary-btn:not(:disabled):active {
+    .vemo-btc .primary-btn:not(:disabled):active {
       transform: translateY(1px);
     }
 
-    .ghost-btn {
+    .vemo-btc .ghost-btn {
       background: var(--bg-soft);
       color: var(--text);
       border-color: var(--border);
@@ -293,7 +293,7 @@
       width: auto;
     }
 
-    .result-box {
+    .vemo-btc .result-box {
       margin-top: 14px;
       padding: 14px 16px;
       border-radius: 14px;
@@ -306,7 +306,7 @@
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
-    .chart-card {
+    .vemo-btc .chart-card {
       background: var(--bg-soft);
       border: 1px solid var(--border);
       border-radius: var(--radius-card);
@@ -315,7 +315,7 @@
       margin-top: 16px;
     }
 
-    .chart-header {
+    .vemo-btc .chart-header {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -324,7 +324,7 @@
       margin-bottom: 10px;
     }
 
-    .range-controls {
+    .vemo-btc .range-controls {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -334,13 +334,13 @@
       font-size: 13px;
     }
 
-    .range-buttons {
+    .vemo-btc .range-buttons {
       display: grid;
       grid-auto-flow: column;
       gap: 6px;
     }
 
-    .range-btn {
+    .vemo-btc .range-btn {
       padding: 8px 10px;
       border-radius: 12px;
       border: 1px solid var(--border);
@@ -351,30 +351,30 @@
       transition: all 0.2s ease;
     }
 
-    .range-btn.active {
+    .vemo-btc .range-btn.active {
       border-color: var(--border-blue);
       background: linear-gradient(180deg, rgba(91, 124, 250, 0.12), rgba(91, 124, 250, 0.06));
       box-shadow: 0 12px 24px rgba(91, 124, 250, 0.12);
       color: var(--text);
     }
 
-    .range-slider {
+    .vemo-btc .range-slider {
       display: grid;
       gap: 2px;
       min-width: 220px;
     }
 
-    .range-slider input[type='range'] {
+    .vemo-btc .range-slider input[type='range'] {
       accent-color: var(--accent);
       cursor: pointer;
     }
 
-    .range-slider small {
+    .vemo-btc .range-slider small {
       color: var(--muted);
       font-size: 12px;
     }
 
-    .chart-wrap {
+    .vemo-btc .chart-wrap {
       position: relative;
       height: 240px;
       margin-top: 6px;
@@ -384,13 +384,13 @@
       background: linear-gradient(180deg, rgba(15, 23, 42, 0.014), rgba(15, 23, 42, 0.02)), #fff;
     }
 
-    canvas {
+    .vemo-btc canvas {
       width: 100%;
       height: 100%;
       display: block;
     }
 
-    .chart-grid {
+    .vemo-btc .chart-grid {
       position: absolute;
       inset: 0;
       background-image:
@@ -401,7 +401,7 @@
       opacity: 0.55;
     }
 
-    .chart-footer {
+    .vemo-btc .chart-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -410,7 +410,7 @@
       font-size: 13px;
     }
 
-    .status {
+    .vemo-btc .status {
       margin-top: 12px;
       display: flex;
       gap: 10px;
@@ -419,7 +419,7 @@
       font-size: 13px;
     }
 
-    .dot {
+    .vemo-btc .dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
@@ -427,7 +427,7 @@
       box-shadow: 0 0 0 6px rgba(126, 217, 87, 0.15);
     }
 
-    .muted {
+    .vemo-btc .muted {
       margin-top: 18px;
       color: var(--muted-soft);
       line-height: 1.55;
@@ -436,31 +436,32 @@
     }
 
     @media (max-width: 680px) {
-      body {
+      .vemo-btc {
         padding: 22px 12px 44px;
       }
 
-      .app-shell {
+      .vemo-btc .app-shell {
         border-radius: 18px;
       }
 
-      header.header {
+      .vemo-btc header.header {
         flex-direction: column;
         align-items: flex-start;
       }
 
-      .direction-toggle {
+      .vemo-btc .direction-toggle {
         grid-template-columns: 1fr;
       }
 
-      .range-slider {
+      .vemo-btc .range-slider {
         min-width: 180px;
       }
     }
   </style>
 </head>
 <body>
-  <main class="app-shell">
+  <div class="vemo-btc">
+    <main class="app-shell">
     <header class="header">
       <div class="title">
         <span class="badge">Vemo</span>
@@ -901,5 +902,6 @@
     loadData();
     loadHistory();
   </script>
+  </div>
 </body>
 </html>
