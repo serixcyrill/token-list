@@ -129,6 +129,34 @@ export const Icon = (props: { mint: string }) => {
 
 ```
 
+#### Convert token amount to fiat with free CoinGecko API
+
+Use the `PriceCalculator` helper to quote conversions with the public CoinGecko API (no API key required).
+
+```typescript
+import { PriceCalculator, TokenListProvider, ENV } from '@solana/spl-token-registry';
+
+const calculator = new PriceCalculator();
+
+// Example: convert 1 BTC to EUR
+new TokenListProvider().resolve().then(async (tokens) => {
+  const [bitcoin] = tokens
+    .filterByChainId(ENV.MainnetBeta)
+    .getList()
+    .filter((token) => token.symbol === 'BTC');
+
+  if (bitcoin) {
+    const quote = await calculator.convertTokenAmount({
+      token: bitcoin,
+      amount: 1,
+      vsCurrency: 'eur',
+    });
+
+    console.log(`1 ${quote.tokenSymbol} ≈ ${quote.value} ${quote.vsCurrency}`);
+  }
+});
+```
+
 # Disclaimer
 
 All claims, content, designs, algorithms, estimates, roadmaps,
