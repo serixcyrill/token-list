@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zinseszins – Vemo Design Preview</title>
+  <title>Finanzielle Freiheit – Vemo Style Rechner</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -32,11 +32,11 @@
         linear-gradient(180deg,#fbfcff 0%, #eef2ff 100%);
     }
 
-    #zinseszins-app *,
-    #zinseszins-app *::before,
-    #zinseszins-app *::after{ box-sizing:border-box; }
+    #freiheit *,
+    #freiheit *::before,
+    #freiheit *::after{ box-sizing:border-box; }
 
-    #zinseszins-app{
+    #freiheit{
       color:#0f172a;
       font-family:'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
       padding:28px 16px 60px;
@@ -45,12 +45,12 @@
       isolation:isolate;
     }
 
-    #zinseszins-app .app{
-      max-width:1080px;
+    #freiheit .app{
+      max-width:1120px;
       margin:0 auto;
       position:relative;
     }
-    #zinseszins-app .orb{
+    #freiheit .orb{
       position:absolute;
       inset:0;
       filter:blur(90px);
@@ -59,7 +59,7 @@
       z-index:0;
       pointer-events:none;
     }
-    #zinseszins-app .shell{
+    #freiheit .shell{
       position:relative; z-index:1;
       background:var(--glass);
       border:1px solid var(--ring);
@@ -69,7 +69,7 @@
       backdrop-filter:blur(10px);
     }
 
-    #zinseszins-app header{
+    #freiheit header{
       padding:14px 20px 8px;
       border-bottom:1px solid var(--ring);
       display:flex;
@@ -79,8 +79,8 @@
       justify-content:space-between;
       background:linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.22) 70%);
     }
-    #zinseszins-app .head-left{ display:flex; flex-direction:column; gap:2px; }
-    #zinseszins-app .eyebrow{
+    #freiheit .head-left{ display:flex; flex-direction:column; gap:2px; }
+    #freiheit .eyebrow{
       display:inline-flex;
       align-items:center;
       gap:8px;
@@ -94,8 +94,8 @@
       letter-spacing:1px;
       text-transform:uppercase;
     }
-    #zinseszins-app .dot{ width:8px; height:8px; border-radius:99px; background:var(--accent); box-shadow:none; }
-    #zinseszins-app h1{
+    #freiheit .dot{ width:8px; height:8px; border-radius:99px; background:var(--accent); box-shadow:none; }
+    #freiheit h1{
       margin:0;
       font-size:30px;
       font-family:'Space Grotesk', 'Inter', system-ui;
@@ -104,7 +104,7 @@
       color:#0f172a;
     }
 
-    #zinseszins-app .save-meta{
+    #freiheit .save-meta{
       color:#475569;
       font-weight:600;
       font-size:13px;
@@ -115,16 +115,16 @@
       box-shadow:0 8px 20px rgba(15,23,42,.06);
     }
 
-    #zinseszins-app main{ padding:24px 28px 36px; }
-    #zinseszins-app .grid{
+    #freiheit main{ padding:24px 28px 36px; }
+    #freiheit .grid{
       display:grid;
       gap:20px;
     }
-    @media (min-width: 860px){
-      #zinseszins-app .grid.cols-2{ grid-template-columns:1.05fr 0.95fr; align-items:stretch; }
+    @media (min-width: 960px){
+      #freiheit .grid.cols-2{ grid-template-columns:1.05fr 0.95fr; align-items:stretch; }
     }
 
-    #zinseszins-app .panel{
+    #freiheit .panel{
       background:var(--panel);
       border:1px solid var(--ring);
       border-radius:22px;
@@ -135,10 +135,10 @@
       height:100%;
     }
 
-    #zinseszins-app .form-grid{ display:grid; gap:18px; }
-    @media (min-width: 640px){ #zinseszins-app .form-grid.cols-2{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    #freiheit .form-grid{ display:grid; gap:18px; }
+    @media (min-width: 640px){ #freiheit .form-grid.cols-2{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
 
-    #zinseszins-app label{
+    #freiheit label{
       font-weight:700;
       color:#0f172a;
       display:flex;
@@ -146,9 +146,9 @@
       font-size:14px;
       margin-bottom:6px;
     }
-    #zinseszins-app .hint{ color:var(--muted); font-weight:600; font-size:12px; }
+    #freiheit .hint{ color:var(--muted); font-weight:600; font-size:12px; }
 
-    #zinseszins-app .input, #zinseszins-app select.input{
+    #freiheit .input, #freiheit select.input{
       width:100%;
       border:1px solid var(--ring);
       background:rgba(248,250,252,.56);
@@ -160,18 +160,38 @@
       transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease, background-color .2s ease;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
     }
-    #zinseszins-app .input:focus{ border-color:var(--ring-strong); box-shadow:0 0 0 4px rgba(126,217,87,.15); background:rgba(255,255,255,.78); }
-    #zinseszins-app .input:active{ transform:translateY(1px); }
+    #freiheit .input:focus{ border-color:var(--ring-strong); box-shadow:0 0 0 4px rgba(126,217,87,.15); background:rgba(255,255,255,.78); }
+    #freiheit .input:active{ transform:translateY(1px); }
 
-    #zinseszins-app .input-wrap{ position:relative; }
-    #zinseszins-app .suffix{
+    #freiheit .input-wrap{ position:relative; }
+    #freiheit .suffix{
       position:absolute; right:14px; top:50%; transform:translateY(-50%);
       color:var(--muted); font-size:12px; font-weight:700; letter-spacing:0.1px;
     }
-    #zinseszins-app select.input{ appearance:none; cursor:pointer; padding-right:48px; background-image:url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5' stroke='%239fb3d0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; }
+    #freiheit select.input{ appearance:none; cursor:pointer; padding-right:48px; background-image:url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5' stroke='%239fb3d0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; }
 
-    #zinseszins-app .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; align-items:stretch; }
-    #zinseszins-app .kpi{
+    #freiheit .steps{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    #freiheit .pill{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--ring);
+      background:rgba(248,250,252,.72);
+      font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color:#0f172a;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+    }
+    #freiheit .pill .index{
+      width:26px; height:26px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(91,124,250,.14);
+      color:#1e293b; font-weight:800; font-size:13px;
+    }
+
+    #freiheit .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; align-items:stretch; }
+    #freiheit .kpi{
       background:var(--panel);
       border:1px solid var(--ring);
       border-radius:14px;
@@ -184,10 +204,10 @@
       min-height:92px;
       box-shadow:0 12px 28px rgba(15,23,42,.06);
     }
-    #zinseszins-app .kpi-label{ color:var(--muted); font-size:13px; }
-    #zinseszins-app .kpi-value{ font-size:22px; font-weight:800; letter-spacing:-0.2px; margin-top:4px; color:#0f172a; transition:color .2s ease; }
+    #freiheit .kpi-label{ color:var(--muted); font-size:13px; }
+    #freiheit .kpi-value{ font-size:22px; font-weight:800; letter-spacing:-0.2px; margin-top:4px; color:#0f172a; transition:color .2s ease; }
 
-    #zinseszins-app .kpi.endcap{
+    #freiheit .kpi.endcap{
       grid-column:1 / -1;
       flex-direction:row;
       align-items:center;
@@ -198,120 +218,148 @@
       border:1px solid rgba(91,124,250,.14);
       box-shadow:0 18px 36px rgba(91,124,250,.08);
     }
-    #zinseszins-app .kpi.endcap .kpi-label{ font-size:14px; color:#0f172a; letter-spacing:0; }
-    #zinseszins-app .kpi.endcap .kpi-value{ font-size:30px; color:#0f172a; }
+    #freiheit .kpi.endcap .kpi-label{ font-size:14px; color:#0f172a; letter-spacing:0; }
+    #freiheit .kpi.endcap .kpi-value{ font-size:30px; color:#0f172a; }
 
-    #zinseszins-app .kpi.accent{
+    #freiheit .kpi.accent{
       background:linear-gradient(180deg,rgba(126,217,87,.12) 0%, rgba(126,217,87,.06) 70%);
       border-color:rgba(126,217,87,.30);
       box-shadow:0 18px 34px rgba(126,217,87,.08);
     }
-    #zinseszins-app .kpi.accent .kpi-label{ color:#0f172a; }
-    #zinseszins-app .kpi.accent .kpi-value{ color:#14532d; }
+    #freiheit .kpi.accent .kpi-label{ color:#0f172a; }
+    #freiheit .kpi.accent .kpi-value{ color:#14532d; }
 
-    #zinseszins-app .chart-section{ margin-top:22px; }
-    #zinseszins-app .chart-card{ padding:18px 18px 10px; border:1px solid var(--ring); border-radius:18px; background:rgba(248,250,252,.58); box-shadow:0 12px 28px rgba(15,23,42,.08); }
-    #zinseszins-app .chart-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-    #zinseszins-app .legend{ display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:600; font-size:12px; }
-    #zinseszins-app .legend .dot{ width:12px; height:12px; box-shadow:none; }
-    #zinseszins-app #chart{ width:100%; height:360px; }
+    #freiheit .chart-section{ margin-top:22px; }
+    #freiheit .chart-card{ padding:18px 18px 10px; border:1px solid var(--ring); border-radius:18px; background:rgba(248,250,252,.58); box-shadow:0 12px 28px rgba(15,23,42,.08); }
+    #freiheit .chart-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    #freiheit .legend{ display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:600; font-size:12px; }
+    #freiheit .legend .dot{ width:12px; height:12px; box-shadow:none; }
+    #freiheit #chart{ width:100%; height:360px; }
+    #freiheit #chart .bar-stack{ transform-origin: bottom; transform-box: fill-box; transition: transform .9s cubic-bezier(.22,.61,.36,1); }
 
-    #zinseszins-app .chart-placeholder{
-      width:100%; height:100%; border-radius:12px; border:1px dashed var(--ring); color:var(--muted);
-      display:flex; align-items:center; justify-content:center; font-weight:700; letter-spacing:0.2px; background:rgba(255,255,255,.38);
+    #freiheit button{
+      margin-top:12px;
+      border:none;
+      background:linear-gradient(90deg,#7ed957,#5b7cfa);
+      color:#0f172a;
+      font-weight:800;
+      font-size:15px;
+      padding:15px 16px;
+      border-radius:14px;
+      cursor:pointer;
+      box-shadow:0 12px 28px rgba(126,217,87,.25), 0 10px 24px rgba(91,124,250,.22);
+      transition: transform .12s ease, box-shadow .2s ease;
     }
+    #freiheit button:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(126,217,87,.28), 0 12px 28px rgba(91,124,250,.24); }
+    #freiheit button:active{ transform:translateY(1px); }
+
+    #freiheit .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; background:rgba(255,255,255,.36); }
 
     @media (max-width: 760px){
-      #zinseszins-app{ padding:22px 12px 44px; }
-      #zinseszins-app header{ padding:14px 16px 8px; gap:6px 8px; }
-      #zinseszins-app h1{ font-size:24px; letter-spacing:-0.15px; }
-      #zinseszins-app main{ padding:18px 18px 28px; }
-      #zinseszins-app .grid{ gap:16px; }
-      #zinseszins-app .panel{ padding:16px; border-radius:18px; box-shadow:0 12px 26px rgba(15,23,42,.08); }
-      #zinseszins-app .form-grid{ gap:14px; }
-      #zinseszins-app label{ font-size:13px; margin-bottom:4px; }
-      #zinseszins-app .input, #zinseszins-app select.input{ padding:13px 14px; font-size:15px; }
-      #zinseszins-app button{ margin-top:10px; padding:15px; border-radius:14px; }
-      #zinseszins-app .kpis{ grid-template-columns:1fr; gap:12px; }
-      #zinseszins-app .kpi{ min-height:86px; padding:12px 14px; }
-      #zinseszins-app .kpi-value{ font-size:20px; }
-      #zinseszins-app .kpi.endcap{ order:-1; min-height:110px; border-radius:16px; }
-      #zinseszins-app .chart-section{ margin-top:16px; }
-      #zinseszins-app #chart{ height:280px; }
+      #freiheit{ padding:22px 12px 44px; }
+      #freiheit header{ padding:14px 16px 8px; gap:6px 8px; }
+      #freiheit h1{ font-size:24px; letter-spacing:-0.15px; }
+      #freiheit main{ padding:18px 18px 28px; }
+      #freiheit .grid{ gap:16px; }
+      #freiheit .panel{ padding:16px; border-radius:18px; box-shadow:0 12px 26px rgba(15,23,42,.08); }
+      #freiheit .form-grid{ gap:14px; }
+      #freiheit label{ font-size:13px; margin-bottom:4px; }
+      #freiheit .input, #freiheit select.input{ padding:13px 14px; font-size:15px; }
+      #freiheit button{ margin-top:10px; padding:15px; border-radius:14px; }
+      #freiheit .kpis{ grid-template-columns:1fr; gap:12px; }
+      #freiheit .kpi{ min-height:86px; padding:12px 14px; }
+      #freiheit .kpi-value{ font-size:20px; }
+      #freiheit .kpi.endcap{ order:-1; min-height:110px; border-radius:16px; }
+      #freiheit .chart-section{ margin-top:16px; }
+      #freiheit #chart{ height:280px; }
     }
   </style>
 </head>
 <body>
-  <div id="zinseszins-app">
+  <div id="freiheit">
     <div class="app">
       <div class="orb"></div>
       <div class="shell">
       <header>
         <div class="head-left">
-          <div class="eyebrow"><span class="dot"></span> Projektions-UI</div>
-          <h1>Zinseszins – Vemo Style</h1>
+          <div class="eyebrow"><span class="dot"></span> Finanzielle Freiheit</div>
+          <h1>Projektions-Tool</h1>
         </div>
-        <div class="save-meta">Design-Dummy ohne Berechnungen.</div>
+        <div class="save-meta" id="status-meta">Speichert deine Eingaben automatisch.</div>
       </header>
       <main>
         <div class="grid cols-2">
           <section class="panel">
+            <div class="steps">
+              <div class="pill"><span class="index">1</span> Freiheit definieren</div>
+              <div class="pill"><span class="index">2</span> Weg dorthin planen</div>
+            </div>
             <div class="form-grid cols-2">
               <div>
-                <label for="anfang">Anfangskapital</label>
+                <label for="ausgaben">Monatliche Ausgaben heute</label>
                 <div class="input-wrap">
-                  <input id="anfang" class="input" inputmode="numeric" value="5'000" />
+                  <input id="ausgaben" class="input" inputmode="numeric" value="3'800" />
                   <span class="suffix">CHF</span>
                 </div>
               </div>
               <div>
-                <label for="rate">Monatliche Sparrate</label>
+                <label for="jahre">Jahre bis Freiheit</label>
                 <div class="input-wrap">
-                  <input id="rate" class="input" inputmode="numeric" value="250" />
-                  <span class="suffix">CHF</span>
-                </div>
-              </div>
-              <div>
-                <label for="dauer">Spardauer</label>
-                <div class="input-wrap">
-                  <input id="dauer" class="input" inputmode="numeric" value="12" />
+                  <input id="jahre" class="input" inputmode="numeric" value="20" />
                   <span class="suffix">Jahre</span>
                 </div>
               </div>
               <div>
-                <label for="zins">Jährlicher Zinssatz <span class="hint">z.B. 6%</span></label>
+                <label for="inflation">Inflation</label>
                 <div class="input-wrap">
-                  <input id="zins" class="input" inputmode="decimal" value="6" />
+                  <input id="inflation" class="input" inputmode="decimal" value="2.0" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div>
+                <label for="entnahme">Entnahmerate <span class="hint">z.B. 3.5%</span></label>
+                <div class="input-wrap">
+                  <input id="entnahme" class="input" inputmode="decimal" value="3.5" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div>
+                <label for="start">Startkapital</label>
+                <div class="input-wrap">
+                  <input id="start" class="input" inputmode="numeric" value="5'000" />
+                  <span class="suffix">CHF</span>
+                </div>
+              </div>
+              <div>
+                <label for="rendite">Erwartete Rendite</label>
+                <div class="input-wrap">
+                  <input id="rendite" class="input" inputmode="decimal" value="6.0" />
                   <span class="suffix">%</span>
                 </div>
               </div>
             </div>
-            <div style="margin-top:14px;">
-              <label for="intervall">Ausschüttungsintervall</label>
-              <select id="intervall" class="input">
-                <option value="jahrlich">jährlich</option>
-                <option value="quartalsweise">quartalsweise</option>
-                <option value="monatlich">monatlich</option>
-              </select>
-            </div>
+            <button id="calc">Berechnen</button>
           </section>
 
           <section class="panel" id="results-panel">
             <div class="kpis">
-              <div class="kpi">
-                <div class="kpi-label">Zinserträge</div>
-                <div class="kpi-value" id="zinsen">–</div>
-              </div>
-              <div class="kpi">
-                <div class="kpi-label">Gesamteinzahlungen</div>
-                <div class="kpi-value" id="einzahlungen">–</div>
-              </div>
               <div class="kpi endcap">
                 <div>
-                  <div class="kpi-label">Endkapital</div>
+                  <div class="kpi-label">Benötigtes Endkapital</div>
                   <div class="kpi-value" id="endkapital">–</div>
                 </div>
-                <div class="hint" style="margin-left:auto;">Statisches UI-Mock</div>
+              </div>
+              <div class="kpi accent">
+                <div class="kpi-label">Erforderliche Sparrate</div>
+                <div class="kpi-value" id="sparrate">–</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Kumulierte Einzahlungen</div>
+                <div class="kpi-value" id="einzahlungen">–</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">Zinsanteil</div>
+                <div class="kpi-value" id="zinsen">–</div>
               </div>
             </div>
           </section>
@@ -320,20 +368,334 @@
         <section class="chart-section">
           <div class="chart-card">
             <div class="chart-head">
-              <h3 style="margin:0;">Jahres-Chart</h3>
+              <h3 style="margin:0;">Entwicklung bis zur Freiheit</h3>
               <div class="legend">
-                <span class="dot" style="background:var(--accent);"></span> Zinsen
+                <span class="dot" style="background:var(--accent);"></span> Zinserträge
                 <span class="dot" style="background:var(--accent-2);"></span> Einzahlungen
               </div>
             </div>
-            <div id="chart" aria-label="Zinseszins Diagramm">
-              <div class="chart-placeholder">Nur Design – keine Berechnung</div>
-            </div>
+            <svg id="chart" viewBox="0 0 1080 360" aria-label="Kapitalverlauf"></svg>
           </div>
         </section>
       </main>
     </div>
   </div>
   </div>
+
+  <script>
+    (function(){
+      const CHF0 = (n)=> new Intl.NumberFormat('de-CH',{style:'currency',currency:'CHF',minimumFractionDigits:0,maximumFractionDigits:0}).format(n||0);
+      const INT = new Intl.NumberFormat('de-CH');
+
+      const el = {
+        expenses: document.getElementById('ausgaben'),
+        years: document.getElementById('jahre'),
+        inflation: document.getElementById('inflation'),
+        withdrawal: document.getElementById('entnahme'),
+        start: document.getElementById('start'),
+        return: document.getElementById('rendite'),
+        end: document.getElementById('endkapital'),
+        rate: document.getElementById('sparrate'),
+        deposits: document.getElementById('einzahlungen'),
+        interest: document.getElementById('zinsen'),
+        chart: document.getElementById('chart'),
+        statusMeta: document.getElementById('status-meta'),
+        calc: document.getElementById('calc')
+      };
+
+      const STORAGE_KEY = 'freiheit-rechner-v1';
+      const lastValues = { end:0, rate:0, deposits:0, interest:0 };
+
+      const debounce = (fn, delay=140)=>{
+        let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), delay); };
+      };
+
+      const sanitizeInt = (value)=> parseInt(String(value).replace(/[^\d]/g,'')) || 0;
+      const sanitizeFloat = (value)=> parseFloat(String(value).replace(/'/g,'').replace(',','.')) || 0;
+      const formatThousands = (input)=> input.value = INT.format(sanitizeInt(input.value));
+
+      [el.expenses, el.years, el.start].forEach(i=>{
+        formatThousands(i);
+        i.addEventListener('focus', ()=> i.select());
+        i.addEventListener('blur', ()=> formatThousands(i));
+        i.addEventListener('input', ()=> i.value = i.value.replace(/[^\d' ]/g,'').replace(/\s+/g,''));
+      });
+      [el.inflation, el.withdrawal, el.return].forEach(i=>{
+        i.addEventListener('focus', ()=> i.select());
+        i.addEventListener('input', ()=> i.value = i.value.replace(/[^0-9.,-]/g,''));
+      });
+
+      function calculate(){
+        const expenses = sanitizeInt(el.expenses.value);
+        const years = Math.max(0, sanitizeInt(el.years.value));
+        const inflation = Math.max(0, sanitizeFloat(el.inflation.value))/100;
+        const withdrawal = Math.max(0.1, sanitizeFloat(el.withdrawal.value))/100;
+        const start = sanitizeInt(el.start.value);
+        const expectedReturn = Math.max(0, sanitizeFloat(el.return.value))/100;
+
+        const inflationFactor = Math.pow(1 + inflation, years);
+        const futureMonthly = expenses * inflationFactor;
+        const annualNeeds = futureMonthly * 12;
+        const requiredCapital = annualNeeds / withdrawal;
+
+        const months = Math.max(1, years*12);
+        const rMonthly = expectedReturn/12;
+        const growthStart = start * Math.pow(1 + rMonthly, months);
+        const numerator = requiredCapital - growthStart;
+        const denom = rMonthly === 0 ? months : (Math.pow(1 + rMonthly, months) - 1) / rMonthly;
+        const monthlySaving = Math.max(0, numerator / denom);
+
+        const projection = buildProjection({ start, monthlySaving, months, rMonthly });
+        const finalBalance = projection.balances[projection.balances.length-1] || 0;
+        const totalDeposits = start + monthlySaving * months;
+        const interestPortion = Math.max(0, finalBalance - totalDeposits);
+
+        renderKpis(requiredCapital, monthlySaving, totalDeposits, interestPortion);
+        renderChart(projection.years, projection.deposits, projection.interests);
+        persistState();
+      }
+
+      function buildProjection({ start, monthlySaving, months, rMonthly }){
+        let balance = start;
+        let depositSum = start;
+        const years = [], deposits=[], interests=[], balances=[];
+
+        for(let m=1; m<=months; m++){
+          balance = balance * (1 + rMonthly) + monthlySaving;
+          depositSum += monthlySaving;
+          if(m % 12 === 0){
+            const year = m/12;
+            years.push(year);
+            balances.push(balance);
+            deposits.push(depositSum);
+            interests.push(Math.max(0, balance - depositSum));
+          }
+        }
+        return { years, deposits, interests, balances };
+      }
+
+      function animateValue(elTarget, from, to, formatter, duration=520){
+        const start = performance.now();
+        const delta = to - from;
+        const ease = (t)=> 1 - Math.pow(1 - t, 3);
+
+        function frame(now){
+          const progress = Math.min(1, (now - start) / duration);
+          const eased = ease(progress);
+          const val = from + delta * eased;
+          elTarget.textContent = formatter(val);
+          if(progress < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      function renderKpis(endCap, rate, deposits, interest){
+        animateValue(el.end, lastValues.end, endCap, CHF0);
+        animateValue(el.rate, lastValues.rate, rate, CHF0);
+        animateValue(el.deposits, lastValues.deposits, deposits, CHF0);
+        animateValue(el.interest, lastValues.interest, interest, CHF0);
+
+        lastValues.end = endCap;
+        lastValues.rate = rate;
+        lastValues.deposits = deposits;
+        lastValues.interest = interest;
+      }
+
+      function renderChart(years, deposits, interest){
+        const svg = el.chart;
+        svg.innerHTML = '';
+
+        const W = 1080, H = 360, pad = { l:64, r:24, t:18, b:34 };
+        const iw = W - pad.l - pad.r;
+        const ih = H - pad.t - pad.b;
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+        const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+        defs.innerHTML = `
+          <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#a2f1a6" />
+            <stop offset="100%" stop-color="#7ed957" />
+          </linearGradient>
+          <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#b3c6ff" />
+            <stop offset="100%" stop-color="#5b7cfa" />
+          </linearGradient>`;
+        svg.appendChild(defs);
+
+        const totals = deposits.map((d,i)=> d + interest[i]);
+        const maxY = Math.max(...totals, 1) * 1.08;
+        const steps = 5;
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+        g.setAttribute('transform', `translate(${pad.l},${pad.t})`);
+        svg.appendChild(g);
+
+        for(let i=0;i<steps;i++){
+          const y = ih - (ih/steps)*i;
+          const band = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          band.setAttribute('x',0); band.setAttribute('width', iw);
+          band.setAttribute('y', y - ih/steps);
+          band.setAttribute('height', ih/steps);
+          band.setAttribute('fill', i%2===0 ? 'rgba(15,23,42,.014)' : 'rgba(15,23,42,.02)');
+          g.appendChild(band);
+        }
+
+        for(let i=0;i<=steps;i++){
+          const y = ih - (ih/steps)*i;
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1',0); line.setAttribute('y1',y);
+          line.setAttribute('x2',iw); line.setAttribute('y2',y);
+          line.setAttribute('stroke','rgba(148,163,184,.32)');
+          line.setAttribute('stroke-dasharray','2 4');
+          g.appendChild(line);
+
+          const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+          lbl.textContent = INT.format(Math.round(maxY/steps*i));
+          lbl.setAttribute('x', -12);
+          lbl.setAttribute('y', y+4);
+          lbl.setAttribute('fill', '#8fa3c0');
+          lbl.setAttribute('font-size','11');
+          lbl.setAttribute('text-anchor','end');
+          g.appendChild(lbl);
+        }
+
+        const n = years.length;
+        if(n === 0){
+          const empty = document.createElementNS('http://www.w3.org/2000/svg','text');
+          empty.textContent = 'Noch keine Daten';
+          empty.setAttribute('x', W/2);
+          empty.setAttribute('y', H/2);
+          empty.setAttribute('fill','#94a3b8');
+          empty.setAttribute('font-size','13');
+          empty.setAttribute('text-anchor','middle');
+          svg.appendChild(empty);
+          return;
+        }
+
+        const gap = 6;
+        const barW = Math.max(4, (iw - gap*(n-1))/n);
+
+        for(let i=0;i<n;i++){
+          const x = i*(barW+gap);
+          const depH = ih * (deposits[i]/maxY);
+          const intH = ih * (interest[i]/maxY);
+          const totalH = depH + intH;
+
+          const holder = document.createElementNS('http://www.w3.org/2000/svg','g');
+          holder.setAttribute('transform', `translate(${x}, ${ih - totalH})`);
+
+          const stack = document.createElementNS('http://www.w3.org/2000/svg','g');
+          stack.setAttribute('class','bar-stack');
+          stack.style.transform = 'scaleY(0.02)';
+
+          const intRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          intRect.setAttribute('x', 0);
+          intRect.setAttribute('y', 0);
+          intRect.setAttribute('width', barW);
+          intRect.setAttribute('height', intH);
+          intRect.setAttribute('fill', 'url(#green)');
+          intRect.setAttribute('rx','3');
+          stack.appendChild(intRect);
+
+          const depRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          depRect.setAttribute('x', 0);
+          depRect.setAttribute('y', intH);
+          depRect.setAttribute('width', barW);
+          depRect.setAttribute('height', depH);
+          depRect.setAttribute('fill', 'url(#blue)');
+          depRect.setAttribute('rx','3');
+          depRect.setAttribute('opacity','0.92');
+          stack.appendChild(depRect);
+
+          holder.appendChild(stack);
+          g.appendChild(holder);
+
+          requestAnimationFrame(()=>{
+            const delay = i * 16;
+            setTimeout(()=>{ stack.style.transform = 'scaleY(1)'; }, delay);
+          });
+
+          const px = x + barW/2;
+          if((years[i] % 2 === 0) || i === n-1){
+            const tx = document.createElementNS('http://www.w3.org/2000/svg','text');
+            tx.textContent = years[i];
+            tx.setAttribute('x', px);
+            tx.setAttribute('y', ih + 18);
+            tx.setAttribute('fill','#8fa3c0');
+            tx.setAttribute('font-size','11');
+            tx.setAttribute('text-anchor','middle');
+            g.appendChild(tx);
+          }
+        }
+
+        const xLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+        xLbl.textContent = 'Jahre';
+        xLbl.setAttribute('x', pad.l + iw/2);
+        xLbl.setAttribute('y', H-6);
+        xLbl.setAttribute('fill','#8fa3c0');
+        xLbl.setAttribute('font-size','12');
+        xLbl.setAttribute('text-anchor','middle');
+        svg.appendChild(xLbl);
+      }
+
+      function loadState(){
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if(!raw) return;
+          const state = JSON.parse(raw);
+          if(state.expenses) el.expenses.value = state.expenses;
+          if(state.years) el.years.value = state.years;
+          if(state.inflation) el.inflation.value = state.inflation;
+          if(state.withdrawal) el.withdrawal.value = state.withdrawal;
+          if(state.start) el.start.value = state.start;
+          if(state.return) el.return.value = state.return;
+          [el.expenses, el.years, el.start].forEach(formatThousands);
+          updateStatusMeta(state.savedAt);
+        }catch(e){ console.warn('Konnte gespeicherte Daten nicht laden', e); }
+      }
+
+      function persistState(){
+        const savedAt = Date.now();
+        const payload = {
+          expenses: el.expenses.value,
+          years: el.years.value,
+          inflation: el.inflation.value,
+          withdrawal: el.withdrawal.value,
+          start: el.start.value,
+          return: el.return.value,
+          savedAt
+        };
+        try{
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+          updateStatusMeta(savedAt);
+        }catch(e){ console.warn('Konnte Daten nicht speichern', e); }
+      }
+
+      const formatSavedAt = (ts)=> new Intl.DateTimeFormat('de-CH',{ dateStyle:'short', timeStyle:'medium' }).format(ts);
+
+      function updateStatusMeta(savedAt){
+        if(!el.statusMeta) return;
+        if(savedAt){
+          el.statusMeta.textContent = `Gespeichert um ${formatSavedAt(savedAt)}`;
+        }else{
+          el.statusMeta.textContent = 'Speichert deine Eingaben automatisch.';
+        }
+      }
+
+      function registerEvents(){
+        [el.expenses, el.years, el.start, el.inflation, el.withdrawal, el.return].forEach(input=>{
+          input.addEventListener('input', ()=> calculateDebounced());
+          input.addEventListener('blur', ()=> calculate());
+        });
+        el.calc.addEventListener('click', ()=> calculate());
+      }
+
+      const calculateDebounced = debounce(calculate, 160);
+
+      loadState();
+      registerEvents();
+      calculate();
+    })();
+  </script>
 </body>
 </html>
