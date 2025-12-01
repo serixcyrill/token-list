@@ -296,7 +296,7 @@
             </div>
             <div class="form-grid cols-2">
               <div>
-                <label for="ausgaben">Monatliche Ausgaben heute</label>
+                <label for="ausgaben">Ziel-Monatslohn</label>
                 <div class="input-wrap">
                   <input id="ausgaben" class="input" inputmode="numeric" value="3'800" />
                   <span class="suffix">CHF</span>
@@ -559,7 +559,11 @@
 
         const totals = deposits.map((d,i)=> d + interests[i]);
         const maxBalance = Math.max(...lineBalances, 1);
-        const maxY = Math.max(...totals, maxBalance, 1) * 1.08;
+        const minBalance = Math.min(...lineBalances, 0);
+        const chartMax = Math.max(...totals, maxBalance, 1);
+        const chartMin = Math.min(0, minBalance);
+        const chartRange = Math.max(1, (chartMax - chartMin) * 1.08);
+        const yScale = (val)=> ih - ((val - chartMin) / chartRange) * ih;
         const steps = 5;
 
         const g = document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -567,17 +571,19 @@
         svg.appendChild(g);
 
         for(let i=0;i<steps;i++){
-          const y = ih - (ih/steps)*i;
+          const yBottom = yScale(chartMin + (chartRange/steps)*i);
+          const yTop = yScale(chartMin + (chartRange/steps)*(i+1));
           const band = document.createElementNS('http://www.w3.org/2000/svg','rect');
           band.setAttribute('x',0); band.setAttribute('width', iw);
-          band.setAttribute('y', y - ih/steps);
-          band.setAttribute('height', ih/steps);
+          band.setAttribute('y', yTop);
+          band.setAttribute('height', yBottom - yTop);
           band.setAttribute('fill', i%2===0 ? 'rgba(15,23,42,.014)' : 'rgba(15,23,42,.02)');
           g.appendChild(band);
         }
 
         for(let i=0;i<=steps;i++){
-          const y = ih - (ih/steps)*i;
+          const value = chartMin + (chartRange/steps)*i;
+          const y = yScale(value);
           const line = document.createElementNS('http://www.w3.org/2000/svg','line');
           line.setAttribute('x1',0); line.setAttribute('y1',y);
           line.setAttribute('x2',iw); line.setAttribute('y2',y);
@@ -586,7 +592,7 @@
           g.appendChild(line);
 
           const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
-          lbl.textContent = INT.format(Math.round(maxY/steps*i));
+          lbl.textContent = INT.format(Math.round(value));
           lbl.setAttribute('x', -12);
           lbl.setAttribute('y', y+4);
           lbl.setAttribute('fill', '#8fa3c0');
@@ -615,12 +621,12 @@
 
         for(let i=0;i<n;i++){
           const x = (accYears[i]-1) * yearSpacing - barW/2;
-          const depH = ih * (deposits[i]/maxY);
-          const intH = ih * (interests[i]/maxY);
-          const totalH = depH + intH;
+          const baseY = yScale(0);
+          const midY = yScale(deposits[i]);
+          const topY = yScale(deposits[i] + interests[i]);
 
           const holder = document.createElementNS('http://www.w3.org/2000/svg','g');
-          holder.setAttribute('transform', `translate(${x}, ${ih - totalH})`);
+          holder.setAttribute('transform', `translate(${x}, 0)`);
 
           const stack = document.createElementNS('http://www.w3.org/2000/svg','g');
           stack.setAttribute('class','bar-stack');
@@ -628,18 +634,18 @@
 
           const intRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
           intRect.setAttribute('x', 0);
-          intRect.setAttribute('y', 0);
+          intRect.setAttribute('y', topY);
           intRect.setAttribute('width', barW);
-          intRect.setAttribute('height', intH);
+          intRect.setAttribute('height', Math.max(0, midY - topY));
           intRect.setAttribute('fill', 'url(#green)');
           intRect.setAttribute('rx','3');
           stack.appendChild(intRect);
 
           const depRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
           depRect.setAttribute('x', 0);
-          depRect.setAttribute('y', intH);
+          depRect.setAttribute('y', midY);
           depRect.setAttribute('width', barW);
-          depRect.setAttribute('height', depH);
+          depRect.setAttribute('height', Math.max(0, baseY - midY));
           depRect.setAttribute('fill', 'url(#blue)');
           depRect.setAttribute('rx','3');
           depRect.setAttribute('opacity','0.92');
@@ -686,7 +692,7 @@
 
         const linePts = lineYears.map((yr, idx)=>{
           const x = (yr - 1) * yearSpacing;
-          const y = ih - (ih * (lineBalances[idx]/maxY));
+          const y = yScale(lineBalances[idx]);
           return { x, y };
         });
 
