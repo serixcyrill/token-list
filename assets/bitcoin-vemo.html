@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vemo Bitcoin Erlebnis</title>
+  <style>
+    :root {
+      --bg: #050816;
+      --panel: rgba(16, 24, 40, 0.8);
+      --glow: #22c55e;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --card: rgba(148, 163, 184, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 20%, rgba(34, 197, 94, 0.2), transparent 35%),
+        radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.15), transparent 30%),
+        linear-gradient(135deg, #0b1222 0%, #050816 60%, #050816 100%);
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px 48px;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+      opacity: 0.4;
+    }
+
+    .app-shell {
+      position: relative;
+      width: min(1100px, 100%);
+      z-index: 1;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #86efac;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(120deg, rgba(34, 197, 94, 0.15), rgba(14, 165, 233, 0.15));
+      filter: blur(24px);
+      z-index: 0;
+      opacity: 0.8;
+    }
+
+    .card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .pill.positive {
+      color: #86efac;
+      border-color: rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .pill.negative {
+      color: #fca5a5;
+      border-color: rgba(248, 113, 113, 0.45);
+      background: rgba(248, 113, 113, 0.08);
+    }
+
+    .price {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 8px 0 6px;
+    }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .input-group label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    input,
+    select,
+    button {
+      font: inherit;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--glow);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
+    }
+
+    .direction-toggle {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .toggle-btn {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 700;
+    }
+
+    .toggle-btn.active {
+      border-color: rgba(34, 197, 94, 0.6);
+      background: rgba(34, 197, 94, 0.14);
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.18);
+      color: #86efac;
+    }
+
+    .primary-btn,
+    .ghost-btn {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.12s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .primary-btn {
+      background: linear-gradient(120deg, #22c55e, #16a34a);
+      color: #052e16;
+      box-shadow: 0 16px 45px rgba(34, 197, 94, 0.35);
+      letter-spacing: 0.01em;
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .primary-btn:not(:disabled):active {
+      transform: translateY(1px);
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .result-box {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      min-height: 42px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 220px;
+      margin-top: 8px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .chart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .status {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--glow);
+      box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.15);
+    }
+
+    .muted {
+      margin-top: 16px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 680px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .direction-toggle {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <main class="app-shell">
+    <header class="header">
+      <div class="title">
+        <span class="badge">Vemo</span>
+        <div>
+          <h1>Bitcoin Live Erlebnis</h1>
+          <div class="subtitle">Konvertiere BTC ↔ EUR, beobachte den Markt und feiere die Kurve.</div>
+        </div>
+      </div>
+      <button id="refresh" class="ghost-btn" type="button">↻ Frische Daten laden</button>
+    </header>
+
+    <section class="card-grid" aria-label="BTC Karten">
+      <article class="card" aria-label="Preisblock">
+        <div class="pill" id="changeBadge">24h Veränderung lädt …</div>
+        <div class="price" id="price">–</div>
+        <div class="subtitle">Letztes Update: <span id="updated">–</span></div>
+        <div class="meta-row">
+          <div>
+            <div class="label">24h Hoch</div>
+            <div class="value" id="high">–</div>
+          </div>
+          <div>
+            <div class="label">24h Tief</div>
+            <div class="value" id="low">–</div>
+          </div>
+          <div>
+            <div class="label">Volumen 24h</div>
+            <div class="value" id="volume">–</div>
+          </div>
+          <div>
+            <div class="label">Marktkapitalisierung</div>
+            <div class="value" id="marketcap">–</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" aria-label="Converter">
+        <div class="pill">Konverter</div>
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="amount">Betrag</label>
+            <input id="amount" type="number" min="0" step="0.00000001" value="1" />
+          </div>
+          <div class="input-group">
+            <label>Richtung</label>
+            <div class="direction-toggle" role="group" aria-label="Richtung wechseln">
+              <button class="toggle-btn active" data-direction="btc-eur" type="button">BTC → EUR</button>
+              <button class="toggle-btn" data-direction="eur-btc" type="button">EUR → BTC</button>
+            </div>
+            <select id="direction" hidden>
+              <option value="btc-eur" selected>BTC zu EUR</option>
+              <option value="eur-btc">EUR zu BTC</option>
+            </select>
+          </div>
+        </div>
+        <button class="primary-btn" id="convertButton" type="button" disabled>Betrag umrechnen</button>
+        <div id="result" class="result-box">Warte auf Live-Preis …</div>
+        <div class="status"><span class="dot" aria-hidden="true"></span><span id="statusText">Lädt Daten von CoinGecko …</span></div>
+      </article>
+    </section>
+
+    <section class="card" aria-label="Performance und Sparkline">
+      <div class="pill">7 Tage Sparkline</div>
+      <div class="chart-wrap">
+        <canvas id="sparkline" width="900" height="220"></canvas>
+      </div>
+      <div class="chart-footer">
+        <span id="sparklineInfo">Lade Verlauf …</span>
+        <span id="sparklineRange">–</span>
+      </div>
+    </section>
+
+    <p class="muted">
+      Quelle: CoinGecko Simple Price &amp; Markets API. Keine Garantie auf Richtigkeit. Keine Empfehlung, keine Anlageberatung,
+      keine Finanzdienstleistung. UI ist clientseitig, bitte Cache und API-Limits beachten.
+    </p>
+  </main>
+
+  <script>
+    const priceElement = document.getElementById('price');
+    const changeBadge = document.getElementById('changeBadge');
+    const updatedElement = document.getElementById('updated');
+    const highElement = document.getElementById('high');
+    const lowElement = document.getElementById('low');
+    const volumeElement = document.getElementById('volume');
+    const marketcapElement = document.getElementById('marketcap');
+    const statusText = document.getElementById('statusText');
+    const resultElement = document.getElementById('result');
+    const amountInput = document.getElementById('amount');
+    const directionSelect = document.getElementById('direction');
+    const toggleButtons = document.querySelectorAll('.toggle-btn');
+    const convertButton = document.getElementById('convertButton');
+    const refreshButton = document.getElementById('refresh');
+    const sparklineCanvas = document.getElementById('sparkline');
+    const sparklineInfo = document.getElementById('sparklineInfo');
+    const sparklineRange = document.getElementById('sparklineRange');
+
+    let btcEurRate = null;
+    let lastPrices = [];
+
+    const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const btc = (value) => Number(value).toFixed(8);
+
+    function setDirection(direction) {
+      directionSelect.value = direction;
+      toggleButtons.forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.direction === direction);
+      });
+      convert();
+    }
+
+    toggleButtons.forEach((btn) => {
+      btn.addEventListener('click', () => setDirection(btn.dataset.direction));
+    });
+
+    amountInput.addEventListener('input', () => convert());
+    convertButton.addEventListener('click', () => convert());
+    refreshButton.addEventListener('click', () => loadData(true));
+
+    function setBadge(change) {
+      const rounded = change.toFixed(2);
+      changeBadge.textContent = `${rounded}% in 24h`;
+      changeBadge.classList.remove('positive', 'negative');
+      if (change > 0) changeBadge.classList.add('positive');
+      if (change < 0) changeBadge.classList.add('negative');
+    }
+
+    function convert() {
+      if (!btcEurRate) {
+        resultElement.textContent = 'Kein Preis geladen.';
+        return;
+      }
+
+      const amount = Number(amountInput.value);
+      if (Number.isNaN(amount) || amount < 0) {
+        resultElement.textContent = 'Bitte einen gültigen Betrag eingeben.';
+        return;
+      }
+
+      const direction = directionSelect.value;
+      if (direction === 'btc-eur') {
+        const eur = amount * btcEurRate;
+        resultElement.textContent = `${amount} BTC ≈ ${euro(eur)} EUR.`;
+      } else {
+        const btcValue = amount / btcEurRate;
+        resultElement.textContent = `${euro(amount)} EUR ≈ ${btc(btcValue)} BTC.`;
+      }
+    }
+
+    function drawSparkline(points) {
+      const ctx = sparklineCanvas.getContext('2d');
+      const width = sparklineCanvas.width;
+      const height = sparklineCanvas.height;
+      ctx.clearRect(0, 0, width, height);
+
+      if (!points || !points.length) return;
+
+      const values = points.map((p) => p[1]);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const range = max - min || 1;
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, 'rgba(34, 197, 94, 0.35)');
+      gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+
+      ctx.beginPath();
+      points.forEach((p, idx) => {
+        const x = (idx / (points.length - 1)) * width;
+        const y = height - ((p[1] - min) / range) * height;
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    }
+
+    async function loadData(manual = false) {
+      statusText.textContent = manual ? 'Aktualisiere …' : 'Lädt Daten von CoinGecko …';
+      convertButton.disabled = true;
+
+      try {
+        const [marketRes, chartRes] = await Promise.all([
+          fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=bitcoin&sparkline=false'),
+          fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=hourly'),
+        ]);
+
+        if (!marketRes.ok || !chartRes.ok) {
+          throw new Error(`API Fehler: ${marketRes.status} / ${chartRes.status}`);
+        }
+
+        const [market] = await marketRes.json();
+        const chart = await chartRes.json();
+
+        btcEurRate = market.current_price;
+        lastPrices = chart.prices || [];
+
+        priceElement.textContent = `€ ${euro(btcEurRate)}`;
+        updatedElement.textContent = new Date(market.last_updated).toLocaleString('de-DE');
+        setBadge(market.price_change_percentage_24h ?? 0);
+        highElement.textContent = `€ ${euro(market.high_24h)}`;
+        lowElement.textContent = `€ ${euro(market.low_24h)}`;
+        volumeElement.textContent = `€ ${euro(market.total_volume)}`;
+        marketcapElement.textContent = `€ ${euro(market.market_cap)}`;
+
+        sparklineInfo.textContent = 'Stündliche Daten (7 Tage)';
+        if (lastPrices.length > 1) {
+          const first = new Date(lastPrices[0][0]).toLocaleDateString('de-DE');
+          const last = new Date(lastPrices[lastPrices.length - 1][0]).toLocaleDateString('de-DE');
+          sparklineRange.textContent = `${first} – ${last}`;
+        } else {
+          sparklineRange.textContent = 'Keine Zeitreihe gefunden';
+        }
+
+        drawSparkline(lastPrices);
+        convert();
+        statusText.textContent = 'Live Preis geladen.';
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = 'Fehler beim Laden. Bitte später erneut versuchen.';
+        resultElement.textContent = 'Keine Daten verfügbar.';
+      } finally {
+        convertButton.disabled = !btcEurRate;
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
