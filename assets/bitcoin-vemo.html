@@ -528,8 +528,14 @@
 
       try {
         const [marketRes, chartRes] = await Promise.all([
-          fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=bitcoin&sparkline=false'),
-          fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=hourly'),
+          fetch(
+            'https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=bitcoin&sparkline=false',
+            { headers: { accept: 'application/json' } }
+          ),
+          fetch(
+            'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=hourly',
+            { headers: { accept: 'application/json' } }
+          ),
         ]);
 
         if (!marketRes.ok || !chartRes.ok) {
@@ -564,10 +570,48 @@
         statusText.textContent = 'Live Preis geladen.';
       } catch (err) {
         console.error(err);
-        statusText.textContent = 'Fehler beim Laden. Bitte später erneut versuchen.';
-        resultElement.textContent = 'Keine Daten verfügbar.';
+        statusText.textContent = 'Live-Preis konnte nicht geladen werden. Versuche Fallback …';
+        await loadFallback();
       } finally {
         convertButton.disabled = !btcEurRate;
+      }
+    }
+
+    async function loadFallback() {
+      try {
+        const res = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_last_updated_at=true&include_24hr_change=true',
+          { headers: { accept: 'application/json' } }
+        );
+
+        if (!res.ok) {
+          throw new Error(`Fallback Fehler: ${res.status}`);
+        }
+
+        const data = await res.json();
+        const fallback = data.bitcoin;
+        btcEurRate = fallback?.eur ?? null;
+        lastPrices = [];
+
+        priceElement.textContent = btcEurRate ? `€ ${euro(btcEurRate)}` : '–';
+        const updated = fallback?.last_updated_at
+          ? new Date(fallback.last_updated_at * 1000).toLocaleString('de-DE')
+          : 'Keine Zeitangabe';
+        updatedElement.textContent = updated;
+        setBadge(fallback?.eur_24h_change ?? 0);
+        highElement.textContent = '–';
+        lowElement.textContent = '–';
+        volumeElement.textContent = '–';
+        marketcapElement.textContent = '–';
+        sparklineInfo.textContent = 'Fallback Preis ohne Zeitreihe';
+        sparklineRange.textContent = 'Keine Zeitreihe geladen';
+        drawSparkline([]);
+        convert();
+        statusText.textContent = 'Einfacher Preis geladen (Fallback).';
+      } catch (fallbackError) {
+        console.error(fallbackError);
+        statusText.textContent = 'Keine Daten verfügbar. Bitte später erneut versuchen.';
+        resultElement.textContent = 'Keine Daten verfügbar.';
       }
     }
 
