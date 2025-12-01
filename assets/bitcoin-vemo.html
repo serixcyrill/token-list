@@ -527,34 +527,37 @@
       convertButton.disabled = true;
 
       try {
-        const [marketRes, chartRes] = await Promise.all([
-          fetch(
-            'https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=bitcoin&sparkline=false',
-            { headers: { accept: 'application/json' } }
-          ),
-          fetch(
-            'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=hourly',
-            { headers: { accept: 'application/json' } }
-          ),
-        ]);
+        const res = await fetch(
+          'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true',
+          { headers: { accept: 'application/json' } }
+        );
 
-        if (!marketRes.ok || !chartRes.ok) {
-          throw new Error(`API Fehler: ${marketRes.status} / ${chartRes.status}`);
+        if (!res.ok) {
+          throw new Error(`API Fehler: ${res.status}`);
         }
 
-        const [market] = await marketRes.json();
-        const chart = await chartRes.json();
+        const data = await res.json();
+        const market = data?.market_data;
+        const spark = data?.market_data?.sparkline_in_7d?.price || [];
 
-        btcEurRate = market.current_price;
-        lastPrices = chart.prices || [];
+        if (!market?.current_price?.eur) {
+          throw new Error('API fehlte current_price, starte Fallback.');
+        }
+
+        btcEurRate = market.current_price.eur;
+        lastPrices = Array.isArray(spark)
+          ? spark.map((value, idx) => [Date.now() - (spark.length - idx) * 3600_000, value])
+          : [];
 
         priceElement.textContent = `€ ${euro(btcEurRate)}`;
-        updatedElement.textContent = new Date(market.last_updated).toLocaleString('de-DE');
+        updatedElement.textContent = data?.last_updated
+          ? new Date(data.last_updated).toLocaleString('de-DE')
+          : '–';
         setBadge(market.price_change_percentage_24h ?? 0);
-        highElement.textContent = `€ ${euro(market.high_24h)}`;
-        lowElement.textContent = `€ ${euro(market.low_24h)}`;
-        volumeElement.textContent = `€ ${euro(market.total_volume)}`;
-        marketcapElement.textContent = `€ ${euro(market.market_cap)}`;
+        highElement.textContent = market.high_24h?.eur ? `€ ${euro(market.high_24h.eur)}` : '–';
+        lowElement.textContent = market.low_24h?.eur ? `€ ${euro(market.low_24h.eur)}` : '–';
+        volumeElement.textContent = market.total_volume?.eur ? `€ ${euro(market.total_volume.eur)}` : '–';
+        marketcapElement.textContent = market.market_cap?.eur ? `€ ${euro(market.market_cap.eur)}` : '–';
 
         sparklineInfo.textContent = 'Stündliche Daten (7 Tage)';
         if (lastPrices.length > 1) {
@@ -580,7 +583,7 @@
     async function loadFallback() {
       try {
         const res = await fetch(
-          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_last_updated_at=true&include_24hr_change=true',
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_last_updated_at=true&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true',
           { headers: { accept: 'application/json' } }
         );
 
@@ -601,8 +604,8 @@
         setBadge(fallback?.eur_24h_change ?? 0);
         highElement.textContent = '–';
         lowElement.textContent = '–';
-        volumeElement.textContent = '–';
-        marketcapElement.textContent = '–';
+        volumeElement.textContent = fallback?.eur_24h_vol ? `€ ${euro(fallback.eur_24h_vol)}` : '–';
+        marketcapElement.textContent = fallback?.eur_market_cap ? `€ ${euro(fallback.eur_market_cap)}` : '–';
         sparklineInfo.textContent = 'Fallback Preis ohne Zeitreihe';
         sparklineRange.textContent = 'Keine Zeitreihe geladen';
         drawSparkline([]);
