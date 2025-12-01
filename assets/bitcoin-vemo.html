@@ -538,6 +538,7 @@
     let historyPrices = [];
     let activeRange = '7';
     let historyLoaded = false;
+    let historyLabel = '';
     rangeSlider.disabled = true;
 
     const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -743,7 +744,8 @@
         const last = new Date(windowed[windowed.length - 1][0]).toLocaleDateString('de-DE');
         sparklineRange.textContent = `${first} – ${last}`;
         if (historyPrices.length) {
-          sparklineInfo.textContent = activeRange === 'max' ? 'Volle Historie (täglich)' : `Fenster: ${activeRange} Tage`;
+          const windowLabel = activeRange === 'max' ? 'Gesamte Historie' : `Fenster: ${activeRange} Tage`;
+          sparklineInfo.textContent = historyLabel ? `${historyLabel} · ${windowLabel}` : windowLabel;
           chartTitle.textContent = 'Bitcoin Langfrist-Chart';
           rangeLabel.textContent = rangeSlider.disabled
             ? 'Gesamte Historie sichtbar'
@@ -762,26 +764,50 @@
 
     async function loadHistory(force = false) {
       if (historyLoaded && !force) return;
-      try {
-        const chartRes = await fetch(
-          'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=max&interval=daily',
-          { headers: { accept: 'application/json' } }
-        );
-        if (!chartRes.ok) throw new Error(`Historie Fehler: ${chartRes.status}`);
-        const chartData = await chartRes.json();
-        if (Array.isArray(chartData?.prices) && chartData.prices.length) {
-          historyPrices = chartData.prices.map(([ts, price]) => [ts, price]);
-          historyLoaded = true;
-          rangeSlider.disabled = historyPrices.length < 2 || activeRange === 'max';
-          renderSparkline();
-        }
-      } catch (chartErr) {
-        console.error('Konnte volle Historie nicht laden', chartErr);
-        if (!historyPrices.length) {
-          sparklineInfo.textContent = 'Historische Daten fehlen, nutze 7-Tage-Ansicht';
-          renderSparkline();
+
+      historyLoaded = false;
+      historyPrices = [];
+      historyLabel = '';
+      rangeSlider.disabled = true;
+
+      const sources = [
+        { query: 'days=max&interval=daily', label: 'Volle Historie (täglich)' },
+        { query: 'days=1825&interval=daily', label: 'Letzte 5 Jahre (täglich)' },
+        { query: 'days=365&interval=daily', label: 'Letztes Jahr (täglich)' },
+        { query: 'days=90&interval=hourly', label: 'Letzte 90 Tage (stündlich)' },
+      ];
+
+      let lastError = null;
+
+      for (const source of sources) {
+        try {
+          sparklineInfo.textContent = `Lade ${source.label} …`;
+          const chartRes = await fetch(
+            `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&${source.query}`,
+            { headers: { accept: 'application/json' } }
+          );
+          if (!chartRes.ok) throw new Error(`Historie Fehler: HTTP ${chartRes.status}`);
+          const chartData = await chartRes.json();
+          if (Array.isArray(chartData?.prices) && chartData.prices.length) {
+            historyPrices = chartData.prices.map(([ts, price]) => [ts, price]);
+            historyLoaded = true;
+            historyLabel = source.label;
+            rangeSlider.disabled = historyPrices.length < 2 || activeRange === 'max';
+            renderSparkline();
+            return;
+          }
+          lastError = new Error('Leere Historie erhalten');
+        } catch (chartErr) {
+          console.error('Konnte Historie nicht laden', chartErr);
+          lastError = chartErr;
         }
       }
+
+      historyLoaded = false;
+      historyLabel = '';
+      sparklineInfo.textContent = `Historie nicht verfügbar (${lastError?.message ?? 'unbekannt'}). Nutze 7-Tage-Ansicht.`;
+      rangeSlider.disabled = true;
+      renderSparkline();
     }
 
     async function loadFallback() {
