@@ -126,6 +126,20 @@
       font-size: 13px;
     }
 
+    .legal-note {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .performance-note {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
     .section-meta {
       display: inline-flex;
       align-items: center;
@@ -999,6 +1013,11 @@
       gap: 6px;
     }
 
+    .fund-disclaimer {
+      border-top: 1px solid rgba(17, 24, 39, 0.08);
+      padding-top: 10px;
+    }
+
     .ablauf-shell {
       margin-top: 6px;
       background: linear-gradient(180deg, #ffffff, #f7f9fd);
@@ -1313,9 +1332,10 @@
       <section class="card" id="vorsorge">
         <div class="section-heading">
           <h2 data-editable="true">Vorsorgemantel</h2>
-          <p class="section-sub" data-editable="true">Deine passenden Vorsorgeoptionen auf einen Blick.</p>
+          <p class="section-sub" data-editable="true">Übersicht möglicher Modellstrategien zu Vorsorgeoptionen.</p>
           <span class="section-meta" id="lastUpdateTrigger" data-editable="true">Letztes Update: 12.09.2024</span>
         </div>
+        <p class="legal-note" data-editable="true">Diese Darstellung ist rein informativ und stellt keine Empfehlung im Sinne des FIDLEG dar.</p>
         <div class="vorsorge-grid" id="vorsorgeGrid">
           <!-- Wird über Google Sheet befüllt; Fallback-Daten im JS -->
         </div>
@@ -1323,8 +1343,8 @@
 
       <section class="card" id="portfolios">
         <div class="section-heading">
-          <h2 data-editable="true">Portfolios</h2>
-          <p class="section-sub" data-editable="true">Wähle einen Portfolio-Typ, um Details zu sehen.</p>
+          <h2 data-editable="true">Modellübersicht</h2>
+          <p class="section-sub" data-editable="true">Modellbasierte Betrachtung verschiedener Gewichtungen.</p>
         </div>
         <div class="tab-buttons">
           <button type="button" class="active" data-portfolio-tab="factor">Factor</button>
@@ -1343,8 +1363,8 @@
       <section class="card" id="ablaufmanagement">
         <div class="section-heading">
           <h2 data-editable="true">Ablaufmanagement</h2>
-          <p class="section-sub" data-editable="true">Planung über die nächsten zehn Jahre nach Assetklassen.</p>
-          <span class="section-meta" data-editable="true">Strategie wählen: konservativ / mittel / aggressiv</span>
+          <p class="section-sub" data-editable="true">Modellbasierte Betrachtung verschiedener Gewichtungen über die kommenden Altersjahre.</p>
+          <span class="section-meta" data-editable="true">Modellübersicht: konservativ / mittel / aggressiv</span>
         </div>
         <div class="mode-tabs" aria-label="Risikoprofil wählen">
           <button type="button" class="active" data-risk="konservativ">Konservativ</button>
@@ -1361,7 +1381,7 @@
       <section class="card" id="advisorSection">
         <div class="section-heading">
           <h2 data-editable="true">Telefontermin mit Honorarberater:in</h2>
-          <p class="section-sub" data-editable="true">Buche einen Termin mit deinem Honorarberater, wenn du Fragen zu deiner Altersvorsorge hast oder Unterstützung brauchst. Bitte wähle den Berater, mit dem du den Anlageberatungsvertrag abgeschlossen hast.</p>
+          <p class="section-sub" data-editable="true">Terminvereinbarung mit der zuständigen Honorarberatung für Rückfragen zur Altersvorsorge oder Unterstützung. Bitte den Berater wählen, mit dem der Anlageberatungsvertrag abgeschlossen wurde.</p>
           <span class="section-meta" data-editable="true">Direkt buchbar</span>
         </div>
         <div class="advisor-grid">
@@ -1375,7 +1395,7 @@
               <div class="advisor-meta">
                 <h4 data-editable="true">Diego Berchtold</h4>
                 <span class="role" data-editable="true">Honorarberater</span>
-                <p data-editable="true">Berät dich persönlich zu Vorsorge Mantel, Portfolios und Ablaufmanagement.</p>
+                <p data-editable="true">Berät rund um Vorsorgemantel, Modellübersichten und Ablaufmanagement.</p>
               </div>
             </div>
             <div class="advisor-qualifications">
@@ -1407,7 +1427,7 @@
               <div class="advisor-meta">
                 <h4 data-editable="true">Lara Steiner</h4>
                 <span class="role" data-editable="true">Senior Honorarberaterin</span>
-                <p data-editable="true">Spezialisiert auf nachhaltige Portfolios und steueroptimierte Auszahlungspfade.</p>
+                <p data-editable="true">Spezialisiert auf nachhaltige Modellübersichten und steueroptimierte Auszahlungspfade.</p>
               </div>
             </div>
             <div class="advisor-qualifications">
@@ -1461,7 +1481,7 @@
     </main>
     <footer>
       <div class="footer-card">
-        <p data-editable="true"><strong>Haftungsausschluss:</strong> Diese Übersicht stellt keine Anlageberatung dar und dient ausschließlich Informationszwecken.</p>
+        <p data-editable="true"><strong>Haftungsausschluss:</strong> Diese Übersicht stellt keine Anlageberatung dar und dient ausschließlich Informationszwecken. Diese Modelle ersetzen keine persönliche Beratung. Entscheide basieren nicht auf individuellen Profilen.</p>
         <p data-editable="true">Die Inhalte richten sich nur an berechtigte Personen und dürfen ohne Zustimmung nicht weitergegeben werden.</p>
         <div class="info-panel">
           <div>
@@ -1662,28 +1682,28 @@
 
     const defaultPortfolioMeta = {
       factor: {
-        title: 'Faktorportfolio',
+        title: 'Faktor-Modellübersicht',
         summary: '',
         renditePa: '',
         seit: '',
         info: '',
       },
       marketcap: {
-        title: 'Marketcap Mix',
+        title: 'Marketcap-Modellübersicht',
         summary: '',
         renditePa: '',
         seit: '',
         info: '',
       },
       bip: {
-        title: 'BIP Allokation',
+        title: 'BIP-Modellübersicht',
         summary: '',
         renditePa: '',
         seit: '',
         info: '',
       },
       obligationen: {
-        title: 'Obligationen Fokus',
+        title: 'Obligationen-Modellübersicht',
         summary: '',
         renditePa: '',
         seit: '',
@@ -1695,7 +1715,7 @@
       factor: [
         {
           title: 'Faktor Plus Global',
-          desc: 'Stark diversifiziertes Faktorportfolio mit Fokus auf Qualität und niedrige Volatilität.',
+          desc: 'Stark diversifizierter Faktoransatz mit Fokus auf Qualität und niedrige Volatilität.',
           fondsvolumen: 'CHF 1.2 Mrd.',
           positionen: '120 Positionen',
           auflageSeit: 'Auflage seit 2015',
@@ -1890,7 +1910,7 @@
         key: 'diego',
         name: 'Diego Berchtold',
         role: 'Honorarberater',
-        description: 'Berät dich persönlich zu Vorsorge Mantel, Portfolios und Ablaufmanagement.',
+      description: 'Berät zu Vorsorgemantel, Modellübersichten und Ablaufmanagement.',
         educationText: 'Professional/academic degree(s); Bachelor-Abschluss: Betriebsökonomie; VBV - Versicherung & Vorsorge',
         codeOfConductText: 'Mendo – FIDLEG Kompakt – Kenntnisnachweis Verhaltensregeln',
         terminLink: 'https://calendly.com/diego-vemo/telefontermin',
@@ -1901,7 +1921,7 @@
         key: 'lara',
         name: 'Lara Steiner',
         role: 'Senior Honorarberaterin',
-        description: 'Spezialisiert auf nachhaltige Portfolios und steueroptimierte Auszahlungspfade.',
+      description: 'Spezialisiert auf nachhaltige Modellübersichten und steueroptimierte Auszahlungspfade.',
         educationText: 'Master: Finance & Risk Management; CAS Sustainable Finance',
         codeOfConductText: 'MIFID & FIDLEG Refresh 2024',
         terminLink: 'https://calendly.com/diego-vemo/telefontermin',
@@ -3009,6 +3029,10 @@
       centerLabel.appendChild(topLabel);
       centerLabel.appendChild(mainLabel);
       centerLabel.appendChild(subLabel);
+      const centerNote = document.createElement('div');
+      centerNote.className = 'performance-note';
+      centerNote.textContent = 'Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.';
+      centerLabel.appendChild(centerNote);
 
       chartVisual.appendChild(canvas);
       chartVisual.appendChild(centerLabel);
@@ -3072,7 +3096,7 @@
         returns.className = 'meta';
         const five = document.createElement('span');
         const displayR5 = formatReturnLabel(item.returns5, 5);
-        five.textContent = displayR5;
+        five.innerHTML = `${displayR5}<span class="performance-note">Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.</span>`;
         if (item.__idx >= 0) {
           bindEditableSync(five, type, item.__idx, 'returns5');
         } else {
@@ -3082,7 +3106,7 @@
         }
         const ten = document.createElement('span');
         const displayR10 = formatReturnLabel(item.returns10, 10);
-        ten.textContent = displayR10;
+        ten.innerHTML = `${displayR10}<span class="performance-note">Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.</span>`;
         if (item.__idx >= 0) {
           bindEditableSync(ten, type, item.__idx, 'returns10');
         } else {
@@ -3095,7 +3119,7 @@
 
         const since = document.createElement('span');
         since.className = 'section-sub';
-        since.textContent = item.since;
+        since.innerHTML = `${item.since}<span class="performance-note">Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.</span>`;
         if (item.__idx >= 0) {
           bindEditableSync(since, type, item.__idx, 'since');
         } else {
@@ -3202,6 +3226,11 @@
           fundActionRow.appendChild(factsheetBtn);
         }
 
+        const fundDisclaimer = document.createElement('p');
+        fundDisclaimer.className = 'fund-disclaimer legal-note';
+        fundDisclaimer.textContent =
+          'Hinweis: Diese Fondsbeschreibung dient ausschliesslich Informationszwecken und ist keine Empfehlung zum Kauf oder Verkauf. Keine Anlageberatung nach FIDLEG.';
+
         const actions = document.createElement('div');
         actions.style.display = 'flex';
         actions.style.justifyContent = 'space-between';
@@ -3224,12 +3253,19 @@
         fund.appendChild(allocationRow);
         fund.appendChild(fundActionRow);
         fund.appendChild(detailsWrapper);
+        fund.appendChild(fundDisclaimer);
         fund.appendChild(actions);
         fundsWrapper.appendChild(fund);
       });
 
+      const portfolioLegal = document.createElement('p');
+      portfolioLegal.className = 'legal-note';
+      portfolioLegal.textContent =
+        'Modellhafte Strategieübersicht. Keine Empfehlung, keine Beratung, keine persönliche Eignungsprüfung.';
+
       content.appendChild(summary);
       content.appendChild(fundsWrapper);
+      content.appendChild(portfolioLegal);
       shell.appendChild(toggle);
       shell.appendChild(content);
       list.appendChild(shell);
