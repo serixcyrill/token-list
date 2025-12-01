@@ -237,21 +237,6 @@
     #freiheit #chart{ width:100%; height:360px; }
     #freiheit #chart .bar-stack{ transform-origin: bottom; transform-box: fill-box; transition: transform .9s cubic-bezier(.22,.61,.36,1); }
 
-    #freiheit button{
-      margin-top:12px;
-      border:none;
-      background:linear-gradient(90deg,#7ed957,#60c44f);
-      color:#ffffff;
-      font-weight:800;
-      font-size:15px;
-      padding:15px 16px;
-      border-radius:14px;
-      cursor:pointer;
-      box-shadow:0 12px 28px rgba(126,217,87,.28), 0 10px 24px rgba(91,124,250,.16);
-      transition: transform .12s ease, box-shadow .2s ease;
-    }
-    #freiheit button:hover{ transform:translateY(-1px); box-shadow:0 14px 30px rgba(126,217,87,.28), 0 12px 28px rgba(91,124,250,.24); }
-    #freiheit button:active{ transform:translateY(1px); }
 
     #freiheit .empty{ color:var(--muted); text-align:center; padding:18px; border:1px dashed var(--ring); border-radius:12px; background:rgba(255,255,255,.36); }
 
@@ -265,7 +250,6 @@
       #freiheit .form-grid{ gap:14px; }
       #freiheit label{ font-size:13px; margin-bottom:4px; }
       #freiheit .input, #freiheit select.input{ padding:13px 14px; font-size:15px; }
-      #freiheit button{ margin-top:10px; padding:15px; border-radius:14px; }
       #freiheit .kpis{ grid-template-columns:1fr; gap:12px; }
       #freiheit .kpi{ min-height:86px; padding:12px 14px; }
       #freiheit .kpi-value{ font-size:20px; }
@@ -290,10 +274,6 @@
       <main>
         <div class="grid cols-2">
           <section class="panel">
-            <div class="steps">
-              <div class="pill"><span class="index">1</span> Freiheit definieren</div>
-              <div class="pill"><span class="index">2</span> Weg dorthin planen</div>
-            </div>
             <div class="form-grid cols-2">
               <div>
                 <label for="ausgaben">Ziel-Monatslohn</label>
@@ -338,7 +318,6 @@
                 </div>
               </div>
             </div>
-            <button id="calc">Berechnen</button>
           </section>
 
           <section class="panel" id="results-panel">
@@ -373,7 +352,6 @@
                 <span class="dot" style="background:var(--accent);"></span> Zinserträge
                 <span class="dot" style="background:var(--accent-2);"></span> Kapitalbestand
                 <span class="dot" style="background:#ef4444;"></span> Kapitalentnahme
-                <span class="dot" style="background:#0ea5e9;"></span> Kapitalverlauf
               </div>
             </div>
             <svg id="chart" viewBox="0 0 1080 360" aria-label="Kapitalverlauf"></svg>
@@ -401,8 +379,7 @@
         deposits: document.getElementById('einzahlungen'),
         interest: document.getElementById('zinsen'),
         chart: document.getElementById('chart'),
-        statusMeta: document.getElementById('status-meta'),
-        calc: document.getElementById('calc')
+        statusMeta: document.getElementById('status-meta')
       };
 
       const STORAGE_KEY = 'freiheit-rechner-v1';
@@ -460,9 +437,6 @@
           durationYears: 10
         });
 
-        const lineYears = projection.years.concat(withdrawalPhase.years);
-        const lineBalances = projection.balances.concat(withdrawalPhase.balances);
-
         const barYears = projection.years.concat(withdrawalPhase.years);
         const baseParts = projection.balances.map((b, i)=> Math.max(0, b - projection.interests[i]))
           .concat(withdrawalPhase.balances.map((b, i)=> Math.max(0, b - withdrawalPhase.interests[i] + withdrawalPhase.withdrawals[i])));
@@ -475,8 +449,6 @@
           baseParts,
           interests: interestParts,
           withdrawals: withdrawalParts,
-          lineYears,
-          lineBalances,
           withdrawalStartYear: years,
           withdrawalDuration: withdrawalPhase.duration
         });
@@ -554,7 +526,7 @@
         lastValues.interest = interest;
       }
 
-      function renderChart({ barYears, baseParts, interests, withdrawals, lineYears, lineBalances, withdrawalStartYear, withdrawalDuration }){
+      function renderChart({ barYears, baseParts, interests, withdrawals, withdrawalStartYear, withdrawalDuration }){
         const svg = el.chart;
         svg.innerHTML = '';
 
@@ -580,10 +552,8 @@
         svg.appendChild(defs);
 
         const stackHeights = barYears.map((_,i)=> baseParts[i] + interests[i] + withdrawals[i]);
-        const maxBalance = Math.max(...lineBalances, 1);
-        const minBalance = Math.min(...lineBalances, 0);
-        const chartMax = Math.max(...stackHeights, maxBalance, 1);
-        const chartMin = Math.min(0, minBalance);
+        const chartMax = Math.max(...stackHeights, 1);
+        const chartMin = 0;
         const chartRange = Math.max(1, (chartMax - chartMin) * 1.08);
         const yScale = (val)=> ih - ((val - chartMin) / chartRange) * ih;
         const steps = 5;
@@ -623,7 +593,7 @@
           g.appendChild(lbl);
         }
 
-        const totalYears = Math.max((lineYears[lineYears.length-1] || 0), withdrawalStartYear + withdrawalDuration);
+        const totalYears = withdrawalStartYear + withdrawalDuration;
         const yearSpacing = totalYears > 1 ? iw / (totalYears - 1) : iw;
 
         const n = barYears.length;
@@ -677,13 +647,12 @@
           if(withdrawals[i] > 0){
             const drawRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
             drawRect.setAttribute('x', 0);
-            drawRect.setAttribute('y', intTop);
+            drawRect.setAttribute('y', drawTop);
             drawRect.setAttribute('width', barW);
-            drawRect.setAttribute('height', Math.max(0, drawTop - intTop));
+            drawRect.setAttribute('height', Math.max(0, intTop - drawTop));
             drawRect.setAttribute('fill', 'url(#red)');
             drawRect.setAttribute('rx','3');
             drawRect.setAttribute('opacity','0.95');
-            drawRect.setAttribute('transform', `translate(0, ${(intTop - drawTop)}) scale(1,-1)`);
             stack.appendChild(drawRect);
           }
 
@@ -720,31 +689,6 @@
           overlay.setAttribute('stroke','rgba(14,165,233,0.18)');
           overlay.setAttribute('stroke-dasharray','6 6');
           svg.appendChild(overlay);
-        }
-
-        const lineGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-        lineGroup.setAttribute('transform', `translate(${pad.l},${pad.t})`);
-        svg.appendChild(lineGroup);
-
-        const linePts = lineYears.map((yr, idx)=>{
-          const x = (yr - 1) * yearSpacing;
-          const y = yScale(lineBalances[idx]);
-          return { x, y };
-        });
-
-        for(let i=1; i<linePts.length; i++){
-          const prev = linePts[i-1];
-          const cur = linePts[i];
-          const delta = lineBalances[i] - lineBalances[i-1];
-          const stroke = delta > 1e-6 ? '#16a34a' : delta < -1e-6 ? '#ef4444' : '#94a3b8';
-          const seg = document.createElementNS('http://www.w3.org/2000/svg','path');
-          seg.setAttribute('d', `M${prev.x},${prev.y} L${cur.x},${cur.y}`);
-          seg.setAttribute('fill','none');
-          seg.setAttribute('stroke', stroke);
-          seg.setAttribute('stroke-width','3');
-          seg.setAttribute('stroke-linecap','round');
-          seg.setAttribute('opacity','0.92');
-          lineGroup.appendChild(seg);
         }
 
         const xLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
@@ -806,7 +750,6 @@
           input.addEventListener('input', ()=> calculateDebounced());
           input.addEventListener('blur', ()=> calculate());
         });
-        el.calc.addEventListener('click', ()=> calculate());
       }
 
       const calculateDebounced = debounce(calculate, 160);
