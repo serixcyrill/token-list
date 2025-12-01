@@ -10,14 +10,14 @@
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <style>
     :root {
-      --primary: #6248f6;
-      --primary-dark: #5138dd;
-      --background: #f7f7fb;
+      --primary: #5d2dfc;
+      --primary-dark: #3f1db1;
+      --background: radial-gradient(circle at 20% 20%, #f4f1ff 0, #f7f8fb 50%, #eef2ff 100%);
       --border: #e6e7ec;
       --text: #0f172a;
       --muted: #64748b;
       --card: #ffffff;
-      --orange: #ff9b48;
+      --orange: #ff8c3a;
     }
 
     * {
@@ -39,27 +39,13 @@
     .page {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 24px 16px 64px;
-    }
-
-    .breadcrumbs {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-
-    .breadcrumbs span:last-child {
-      color: var(--text);
-      font-weight: 600;
+      padding: 32px 16px 72px;
     }
 
     h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
-      font-weight: 700;
+      margin: 0 0 8px;
+      font-size: 30px;
+      font-weight: 800;
       letter-spacing: -0.01em;
     }
 
@@ -68,6 +54,7 @@
       font-size: 16px;
       line-height: 1.6;
       margin-bottom: 20px;
+      max-width: 760px;
     }
 
     .card {
@@ -302,9 +289,8 @@
 </head>
 <body>
   <div class="page">
-    <div class="breadcrumbs"><span>Home</span><span>/</span><span>Rechner</span><span>/</span><span>Finanzielle Freiheit</span></div>
-    <h1>Finanzielle Freiheit Rechner</h1>
-    <p class="lead">Wieviel brauchst du für deine finanzielle Freiheit? Mit unserem Rechner kannst du das nötige Kapital und deine Sparrate für deine zukünftige Unabhängigkeit errechnen. Anschließend senden wir dir deinen individuellen Plan zu. So kannst du dir finanzielle Freiheit eigenständig planen.</p>
+    <h1>Finanzielle Freiheit im Vemo Style</h1>
+    <p class="lead">Stell die Parameter so ein, wie es für dich passt, und sieh sofort, welche Sparrate und welches Zielkapital du für deine persönliche Freiheit benötigst. Alles ohne Steuerabzüge, klar für die Schweiz kalkuliert.</p>
 
     <div class="card">
       <div class="card-header">💰 Finanzielle Freiheit berechnen</div>
@@ -326,11 +312,6 @@
         <div class="field">
           <label>Inflation <span class="info">?</span></label>
           <input id="inflation" class="input" type="number" inputmode="decimal" value="2" min="0" step="0.1" />
-        </div>
-        <div class="field">
-          <label>Steuersatz der Kapitalerträge? <span class="info">?</span></label>
-          <input id="tax-rate" class="input" type="number" inputmode="decimal" value="0" min="0" step="0.1" />
-          <span class="muted">Keine Steuerabzüge (Schweizer Kalkulation)</span>
         </div>
         <div class="field">
           <label>Kapitalverzehr? <span class="info">?</span></label>
@@ -418,7 +399,6 @@
       const monthlyNeed = parseNumber(document.getElementById('monthly-need').value);
       const returnRate = parseNumber(document.getElementById('return-rate').value) / 100;
       const inflation = parseNumber(document.getElementById('inflation').value) / 100;
-      const taxRate = 0; // schweiz, keine steuern
       const drawdown = document.getElementById('drawdown').value === 'ja';
       const currentAge = parseNumber(document.getElementById('current-age').value);
       const retireAge = parseNumber(document.getElementById('retire-age').value);
@@ -427,7 +407,7 @@
 
       const months = Math.round(yearsToFreedom * 12);
       const nominalMonthly = Math.pow(1 + returnRate, 1 / 12) - 1;
-      const realAnnual = ((1 + returnRate * (1 - taxRate)) / (1 + inflation)) - 1;
+      const realAnnual = ((1 + returnRate) / (1 + inflation)) - 1;
       const realMonthly = Math.pow(1 + realAnnual, 1 / 12) - 1;
       const inflationFactor = Math.pow(1 + inflation, yearsToFreedom);
       const futureMonthlyNeed = monthlyNeed * inflationFactor;
@@ -526,7 +506,7 @@
           line: { lineWidth: 3, marker: { enabled: false } }
         },
         series: [
-          { name: 'Zinsen nach Steuern', data: interests, color: '#ff9b48' },
+          { name: 'Zinserträge', data: interests, color: '#ff9b48' },
           { name: 'Einzahlungen', data: contributions, color: '#6248f6' },
           { type: 'line', name: 'Gesamtkapital', data: totals, color: '#1f2937' }
         ],
@@ -541,7 +521,6 @@
       params.set('wunschbetrag', document.getElementById('monthly-need').value);
       params.set('rendite', document.getElementById('return-rate').value);
       params.set('inflation', document.getElementById('inflation').value);
-      params.set('steuer', document.getElementById('tax-rate').value);
       params.set('drawdown', document.getElementById('drawdown').value);
       params.set('alter', document.getElementById('current-age').value);
       params.set('rente', document.getElementById('retire-age').value);
@@ -560,7 +539,6 @@
         'wunschbetrag': 'monthly-need',
         'rendite': 'return-rate',
         'inflation': 'inflation',
-        'steuer': 'tax-rate',
         'drawdown': 'drawdown',
         'alter': 'current-age',
         'rente': 'retire-age',
