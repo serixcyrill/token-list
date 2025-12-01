@@ -313,6 +313,7 @@
       padding: 18px 18px 12px;
       box-shadow: var(--shadow-panel);
       margin-top: 16px;
+      position: relative;
     }
 
     .vemo-btc .chart-meta {
@@ -352,6 +353,19 @@
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 10px;
+    }
+
+    .vemo-btc .chart-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .vemo-btc .chart-hint .dot {
+      box-shadow: none;
     }
 
     .vemo-btc .range-controls {
@@ -406,12 +420,19 @@
 
     .vemo-btc .chart-wrap {
       position: relative;
-      height: 300px;
+      height: 340px;
       margin-top: 6px;
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid var(--border);
       background: linear-gradient(180deg, rgba(15, 23, 42, 0.014), rgba(15, 23, 42, 0.02)), #fff;
+      cursor: grab;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .vemo-btc .chart-wrap:active {
+      cursor: grabbing;
+      box-shadow: 0 12px 26px rgba(91, 124, 250, 0.12);
     }
 
     .vemo-btc canvas {
@@ -434,6 +455,15 @@
       min-width: 160px;
     }
 
+    .vemo-btc .chart-tooltip .muted-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
     .vemo-btc .chart-tooltip strong {
       display: block;
       font-size: 14px;
@@ -451,13 +481,25 @@
       opacity: 0.55;
     }
 
+    .vemo-btc .chart-axis-labels {
+      position: absolute;
+      left: 10px;
+      top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      display: grid;
+      gap: 6px;
+      pointer-events: none;
+    }
+
     .vemo-btc .chart-footer {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       align-items: center;
       margin-top: 10px;
       color: var(--muted);
       font-size: 13px;
+      gap: 8px;
     }
 
     .vemo-btc .chart-legend {
@@ -476,6 +518,25 @@
       background: linear-gradient(180deg, #7ed957, #5b7cfa);
       display: inline-block;
       margin-right: 6px;
+    }
+
+    .vemo-btc .timeline-bar {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      background: rgba(255, 255, 255, 0.72);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .vemo-btc .timeline-bar strong {
+      color: var(--text);
+      font-size: 13px;
     }
 
     .vemo-btc .status {
@@ -614,6 +675,11 @@
         </div>
       </div>
 
+      <div class="chart-hint">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Scroll oder klicke &amp; ziehe im Chart zum Pannen · Shift+Scroll zoomt den Ausschnitt.</span>
+      </div>
+
       <div class="chart-meta">
         <div class="stat-chip">
           <span class="label">Startwert</span>
@@ -635,10 +701,25 @@
           <span class="value" id="windowRange">–</span>
           <small id="windowRangeLabel" class="label"></small>
         </div>
+        <div class="stat-chip">
+          <span class="label">Durchschnitt</span>
+          <span class="value" id="windowAverage">–</span>
+          <small class="label">arithmetisch</small>
+        </div>
+        <div class="stat-chip">
+          <span class="label">Dynamik</span>
+          <span class="value" id="windowVolatility">–</span>
+          <small id="volatilityLabel" class="label">Bandbreite</small>
+        </div>
       </div>
 
       <div class="chart-wrap">
         <div class="chart-grid" aria-hidden="true"></div>
+        <div class="chart-axis-labels" aria-hidden="true">
+          <span id="axisMax">–</span>
+          <span id="axisMid">–</span>
+          <span id="axisMin">–</span>
+        </div>
         <canvas id="sparkline" width="900" height="220"></canvas>
         <div class="chart-tooltip" id="chartTooltip"></div>
       </div>
@@ -651,6 +732,12 @@
         <span><span class="legend-dot"></span>BTC Preis</span>
         <span>Hover/Touch für genauen Wert &amp; Datum</span>
         <span id="windowPointCount">– Datenpunkte</span>
+      </div>
+
+      <div class="timeline-bar">
+        <span>Fenster: <strong id="timelineWindow">–</strong></span>
+        <span>Punkte sichtbar: <strong id="timelinePoints">–</strong></span>
+        <span id="timelineHint">Scrollen &amp; Ziehen für Navigation</span>
       </div>
     </section>
 
@@ -691,7 +778,16 @@
     const windowRangeValue = document.getElementById('windowRange');
     const windowRangeLabel = document.getElementById('windowRangeLabel');
     const windowPointCount = document.getElementById('windowPointCount');
+    const windowAverage = document.getElementById('windowAverage');
+    const windowVolatility = document.getElementById('windowVolatility');
+    const volatilityLabel = document.getElementById('volatilityLabel');
     const chartTooltip = document.getElementById('chartTooltip');
+    const axisMax = document.getElementById('axisMax');
+    const axisMid = document.getElementById('axisMid');
+    const axisMin = document.getElementById('axisMin');
+    const timelineWindow = document.getElementById('timelineWindow');
+    const timelinePoints = document.getElementById('timelinePoints');
+    const timelineHint = document.getElementById('timelineHint');
 
     let btcEurRate = null;
     let lastPrices = [];
@@ -714,6 +810,23 @@
         minute: withTime ? '2-digit' : undefined,
       });
 
+    function setRangeValue(value) {
+      activeRange = value;
+      rangeButtons.forEach((b) => b.classList.toggle('active', b.dataset.days === value));
+      rangeSlider.disabled = historyPrices.length < 2 || activeRange === 'max';
+      if (rangeSlider.disabled) {
+        rangeSlider.value = 100;
+      }
+      renderSparkline();
+    }
+
+    function getHistorySpanDays() {
+      if (!historyPrices.length) return 365;
+      const first = historyPrices[0][0];
+      const last = historyPrices[historyPrices.length - 1][0];
+      return Math.max(Math.round((last - first) / (24 * 3600 * 1000)), 1);
+    }
+
     function setDirection(direction) {
       directionSelect.value = direction;
       toggleButtons.forEach((btn) => {
@@ -734,15 +847,56 @@
     });
     rangeSlider.addEventListener('input', () => renderSparkline());
     rangeButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        activeRange = btn.dataset.days;
-        rangeButtons.forEach((b) => b.classList.toggle('active', b === btn));
-        rangeSlider.disabled = activeRange === 'max' || historyPrices.length < 2;
-        if (rangeSlider.disabled) {
-          rangeSlider.value = 100;
-        }
-        renderSparkline();
+      btn.addEventListener('click', () => setRangeValue(btn.dataset.days));
+    });
+
+    function adjustPan(deltaPercent) {
+      if (rangeSlider.disabled) return;
+      const next = Math.min(Math.max(Number(rangeSlider.value) + deltaPercent, 0), 100);
+      rangeSlider.value = next;
+      renderSparkline();
+    }
+
+    let draggingChart = false;
+    let dragStartX = 0;
+    let dragStartValue = 100;
+
+    sparklineCanvas.addEventListener('pointerdown', (evt) => {
+      if (rangeSlider.disabled) return;
+      draggingChart = true;
+      dragStartX = evt.clientX;
+      dragStartValue = Number(rangeSlider.value);
+      sparklineCanvas.setPointerCapture?.(evt.pointerId);
+    });
+
+    sparklineCanvas.addEventListener('pointermove', (evt) => {
+      if (!draggingChart) return;
+      const rect = sparklineCanvas.getBoundingClientRect();
+      const delta = ((evt.clientX - dragStartX) / rect.width) * 100;
+      const next = Math.min(Math.max(dragStartValue - delta, 0), 100);
+      rangeSlider.value = next;
+      renderSparkline();
+    });
+
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((eventName) => {
+      sparklineCanvas.addEventListener(eventName, () => {
+        draggingChart = false;
       });
+    });
+
+    sparklineCanvas.addEventListener('wheel', (evt) => {
+      evt.preventDefault();
+      if (evt.shiftKey) {
+        const baseDays = activeRange === 'max' ? getHistorySpanDays() : Number(activeRange) || 30;
+        const step = Math.max(3, Math.round(baseDays * 0.08));
+        const direction = evt.deltaY > 0 ? 1 : -1;
+        const maxDays = Math.max(getHistorySpanDays(), baseDays);
+        const next = Math.min(Math.max(baseDays + direction * step, 7), maxDays);
+        setRangeValue(`${next}`);
+        return;
+      }
+      const scrollStep = evt.deltaY > 0 ? 4 : -4;
+      adjustPan(scrollStep);
     });
 
     function updateHoverFromClientX(clientX) {
@@ -810,6 +964,13 @@
         windowRangeValue.textContent = '–';
         windowRangeLabel.textContent = 'Keine Ansicht';
         windowPointCount.textContent = '0 Datenpunkte';
+        windowAverage.textContent = '–';
+        windowVolatility.textContent = '–';
+        axisMax.textContent = '–';
+        axisMid.textContent = '–';
+        axisMin.textContent = '–';
+        timelineWindow.textContent = '–';
+        timelinePoints.textContent = '–';
         return;
       }
 
@@ -818,8 +979,10 @@
       const values = points.map((p) => p[1]);
       const min = Math.min(...values);
       const max = Math.max(...values);
+      const avg = values.reduce((a, b) => a + b, 0) / values.length;
       const absChange = end[1] - start[1];
       const pctChange = start[1] !== 0 ? (absChange / start[1]) * 100 : 0;
+      const bandPct = avg !== 0 ? ((max - min) / avg) * 100 : 0;
       windowStartValue.textContent = `€ ${euro(start[1])}`;
       windowEndValue.textContent = `€ ${euro(end[1])}`;
       windowStartTime.textContent = formatDate(start[0]);
@@ -829,6 +992,14 @@
       windowRangeValue.textContent = `€ ${euro(min)} – € ${euro(max)}`;
       windowRangeLabel.textContent = activeRange === 'max' ? 'Gesamte Historie' : `${activeRange} Tage Fenster`;
       windowPointCount.textContent = `${points.length} Datenpunkte`;
+      windowAverage.textContent = `€ ${euro(avg)}`;
+      windowVolatility.textContent = `€ ${euro(max - min)}`;
+      volatilityLabel.textContent = `±${bandPct.toFixed(2)}% Sichtfenster`; 
+      axisMax.textContent = `€ ${euro(max)}`;
+      axisMid.textContent = `€ ${euro((max + min) / 2)}`;
+      axisMin.textContent = `€ ${euro(min)}`;
+      timelineWindow.textContent = `${formatDate(start[0], false)} – ${formatDate(end[0], false)}`;
+      timelinePoints.textContent = `${points.length} Punkte`;
     }
 
     function drawSparkline(points) {
@@ -920,9 +1091,17 @@
         ctx.fill();
 
         chartTooltip.style.display = 'block';
+        const base = points[0][1];
+        const delta = hoverPoint[1] - base;
+        const deltaPct = base !== 0 ? (delta / base) * 100 : 0;
+        const hoverIndex = points.indexOf(hoverPoint) + 1;
         chartTooltip.innerHTML = `<strong>€ ${euro(hoverPoint[1])}</strong><div>${formatDate(
           hoverPoint[0]
-        )}</div>`;
+        )}</div><div class="muted-row"><span>Δ zum Start</span><span>${delta >= 0 ? '+' : ''}${euro(
+          delta
+        )} (${deltaPct.toFixed(2)}%)</span></div><div class="muted-row"><span>Punkt</span><span>${hoverIndex}/${
+          points.length
+        }</span></div>`;
 
         const wrapRect = sparklineCanvas.parentElement.getBoundingClientRect();
         const tooltipWidth = chartTooltip.offsetWidth || 200;
@@ -1028,14 +1207,19 @@
           chartTitle.textContent = 'Bitcoin Langfrist-Chart';
           rangeLabel.textContent = rangeSlider.disabled
             ? 'Gesamte Historie sichtbar'
-            : `${rangeSlider.value}% der ausgewählten Historie`; 
+            : `${rangeSlider.value}% der ausgewählten Historie`;
+          timelineHint.textContent = rangeSlider.disabled
+            ? 'Komplette Historie aktiv · Shift+Scroll zoomt'
+            : 'Scrollen/Ziehen zum Pannen · Shift+Scroll zoomt';
         } else {
           sparklineInfo.textContent = 'Stündliche Daten (7 Tage)';
+          timelineHint.textContent = 'Scrollen/Ziehen bewegt den 7-Tage-Bereich';
         }
       } else {
         sparklineInfo.textContent = 'Keine Zeitreihe gefunden';
         sparklineRange.textContent = '–';
         rangeLabel.textContent = 'Keine Historie verfügbar';
+        timelineHint.textContent = 'Keine Daten zum Navigieren';
       }
 
       updateWindowStats(windowed);
