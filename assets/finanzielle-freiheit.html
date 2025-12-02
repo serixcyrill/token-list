@@ -191,33 +191,32 @@
       color:#1e293b; font-weight:800; font-size:13px;
     }
 
-    #freiheit .kpis{ display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; align-items:stretch; }
+    #freiheit .kpis{ display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); margin-top:14px; align-items:stretch; }
     #freiheit .kpi{
       background:var(--panel);
       border:1px solid var(--ring);
       border-radius:14px;
-      padding:12px 14px 10px;
+      padding:11px 13px 9px;
       position:relative;
       overflow:hidden;
       display:flex;
       flex-direction:column;
       justify-content:center;
-      min-height:84px;
+      min-height:78px;
       box-shadow:0 12px 28px rgba(15,23,42,.06);
     }
     #freiheit .kpi-label{ color:var(--muted); font-size:12px; font-weight:600; }
     #freiheit .kpi-value{ font-size:21px; font-weight:700; letter-spacing:-0.15px; margin-top:6px; color:#0f172a; transition:color .2s ease; }
 
     #freiheit .kpi.endcap{
-      grid-column:1 / -1;
       flex-direction:row;
       align-items:center;
-      gap:12px;
-      padding:16px 20px;
-      min-height:108px;
+      gap:10px;
+      padding:14px 16px;
+      min-height:92px;
       background:rgba(91,124,250,0.06);
       border:1px solid rgba(91,124,250,0.18);
-      box-shadow:0 18px 36px rgba(91,124,250,.06);
+      box-shadow:0 18px 32px rgba(91,124,250,.06);
     }
     #freiheit .kpi.endcap .kpi-label{ font-size:13px; color:#0f172a; letter-spacing:0; font-weight:600; }
     #freiheit .kpi.endcap .kpi-value{ font-size:28px; color:#0f172a; font-weight:700; }
@@ -234,9 +233,9 @@
       background:rgba(14,165,233,0.08);
       border-color:rgba(14,165,233,0.22);
       box-shadow:0 12px 24px rgba(14,165,233,.05);
-      min-height:110px;
+      min-height:96px;
     }
-    #freiheit .kpi.status .kpi-value{ color:#0f172a; font-size:15px; font-weight:500; min-height:38px; line-height:1.4; display:block; }
+    #freiheit .kpi.status .kpi-value{ color:#0f172a; font-size:15px; font-weight:500; min-height:38px; line-height:1.35; display:block; }
     #freiheit .kpi.status.warn{
       background:rgba(250,204,21,0.10);
       border-color:rgba(234,179,8,0.26);
@@ -274,11 +273,11 @@
       #freiheit label{ font-size:12.5px; margin-bottom:6px; }
       #freiheit .input, #freiheit select.input{ padding:13px 14px; font-size:15px; font-weight:500; }
       #freiheit .kpis{ grid-template-columns:1fr; gap:12px; }
-      #freiheit .kpi{ min-height:82px; padding:12px 14px; }
+      #freiheit .kpi{ min-height:78px; padding:12px 14px; }
       #freiheit .kpi-label{ font-size:12px; }
       #freiheit .kpi-value{ font-size:19px; }
-      #freiheit .kpi.status{ min-height:118px; }
-      #freiheit .kpi.endcap{ order:-1; min-height:110px; border-radius:16px; }
+      #freiheit .kpi.status{ min-height:102px; }
+      #freiheit .kpi.endcap{ order:-1; min-height:98px; border-radius:16px; }
       #freiheit .chart-section{ margin-top:16px; }
       #freiheit .chart-head{ flex-direction:column; align-items:flex-start; gap:10px; }
       #freiheit .legend{ flex-wrap:wrap; gap:10px; font-size:11px; }
