@@ -191,7 +191,7 @@
       color:#1e293b; font-weight:800; font-size:13px;
     }
 
-    #freiheit .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); margin-top:16px; align-items:stretch; }
+    #freiheit .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-top:16px; align-items:stretch; }
     #freiheit .kpi{
       background:var(--panel);
       border:1px solid var(--ring);
@@ -352,27 +352,27 @@
 
           <section class="panel" id="results-panel">
             <div class="kpis">
-              <div class="kpi endcap full">
+              <div class="kpi endcap">
                 <div>
                   <div class="kpi-label">Benötigtes Endkapital</div>
                   <div class="kpi-value" id="endkapital">–</div>
                 </div>
               </div>
-              <div class="kpi status full" id="depletion-card">
+              <div class="kpi status" id="depletion-card">
                 <div class="kpi-label">Kapitalstatus</div>
                 <div class="kpi-value" id="depletion">–</div>
               </div>
-              <div class="kpi accent full">
-                <div class="kpi-label">Erforderliche Sparrate</div>
-                <div class="kpi-value" id="sparrate">–</div>
+              <div class="kpi">
+                <div class="kpi-label">Kumulierte Einzahlungen</div>
+                <div class="kpi-value" id="einzahlungen">–</div>
               </div>
               <div class="kpi">
                 <div class="kpi-label">Zinsanteil</div>
                 <div class="kpi-value" id="zinsen">–</div>
               </div>
-              <div class="kpi">
-                <div class="kpi-label">Kumulierte Einzahlungen</div>
-                <div class="kpi-value" id="einzahlungen">–</div>
+              <div class="kpi accent full">
+                <div class="kpi-label">Erforderliche Sparrate pro Monat</div>
+                <div class="kpi-value" id="sparrate">–</div>
               </div>
             </div>
           </section>
