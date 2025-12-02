@@ -15,16 +15,16 @@
 
     /* Widget namespace */
     .msci-overlay {
-      --bg-gradient: radial-gradient(52% 60% at 20% 18%, rgba(126, 217, 87, 0.12), transparent),
-        radial-gradient(48% 56% at 86% 12%, rgba(91, 124, 250, 0.10), transparent),
-        linear-gradient(180deg, #fdfefe 0%, #f2f5ff 48%, #edf2ff 100%);
-      --panel: rgba(255, 255, 255, 0.94);
-      --panel-strong: rgba(255, 255, 255, 0.98);
-      --text-strong: #0f172a;
-      --text-muted: #6b7280;
+      --bg-gradient: radial-gradient(60% 70% at 20% 18%, rgba(126, 217, 87, 0.1), transparent),
+        radial-gradient(54% 62% at 84% 14%, rgba(91, 124, 250, 0.08), transparent),
+        linear-gradient(180deg, #fcfdff 0%, #eef3ff 48%, #eaf1ff 100%);
+      --panel: rgba(255, 255, 255, 0.96);
+      --panel-strong: rgba(255, 255, 255, 0.99);
+      --text-strong: #0b162c;
+      --text-muted: #5b6b82;
       --border-soft: rgba(17, 24, 39, 0.05);
-      --shadow-strong: 0 22px 52px rgba(15, 23, 42, 0.12);
-      --shadow-soft: 0 16px 36px rgba(15, 23, 42, 0.07);
+      --shadow-strong: 0 22px 52px rgba(15, 23, 42, 0.1);
+      --shadow-soft: 0 16px 36px rgba(15, 23, 42, 0.06);
       --radius-shell: 30px;
       --radius-card: 18px;
       --radius-chip: 18px;
@@ -114,13 +114,13 @@
     }
 
     .input {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(245, 247, 252, 0.94));
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 254, 0.94));
       border: 1px solid var(--border-soft);
-      border-radius: 18px;
-      padding: 12px 14px;
+      border-radius: 12px;
+      padding: 13px 16px;
       font-size: 14px;
       min-width: 260px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 20px rgba(15, 23, 42, 0.04);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 10px 22px rgba(15, 23, 42, 0.05);
       transition: all 0.18s ease;
     }
 
@@ -135,7 +135,7 @@
 
     .chip {
       border: 1px solid var(--border-soft);
-      border-radius: var(--radius-chip);
+      border-radius: 14px;
       padding: 9px 14px;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(243, 247, 252, 0.94));
       color: var(--text-strong);
@@ -162,9 +162,9 @@
     }
 
     .chart-card {
-      background: linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(241, 246, 255, 0.94));
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(243, 248, 255, 0.94));
       border: 1px solid var(--border-soft);
-      border-radius: 22px;
+      border-radius: 24px;
       box-shadow: var(--shadow-soft);
       padding: 18px 18px 14px;
       overflow: hidden;
@@ -318,20 +318,37 @@
       return dates;
     })();
 
-    const baseCurve = baseDates.map((_, i) => 100 * Math.exp(i * 0.012));
-
-    function createSeries(vol = 0.08, drift = 1) {
-      return baseCurve.map((p, i) => {
-        const noise = Math.sin(i / 6) * vol * 18 + (Math.random() - 0.5) * vol * 10;
-        return p * drift + noise;
-      });
+    // deterministic, more varied growth paths per index (normalized later)
+    function seededRandom(seed) {
+      let t = seed + 0x6d2b79f5;
+      return () => {
+        t += 0x6d2b79f5;
+        let x = t;
+        x = Math.imul(x ^ (x >>> 15), 1 | x);
+        x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+      };
     }
 
-    const priceData = Object.fromEntries(indexCatalog.map((idx, i) => {
-      const drift = 1 + (Math.sin(i) * 0.12);
-      const vol = 0.05 + (i % 3) * 0.02;
-      return [idx.id, createSeries(vol, drift)];
-    }));
+    function createSeries(id, index) {
+      const seed = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + index * 31;
+      const rand = seededRandom(seed);
+      const baseDrift = 0.0045 + (seed % 7) * 0.0012; // monthly drift spread
+      const vol = 0.022 + (seed % 9) * 0.004; // monthly volatility spread
+      let value = 1;
+      const series = [];
+      baseDates.forEach((_, i) => {
+        const cycle = Math.sin(i / 14) * 0.35 + Math.cos(i / 7) * 0.18;
+        const shock = (rand() - 0.5) * vol * 3.4;
+        const monthlyReturn = baseDrift * (1 + cycle) + shock;
+        value *= 1 + monthlyReturn;
+        value = Math.max(value, 0.25); // prevent collapse
+        series.push(value * 100);
+      });
+      return series;
+    }
+
+    const priceData = Object.fromEntries(indexCatalog.map((idx, i) => [idx.id, createSeries(idx.id, i)]));
 
     const ranges = [
       { id: 'max', label: 'Max', months: null },
@@ -374,8 +391,8 @@
 
     function blendColors(colors) {
       if (!colors.length) return ['rgba(91, 124, 250, 0.86)', 'rgba(126, 217, 87, 0.5)'];
-      const primary = pastelize(colors[0], 0.2, 0.88);
-      const secondary = pastelize(colors[1] || colors[0], 0.32, 0.58);
+      const primary = pastelize(colors[0], 0.14, 0.9);
+      const secondary = pastelize(colors[1] || colors[0], 0.22, 0.72);
       return [primary, secondary];
     }
 
@@ -423,9 +440,9 @@
         const raw = priceData[id] || [];
         const norm = normalize(raw);
         const { dates, series } = sliceRange(baseDates, norm);
-        const [colorPrimary] = blendColors(info.colors);
-        const borderColor = pastelize(info.colors[0], 0.12, 0.9);
-        const gradient = pickGradient(ctx, info.colors);
+        const [colorPrimary, colorSecondary] = blendColors(info.colors);
+        const borderColor = setAlpha(info.colors[0], id === 'ACWI' ? 0.9 : 0.8);
+        const gradient = id === 'ACWI' ? pickGradient(ctx, [colorPrimary, colorSecondary]) : 'transparent';
         datasets.push({
           label: `${info.name}`,
           data: series,
