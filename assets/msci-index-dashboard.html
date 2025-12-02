@@ -6,7 +6,7 @@
   <title>MSCI Index Overlay · Vemo UI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <style>
     :root {
@@ -15,21 +15,21 @@
 
     /* Widget namespace */
     .msci-overlay {
-      --bg-gradient: radial-gradient(48% 60% at 16% 16%, rgba(126, 217, 87, 0.10), transparent),
-        radial-gradient(44% 52% at 84% 14%, rgba(91, 124, 250, 0.10), transparent),
-        linear-gradient(180deg, #f9fbff 0%, #eef2ff 60%, #f8f9ff 100%);
-      --panel: rgba(255, 255, 255, 0.9);
+      --bg-gradient: radial-gradient(52% 60% at 20% 18%, rgba(126, 217, 87, 0.12), transparent),
+        radial-gradient(48% 56% at 86% 12%, rgba(91, 124, 250, 0.10), transparent),
+        linear-gradient(180deg, #fdfefe 0%, #f2f5ff 48%, #edf2ff 100%);
+      --panel: rgba(255, 255, 255, 0.94);
       --panel-strong: rgba(255, 255, 255, 0.98);
       --text-strong: #0f172a;
-      --text-muted: #606b86;
-      --border-soft: rgba(17, 24, 39, 0.06);
+      --text-muted: #6b7280;
+      --border-soft: rgba(17, 24, 39, 0.05);
       --shadow-strong: 0 22px 52px rgba(15, 23, 42, 0.12);
       --shadow-soft: 0 16px 36px rgba(15, 23, 42, 0.07);
       --radius-shell: 30px;
-      --radius-card: 20px;
-      --radius-chip: 16px;
+      --radius-card: 18px;
+      --radius-chip: 18px;
       --blur: 14px;
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
       background: var(--bg-gradient);
       border-radius: var(--radius-shell);
       border: 1px solid var(--border-soft);
@@ -68,7 +68,7 @@
       font-weight: 800;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: #0f9c4a;
+      color: #1d9c59;
     }
 
     .eyebrow .dot {
@@ -79,11 +79,11 @@
     }
 
     h1 {
-      font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+      font-family: "Poppins", system-ui, sans-serif;
       font-weight: 800;
-      letter-spacing: -0.36px;
-      font-size: clamp(34px, 3vw, 46px);
-      margin: 8px 0 4px;
+      letter-spacing: -0.4px;
+      font-size: clamp(34px, 3vw, 48px);
+      margin: 10px 0 4px;
       color: var(--text-strong);
     }
 
@@ -114,13 +114,13 @@
     }
 
     .input {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 247, 252, 0.92));
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(245, 247, 252, 0.94));
       border: 1px solid var(--border-soft);
       border-radius: 18px;
       padding: 12px 14px;
       font-size: 14px;
       min-width: 260px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 8px 20px rgba(15, 23, 42, 0.04);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 20px rgba(15, 23, 42, 0.04);
       transition: all 0.18s ease;
     }
 
@@ -137,7 +137,7 @@
       border: 1px solid var(--border-soft);
       border-radius: var(--radius-chip);
       padding: 9px 14px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(244, 247, 252, 0.9));
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(243, 247, 252, 0.94));
       color: var(--text-strong);
       font-weight: 700;
       font-size: 13px;
@@ -146,24 +146,23 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
-      border-radius: 14px;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
     }
 
-    .chip .dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.04); }
+    .chip .dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.03); }
 
     .chip:hover { transform: translateY(-1px); background: var(--panel-strong); }
 
     .chip.active {
-      background: linear-gradient(135deg, rgba(126, 217, 87, 0.12), rgba(91, 124, 250, 0.10));
+      background: linear-gradient(135deg, rgba(126, 217, 87, 0.16), rgba(91, 124, 250, 0.12));
       border-color: rgba(91, 124, 250, 0.22);
       color: #0f172a;
-      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.07);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
       transform: translateY(-1px);
     }
 
     .chart-card {
-      background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(240, 245, 255, 0.9));
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(241, 246, 255, 0.94));
       border: 1px solid var(--border-soft);
       border-radius: 22px;
       box-shadow: var(--shadow-soft);
@@ -195,13 +194,14 @@
       position: relative;
       border-radius: 20px;
       padding: 16px 16px 14px;
-      color: #f8fbff;
+      color: #ffffff;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.7);
       cursor: pointer;
       transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
-      background: linear-gradient(140deg, rgba(255, 255, 255, 0.16), rgba(248, 250, 252, 0.12));
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.10);
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.24), rgba(248, 250, 252, 0.18));
+      backdrop-filter: blur(4px);
     }
 
     .index-card::after {
@@ -209,17 +209,17 @@
       position: absolute;
       inset: 0;
       background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), transparent 70%);
-      opacity: 0.94;
+      opacity: 0.86;
       pointer-events: none;
       transition: opacity 0.25s ease;
     }
 
     .index-card:hover { transform: translateY(-2px); }
-    .index-card:hover::after { opacity: 0.82; }
+    .index-card:hover::after { opacity: 0.78; }
 
     .index-card.selected {
-      border-color: rgba(126, 217, 87, 0.42);
-      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.13);
+      border-color: rgba(126, 217, 87, 0.46);
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.12);
       transform: translateY(-2px);
     }
 
@@ -267,9 +267,6 @@
         <div class="chip-group" id="range-chips"></div>
         <div class="chip-group" id="scale-chips"></div>
       </div>
-      <div class="control-row">
-        <div class="chip-group" id="region-chips"></div>
-      </div>
     </div>
 
     <div class="chart-card">
@@ -286,26 +283,26 @@
 
   <script>
     const indexCatalog = [
-      { id: 'ACWI', name: 'MSCI ACWI', country: 'Global', region: 'Global', flag: '🌍', colors: ['#3dd067', '#0f9c4a'] },
-      { id: 'USA', name: 'MSCI USA', country: 'USA', region: 'Amerika', flag: '🇺🇸', colors: ['#e24c61', '#4b6cb7'] },
-      { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', region: 'Amerika', flag: '🇨🇦', colors: ['#e15c68', '#f4f7fb'] },
-      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', region: 'Amerika', flag: '🇧🇷', colors: ['#3bbf74', '#eedf64'] },
-      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', region: 'Amerika', flag: '🇲🇽', colors: ['#4aa18f', '#d96b72'] },
-      { id: 'GER', name: 'MSCI Deutschland', country: 'Deutschland', region: 'Europa', flag: '🇩🇪', colors: ['#d95d5d', '#f8d25d'] },
-      { id: 'FRA', name: 'MSCI Frankreich', country: 'Frankreich', region: 'Europa', flag: '🇫🇷', colors: ['#6a8bd8', '#f0b0c3']},
-      { id: 'ITA', name: 'MSCI Italien', country: 'Italien', region: 'Europa', flag: '🇮🇹', colors: ['#60c18a', '#f28b8b'] },
-      { id: 'ESP', name: 'MSCI Spanien', country: 'Spanien', region: 'Europa', flag: '🇪🇸', colors: ['#e86b6b', '#f4c54f'] },
-      { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', region: 'Europa', flag: '🇬🇧', colors: ['#6e8ad6', '#dd7c8a'] },
-      { id: 'SWE', name: 'MSCI Schweden', country: 'Schweden', region: 'Europa', flag: '🇸🇪', colors: ['#7aa6f8', '#f5d865'] },
-      { id: 'CHE', name: 'MSCI Schweiz', country: 'Schweiz', region: 'Europa', flag: '🇨🇭', colors: ['#e46b6b', '#f4f4f4'] },
-      { id: 'AUS', name: 'MSCI Australien', country: 'Australien', region: 'Asien', flag: '🇦🇺', colors: ['#6a8adf', '#e99595'] },
-      { id: 'JPN', name: 'MSCI Japan', country: 'Japan', region: 'Asien', flag: '🇯🇵', colors: ['#e77b8f', '#f9f0f0'] },
-      { id: 'CHN', name: 'MSCI China', country: 'China', region: 'Asien', flag: '🇨🇳', colors: ['#e66f5f', '#f7d76f'] },
-      { id: 'IND', name: 'MSCI Indien', country: 'Indien', region: 'Asien', flag: '🇮🇳', colors: ['#f7a35c', '#7fc68c'] },
-      { id: 'KOR', name: 'MSCI Korea', country: 'Südkorea', region: 'Asien', flag: '🇰🇷', colors: ['#7aa0e8', '#e57b8a'] },
-      { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', region: 'Afrika', flag: '🇿🇦', colors: ['#4dad8a', '#ef916c'] },
-      { id: 'SAU', name: 'MSCI Saudi-Arabien', country: 'Saudi-Arabien', region: 'Nahost', flag: '🇸🇦', colors: ['#63b786', '#f3fff7'] },
-      { id: 'ARE', name: 'MSCI VAE', country: 'VAE', region: 'Nahost', flag: '🇦🇪', colors: ['#61bfa4', '#e98c8c'] },
+      { id: 'ACWI', name: 'MSCI ACWI', country: 'Global', region: 'Global', flag: '🌍', colors: ['#6fd394', '#9ce6c0'] },
+      { id: 'USA', name: 'MSCI USA', country: 'USA', region: 'Amerika', flag: '🇺🇸', colors: ['#88b8f6', '#f4a9c1'] },
+      { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', region: 'Amerika', flag: '🇨🇦', colors: ['#f28f9a', '#f7d7df'] },
+      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', region: 'Amerika', flag: '🇧🇷', colors: ['#74d7a2', '#f2e8a0'] },
+      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', region: 'Amerika', flag: '🇲🇽', colors: ['#7cc4ad', '#f1b1b7'] },
+      { id: 'GER', name: 'MSCI Deutschland', country: 'Deutschland', region: 'Europa', flag: '🇩🇪', colors: ['#f28a8a', '#f6d48a'] },
+      { id: 'FRA', name: 'MSCI Frankreich', country: 'Frankreich', region: 'Europa', flag: '🇫🇷', colors: ['#8fb2f4', '#f3c1d5']},
+      { id: 'ITA', name: 'MSCI Italien', country: 'Italien', region: 'Europa', flag: '🇮🇹', colors: ['#7fd3a6', '#f5a6a6'] },
+      { id: 'ESP', name: 'MSCI Spanien', country: 'Spanien', region: 'Europa', flag: '🇪🇸', colors: ['#f39c9c', '#f6d780'] },
+      { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', region: 'Europa', flag: '🇬🇧', colors: ['#8da8f2', '#f3a9bb'] },
+      { id: 'SWE', name: 'MSCI Schweden', country: 'Schweden', region: 'Europa', flag: '🇸🇪', colors: ['#9bc1fb', '#f7e08e'] },
+      { id: 'CHE', name: 'MSCI Schweiz', country: 'Schweiz', region: 'Europa', flag: '🇨🇭', colors: ['#f09b9b', '#f6f2f2'] },
+      { id: 'AUS', name: 'MSCI Australien', country: 'Australien', region: 'Asien', flag: '🇦🇺', colors: ['#8daaf5', '#f3b1b1'] },
+      { id: 'JPN', name: 'MSCI Japan', country: 'Japan', region: 'Asien', flag: '🇯🇵', colors: ['#f0a2b3', '#f8f0f0'] },
+      { id: 'CHN', name: 'MSCI China', country: 'China', region: 'Asien', flag: '🇨🇳', colors: ['#f39d8c', '#f7e3a4'] },
+      { id: 'IND', name: 'MSCI Indien', country: 'Indien', region: 'Asien', flag: '🇮🇳', colors: ['#f7b17a', '#8dd4a3'] },
+      { id: 'KOR', name: 'MSCI Korea', country: 'Südkorea', region: 'Asien', flag: '🇰🇷', colors: ['#99b7f6', '#f0a0b4'] },
+      { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', region: 'Afrika', flag: '🇿🇦', colors: ['#7fc8ab', '#f2a98a'] },
+      { id: 'SAU', name: 'MSCI Saudi-Arabien', country: 'Saudi-Arabien', region: 'Nahost', flag: '🇸🇦', colors: ['#7ed0a2', '#f1fff6'] },
+      { id: 'ARE', name: 'MSCI VAE', country: 'VAE', region: 'Nahost', flag: '🇦🇪', colors: ['#7fd2b6', '#f3b0b0'] },
     ];
 
     // demo data generator
@@ -344,11 +341,8 @@
       { id: '6m', label: '6M', months: 6 },
     ];
 
-    const regions = ['Alle', 'Global', 'Amerika', 'Europa', 'Asien', 'Afrika', 'Nahost'];
-
     const state = {
       search: '',
-      region: 'Alle',
       range: 'max',
       scale: 'log',
       selected: ['ACWI', 'USA', 'GER'],
@@ -367,7 +361,7 @@
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
-    function pastelize(hex, mix = 0.25, alpha = 1) {
+    function pastelize(hex, mix = 0.32, alpha = 1) {
       if (hex.startsWith('rgb')) return hex;
       const parsed = hex.replace('#', '');
       const bigint = parseInt(parsed.length === 3 ? parsed.split('').map(c => c + c).join('') : parsed, 16);
@@ -379,9 +373,9 @@
     }
 
     function blendColors(colors) {
-      if (!colors.length) return ['rgba(91, 124, 250, 0.9)', 'rgba(126, 217, 87, 0.5)'];
-      const primary = pastelize(colors[0], 0.22, 0.9);
-      const secondary = pastelize(colors[1] || colors[0], 0.32, 0.62);
+      if (!colors.length) return ['rgba(91, 124, 250, 0.86)', 'rgba(126, 217, 87, 0.5)'];
+      const primary = pastelize(colors[0], 0.2, 0.88);
+      const secondary = pastelize(colors[1] || colors[0], 0.32, 0.58);
       return [primary, secondary];
     }
 
@@ -411,8 +405,8 @@
     function pickGradient(ctx, colors) {
       const [start, end] = blendColors(colors);
       const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 0.9);
-      gradient.addColorStop(0, start);
-      const tail = end.replace(/rgba\(([^)]+), [0-9.]+\)/, 'rgba($1, 0.18)');
+      gradient.addColorStop(0, setAlpha(start, 0.32));
+      const tail = end.replace(/rgba\(([^)]+), [0-9.]+\)/, 'rgba($1, 0.10)');
       gradient.addColorStop(1, tail);
       return gradient;
     }
@@ -430,7 +424,7 @@
         const norm = normalize(raw);
         const { dates, series } = sliceRange(baseDates, norm);
         const [colorPrimary] = blendColors(info.colors);
-        const borderColor = pastelize(info.colors[0], 0.16, 0.88);
+        const borderColor = pastelize(info.colors[0], 0.12, 0.9);
         const gradient = pickGradient(ctx, info.colors);
         datasets.push({
           label: `${info.name}`,
@@ -439,13 +433,16 @@
           backgroundColor: gradient,
           tension: 0.32,
           borderWidth: id === 'ACWI' ? 3 : 2.2,
-          fill: true,
+          fill: id === 'ACWI',
           pointRadius: 0,
           pointHitRadius: 10,
         });
         const chip = document.createElement('div');
         chip.className = 'chip active';
-        chip.innerHTML = `<span class="dot" style="background:${colorPrimary}"></span>${info.flag} ${info.name}`;
+        chip.style.background = colorPrimary;
+        chip.style.color = '#ffffff';
+        chip.style.borderColor = setAlpha(colorPrimary, 0.6);
+        chip.innerHTML = `<span class="dot" style="background:${setAlpha(colorPrimary,0.82)}"></span>${info.flag} ${info.name}`;
         chip.onclick = () => {
           if (state.selected.includes(id)) {
             state.selected = state.selected.filter((x) => x !== id);
@@ -475,7 +472,7 @@
                 callback: (val) => formatPercent(val),
                 maxTicksLimit: 6,
               },
-              grid: { color: 'rgba(15,23,42,0.06)' },
+              grid: { color: 'rgba(15,23,42,0.05)' },
             },
             x: {
               grid: { display: false },
@@ -528,31 +525,18 @@
       });
     }
 
-    function renderRegions() {
-      const wrap = document.getElementById('region-chips');
-      wrap.innerHTML = '';
-      regions.forEach((r) => {
-        const chip = document.createElement('div');
-        chip.className = 'chip' + (state.region === r ? ' active' : '');
-        chip.textContent = r;
-        chip.onclick = () => { state.region = r; renderCards(); };
-        wrap.appendChild(chip);
-      });
-    }
-
     function renderCards() {
       const container = document.getElementById('cards');
       container.innerHTML = '';
       const search = state.search.trim().toLowerCase();
       indexCatalog
-        .filter((i) => state.region === 'Alle' || i.region === state.region)
         .filter((i) => !search || i.name.toLowerCase().includes(search) || i.country.toLowerCase().includes(search))
         .forEach((idx) => {
           const card = document.createElement('div');
           card.className = 'index-card' + (state.selected.includes(idx.id) ? ' selected' : '');
           const colors = blendColors(idx.colors);
-          const softA = setAlpha(colors[0], 0.32);
-          const softB = setAlpha(colors[1], 0.24);
+          const softA = setAlpha(colors[0], 0.26);
+          const softB = setAlpha(colors[1], 0.18);
           card.style.backgroundImage = `linear-gradient(145deg, ${softA}, ${softB}), linear-gradient(160deg, ${colors[0]}, ${colors[1]})`;
           if (idx.id === 'ACWI') {
             card.style.borderColor = 'rgba(126, 217, 87, 0.5)';
@@ -593,7 +577,6 @@
 
     renderRanges();
     renderScales();
-    renderRegions();
     renderCards();
     buildChart();
   </script>
