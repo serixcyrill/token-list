@@ -233,8 +233,9 @@
       background:rgba(14,165,233,0.08);
       border-color:rgba(14,165,233,0.22);
       box-shadow:0 12px 24px rgba(14,165,233,.05);
+      min-height:110px;
     }
-    #freiheit .kpi.status .kpi-value{ color:#0f172a; font-size:16px; font-weight:500; }
+    #freiheit .kpi.status .kpi-value{ color:#0f172a; font-size:16px; font-weight:500; min-height:36px; line-height:1.35; display:block; }
     #freiheit .kpi.status.warn{
       background:rgba(250,204,21,0.10);
       border-color:rgba(234,179,8,0.26);
@@ -271,6 +272,7 @@
       #freiheit .kpis{ grid-template-columns:1fr; gap:12px; }
       #freiheit .kpi{ min-height:86px; padding:12px 14px; }
       #freiheit .kpi-value{ font-size:20px; }
+      #freiheit .kpi.status{ min-height:118px; }
       #freiheit .kpi.endcap{ order:-1; min-height:110px; border-radius:16px; }
       #freiheit .chart-section{ margin-top:16px; }
       #freiheit #chart{ height:280px; }
@@ -482,7 +484,7 @@
         }else if(gap <= 0.02){
           status = {
             type:'warn',
-            text:'Kapital könnte ausgehen – Entnahme reduzieren'
+            text:'Kapital könnte ausgehen'
           };
         }
 
