@@ -520,6 +520,44 @@
       margin-right: 6px;
     }
 
+    .vemo-btc .legend-dot.legend-btc {
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+    }
+
+    .vemo-btc .legend-dot.legend-gold {
+      background: #5b7cfa;
+      box-shadow: 0 0 0 4px rgba(91, 124, 250, 0.14);
+    }
+
+    .vemo-btc .compare-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 10px 0 4px;
+    }
+
+    .vemo-btc .compare-chip {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: grid;
+      gap: 2px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .vemo-btc .compare-chip strong {
+      font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .vemo-btc .compare-chip small {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
     .vemo-btc .timeline-bar {
       margin-top: 12px;
       padding: 10px 12px;
@@ -680,36 +718,44 @@
         <span>Scroll oder klicke &amp; ziehe im Chart zum Pannen · Shift+Scroll zoomt den Ausschnitt.</span>
       </div>
 
+      <div class="compare-meta">
+        <div class="compare-chip">
+          <small>BTC Fenster-Performance</small>
+          <strong id="btcReturn">–</strong>
+          <small id="btcBaseLabel">–</small>
+        </div>
+        <div class="compare-chip">
+          <small>Gold (% seit Start)</small>
+          <strong id="goldReturn">–</strong>
+          <small id="goldBaseLabel">–</small>
+        </div>
+        <div class="compare-chip">
+          <small>BTC vs Gold</small>
+          <strong id="spreadReturn">–</strong>
+          <small id="compareStatus">Lade Gold …</small>
+        </div>
+      </div>
+
       <div class="chart-meta">
         <div class="stat-chip">
-          <span class="label">Startwert</span>
-          <span class="value" id="windowStartValue">–</span>
-          <small id="windowStartTime" class="label"></small>
-        </div>
-        <div class="stat-chip">
-          <span class="label">Endwert</span>
-          <span class="value" id="windowEndValue">–</span>
-          <small id="windowEndTime" class="label"></small>
-        </div>
-        <div class="stat-chip">
-          <span class="label">Veränderung</span>
-          <span class="value" id="windowChange">–</span>
-          <small id="windowChangePct" class="label"></small>
-        </div>
-        <div class="stat-chip">
-          <span class="label">Spannweite</span>
+          <span class="label">Sichtfenster</span>
           <span class="value" id="windowRange">–</span>
           <small id="windowRangeLabel" class="label"></small>
         </div>
         <div class="stat-chip">
-          <span class="label">Durchschnitt</span>
-          <span class="value" id="windowAverage">–</span>
-          <small class="label">arithmetisch</small>
+          <span class="label">BTC Bandbreite</span>
+          <span class="value" id="windowVolatility">–</span>
+          <small id="volatilityLabel" class="label">Max - Min</small>
         </div>
         <div class="stat-chip">
-          <span class="label">Dynamik</span>
-          <span class="value" id="windowVolatility">–</span>
-          <small id="volatilityLabel" class="label">Bandbreite</small>
+          <span class="label">BTC Ø Veränderung</span>
+          <span class="value" id="windowAverage">–</span>
+          <small class="label" id="windowChangePct">arithmetisch</small>
+        </div>
+        <div class="stat-chip">
+          <span class="label">Punkt-Details</span>
+          <span class="value" id="windowPointCount">–</span>
+          <small id="windowStartTime" class="label"></small>
         </div>
       </div>
 
@@ -729,9 +775,9 @@
       </div>
 
       <div class="chart-legend">
-        <span><span class="legend-dot"></span>BTC Preis</span>
-        <span>Hover/Touch für genauen Wert &amp; Datum</span>
-        <span id="windowPointCount">– Datenpunkte</span>
+        <span><span class="legend-dot legend-btc"></span>BTC % seit Fenster-Start</span>
+        <span><span class="legend-dot legend-gold"></span>Gold % (PAXG) seit Fenster-Start</span>
+        <span>Hover/Touch: Exakter %-Wert + Datum</span>
       </div>
 
       <div class="timeline-bar">
@@ -769,11 +815,7 @@
     const rangeButtons = document.querySelectorAll('.range-btn');
     const rangeSlider = document.getElementById('rangeSlider');
     const rangeLabel = document.getElementById('rangeLabel');
-    const windowStartValue = document.getElementById('windowStartValue');
     const windowStartTime = document.getElementById('windowStartTime');
-    const windowEndValue = document.getElementById('windowEndValue');
-    const windowEndTime = document.getElementById('windowEndTime');
-    const windowChange = document.getElementById('windowChange');
     const windowChangePct = document.getElementById('windowChangePct');
     const windowRangeValue = document.getElementById('windowRange');
     const windowRangeLabel = document.getElementById('windowRangeLabel');
@@ -788,19 +830,29 @@
     const timelineWindow = document.getElementById('timelineWindow');
     const timelinePoints = document.getElementById('timelinePoints');
     const timelineHint = document.getElementById('timelineHint');
+    const btcReturn = document.getElementById('btcReturn');
+    const goldReturn = document.getElementById('goldReturn');
+    const spreadReturn = document.getElementById('spreadReturn');
+    const btcBaseLabel = document.getElementById('btcBaseLabel');
+    const goldBaseLabel = document.getElementById('goldBaseLabel');
+    const compareStatus = document.getElementById('compareStatus');
 
     let btcEurRate = null;
     let lastPrices = [];
     let historyPrices = [];
+    let goldPrices = [];
     let activeRange = '7';
     let historyLoaded = false;
+    let goldLoaded = false;
     let historyLabel = '';
-    let currentWindow = [];
+    let goldLabel = '';
+    let currentWindow = { btc: [], gold: [] };
     let hoverTs = null;
     rangeSlider.disabled = true;
 
     const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const btc = (value) => Number(value).toFixed(8);
+    const percent = (value, fraction = 2) => `${value >= 0 ? '+' : ''}${value.toFixed(fraction)}%`;
     const formatDate = (ts, withTime = true) =>
       new Date(ts).toLocaleString('de-DE', {
         year: 'numeric',
@@ -900,13 +952,14 @@
     });
 
     function updateHoverFromClientX(clientX) {
-      if (!currentWindow.length) return;
+      const base = currentWindow?.btc?.length ? currentWindow.btc : currentWindow?.gold || [];
+      if (!base.length) return;
       const rect = sparklineCanvas.getBoundingClientRect();
       const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
-      const minTime = currentWindow[0][0];
-      const maxTime = currentWindow[currentWindow.length - 1][0];
+      const minTime = base[0].ts;
+      const maxTime = base[base.length - 1].ts;
       hoverTs = minTime + ratio * Math.max(maxTime - minTime, 1);
-      drawSparkline(currentWindow);
+      drawSparkline(currentWindow.btc || [], currentWindow.gold || []);
     }
 
     sparklineCanvas.addEventListener('mousemove', (evt) => updateHoverFromClientX(evt.clientX));
@@ -916,7 +969,7 @@
     sparklineCanvas.addEventListener('mouseleave', () => {
       hoverTs = null;
       chartTooltip.style.display = 'none';
-      drawSparkline(currentWindow);
+      drawSparkline(currentWindow.btc || [], currentWindow.gold || []);
     });
     sparklineCanvas.addEventListener('touchend', () => {
       hoverTs = null;
@@ -953,17 +1006,17 @@
       }
     }
 
-    function updateWindowStats(points) {
-      if (!points || points.length < 2) {
-        windowStartValue.textContent = '–';
-        windowEndValue.textContent = '–';
-        windowStartTime.textContent = '';
-        windowEndTime.textContent = '';
-        windowChange.textContent = '–';
-        windowChangePct.textContent = '';
+    function updateWindowStats(btcPoints, goldPoints) {
+      if (!btcPoints || btcPoints.length < 2) {
+        btcReturn.textContent = '–';
+        goldReturn.textContent = goldPoints?.length ? '–' : 'Kein Gold';
+        spreadReturn.textContent = '–';
+        btcBaseLabel.textContent = 'Keine Basis';
+        goldBaseLabel.textContent = goldPoints?.length ? 'Lade …' : 'Keine Gold-Daten';
+        compareStatus.textContent = goldLoaded ? 'Gold geladen' : 'Gold noch laden';
         windowRangeValue.textContent = '–';
         windowRangeLabel.textContent = 'Keine Ansicht';
-        windowPointCount.textContent = '0 Datenpunkte';
+        windowPointCount.textContent = '0 BTC / 0 Gold Punkte';
         windowAverage.textContent = '–';
         windowVolatility.textContent = '–';
         axisMax.textContent = '–';
@@ -974,35 +1027,54 @@
         return;
       }
 
-      const start = points[0];
-      const end = points[points.length - 1];
-      const values = points.map((p) => p[1]);
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      const avg = values.reduce((a, b) => a + b, 0) / values.length;
-      const absChange = end[1] - start[1];
-      const pctChange = start[1] !== 0 ? (absChange / start[1]) * 100 : 0;
-      const bandPct = avg !== 0 ? ((max - min) / avg) * 100 : 0;
-      windowStartValue.textContent = `€ ${euro(start[1])}`;
-      windowEndValue.textContent = `€ ${euro(end[1])}`;
-      windowStartTime.textContent = formatDate(start[0]);
-      windowEndTime.textContent = formatDate(end[0]);
-      windowChange.textContent = `${absChange >= 0 ? '+' : ''}€ ${euro(absChange)}`;
-      windowChangePct.textContent = `${pctChange >= 0 ? '+' : ''}${pctChange.toFixed(2)}%`;
-      windowRangeValue.textContent = `€ ${euro(min)} – € ${euro(max)}`;
-      windowRangeLabel.textContent = activeRange === 'max' ? 'Gesamte Historie' : `${activeRange} Tage Fenster`;
-      windowPointCount.textContent = `${points.length} Datenpunkte`;
-      windowAverage.textContent = `€ ${euro(avg)}`;
-      windowVolatility.textContent = `€ ${euro(max - min)}`;
-      volatilityLabel.textContent = `±${bandPct.toFixed(2)}% Sichtfenster`; 
-      axisMax.textContent = `€ ${euro(max)}`;
-      axisMid.textContent = `€ ${euro((max + min) / 2)}`;
-      axisMin.textContent = `€ ${euro(min)}`;
-      timelineWindow.textContent = `${formatDate(start[0], false)} – ${formatDate(end[0], false)}`;
-      timelinePoints.textContent = `${points.length} Punkte`;
+      const btcStart = btcPoints[0];
+      const btcEnd = btcPoints[btcPoints.length - 1];
+      const btcValues = btcPoints.map((p) => p.pct);
+      const btcMin = Math.min(...btcValues);
+      const btcMax = Math.max(...btcValues);
+      const btcAvg = btcValues.reduce((a, b) => a + b, 0) / btcValues.length;
+      const btcChange = btcEnd.pct;
+
+      const hasGold = goldPoints && goldPoints.length > 1;
+      const goldChange = hasGold ? goldPoints[goldPoints.length - 1].pct : null;
+      const goldRangeLabel = hasGold
+        ? `${formatDate(goldPoints[0].ts, false)} – ${formatDate(goldPoints[goldPoints.length - 1].ts, false)}`
+        : 'Gold-Zeitreihe fehlt';
+
+      btcReturn.textContent = percent(btcChange);
+      btcBaseLabel.textContent = `Basis: € ${euro(btcStart.price)} · ${formatDate(btcStart.ts, false)}`;
+      goldReturn.textContent = hasGold ? percent(goldChange) : '–';
+      goldBaseLabel.textContent = hasGold
+        ? `Basis: € ${euro(goldPoints[0].price)} · ${formatDate(goldPoints[0].ts, false)}`
+        : 'Gold wird nicht angezeigt';
+
+      if (hasGold) {
+        const spread = btcChange - goldChange;
+        spreadReturn.textContent = percent(spread);
+        compareStatus.textContent = spread >= 0 ? 'BTC liegt vorn' : 'Gold liegt vorn';
+      } else {
+        spreadReturn.textContent = '–';
+        compareStatus.textContent = goldLoaded ? 'Gold fehlte im Fenster' : 'Gold lädt …';
+      }
+
+      windowRangeValue.textContent = `${formatDate(btcStart.ts, false)} – ${formatDate(btcEnd.ts, false)}`;
+      windowRangeLabel.textContent = activeRange === 'max' ? 'Gesamte BTC-Historie' : `${activeRange} Tage (BTC-Basis)`;
+      windowPointCount.textContent = `${btcPoints.length} BTC / ${goldPoints?.length ?? 0} Gold Punkte`;
+      windowAverage.textContent = percent(btcAvg);
+      windowVolatility.textContent = percent(btcMax - btcMin);
+      volatilityLabel.textContent = `Bandbreite: ${percent(btcMin)} bis ${percent(btcMax)}`;
+      windowChangePct.textContent = hasGold ? `Überlappung: ${goldRangeLabel}` : 'Nur BTC im Fenster';
+
+      const axisTop = Math.max(btcMax, hasGold ? Math.max(...goldPoints.map((p) => p.pct)) : btcMax);
+      const axisBottom = Math.min(btcMin, hasGold ? Math.min(...goldPoints.map((p) => p.pct)) : btcMin);
+      axisMax.textContent = percent(axisTop);
+      axisMin.textContent = percent(axisBottom);
+      axisMid.textContent = percent((axisTop + axisBottom) / 2);
+      timelineWindow.textContent = `${formatDate(btcStart.ts, false)} – ${formatDate(btcEnd.ts, false)}`;
+      timelinePoints.textContent = `${btcPoints.length + (goldPoints?.length || 0)} Punkte gesamt`;
     }
 
-    function drawSparkline(points) {
+    function drawSparkline(btcPoints, goldPoints) {
       const ctx = sparklineCanvas.getContext('2d');
       const pixelRatio = window.devicePixelRatio || 1;
       const displayWidth = sparklineCanvas.clientWidth || sparklineCanvas.width;
@@ -1012,7 +1084,10 @@
       ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       ctx.clearRect(0, 0, displayWidth, displayHeight);
 
-      if (!points || !points.length) {
+      const hasBtc = Array.isArray(btcPoints) && btcPoints.length;
+      const hasGold = Array.isArray(goldPoints) && goldPoints.length;
+
+      if (!hasBtc && !hasGold) {
         ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
         ctx.font = '600 14px Inter, system-ui, sans-serif';
         ctx.fillText('Keine Zeitreihe verfügbar', 16, displayHeight / 2);
@@ -1020,10 +1095,11 @@
         return;
       }
 
-      const minTime = points[0][0];
-      const maxTime = points[points.length - 1][0];
+      const allPoints = [...(btcPoints || []), ...(goldPoints || [])];
+      const minTime = allPoints.reduce((min, p) => Math.min(min, p.ts), allPoints[0].ts);
+      const maxTime = allPoints.reduce((max, p) => Math.max(max, p.ts), allPoints[0].ts);
       const spanTime = Math.max(maxTime - minTime, 1);
-      const values = points.map((p) => p[1]);
+      const values = allPoints.map((p) => p.pct);
       const min = Math.min(...values);
       const max = Math.max(...values);
       const range = max - min || 1;
@@ -1031,50 +1107,65 @@
       const xFor = (ts) => ((ts - minTime) / spanTime) * displayWidth;
       const yFor = (val) => displayHeight - ((val - min) / range) * displayHeight;
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, displayHeight);
-      gradient.addColorStop(0, 'rgba(34, 197, 94, 0.35)');
-      gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+      const drawLine = (series, color, fill) => {
+        if (!series.length) return;
+        ctx.beginPath();
+        series.forEach((p, idx) => {
+          const x = xFor(p.ts);
+          const y = yFor(p.pct);
+          if (idx === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+        if (fill) {
+          ctx.lineTo(displayWidth, displayHeight);
+          ctx.lineTo(0, displayHeight);
+          ctx.closePath();
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        const lastPoint = series[series.length - 1];
+        const lx = xFor(lastPoint.ts);
+        const ly = yFor(lastPoint.pct);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(lx, ly, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      };
 
-      ctx.beginPath();
-      points.forEach((p, idx) => {
-        const x = xFor(p[0]);
-        const y = yFor(p[1]);
-        if (idx === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.strokeStyle = '#22c55e';
-      ctx.lineWidth = 2.4;
-      ctx.stroke();
+      const btcGradient = ctx.createLinearGradient(0, 0, 0, displayHeight);
+      btcGradient.addColorStop(0, 'rgba(34, 197, 94, 0.28)');
+      btcGradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+      drawLine(btcPoints, '#22c55e', btcGradient);
 
-      ctx.lineTo(displayWidth, displayHeight);
-      ctx.lineTo(0, displayHeight);
-      ctx.closePath();
-      ctx.fillStyle = gradient;
-      ctx.fill();
-
-      const lastPoint = points[points.length - 1];
-      const lastX = xFor(lastPoint[0]);
-      const lastY = yFor(lastPoint[1]);
-      ctx.fillStyle = '#22c55e';
-      ctx.beginPath();
-      ctx.arc(lastX, lastY, 4.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowColor = 'rgba(34, 197, 94, 0.45)';
-      ctx.shadowBlur = 16;
-      ctx.beginPath();
-      ctx.arc(lastX, lastY, 2, 0, Math.PI * 2);
-      ctx.fill();
-
-      let hoverPoint = null;
-      if (hoverTs) {
-        hoverPoint = points.reduce((closest, point) => {
-          return Math.abs(point[0] - hoverTs) < Math.abs(closest[0] - hoverTs) ? point : closest;
-        }, points[0]);
+      if (hasGold) {
+        const goldGradient = ctx.createLinearGradient(0, 0, 0, displayHeight);
+        goldGradient.addColorStop(0, 'rgba(91, 124, 250, 0.3)');
+        goldGradient.addColorStop(1, 'rgba(91, 124, 250, 0)');
+        drawLine(goldPoints, '#5b7cfa', goldGradient);
       }
 
+      let hoverPointBtc = null;
+      let hoverPointGold = null;
+      if (hoverTs) {
+        if (hasBtc) {
+          hoverPointBtc = btcPoints.reduce((closest, point) => {
+            return Math.abs(point.ts - hoverTs) < Math.abs(closest.ts - hoverTs) ? point : closest;
+          }, btcPoints[0]);
+        }
+        if (hasGold) {
+          hoverPointGold = goldPoints.reduce((closest, point) => {
+            return Math.abs(point.ts - hoverTs) < Math.abs(closest.ts - hoverTs) ? point : closest;
+          }, goldPoints[0]);
+        }
+      }
+
+      const hoverPoint = hoverPointBtc || hoverPointGold;
       if (hoverPoint) {
-        const hx = xFor(hoverPoint[0]);
-        const hy = yFor(hoverPoint[1]);
+        const hx = xFor(hoverPoint.ts);
+        const hy = yFor(hoverPoint.pct);
         ctx.save();
         ctx.setLineDash([4, 6]);
         ctx.strokeStyle = 'rgba(91, 124, 250, 0.7)';
@@ -1085,27 +1176,28 @@
         ctx.stroke();
         ctx.restore();
 
-        ctx.fillStyle = '#5b7cfa';
+        ctx.fillStyle = '#0f172a';
         ctx.beginPath();
         ctx.arc(hx, hy, 5, 0, Math.PI * 2);
         ctx.fill();
 
+        const btcText = hoverPointBtc
+          ? `<div class="muted-row"><span>BTC</span><span>${percent(hoverPointBtc.pct, 2)} · € ${euro(
+              hoverPointBtc.price
+            )}</span></div>`
+          : '';
+        const goldText = hoverPointGold
+          ? `<div class="muted-row"><span>Gold</span><span>${percent(hoverPointGold.pct, 2)} · € ${euro(
+              hoverPointGold.price
+            )}</span></div>`
+          : '<div class="muted-row"><span>Gold</span><span>kein Punkt</span></div>';
+
         chartTooltip.style.display = 'block';
-        const base = points[0][1];
-        const delta = hoverPoint[1] - base;
-        const deltaPct = base !== 0 ? (delta / base) * 100 : 0;
-        const hoverIndex = points.indexOf(hoverPoint) + 1;
-        chartTooltip.innerHTML = `<strong>€ ${euro(hoverPoint[1])}</strong><div>${formatDate(
-          hoverPoint[0]
-        )}</div><div class="muted-row"><span>Δ zum Start</span><span>${delta >= 0 ? '+' : ''}${euro(
-          delta
-        )} (${deltaPct.toFixed(2)}%)</span></div><div class="muted-row"><span>Punkt</span><span>${hoverIndex}/${
-          points.length
-        }</span></div>`;
+        chartTooltip.innerHTML = `<strong>${formatDate(hoverPoint.ts)}</strong>${btcText}${goldText}`;
 
         const wrapRect = sparklineCanvas.parentElement.getBoundingClientRect();
-        const tooltipWidth = chartTooltip.offsetWidth || 200;
-        const tooltipHeight = chartTooltip.offsetHeight || 80;
+        const tooltipWidth = chartTooltip.offsetWidth || 220;
+        const tooltipHeight = chartTooltip.offsetHeight || 100;
         const relX = (hx / displayWidth) * wrapRect.width;
         const relY = (hy / displayHeight) * wrapRect.height;
         let left = relX - tooltipWidth / 2;
@@ -1172,49 +1264,68 @@
     }
 
     function computeWindowedPrices() {
-      const source = historyPrices.length ? historyPrices : lastPrices;
-      if (!source || source.length < 2) return [];
+      const btcSource = historyPrices.length ? historyPrices : lastPrices;
+      const goldSource = goldPrices;
+      if (!btcSource?.length) return { btc: [], gold: [] };
 
-      if (activeRange === 'max' || source.length < 3) {
-        return [...source];
-      }
-
+      const useFull = activeRange === 'max' || btcSource.length < 3;
       const days = Number(activeRange) || 7;
-      const windowMs = days * 24 * 3600 * 1000;
-      const firstTs = source[0][0];
-      const lastTs = source[source.length - 1][0];
+      const windowMs = useFull ? Number.MAX_SAFE_INTEGER : days * 24 * 3600 * 1000;
+      const firstTs = btcSource[0][0];
+      const lastTs = btcSource[btcSource.length - 1][0];
       const spanMs = Math.max(lastTs - firstTs, 1);
       const usableSpan = Math.max(spanMs - windowMs, 0);
       const ratio = Math.min(Math.max(Number(rangeSlider.value) / 100, 0), 1);
       const startCandidate = firstTs + usableSpan * ratio;
-      const startTs = Math.min(Math.max(startCandidate, firstTs), Math.max(lastTs - windowMs, firstTs));
-      const endTs = Math.min(startTs + windowMs, lastTs);
+      const startTs = useFull
+        ? firstTs
+        : Math.min(Math.max(startCandidate, firstTs), Math.max(lastTs - windowMs, firstTs));
+      const endTs = useFull ? lastTs : Math.min(startTs + windowMs, lastTs);
 
-      return source.filter(([ts]) => ts >= startTs && ts <= endTs);
+      const btcWindow = btcSource.filter(([ts]) => ts >= startTs && ts <= endTs);
+      const goldWindowRaw = goldSource.filter(([ts]) => ts >= startTs && ts <= endTs);
+
+      let goldWindow = goldWindowRaw;
+      let btcAligned = btcWindow;
+      if (goldWindowRaw.length) {
+        const overlapStart = Math.max(btcWindow[0]?.[0] ?? startTs, goldWindowRaw[0][0]);
+        const overlapEnd = Math.min(btcWindow[btcWindow.length - 1]?.[0] ?? endTs, goldWindowRaw[goldWindowRaw.length - 1][0]);
+        if (overlapEnd > overlapStart) {
+          goldWindow = goldWindowRaw.filter(([ts]) => ts >= overlapStart && ts <= overlapEnd);
+          btcAligned = btcWindow.filter(([ts]) => ts >= overlapStart && ts <= overlapEnd);
+        }
+      }
+
+      const toPercentSeries = (series) => {
+        if (!series.length) return [];
+        const base = series[0][1] || 1;
+        return series.map(([ts, price]) => ({ ts, price, pct: base ? ((price - base) / base) * 100 : 0 }));
+      };
+
+      return { btc: toPercentSeries(btcAligned), gold: toPercentSeries(goldWindow) };
     }
 
     function renderSparkline() {
       const windowed = computeWindowedPrices();
       currentWindow = windowed;
 
-      if (windowed.length > 1) {
-        const first = new Date(windowed[0][0]).toLocaleDateString('de-DE');
-        const last = new Date(windowed[windowed.length - 1][0]).toLocaleDateString('de-DE');
+      const btcPoints = windowed.btc || [];
+      const goldPoints = windowed.gold || [];
+
+      if (btcPoints.length > 1) {
+        const first = new Date(btcPoints[0].ts).toLocaleDateString('de-DE');
+        const last = new Date(btcPoints[btcPoints.length - 1].ts).toLocaleDateString('de-DE');
         sparklineRange.textContent = `${first} – ${last}`;
-        if (historyPrices.length) {
-          const windowLabel = activeRange === 'max' ? 'Gesamte Historie' : `Fenster: ${activeRange} Tage`;
-          sparklineInfo.textContent = historyLabel ? `${historyLabel} · ${windowLabel}` : windowLabel;
-          chartTitle.textContent = 'Bitcoin Langfrist-Chart';
-          rangeLabel.textContent = rangeSlider.disabled
-            ? 'Gesamte Historie sichtbar'
-            : `${rangeSlider.value}% der ausgewählten Historie`;
-          timelineHint.textContent = rangeSlider.disabled
-            ? 'Komplette Historie aktiv · Shift+Scroll zoomt'
-            : 'Scrollen/Ziehen zum Pannen · Shift+Scroll zoomt';
-        } else {
-          sparklineInfo.textContent = 'Stündliche Daten (7 Tage)';
-          timelineHint.textContent = 'Scrollen/Ziehen bewegt den 7-Tage-Bereich';
-        }
+        const windowLabel = activeRange === 'max' ? 'Gesamte BTC-Historie' : `Fenster: ${activeRange} Tage`;
+        const goldLabelText = goldPoints.length ? 'Gold Overlay aktiv' : 'Gold Overlay leer';
+        sparklineInfo.textContent = `${windowLabel} · ${goldLabelText}`;
+        chartTitle.textContent = 'BTC vs. Gold (% Veränderung)';
+        rangeLabel.textContent = rangeSlider.disabled
+          ? 'Gesamte Historie sichtbar'
+          : `${rangeSlider.value}% der ausgewählten Historie (BTC-Basis)`;
+        timelineHint.textContent = rangeSlider.disabled
+          ? 'Komplette Historie aktiv · Shift+Scroll zoomt'
+          : 'Scrollen/Ziehen zum Pannen · Shift+Scroll zoomt';
       } else {
         sparklineInfo.textContent = 'Keine Zeitreihe gefunden';
         sparklineRange.textContent = '–';
@@ -1222,28 +1333,36 @@
         timelineHint.textContent = 'Keine Daten zum Navigieren';
       }
 
-      updateWindowStats(windowed);
-      drawSparkline(windowed);
+      updateWindowStats(btcPoints, goldPoints);
+      drawSparkline(btcPoints, goldPoints);
     }
 
     async function loadHistory(force = false) {
-      if (historyLoaded && !force) return;
+      if (historyLoaded && goldLoaded && !force) return;
 
       historyLoaded = false;
+      goldLoaded = false;
       historyPrices = [];
+      goldPrices = [];
       historyLabel = '';
+      goldLabel = '';
       rangeSlider.disabled = true;
 
-      const sources = [
-        { query: 'days=max&interval=daily', label: 'Volle Historie (täglich)' },
-        { query: 'days=1825&interval=daily', label: 'Letzte 5 Jahre (täglich)' },
-        { query: 'days=365&interval=daily', label: 'Letztes Jahr (täglich)' },
-        { query: 'days=90&interval=hourly', label: 'Letzte 90 Tage (stündlich)' },
+      const btcSources = [
+        { query: 'days=max&interval=daily', label: 'BTC: Volle Historie (täglich)' },
+        { query: 'days=1825&interval=daily', label: 'BTC: Letzte 5 Jahre (täglich)' },
+        { query: 'days=365&interval=daily', label: 'BTC: Letztes Jahr (täglich)' },
+        { query: 'days=90&interval=hourly', label: 'BTC: Letzte 90 Tage (stündlich)' },
       ];
 
-      let lastError = null;
+      const goldSources = [
+        { query: 'days=max&interval=daily', label: 'Gold: Volle Historie (täglich)' },
+        { query: 'days=1825&interval=daily', label: 'Gold: Letzte 5 Jahre (täglich)' },
+        { query: 'days=365&interval=daily', label: 'Gold: Letztes Jahr (täglich)' },
+      ];
 
-      for (const source of sources) {
+      let btcError = null;
+      for (const source of btcSources) {
         try {
           sparklineInfo.textContent = `Lade ${source.label} …`;
           const chartRes = await fetch(
@@ -1256,21 +1375,48 @@
             historyPrices = chartData.prices.map(([ts, price]) => [ts, price]);
             historyLoaded = true;
             historyLabel = source.label;
-            rangeSlider.disabled = historyPrices.length < 2 || activeRange === 'max';
-            renderSparkline();
-            return;
+            break;
           }
-          lastError = new Error('Leere Historie erhalten');
+          btcError = new Error('Leere Historie erhalten');
         } catch (chartErr) {
-          console.error('Konnte Historie nicht laden', chartErr);
-          lastError = chartErr;
+          console.error('Konnte BTC Historie nicht laden', chartErr);
+          btcError = chartErr;
         }
       }
 
-      historyLoaded = false;
-      historyLabel = '';
-      sparklineInfo.textContent = `Historie nicht verfügbar (${lastError?.message ?? 'unbekannt'}). Nutze 7-Tage-Ansicht.`;
-      rangeSlider.disabled = true;
+      let goldError = null;
+      for (const source of goldSources) {
+        try {
+          compareStatus.textContent = `Lade ${source.label} …`;
+          const chartRes = await fetch(
+            `https://api.coingecko.com/api/v3/coins/pax-gold/market_chart?vs_currency=eur&${source.query}`,
+            { headers: { accept: 'application/json' } }
+          );
+          if (!chartRes.ok) throw new Error(`Gold Fehler: HTTP ${chartRes.status}`);
+          const chartData = await chartRes.json();
+          if (Array.isArray(chartData?.prices) && chartData.prices.length) {
+            goldPrices = chartData.prices.map(([ts, price]) => [ts, price]);
+            goldLoaded = true;
+            goldLabel = source.label;
+            break;
+          }
+          goldError = new Error('Leere Gold-Reihe erhalten');
+        } catch (chartErr) {
+          console.error('Konnte Gold Historie nicht laden', chartErr);
+          goldError = chartErr;
+        }
+      }
+
+      rangeSlider.disabled = historyPrices.length < 2 || activeRange === 'max';
+
+      if (!historyLoaded) {
+        sparklineInfo.textContent = `Historie nicht verfügbar (${btcError?.message ?? 'unbekannt'}). Nutze 7-Tage-Ansicht.`;
+      }
+
+      if (!goldLoaded) {
+        compareStatus.textContent = `Gold-Overlay fehlt (${goldError?.message ?? 'keine Daten'})`;
+      }
+
       renderSparkline();
     }
 
@@ -1302,8 +1448,8 @@
         marketcapElement.textContent = fallback?.eur_market_cap ? `€ ${euro(fallback.eur_market_cap)}` : '–';
         sparklineInfo.textContent = 'Fallback Preis ohne Zeitreihe';
         sparklineRange.textContent = 'Keine Zeitreihe geladen';
-        updateWindowStats([]);
-        drawSparkline([]);
+        updateWindowStats([], []);
+        drawSparkline([], []);
         convert();
         statusText.textContent = 'Einfacher Preis geladen (Fallback).';
       } catch (fallbackError) {
