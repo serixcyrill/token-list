@@ -191,7 +191,17 @@
       color:#1e293b; font-weight:800; font-size:13px;
     }
 
-    #freiheit .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-top:16px; align-items:stretch; }
+    #freiheit .kpis{
+      display:grid;
+      gap:14px;
+      margin-top:16px;
+      align-items:stretch;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-areas:
+        "dep interest"
+        "end status"
+        "save save";
+    }
     #freiheit .kpi{
       background:var(--panel);
       border:1px solid var(--ring);
@@ -208,7 +218,11 @@
     #freiheit .kpi-label{ color:var(--muted); font-size:12px; font-weight:600; }
     #freiheit .kpi-value{ font-size:21px; font-weight:700; letter-spacing:-0.15px; margin-top:6px; color:#0f172a; transition:color .2s ease; }
 
-    #freiheit .kpi.full{ grid-column:1 / -1; }
+    #freiheit .kpi.deposits{ grid-area:dep; }
+    #freiheit .kpi.interest{ grid-area:interest; }
+    #freiheit .kpi.endcap{ grid-area:end; }
+    #freiheit .kpi.status{ grid-area:status; }
+    #freiheit .kpi.savings{ grid-area:save; }
     #freiheit .kpi.endcap{
       flex-direction:row;
       align-items:center;
@@ -273,13 +287,21 @@
       #freiheit .form-grid{ gap:14px; }
       #freiheit label{ font-size:12.5px; margin-bottom:6px; }
       #freiheit .input, #freiheit select.input{ padding:13px 14px; font-size:15px; font-weight:500; }
-      #freiheit .kpis{ grid-template-columns:1fr; gap:14px; }
+      #freiheit .kpis{
+        grid-template-columns:1fr;
+        gap:14px;
+        grid-template-areas:
+          "dep"
+          "interest"
+          "end"
+          "status"
+          "save";
+      }
       #freiheit .kpi{ min-height:92px; padding:14px 16px; }
       #freiheit .kpi-label{ font-size:12px; }
       #freiheit .kpi-value{ font-size:19px; }
-      #freiheit .kpi.status{ min-height:118px; }
-      #freiheit .kpi.full{ grid-column:auto; }
-      #freiheit .kpi.endcap{ order:-1; min-height:114px; border-radius:16px; }
+        #freiheit .kpi.status{ min-height:118px; }
+        #freiheit .kpi.endcap{ min-height:114px; border-radius:16px; }
       #freiheit .chart-section{ margin-top:16px; }
       #freiheit .chart-head{ flex-direction:column; align-items:flex-start; gap:10px; }
       #freiheit .legend{ flex-wrap:wrap; gap:10px; font-size:11px; }
@@ -352,6 +374,14 @@
 
           <section class="panel" id="results-panel">
             <div class="kpis">
+              <div class="kpi deposits">
+                <div class="kpi-label">Kumulierte Einzahlungen</div>
+                <div class="kpi-value" id="einzahlungen">–</div>
+              </div>
+              <div class="kpi interest">
+                <div class="kpi-label">Zinsanteil</div>
+                <div class="kpi-value" id="zinsen">–</div>
+              </div>
               <div class="kpi endcap">
                 <div>
                   <div class="kpi-label">Benötigtes Endkapital</div>
@@ -362,15 +392,7 @@
                 <div class="kpi-label">Kapitalstatus</div>
                 <div class="kpi-value" id="depletion">–</div>
               </div>
-              <div class="kpi">
-                <div class="kpi-label">Kumulierte Einzahlungen</div>
-                <div class="kpi-value" id="einzahlungen">–</div>
-              </div>
-              <div class="kpi">
-                <div class="kpi-label">Zinsanteil</div>
-                <div class="kpi-value" id="zinsen">–</div>
-              </div>
-              <div class="kpi accent full">
+              <div class="kpi accent savings">
                 <div class="kpi-label">Erforderliche Sparrate pro Monat</div>
                 <div class="kpi-value" id="sparrate">–</div>
               </div>
