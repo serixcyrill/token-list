@@ -15,29 +15,29 @@
 
     /* Widget namespace */
     .msci-overlay {
-      --bg-gradient: radial-gradient(36% 42% at 18% 20%, rgba(126, 217, 87, 0.18), transparent),
-        radial-gradient(32% 40% at 84% 20%, rgba(91, 124, 250, 0.16), transparent),
-        linear-gradient(180deg, #f9fbff 0%, #eef2ff 100%);
-      --card-glass: rgba(255, 255, 255, 0.75);
-      --panel-glass: rgba(255, 255, 255, 0.8);
+      --bg-gradient: radial-gradient(42% 50% at 16% 20%, rgba(126, 217, 87, 0.16), transparent),
+        radial-gradient(36% 42% at 86% 18%, rgba(91, 124, 250, 0.14), transparent),
+        linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
+      --panel: rgba(255, 255, 255, 0.82);
+      --panel-strong: rgba(255, 255, 255, 0.94);
       --text-strong: #0f172a;
       --text-muted: #5f6a86;
-      --border-soft: rgba(17, 24, 39, 0.08);
-      --shadow-strong: 0 24px 56px rgba(15, 23, 42, 0.16);
+      --border-soft: rgba(17, 24, 39, 0.07);
+      --shadow-strong: 0 24px 56px rgba(15, 23, 42, 0.13);
       --shadow-soft: 0 18px 42px rgba(15, 23, 42, 0.08);
-      --radius-shell: 26px;
-      --radius-card: 20px;
+      --radius-shell: 28px;
+      --radius-card: 18px;
       --radius-chip: 14px;
       --blur: 12px;
       font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
       background: var(--bg-gradient);
       border-radius: var(--radius-shell);
       border: 1px solid var(--border-soft);
-      padding: 28px 26px 26px;
+      padding: 30px 26px 26px;
       box-shadow: var(--shadow-strong);
       backdrop-filter: blur(var(--blur));
       color: var(--text-strong);
-      max-width: 1320px;
+      max-width: 1360px;
       margin: 0 auto;
     }
 
@@ -62,7 +62,7 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(248, 250, 252, 0.92);
+      background: rgba(248, 250, 252, 0.9);
       border: 1px solid var(--border-soft);
       font-size: 11px;
       font-weight: 800;
@@ -81,9 +81,9 @@
     h1 {
       font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
       font-weight: 800;
-      letter-spacing: -0.4px;
-      font-size: clamp(30px, 3vw, 38px);
-      margin: 6px 0 2px;
+      letter-spacing: -0.38px;
+      font-size: clamp(32px, 3.2vw, 44px);
+      margin: 8px 0 4px;
       color: var(--text-strong);
     }
 
@@ -91,6 +91,7 @@
       color: var(--text-muted);
       font-weight: 600;
       margin: 0;
+      letter-spacing: 0.1px;
     }
 
     .controls-grid {
@@ -98,7 +99,7 @@
       grid-template-columns: 1fr auto;
       gap: 14px;
       align-items: center;
-      margin: 14px 0 6px;
+      margin: 16px 0 8px;
     }
 
     @media (max-width: 900px) {
@@ -113,13 +114,21 @@
     }
 
     .input {
-      background: rgba(255, 255, 255, 0.82);
+      background: var(--panel);
       border: 1px solid var(--border-soft);
-      border-radius: var(--radius-chip);
-      padding: 11px 14px;
+      border-radius: 16px;
+      padding: 12px 14px;
       font-size: 14px;
       min-width: 260px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 8px 20px rgba(15, 23, 42, 0.04);
+      transition: all 0.18s ease;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: rgba(126, 217, 87, 0.35);
+      box-shadow: 0 0 0 6px rgba(126, 217, 87, 0.14);
+      background: var(--panel-strong);
     }
 
     .chip-group { display: inline-flex; flex-wrap: wrap; gap: 8px; }
@@ -128,7 +137,7 @@
       border: 1px solid var(--border-soft);
       border-radius: var(--radius-chip);
       padding: 9px 13px;
-      background: rgba(255, 255, 255, 0.82);
+      background: var(--panel);
       color: var(--text-strong);
       font-weight: 700;
       font-size: 13px;
@@ -138,21 +147,25 @@
       align-items: center;
       gap: 8px;
       box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+      border-radius: 14px;
     }
 
-    .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .chip .dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.04); }
+
+    .chip:hover { transform: translateY(-1px); background: var(--panel-strong); }
 
     .chip.active {
-      background: linear-gradient(135deg, rgba(126, 217, 87, 0.18), rgba(91, 124, 250, 0.18));
-      border-color: rgba(126, 217, 87, 0.45);
-      color: #0b4c28;
+      background: linear-gradient(135deg, rgba(126, 217, 87, 0.16), rgba(91, 124, 250, 0.14));
+      border-color: rgba(91, 124, 250, 0.28);
+      color: #0f172a;
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
       transform: translateY(-1px);
     }
 
     .chart-card {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(243, 246, 255, 0.8));
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(243, 246, 255, 0.82));
       border: 1px solid var(--border-soft);
-      border-radius: var(--radius-card);
+      border-radius: 20px;
       box-shadow: var(--shadow-soft);
       padding: 18px 18px 14px;
       overflow: hidden;
@@ -180,32 +193,33 @@
 
     .index-card {
       position: relative;
-      border-radius: var(--radius-card);
-      padding: 16px;
-      color: #fff;
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      color: var(--text-strong);
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.6);
       cursor: pointer;
       transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.18);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(0, 0, 0, 0.08));
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.86), rgba(248, 250, 252, 0.9));
     }
 
     .index-card::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.12));
-      opacity: 0;
-      transition: opacity 0.2s ease;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), transparent 70%);
+      opacity: 0.92;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
     }
 
     .index-card:hover { transform: translateY(-2px); }
-    .index-card:hover::after { opacity: 0.5; }
+    .index-card:hover::after { opacity: 0.82; }
 
     .index-card.selected {
-      border-color: rgba(255, 255, 255, 0.6);
-      box-shadow: 0 22px 38px rgba(15, 23, 42, 0.2);
+      border-color: rgba(126, 217, 87, 0.38);
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.15);
       transform: translateY(-2px);
     }
 
@@ -224,7 +238,7 @@
     .index-change { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
 
     .disclaimer {
-      margin-top: 14px;
+      margin-top: 16px;
       font-size: 12px;
       color: var(--text-muted);
       text-align: right;
@@ -237,7 +251,7 @@
     }
   </style>
 </head>
-<body style="margin:0; padding:14px; background:#eef2ff;">
+  <body style="margin:0; padding:14px; background:linear-gradient(180deg,#eef2ff 0%,#e5ecff 60%,#eef2ff 100%);">
   <div class="msci-overlay">
     <div class="topline">
       <div>
@@ -343,6 +357,23 @@
     const chartEl = document.getElementById('chart');
     let chart;
 
+    function hexToRgba(hex, alpha = 1) {
+      if (hex.startsWith('rgb')) return hex;
+      const parsed = hex.replace('#', '');
+      const bigint = parseInt(parsed.length === 3 ? parsed.split('').map(c => c + c).join('') : parsed, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function blendColors(colors) {
+      if (!colors.length) return ['#5b7cfa', '#7ed957'];
+      const primary = hexToRgba(colors[0], 0.72);
+      const secondary = hexToRgba(colors[1] || colors[0], 0.4);
+      return [primary, secondary];
+    }
+
     function normalize(series) {
       if (!series.length) return [];
       const first = series[0];
@@ -362,9 +393,10 @@
     }
 
     function pickGradient(ctx, colors) {
+      const [start, end] = blendColors(colors);
       const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 0.9);
-      gradient.addColorStop(0, colors[0]);
-      gradient.addColorStop(1, colors[1] || colors[0]);
+      gradient.addColorStop(0, start);
+      gradient.addColorStop(1, hexToRgba(end, 0.04));
       return gradient;
     }
 
@@ -373,15 +405,16 @@
       const datasets = [];
       const legend = document.getElementById('legend');
       legend.innerHTML = '';
+      if (!state.selected.length) state.selected = ['ACWI'];
       state.selected.forEach((id) => {
         const info = indexCatalog.find((i) => i.id === id);
         if (!info) return;
         const raw = priceData[id] || [];
         const norm = normalize(raw);
         const { dates, series } = sliceRange(baseDates, norm);
-        const color = info.colors[0];
-        const borderColor = info.colors[1] || info.colors[0];
-        const gradient = pickGradient(ctx, [color, 'rgba(255,255,255,0)']);
+        const [colorPrimary] = blendColors(info.colors);
+        const borderColor = hexToRgba(info.colors[0], 0.9);
+        const gradient = pickGradient(ctx, info.colors);
         datasets.push({
           label: `${info.name}`,
           data: series,
@@ -395,7 +428,16 @@
         });
         const chip = document.createElement('div');
         chip.className = 'chip active';
-        chip.innerHTML = `<span class="dot" style="background:${borderColor}"></span>${info.flag} ${info.name}`;
+        chip.innerHTML = `<span class="dot" style="background:${colorPrimary}"></span>${info.flag} ${info.name}`;
+        chip.onclick = () => {
+          if (state.selected.includes(id)) {
+            state.selected = state.selected.filter((x) => x !== id);
+          } else {
+            state.selected.push(id);
+          }
+          buildChart();
+          renderCards();
+        };
         legend.appendChild(chip);
       });
 
@@ -491,8 +533,11 @@
         .forEach((idx) => {
           const card = document.createElement('div');
           card.className = 'index-card' + (state.selected.includes(idx.id) ? ' selected' : '');
-          const colors = idx.colors.length === 1 ? [idx.colors[0], idx.colors[0]] : idx.colors;
-          card.style.background = `linear-gradient(160deg, ${colors[0]}, ${colors[1] || colors[0]})`;
+          const colors = blendColors(idx.colors);
+          card.style.backgroundImage = `linear-gradient(145deg, ${hexToRgba(colors[0], 0.16)}, ${hexToRgba(colors[1], 0.12)}), linear-gradient(160deg, ${colors[0]}, ${colors[1]})`;
+          if (idx.id === 'ACWI') {
+            card.style.borderColor = 'rgba(126, 217, 87, 0.5)';
+          }
           const series = normalize(priceData[idx.id] || []);
           const latest = series.at(-1) || 1;
           const change = formatPercent(latest);
