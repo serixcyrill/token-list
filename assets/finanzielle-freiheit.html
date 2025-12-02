@@ -191,18 +191,18 @@
       color:#1e293b; font-weight:800; font-size:13px;
     }
 
-    #freiheit .kpis{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; align-items:stretch; }
+    #freiheit .kpis{ display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-top:18px; align-items:stretch; }
     #freiheit .kpi{
       background:var(--panel);
       border:1px solid var(--ring);
       border-radius:14px;
-      padding:14px 16px 12px;
+      padding:12px 14px 10px;
       position:relative;
       overflow:hidden;
       display:flex;
       flex-direction:column;
       justify-content:center;
-      min-height:92px;
+      min-height:84px;
       box-shadow:0 12px 28px rgba(15,23,42,.06);
     }
     #freiheit .kpi-label{ color:var(--muted); font-size:12px; font-weight:600; }
@@ -213,8 +213,8 @@
       flex-direction:row;
       align-items:center;
       gap:12px;
-      padding:18px 22px;
-      min-height:120px;
+      padding:16px 20px;
+      min-height:108px;
       background:rgba(91,124,250,0.06);
       border:1px solid rgba(91,124,250,0.18);
       box-shadow:0 18px 36px rgba(91,124,250,.06);
@@ -252,7 +252,9 @@
     #freiheit .chart-section{ margin-top:24px; }
     #freiheit .chart-card{ padding:18px 18px 10px; border:1px solid var(--ring); border-radius:18px; background:rgba(248,250,252,.58); box-shadow:0 12px 28px rgba(15,23,42,.08); }
     #freiheit .chart-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-    #freiheit .legend{ display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:500; font-size:12px; }
+    #freiheit .legend{ display:flex; gap:14px; align-items:center; color:var(--muted); font-weight:500; font-size:12px; flex-wrap:wrap; }
+    #freiheit .legend-item{ display:inline-flex; align-items:center; gap:8px; white-space:nowrap; }
+    #freiheit .legend-item.legend-withdraw{ gap:8px; }
     #freiheit .legend .dot{ width:12px; height:12px; box-shadow:none; }
     #freiheit #chart{ width:100%; height:360px; }
     #freiheit #chart .bar-stack{ transform-origin: bottom; transform-box: fill-box; transition: transform .9s cubic-bezier(.22,.61,.36,1); }
@@ -272,14 +274,15 @@
       #freiheit label{ font-size:12.5px; margin-bottom:6px; }
       #freiheit .input, #freiheit select.input{ padding:13px 14px; font-size:15px; font-weight:500; }
       #freiheit .kpis{ grid-template-columns:1fr; gap:12px; }
-      #freiheit .kpi{ min-height:86px; padding:12px 14px; }
+      #freiheit .kpi{ min-height:82px; padding:12px 14px; }
       #freiheit .kpi-label{ font-size:12px; }
       #freiheit .kpi-value{ font-size:19px; }
       #freiheit .kpi.status{ min-height:118px; }
       #freiheit .kpi.endcap{ order:-1; min-height:110px; border-radius:16px; }
       #freiheit .chart-section{ margin-top:16px; }
       #freiheit .chart-head{ flex-direction:column; align-items:flex-start; gap:10px; }
-      #freiheit .legend{ flex-wrap:wrap; gap:12px; font-size:11px; }
+      #freiheit .legend{ flex-wrap:wrap; gap:10px; font-size:11px; }
+      #freiheit .legend-item.legend-withdraw{ width:100%; }
       #freiheit .legend .dot{ width:10px; height:10px; }
       #freiheit #chart{ height:280px; }
     }
@@ -379,9 +382,9 @@
             <div class="chart-head">
               <h3 style="margin:0;">Entwicklung bis zur Freiheit</h3>
               <div class="legend">
-                <span class="dot" style="background:var(--accent);"></span> Zinserträge
-                <span class="dot" style="background:var(--accent-2);"></span> Kapitalbestand
-                <span class="dot" style="background:#ef4444;"></span> Kapitalentnahme
+                <span class="legend-item"><span class="dot" style="background:var(--accent);"></span> Zinserträge</span>
+                <span class="legend-item"><span class="dot" style="background:var(--accent-2);"></span> Kapitalbestand</span>
+                <span class="legend-item legend-withdraw"><span class="dot" style="background:#ef4444;"></span> Kapitalentnahme</span>
               </div>
             </div>
             <svg id="chart" viewBox="0 0 1080 360" aria-label="Kapitalverlauf"></svg>
