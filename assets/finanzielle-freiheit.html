@@ -230,11 +230,16 @@
     #freiheit .kpi.accent .kpi-value{ color:#14532d; }
 
     #freiheit .kpi.status{
-      background:rgba(14,165,233,0.10);
-      border-color:rgba(14,165,233,0.28);
-      box-shadow:0 14px 26px rgba(14,165,233,.07);
+      background:rgba(14,165,233,0.08);
+      border-color:rgba(14,165,233,0.22);
+      box-shadow:0 12px 24px rgba(14,165,233,.05);
     }
-    #freiheit .kpi.status .kpi-value{ color:#0f172a; }
+    #freiheit .kpi.status .kpi-value{ color:#0f172a; font-size:16px; font-weight:500; }
+    #freiheit .kpi.status.warn{
+      background:rgba(250,204,21,0.10);
+      border-color:rgba(234,179,8,0.26);
+      box-shadow:0 12px 24px rgba(234,179,8,.05);
+    }
     #freiheit .kpi.status.danger{
       background:rgba(239,68,68,0.12);
       border-color:rgba(239,68,68,0.32);
@@ -456,13 +461,38 @@
           durationYears: 10
         });
 
+        const longHorizon = Math.max(60, years + 20);
+        const depletionCheck = buildWithdrawal({
+          startBalance: finalBalance,
+          monthlyNeed: futureMonthly,
+          rMonthly,
+          startYear: years,
+          durationYears: longHorizon
+        });
+
+        const gap = expectedReturn - withdrawal;
+        let status = { type:'safe', text:'Kapital wird nie aufgebraucht' };
+
+        if(depletionCheck.depletionYear){
+          const yearsLeft = Math.max(0.5, depletionCheck.depletionYear - years).toFixed(1).replace('.', ',');
+          status = {
+            type: gap <= 0.02 ? 'warn' : 'danger',
+            text: `Kapital in ${yearsLeft} Jahren aufgebraucht`
+          };
+        }else if(gap <= 0.02){
+          status = {
+            type:'warn',
+            text:'Kapital könnte ausgehen – Entnahme reduzieren'
+          };
+        }
+
         const barYears = projection.years.concat(withdrawalPhase.years);
         const baseParts = projection.balances.map((b, i)=> Math.max(0, b - projection.interests[i]))
           .concat(withdrawalPhase.balances.map((b, i)=> Math.max(0, b - withdrawalPhase.interests[i])));
         const interestParts = projection.interests.concat(withdrawalPhase.interests);
         const withdrawalParts = projection.years.map(()=> 0).concat(withdrawalPhase.withdrawals);
 
-        renderKpis(requiredCapital, monthlySaving, totalDeposits, interestPortion, withdrawalPhase.depletionYear);
+        renderKpis({ requiredCapital, monthlySaving, totalDeposits, interestPortion, status });
         renderChart({
           barYears,
           baseParts,
@@ -540,26 +570,21 @@
         requestAnimationFrame(frame);
       }
 
-      function renderKpis(endCap, rate, deposits, interest, depletionYear){
-        animateValue(el.end, lastValues.end, endCap, CHF0);
-        animateValue(el.rate, lastValues.rate, rate, CHF0);
-        animateValue(el.deposits, lastValues.deposits, deposits, CHF0);
-        animateValue(el.interest, lastValues.interest, interest, CHF0);
+      function renderKpis({ requiredCapital, monthlySaving, totalDeposits, interestPortion, status }){
+        animateValue(el.end, lastValues.end, requiredCapital, CHF0);
+        animateValue(el.rate, lastValues.rate, monthlySaving, CHF0);
+        animateValue(el.deposits, lastValues.deposits, totalDeposits, CHF0);
+        animateValue(el.interest, lastValues.interest, interestPortion, CHF0);
 
-        lastValues.end = endCap;
-        lastValues.rate = rate;
-        lastValues.deposits = deposits;
-        lastValues.interest = interest;
+        lastValues.end = requiredCapital;
+        lastValues.rate = monthlySaving;
+        lastValues.deposits = totalDeposits;
+        lastValues.interest = interestPortion;
 
         if(el.depletion && el.depletionCard){
-          const safe = depletionYear === null;
-          el.depletionCard.classList.toggle('danger', !safe);
-          if(safe){
-            el.depletion.textContent = 'Kapital wird nie aufgebraucht';
-          }else{
-            const yearsText = Math.max(0, depletionYear).toFixed(1).replace('.', ',');
-            el.depletion.textContent = `Kapital in ${yearsText} Jahren aufgebraucht`;
-          }
+          el.depletionCard.classList.toggle('danger', status.type === 'danger');
+          el.depletionCard.classList.toggle('warn', status.type === 'warn');
+          el.depletion.textContent = status.text;
         }
       }
 
