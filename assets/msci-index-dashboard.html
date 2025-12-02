@@ -3,926 +3,535 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MSCI Index Explorer · Vemo Zinseszinsrechner UI</title>
+  <title>MSCI Index Overlay · Vemo UI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <style>
-    /* Alles in eine eigene Klasse namespaced, damit keine Stile der bestehenden Seite überschrieben werden. */
-    .msci-app {
-      --bg-primary: #f7f8fb;
-      --bg-card: #ffffff;
-      --bg-glass: rgba(255, 255, 255, 0.52);
-      --bg-panel: rgba(255, 255, 255, 0.7);
-      --bg-panel-soft: rgba(248, 250, 252, 0.78);
-      --text-primary: #0f172a;
-      --text-muted: #6b7280;
-      --text-muted-strong: #475569;
-      --text-muted-soft: #94a3b8;
-      --accent-green: #7ed957;
-      --accent-blue: #5b7cfa;
-      --border-soft: rgba(17, 24, 39, 0.08);
-      --border-strong-accent: rgba(126, 217, 87, 0.35);
-      --legend-label: #8fa3c0;
-      --input-bg: rgba(248, 250, 252, 0.7);
-      --input-bg-focus: rgba(255, 255, 255, 0.9);
-      --card-radius: 18px;
-      --panel-radius: 22px;
-      --input-radius: 14px;
-      --shadow-panel: 0 20px 42px rgba(15, 23, 42, 0.12);
-      --shadow-shell: 0 24px 56px rgba(15, 23, 42, 0.14);
-      --gradient-bg: radial-gradient(36% 40% at 18% 20%, rgba(126, 217, 87, 0.16), transparent),
-        radial-gradient(32% 38% at 86% 18%, rgba(91, 124, 250, 0.16), transparent),
-        linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: var(--gradient-bg);
-      color: var(--text-primary);
-      position: relative;
-      border-radius: 26px;
-      box-shadow: var(--shadow-shell);
-      padding: 28px 30px 34px;
-      border: 1px solid var(--border-soft);
-      backdrop-filter: blur(10px);
-      width: 100%;
-      max-width: 1260px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    :root {
+      color-scheme: light;
     }
 
-    /* Box sizing nur innerhalb des Widgets setzen. */
-    .msci-app *,
-    .msci-app *::before,
-    .msci-app *::after {
+    /* Widget namespace */
+    .msci-overlay {
+      --bg-gradient: radial-gradient(36% 42% at 18% 20%, rgba(126, 217, 87, 0.18), transparent),
+        radial-gradient(32% 40% at 84% 20%, rgba(91, 124, 250, 0.16), transparent),
+        linear-gradient(180deg, #f9fbff 0%, #eef2ff 100%);
+      --card-glass: rgba(255, 255, 255, 0.75);
+      --panel-glass: rgba(255, 255, 255, 0.8);
+      --text-strong: #0f172a;
+      --text-muted: #5f6a86;
+      --border-soft: rgba(17, 24, 39, 0.08);
+      --shadow-strong: 0 24px 56px rgba(15, 23, 42, 0.16);
+      --shadow-soft: 0 18px 42px rgba(15, 23, 42, 0.08);
+      --radius-shell: 26px;
+      --radius-card: 20px;
+      --radius-chip: 14px;
+      --blur: 12px;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg-gradient);
+      border-radius: var(--radius-shell);
+      border: 1px solid var(--border-soft);
+      padding: 28px 26px 26px;
+      box-shadow: var(--shadow-strong);
+      backdrop-filter: blur(var(--blur));
+      color: var(--text-strong);
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    .msci-overlay *,
+    .msci-overlay *::before,
+    .msci-overlay *::after {
       box-sizing: border-box;
     }
 
-    /* Umfeld neutral halten – das Widget kann in jede Seite eingebettet werden. */
-    .msci-app-wrapper {
-      width: 100%;
-      margin: 0;
-      padding: 0;
+    .topline {
       display: flex;
-      justify-content: center;
-      background: var(--bg-primary);
-      background: radial-gradient(36% 40% at 18% 20%, rgba(126, 217, 87, 0.12), transparent),
-        radial-gradient(32% 38% at 86% 18%, rgba(91, 124, 250, 0.12), transparent),
-        linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
     }
 
-    @media (max-width: 860px) {
-      .msci-app {
-        border-radius: 18px;
-        padding: 18px;
-      }
-    }
-
-    .msci-app .header {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.62));
-      border: 1px solid var(--border-soft);
-      border-radius: 22px;
-      padding: 18px 20px 16px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 14px;
-      align-items: center;
-      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.09);
-    }
-
-    @media (max-width: 780px) {
-      .msci-app .header {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .msci-app .eyebrow {
+    .eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 11px;
-      background: rgba(248, 250, 252, 0.9);
-      border: 1px solid var(--border-soft);
+      padding: 8px 12px;
       border-radius: 999px;
+      background: rgba(248, 250, 252, 0.92);
+      border: 1px solid var(--border-soft);
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 1px;
       text-transform: uppercase;
+      color: #0f9c4a;
     }
 
-    .msci-app .eyebrow .dot {
+    .eyebrow .dot {
       width: 8px;
       height: 8px;
-      border-radius: 999px;
-      background: var(--accent-green);
+      background: #7ed957;
+      border-radius: 50%;
     }
 
-    .msci-app .eyebrow-compact {
-      padding: 7px 10px;
-      font-size: 10px;
-      letter-spacing: 0.8px;
-    }
-
-    .msci-app h1 {
+    h1 {
       font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
-      font-size: clamp(28px, 3vw, 36px);
       font-weight: 800;
-      letter-spacing: -0.45px;
+      letter-spacing: -0.4px;
+      font-size: clamp(30px, 3vw, 38px);
+      margin: 6px 0 2px;
+      color: var(--text-strong);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-weight: 600;
       margin: 0;
-      line-height: 1.1;
     }
 
-    .msci-app .meta {
-      display: flex;
-      gap: 8px;
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
       align-items: center;
-      justify-content: flex-end;
-      flex-wrap: wrap;
+      margin: 14px 0 6px;
     }
 
-    .msci-app .meta-badge {
+    @media (max-width: 900px) {
+      .controls-grid { grid-template-columns: 1fr; }
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .input {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-chip);
+      padding: 11px 14px;
+      font-size: 14px;
+      min-width: 260px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .chip-group { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+
+    .chip {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-chip);
+      padding: 9px 13px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--text-strong);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.18s ease;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--border-soft);
-      border-radius: 12px;
-      padding: 8px 12px;
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
-      font-size: 13px;
-      color: var(--text-muted-strong);
-      font-weight: 700;
-      letter-spacing: 0.1px;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
     }
 
-    .msci-app .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
+    .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .chip.active {
+      background: linear-gradient(135deg, rgba(126, 217, 87, 0.18), rgba(91, 124, 250, 0.18));
+      border-color: rgba(126, 217, 87, 0.45);
+      color: #0b4c28;
+      transform: translateY(-1px);
     }
 
-    .msci-app .panel {
-      background: var(--bg-panel);
+    .chart-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(243, 246, 255, 0.8));
       border: 1px solid var(--border-soft);
-      border-radius: var(--panel-radius);
-      box-shadow: var(--shadow-panel);
-      padding: 22px;
-    }
-
-    .msci-app .chart-card {
-      background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(243, 246, 255, 0.82)), var(--bg-panel-soft);
-      border: 1px solid var(--border-soft);
-      border-radius: 22px;
-      padding: 20px 20px 14px;
-      box-shadow: var(--shadow-panel);
-      width: 100%;
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 18px 14px;
       overflow: hidden;
     }
 
-    .msci-app .chart-header {
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .chart-title { font-size: 15px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.2px; }
+
+    canvas { width: 100% !important; height: 420px !important; }
+
+    .grid-cards {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
     }
 
-    @media (max-width: 820px) {
-      .msci-app .chart-header {
-        grid-template-columns: 1fr;
-      }
+    .index-card {
+      position: relative;
+      border-radius: var(--radius-card);
+      padding: 16px;
+      color: #fff;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.18);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(0, 0, 0, 0.08));
     }
 
-    .msci-app .chart-title {
-      margin: 6px 0 0;
-      font-family: "Space Grotesk", "Inter", sans-serif;
-      font-size: clamp(22px, 2.4vw, 26px);
-      font-weight: 800;
-      letter-spacing: -0.2px;
+    .index-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.12));
+      opacity: 0;
+      transition: opacity 0.2s ease;
     }
 
-    .msci-app .chart-subtitle {
-      margin: 6px 0 0;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 13px;
+    .index-card:hover { transform: translateY(-2px); }
+    .index-card:hover::after { opacity: 0.5; }
+
+    .index-card.selected {
+      border-color: rgba(255, 255, 255, 0.6);
+      box-shadow: 0 22px 38px rgba(15, 23, 42, 0.2);
+      transform: translateY(-2px);
     }
 
-    .msci-app .chart-controls {
+    .index-top {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
-      align-items: stretch;
-      justify-content: flex-end;
-      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
     }
 
-    .msci-app .range-toggle {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .index-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+    .index-flag { font-size: 20px; }
+    .index-sub { font-size: 13px; opacity: 0.92; font-weight: 700; }
+    .index-change { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
 
-    .msci-app .scale-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 8px 10px;
-      border-radius: 16px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted-strong);
-      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
-    }
-
-    .msci-app .chip-label {
+    .disclaimer {
+      margin-top: 14px;
       font-size: 12px;
       color: var(--text-muted);
-      font-weight: 700;
-      letter-spacing: 0.1px;
-    }
-
-    .msci-app .scale-toggle button {
-      border: 0;
-      background: transparent;
-      padding: 6px 10px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 700;
-      color: var(--text-muted-strong);
-      transition: all 0.18s ease;
-    }
-
-    .msci-app .scale-toggle button.active {
-      background: linear-gradient(180deg, rgba(126, 217, 87, 0.16), rgba(126, 217, 87, 0.08));
-      color: var(--text-primary);
-      box-shadow: inset 0 0 0 1px var(--border-strong-accent), 0 10px 20px rgba(126, 217, 87, 0.18);
-    }
-
-    .msci-app .range-button {
-      border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.86);
-      color: var(--text-muted-strong);
-      border-radius: 14px;
-      padding: 9px 12px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
-      min-width: 54px;
-      text-align: center;
-    }
-
-    .msci-app .range-button.active {
-      border-color: var(--border-strong-accent);
-      background: linear-gradient(180deg, rgba(126, 217, 87, 0.16), rgba(126, 217, 87, 0.1));
-      color: var(--text-primary);
-      box-shadow: 0 0 0 4px rgba(126, 217, 87, 0.14), 0 12px 22px rgba(126, 217, 87, 0.12);
-    }
-
-    .msci-app .search-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 220px;
-      gap: 12px;
-      margin-bottom: 18px;
+      text-align: right;
+      font-weight: 600;
     }
 
     @media (max-width: 720px) {
-      .msci-app .search-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .msci-app .input {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: var(--input-radius);
-      border: 1px solid var(--border-soft);
-      background: var(--input-bg);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      transition: all 0.18s ease;
-      outline: none;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 18px rgba(15, 23, 42, 0.04);
-    }
-
-    .msci-app .input:focus {
-      background: var(--input-bg-focus);
-      border-color: var(--border-strong-accent);
-      box-shadow: 0 0 0 4px rgba(126, 217, 87, 0.15);
-    }
-
-    .msci-app .index-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 12px;
-    }
-
-    .msci-app .index-card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.84));
-      border: 1px solid var(--border-soft);
-      border-radius: 18px;
-      padding: 14px 14px 12px;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
-      display: grid;
-      gap: 6px;
-      cursor: pointer;
-      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
-      position: relative;
-      text-align: left;
-    }
-
-    .msci-app .index-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(91, 124, 250, 0.2);
-      box-shadow: 0 18px 38px rgba(91, 124, 250, 0.12);
-      background: linear-gradient(180deg, rgba(245, 248, 255, 0.98), rgba(255, 255, 255, 0.9));
-    }
-
-    .msci-app .index-card .check {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 26px;
-      height: 26px;
-      border-radius: 10px;
-      background: rgba(248, 250, 252, 0.95);
-      border: 1px solid var(--border-soft);
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      color: var(--accent-green);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-      opacity: 0;
-      transform: scale(0.92);
-      transition: all 0.16s ease;
-    }
-
-    .msci-app .index-card.active .check {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .msci-app .index-card.active {
-      border-color: var(--border-strong-accent);
-      box-shadow: 0 18px 40px rgba(126, 217, 87, 0.2);
-      background: linear-gradient(180deg, rgba(126, 217, 87, 0.12), rgba(255, 255, 255, 0.9));
-    }
-
-    .msci-app .index-card.global {
-      border-color: rgba(126, 217, 87, 0.8);
-      box-shadow: 0 20px 44px rgba(126, 217, 87, 0.24);
-    }
-
-    .msci-app .index-name {
-      font-weight: 800;
-      font-size: 15px;
-      letter-spacing: -0.1px;
-    }
-
-    .msci-app .index-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      color: var(--text-muted);
-      gap: 8px;
-    }
-
-    .msci-app .pill {
-      padding: 6px 10px;
-      background: rgba(243, 246, 255, 0.9);
-      color: var(--accent-blue);
-      font-weight: 700;
-      border-radius: 12px;
-      border: 1px solid rgba(91, 124, 250, 0.22);
-      box-shadow: 0 10px 20px rgba(91, 124, 250, 0.08);
-    }
-
-    .msci-app .legend {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--legend-label);
-    }
-
-    .msci-app .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-      padding: 7px 10px;
-      background: rgba(255, 255, 255, 0.86);
-      border: 1px solid var(--border-soft);
-      border-radius: 12px;
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
-    }
-
-    .msci-app .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-    }
-
-    .msci-app .empty-state {
-      border: 1px dashed var(--border-soft);
-      border-radius: 12px;
-      padding: 18px;
-      background: rgba(255, 255, 255, 0.36);
-      color: var(--text-muted-soft);
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .msci-app .disclaimer {
-      margin: 2px 2px 0;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
-      text-align: right;
+      canvas { height: 340px !important; }
+      .input { min-width: 100%; }
     }
   </style>
 </head>
-<body style="margin:0;">
-  <div class="msci-app-wrapper">
-    <div class="msci-app">
-      <div class="header">
-        <div>
-          <div class="eyebrow"><span class="dot"></span> Index Navigator</div>
-          <h1>MSCI All-Country & Länderindizes</h1>
-        </div>
-        <div class="meta">
-          <div class="meta-badge">Mehrfachauswahl & Overlay</div>
-          <div class="meta-badge">Suche + Region-Filter</div>
-        </div>
+<body style="margin:0; padding:14px; background:#eef2ff;">
+  <div class="msci-overlay">
+    <div class="topline">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> MSCI Overlay</div>
+        <h1>Globale Index-Performance</h1>
+        <p class="subtitle">Vergleiche Märkte übereinander – alles auf Basis prozentualer Entwicklung ab Start.</p>
       </div>
-
-      <section class="chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="eyebrow eyebrow-compact">Live Chart</div>
-            <h2 id="chartTitle" class="chart-title">Globale & Länderindizes übereinander</h2>
-            <p id="chartSubtitle" class="chart-subtitle">Max · Log-Skala · Prozentuale Entwicklung ab 0</p>
-          </div>
-          <div class="chart-controls">
-            <div class="scale-toggle" aria-label="Skalierung">
-              <span class="chip-label">Skala</span>
-              <button class="active" data-scale="logarithmic" type="button">Log</button>
-              <button data-scale="linear" type="button">Linear</button>
-            </div>
-            <div class="range-toggle" aria-label="Zeitraum wählen">
-              <button class="range-button active" data-range="MAX">Max</button>
-              <button class="range-button" data-range="5Y">5J</button>
-              <button class="range-button" data-range="1Y">1J</button>
-              <button class="range-button" data-range="6M">6M</button>
-              <button class="range-button" data-range="3M">3M</button>
-              <button class="range-button" data-range="1M">1M</button>
-            </div>
-          </div>
-        </div>
-        <div style="position:relative;height:380px;">
-          <canvas id="chart"></canvas>
-        </div>
-        <div id="legendContainer" class="legend" style="margin-top:12px;"></div>
-      </section>
-
-      <div class="grid">
-        <section class="panel">
-          <div class="search-row">
-            <input id="search" class="input" type="search" placeholder="Index suchen (z.B. MSCI, S&P, DAX)..." />
-            <select id="regionFilter" class="input" aria-label="Region filtern">
-              <option value="all">Alle Regionen</option>
-              <option value="global">Global</option>
-              <option value="emea">EMEA</option>
-              <option value="americas">Americas</option>
-              <option value="apac">APAC</option>
-            </select>
-          </div>
-          <div id="indexContainer" class="index-list"></div>
-          <div id="emptyState" class="empty-state" style="display:none;">Keine Treffer – verfeinere deine Suche.</div>
-        </section>
-      </div>
-      <p class="disclaimer">API: Angaben ohne Gewähr – keine Haftung für Richtigkeit oder Aktualität.</p>
     </div>
+
+    <div class="controls-grid">
+      <div class="control-row">
+        <input class="input" id="search" type="search" placeholder="Suchen nach Land oder Index" />
+        <div class="chip-group" id="range-chips"></div>
+        <div class="chip-group" id="scale-chips"></div>
+      </div>
+      <div class="control-row">
+        <div class="chip-group" id="region-chips"></div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title" id="chart-title">ACWI plus ausgewählte Märkte</div>
+        <div class="chip-group" id="legend"></div>
+      </div>
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="grid-cards" id="cards"></div>
+    <div class="disclaimer">API: Angaben ohne Gewähr, keine Haftung für die Richtigkeit der Daten.</div>
   </div>
 
   <script>
-    // Demo-Daten: externe APIs wie Stooq (https://stooq.pl) liefern CSV/JSON-Daten ohne API-Key.
-    // Du kannst die Funktion loadFromStooq(symbol) nutzen, um echte Kursreihen einzubinden.
-    const demoSeries = {
-      ACWI: generateSeries(365 * 8, 100, 0.0006),
-      SPX: generateSeries(365 * 8, 4200, 0.00085),
-      NDX: generateSeries(365 * 8, 14000, 0.0011),
-      DAX: generateSeries(365 * 8, 13000, 0.0008),
-      CAC40: generateSeries(365 * 8, 6500, 0.0007),
-      FTSE100: generateSeries(365 * 8, 7200, 0.00055),
-      SMI: generateSeries(365 * 8, 11200, 0.00055),
-      IBEX35: generateSeries(365 * 8, 8200, 0.0006),
-      AEX: generateSeries(365 * 8, 720, 0.00075),
-      OMXC25: generateSeries(365 * 8, 1700, 0.00072),
-      OMX30: generateSeries(365 * 8, 2200, 0.00068),
-      FTSEMIB: generateSeries(365 * 8, 24000, 0.00064),
-      ATX: generateSeries(365 * 8, 3200, 0.00066),
-      PSI20: generateSeries(365 * 8, 5200, 0.00058),
-      IBOVESPA: generateSeries(365 * 8, 110000, 0.001),
-      TSX: generateSeries(365 * 8, 19500, 0.0007),
-      IPC: generateSeries(365 * 8, 51000, 0.00078),
-      IPSA: generateSeries(365 * 8, 5400, 0.00072),
-      NIFTY50: generateSeries(365 * 8, 17000, 0.00095),
-      NIKKEI: generateSeries(365 * 8, 28500, 0.00078),
-      HSI: generateSeries(365 * 8, 24000, 0.00064),
-      KOSPI: generateSeries(365 * 8, 2500, 0.00082),
-      TAIEX: generateSeries(365 * 8, 15000, 0.00088),
-      SHCOMP: generateSeries(365 * 8, 3400, 0.0006),
-      STI: generateSeries(365 * 8, 3300, 0.00058),
-      ASX200: generateSeries(365 * 8, 6900, 0.00066),
-      NZX50: generateSeries(365 * 8, 11500, 0.0006)
-    };
-
     const indexCatalog = [
-      { id: 'ACWI', name: 'MSCI All-Country World Index', region: 'global', country: 'Weltweit' },
-      { id: 'SPX', name: 'S&P 500 Index', region: 'americas', country: 'USA' },
-      { id: 'NDX', name: 'NASDAQ 100 Index', region: 'americas', country: 'USA (Tech)' },
-      { id: 'TSX', name: 'S&P/TSX Composite Index', region: 'americas', country: 'Kanada' },
-      { id: 'IBOVESPA', name: 'Bovespa Index', region: 'americas', country: 'Brasilien' },
-      { id: 'IPC', name: 'IPC México Index', region: 'americas', country: 'Mexiko' },
-      { id: 'IPSA', name: 'IPSA Index', region: 'americas', country: 'Chile' },
-      { id: 'DAX', name: 'DAX 40 Performance Index', region: 'emea', country: 'Deutschland' },
-      { id: 'CAC40', name: 'CAC 40 Index', region: 'emea', country: 'Frankreich' },
-      { id: 'FTSE100', name: 'FTSE 100 Index', region: 'emea', country: 'Vereinigtes Königreich' },
-      { id: 'SMI', name: 'Swiss Market Index', region: 'emea', country: 'Schweiz' },
-      { id: 'IBEX35', name: 'IBEX 35 Index', region: 'emea', country: 'Spanien' },
-      { id: 'AEX', name: 'AEX Index', region: 'emea', country: 'Niederlande' },
-      { id: 'OMXC25', name: 'OMX Copenhagen 25', region: 'emea', country: 'Dänemark' },
-      { id: 'OMX30', name: 'OMX Stockholm 30', region: 'emea', country: 'Schweden' },
-      { id: 'FTSEMIB', name: 'FTSE MIB Index', region: 'emea', country: 'Italien' },
-      { id: 'ATX', name: 'ATX Index', region: 'emea', country: 'Österreich' },
-      { id: 'PSI20', name: 'PSI 20 Index', region: 'emea', country: 'Portugal' },
-      { id: 'NIFTY50', name: 'NIFTY 50 Index', region: 'apac', country: 'Indien' },
-      { id: 'NIKKEI', name: 'Nikkei 225 Index', region: 'apac', country: 'Japan' },
-      { id: 'HSI', name: 'Hang Seng Index', region: 'apac', country: 'Hongkong' },
-      { id: 'KOSPI', name: 'KOSPI Index', region: 'apac', country: 'Südkorea' },
-      { id: 'TAIEX', name: 'TAIEX Index', region: 'apac', country: 'Taiwan' },
-      { id: 'SHCOMP', name: 'SSE Composite Index', region: 'apac', country: 'China' },
-      { id: 'STI', name: 'Straits Times Index', region: 'apac', country: 'Singapur' },
-      { id: 'ASX200', name: 'S&P/ASX 200 Index', region: 'apac', country: 'Australien' },
-      { id: 'NZX50', name: 'S&P/NZX 50 Index', region: 'apac', country: 'Neuseeland' }
+      { id: 'ACWI', name: 'MSCI ACWI', country: 'Global', region: 'Global', flag: '🌍', colors: ['#3dd067', '#0f9c4a'] },
+      { id: 'USA', name: 'MSCI USA', country: 'USA', region: 'Amerika', flag: '🇺🇸', colors: ['#d02630', '#1f3a93'] },
+      { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', region: 'Amerika', flag: '🇨🇦', colors: ['#d40019', '#f2f2f2'] },
+      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', region: 'Amerika', flag: '🇧🇷', colors: ['#0f8a1a', '#f5d028'] },
+      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', region: 'Amerika', flag: '🇲🇽', colors: ['#006341', '#bf0a30'] },
+      { id: 'GER', name: 'MSCI Deutschland', country: 'Deutschland', region: 'Europa', flag: '🇩🇪', colors: ['#000000', '#e00025', '#ffce00'] },
+      { id: 'FRA', name: 'MSCI Frankreich', country: 'Frankreich', region: 'Europa', flag: '🇫🇷', colors: ['#00437a', '#e00025'] },
+      { id: 'ITA', name: 'MSCI Italien', country: 'Italien', region: 'Europa', flag: '🇮🇹', colors: ['#008c45', '#ce2b37'] },
+      { id: 'ESP', name: 'MSCI Spanien', country: 'Spanien', region: 'Europa', flag: '🇪🇸', colors: ['#aa151b', '#f1bf00'] },
+      { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', region: 'Europa', flag: '🇬🇧', colors: ['#012169', '#c8102e'] },
+      { id: 'SWE', name: 'MSCI Schweden', country: 'Schweden', region: 'Europa', flag: '🇸🇪', colors: ['#006aa7', '#fecc00'] },
+      { id: 'CHE', name: 'MSCI Schweiz', country: 'Schweiz', region: 'Europa', flag: '🇨🇭', colors: ['#d52b1e', '#ffffff'] },
+      { id: 'AUS', name: 'MSCI Australien', country: 'Australien', region: 'Asien', flag: '🇦🇺', colors: ['#002664', '#e4002b'] },
+      { id: 'JPN', name: 'MSCI Japan', country: 'Japan', region: 'Asien', flag: '🇯🇵', colors: ['#bc002d', '#ffffff'] },
+      { id: 'CHN', name: 'MSCI China', country: 'China', region: 'Asien', flag: '🇨🇳', colors: ['#de2910', '#ffde00'] },
+      { id: 'IND', name: 'MSCI Indien', country: 'Indien', region: 'Asien', flag: '🇮🇳', colors: ['#ff9933', '#138808', '#000080'] },
+      { id: 'KOR', name: 'MSCI Korea', country: 'Südkorea', region: 'Asien', flag: '🇰🇷', colors: ['#0f4c81', '#c7001e'] },
+      { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', region: 'Afrika', flag: '🇿🇦', colors: ['#007a4d', '#e03c31', '#002395'] },
+      { id: 'SAU', name: 'MSCI Saudi-Arabien', country: 'Saudi-Arabien', region: 'Nahost', flag: '🇸🇦', colors: ['#006c35', '#ffffff'] },
+      { id: 'ARE', name: 'MSCI VAE', country: 'VAE', region: 'Nahost', flag: '🇦🇪', colors: ['#00732f', '#000000', '#ff0000'] },
     ];
 
-    const colorMap = {
-      ACWI: '#69c94a',
-      SPX: '#5b7cfa',
-      NDX: '#9f7aea',
-      DAX: '#3b82f6',
-      CAC40: '#38bdf8',
-      FTSE100: '#10b981',
-      SMI: '#22c55e',
-      IBEX35: '#f59e0b',
-      AEX: '#14b8a6',
-      OMXC25: '#0ea5e9',
-      OMX30: '#6366f1',
-      FTSEMIB: '#8b5cf6',
-      ATX: '#ef4444',
-      PSI20: '#f97316',
-      IBOVESPA: '#0f766e',
-      TSX: '#2563eb',
-      IPC: '#0891b2',
-      IPSA: '#c084fc',
-      NIFTY50: '#eab308',
-      NIKKEI: '#60a5fa',
-      HSI: '#22d3ee',
-      KOSPI: '#16a34a',
-      TAIEX: '#db2777',
-      SHCOMP: '#f43f5e',
-      STI: '#0d9488',
-      ASX200: '#4ade80',
-      NZX50: '#94a3b8'
+    // demo data generator
+    const baseDates = (() => {
+      const dates = [];
+      const start = new Date();
+      start.setFullYear(start.getFullYear() - 10);
+      for (let i = 0; i <= 120; i++) {
+        const d = new Date(start);
+        d.setMonth(start.getMonth() + i);
+        dates.push(d.toISOString().slice(0, 10));
+      }
+      return dates;
+    })();
+
+    const baseCurve = baseDates.map((_, i) => 100 * Math.exp(i * 0.012));
+
+    function createSeries(vol = 0.08, drift = 1) {
+      return baseCurve.map((p, i) => {
+        const noise = Math.sin(i / 6) * vol * 18 + (Math.random() - 0.5) * vol * 10;
+        return p * drift + noise;
+      });
+    }
+
+    const priceData = Object.fromEntries(indexCatalog.map((idx, i) => {
+      const drift = 1 + (Math.sin(i) * 0.12);
+      const vol = 0.05 + (i % 3) * 0.02;
+      return [idx.id, createSeries(vol, drift)];
+    }));
+
+    const ranges = [
+      { id: 'max', label: 'Max', months: null },
+      { id: '5y', label: '5J', months: 60 },
+      { id: '3y', label: '3J', months: 36 },
+      { id: '1y', label: '1J', months: 12 },
+      { id: '6m', label: '6M', months: 6 },
+    ];
+
+    const regions = ['Alle', 'Global', 'Amerika', 'Europa', 'Asien', 'Afrika', 'Nahost'];
+
+    const state = {
+      search: '',
+      region: 'Alle',
+      range: 'max',
+      scale: 'log',
+      selected: ['ACWI', 'USA', 'GER'],
     };
 
-    const indexMap = Object.fromEntries(indexCatalog.map((i) => [i.id, i]));
-
-    const indexContainer = document.getElementById('indexContainer');
-    const emptyState = document.getElementById('emptyState');
-    const searchInput = document.getElementById('search');
-    const regionFilter = document.getElementById('regionFilter');
-    const rangeButtons = Array.from(document.querySelectorAll('.range-button'));
-    const scaleButtons = Array.from(document.querySelectorAll('[data-scale]'));
-    const chartTitle = document.getElementById('chartTitle');
-    const chartSubtitle = document.getElementById('chartSubtitle');
-    const legendContainer = document.getElementById('legendContainer');
-
-    let selectedIds = ['ACWI', 'SPX', 'DAX', 'NIKKEI'];
-    let currentRange = 'MAX';
-    let scaleType = 'logarithmic';
+    const chartEl = document.getElementById('chart');
     let chart;
 
-    function generateSeries(days, start, drift) {
-      const data = [];
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-      let price = start;
-      for (let i = 0; i < days; i++) {
-        const volatility = 0.015;
-        const shock = (Math.random() - 0.5) * volatility * start;
-        price = Math.max(0.1, price * (1 + drift + shock / start));
-        const date = new Date(startDate);
-        date.setDate(startDate.getDate() + i);
-        data.push({ date: date.toISOString().slice(0, 10), close: Number(price.toFixed(2)) });
-      }
-      return data;
-    }
-
-    function formatNumber(value) {
-      return value.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-    }
-
-    function lightenColor(hex, amount = 0.3) {
-      const num = parseInt(hex.replace('#', ''), 16);
-      const r = Math.min(255, Math.floor(((num >> 16) & 255) * (1 + amount)));
-      const g = Math.min(255, Math.floor(((num >> 8) & 255) * (1 + amount)));
-      const b = Math.min(255, Math.floor((num & 255) * (1 + amount)));
-      return `rgb(${r}, ${g}, ${b})`;
-    }
-
-    function movingAverage(series, window = 21) {
-      const result = [];
-      for (let i = 0; i < series.length; i++) {
-        const start = Math.max(0, i - window + 1);
-        const slice = series.slice(start, i + 1).map((p) => p.value);
-        const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
-        result.push({ date: series[i].date, value: Number(avg.toFixed(2)) });
-      }
-      return result;
-    }
-
-    function filterRange(series, range) {
-      const now = new Date();
-      let days;
-      switch (range) {
-        case '1M': days = 30; break;
-        case '3M': days = 90; break;
-        case '6M': days = 180; break;
-        case '1Y': days = 365; break;
-        case '5Y': days = 365 * 5; break;
-        default: return series;
-      }
-      const cutoff = new Date();
-      cutoff.setDate(now.getDate() - days);
-      return series.filter((p) => new Date(p.date) >= cutoff);
-    }
-
-    function normalizeSeries(series) {
+    function normalize(series) {
       if (!series.length) return [];
-      const base = series[0].close;
-      return series.map((p) => ({ date: p.date, value: Number(((p.close / base) * 100).toFixed(2)) }));
+      const first = series[0];
+      return series.map(v => v / first); // growth factor, 1 = 0%
     }
 
-    async function loadFromStooq(symbol) {
-      // Beispiel für echte Daten (CSV): https://stooq.pl/q/d/l/?s=spx&i=d
-      // const url = `https://stooq.pl/q/d/l/?s=${symbol.toLowerCase()}&i=d`;
-      // const res = await fetch(url);
-      // const csv = await res.text();
-      // return csv
-      //   .trim()
-      //   .split('\n')
-      //   .slice(1)
-      //   .map((row) => {
-      //     const [date, open, high, low, close] = row.split(',');
-      //     return { date, close: Number(close) };
-      //   });
-      return null;
+    function sliceRange(dates, series) {
+      const range = ranges.find(r => r.id === state.range);
+      if (!range || !range.months) return { dates, series };
+      const startIndex = Math.max(0, dates.length - range.months - 1);
+      return { dates: dates.slice(startIndex), series: series.slice(startIndex) };
     }
 
-    function renderList() {
-      const query = searchInput.value.toLowerCase();
-      const region = regionFilter.value;
-      const filtered = indexCatalog
-        .filter((item) => {
-          const matchesSearch = `${item.name} ${item.country} ${item.id}`.toLowerCase().includes(query);
-          const matchesRegion = region === 'all' || item.region === region;
-          return matchesSearch && matchesRegion;
-        })
-        .sort((a, b) => {
-          if (a.region === 'global') return -1;
-          if (b.region === 'global') return 1;
-          return a.name.localeCompare(b.name);
-        });
-
-      indexContainer.innerHTML = '';
-      if (!filtered.length) {
-        emptyState.style.display = 'block';
-        return;
-      }
-      emptyState.style.display = 'none';
-
-      filtered.forEach((item) => {
-        const card = document.createElement('button');
-        card.className = 'index-card';
-        if (item.region === 'global') card.classList.add('global');
-        if (selectedIds.includes(item.id)) card.classList.add('active');
-        card.type = 'button';
-        card.innerHTML = `
-          <div class="index-name">${item.name}</div>
-          <div class="index-meta">
-            <span class="pill">${item.country}</span>
-            <span>${item.id}</span>
-          </div>
-          <span class="check">✓</span>
-        `;
-        card.addEventListener('click', () => toggleIndex(item.id));
-        indexContainer.appendChild(card);
-      });
+    function formatPercent(factor) {
+      const pct = (factor - 1) * 100;
+      return `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
     }
 
-    function toggleIndex(id) {
-      if (selectedIds.includes(id)) {
-        if (selectedIds.length === 1) return;
-        selectedIds = selectedIds.filter((x) => x !== id);
-      } else {
-        selectedIds = [...selectedIds, id];
-      }
-      updateMeta();
-      updateChart();
-      renderList();
+    function pickGradient(ctx, colors) {
+      const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 0.9);
+      gradient.addColorStop(0, colors[0]);
+      gradient.addColorStop(1, colors[1] || colors[0]);
+      return gradient;
     }
 
-    function updateRange(range) {
-      currentRange = range;
-      rangeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.range === range));
-      updateMeta();
-      updateChart();
-    }
-
-    function updateScale(type) {
-      scaleType = type;
-      scaleButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.scale === type));
-      updateMeta();
-      updateChart();
-    }
-
-    async function getSeries(id) {
-      const live = await loadFromStooq(id);
-      const base = live?.length ? live : demoSeries[id] || demoSeries.ACWI;
-      return filterRange(base, currentRange === 'MAX' ? 'MAX' : currentRange);
-    }
-
-    function updateMeta() {
-      const rangeLabel = {
-        MAX: 'Max',
-        '5Y': '5 Jahre',
-        '1Y': '1 Jahr',
-        '6M': '6 Monate',
-        '3M': '3 Monate',
-        '1M': '1 Monat'
-      };
-
-      if (selectedIds.length === 1) {
-        const id = selectedIds[0];
-        const item = indexMap[id];
-        chartTitle.textContent = item ? `${item.name}` : id;
-      } else {
-        chartTitle.textContent = `Overlay: ${selectedIds.length} Indizes`;
-      }
-      const regionText = selectedIds.map((id) => indexMap[id]?.country).filter(Boolean).join(' · ');
-      chartSubtitle.textContent = `${rangeLabel[currentRange]} · ${scaleType === 'logarithmic' ? 'Log-Skala' : 'Lineare Skala'} · Start = 0 % · ${regionText}`;
-    }
-
-    function renderLegend() {
-      legendContainer.innerHTML = '';
-      selectedIds.forEach((id) => {
-        const item = indexMap[id];
-        const color = colorMap[id] || '#5b7cfa';
-        const span = document.createElement('span');
-        span.className = 'legend-item';
-        span.innerHTML = `<span class="legend-dot" style="background:${color};"></span>${item?.name || id} (${item?.country || ''})`;
-        legendContainer.appendChild(span);
-      });
-      const sma = document.createElement('span');
-      sma.className = 'legend-item';
-      sma.innerHTML = '<span class="legend-dot" style="background:linear-gradient(180deg,#b3c6ff,#5b7cfa);"></span>SMA 21 (pro Index)';
-      legendContainer.appendChild(sma);
-    }
-
-    async function updateChart() {
-      const ctx = document.getElementById('chart');
-      const fill = ctx.getContext('2d').createLinearGradient(0, 0, 0, 320);
-      fill.addColorStop(0, 'rgba(126, 217, 87, 0.32)');
-      fill.addColorStop(1, 'rgba(126, 217, 87, 0.04)');
-
+    function buildChart() {
+      const ctx = chartEl.getContext('2d');
       const datasets = [];
-      const labels = [];
-      const seriesList = await Promise.all(
-        selectedIds.map(async (id) => ({ id, data: normalizeSeries(await getSeries(id)) }))
-      );
-
-      seriesList.forEach(({ id, data }) => {
-        if (!labels.length) {
-          labels.push(...data.map((p) => p.date));
-        }
-        const color = colorMap[id] || '#5b7cfa';
-        const avg = movingAverage(data);
-
+      const legend = document.getElementById('legend');
+      legend.innerHTML = '';
+      state.selected.forEach((id) => {
+        const info = indexCatalog.find((i) => i.id === id);
+        if (!info) return;
+        const raw = priceData[id] || [];
+        const norm = normalize(raw);
+        const { dates, series } = sliceRange(baseDates, norm);
+        const color = info.colors[0];
+        const borderColor = info.colors[1] || info.colors[0];
+        const gradient = pickGradient(ctx, [color, 'rgba(255,255,255,0)']);
         datasets.push({
-          label: `${indexMap[id]?.name || id}`,
-          data: data.map((p) => p.value),
-          borderColor: color,
-          backgroundColor: id === 'ACWI' ? fill : 'transparent',
-          fill: id === 'ACWI',
-          tension: 0.22,
-          borderWidth: 2,
+          label: `${info.name}`,
+          data: series,
+          borderColor,
+          backgroundColor: gradient,
+          tension: 0.32,
+          borderWidth: id === 'ACWI' ? 2.8 : 2,
+          fill: true,
           pointRadius: 0,
-          pointHoverRadius: 3,
-          pointHoverBorderWidth: 2,
-          pointHoverBackgroundColor: color,
-          pointHoverBorderColor: '#ffffff',
-          borderJoinStyle: 'round',
+          pointHitRadius: 10,
         });
-
-        datasets.push({
-          label: `${indexMap[id]?.name || id} · SMA 21`,
-          data: avg.map((p) => p.value),
-          borderColor: lightenColor(color, 0.35),
-          backgroundColor: 'transparent',
-          borderWidth: 1.6,
-          tension: 0.18,
-          pointRadius: 0,
-          borderDash: [5, 4],
-          fill: false,
-        });
+        const chip = document.createElement('div');
+        chip.className = 'chip active';
+        chip.innerHTML = `<span class="dot" style="background:${borderColor}"></span>${info.flag} ${info.name}`;
+        legend.appendChild(chip);
       });
+
+      const labels = sliceRange(baseDates, normalize(priceData[state.selected[0]] || [])).dates;
 
       if (chart) chart.destroy();
-
       chart = new Chart(ctx, {
         type: 'line',
         data: { labels, datasets },
         options: {
-          interaction: { intersect: false, mode: 'index' },
           responsive: true,
+          animation: { duration: 500 },
           maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: state.scale === 'log' ? 'logarithmic' : 'linear',
+              ticks: {
+                callback: (val) => formatPercent(val),
+                maxTicksLimit: 6,
+              },
+              grid: { color: 'rgba(15,23,42,0.06)' },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { maxTicksLimit: 6 },
+            },
+          },
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(255,255,255,0.92)',
-              borderColor: 'rgba(17,24,39,0.08)',
+              mode: 'nearest',
+              intersect: false,
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${formatPercent(ctx.parsed.y)}`,
+                title: (items) => items[0]?.label || '',
+              },
+              backgroundColor: '#0f172a',
+              borderColor: 'rgba(255,255,255,0.3)',
               borderWidth: 1,
-              titleColor: '#0f172a',
-              bodyColor: '#475569',
+              titleColor: '#fff',
+              bodyColor: '#e2e8f0',
               padding: 10,
               displayColors: false,
-              callbacks: {
-                label(context) {
-                  const value = context.parsed.y;
-                  const pct = (value - 100).toFixed(2);
-                  const prefix = pct >= 0 ? '+' : '';
-                  return `${context.dataset.label}: ${prefix}${pct}%`;
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(15,23,42,0.02)', drawTicks: false },
-              ticks: {
-                color: '#8fa3c0',
-                font: { size: 11, family: 'Inter' },
-                maxRotation: 0,
-              }
             },
-            y: {
-              type: scaleType,
-              grid: { color: 'rgba(15,23,42,0.02)' },
-              ticks: {
-                color: '#8fa3c0',
-                font: { size: 11, family: 'Inter' },
-                callback: (v) => `${(v - 100).toFixed(0)}%`
-              }
-            }
-          }
-        }
+          },
+        },
       });
-
-      renderLegend();
     }
 
-    searchInput.addEventListener('input', renderList);
-    regionFilter.addEventListener('change', renderList);
-    rangeButtons.forEach((btn) => btn.addEventListener('click', () => updateRange(btn.dataset.range)));
-    scaleButtons.forEach((btn) => btn.addEventListener('click', () => updateScale(btn.dataset.scale)));
+    function renderRanges() {
+      const wrap = document.getElementById('range-chips');
+      wrap.innerHTML = '';
+      ranges.forEach((r) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (state.range === r.id ? ' active' : '');
+        chip.textContent = r.label;
+        chip.onclick = () => { state.range = r.id; buildChart(); renderCards(); };
+        wrap.appendChild(chip);
+      });
+    }
 
-    renderList();
-    updateMeta();
-    updateChart();
+    function renderScales() {
+      const wrap = document.getElementById('scale-chips');
+      wrap.innerHTML = '';
+      ['linear', 'log'].forEach((s) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (state.scale === s ? ' active' : '');
+        chip.textContent = s === 'log' ? 'Log' : 'Linear';
+        chip.onclick = () => { state.scale = s; buildChart(); };
+        wrap.appendChild(chip);
+      });
+    }
+
+    function renderRegions() {
+      const wrap = document.getElementById('region-chips');
+      wrap.innerHTML = '';
+      regions.forEach((r) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (state.region === r ? ' active' : '');
+        chip.textContent = r;
+        chip.onclick = () => { state.region = r; renderCards(); };
+        wrap.appendChild(chip);
+      });
+    }
+
+    function renderCards() {
+      const container = document.getElementById('cards');
+      container.innerHTML = '';
+      const search = state.search.trim().toLowerCase();
+      indexCatalog
+        .filter((i) => state.region === 'Alle' || i.region === state.region)
+        .filter((i) => !search || i.name.toLowerCase().includes(search) || i.country.toLowerCase().includes(search))
+        .forEach((idx) => {
+          const card = document.createElement('div');
+          card.className = 'index-card' + (state.selected.includes(idx.id) ? ' selected' : '');
+          const colors = idx.colors.length === 1 ? [idx.colors[0], idx.colors[0]] : idx.colors;
+          card.style.background = `linear-gradient(160deg, ${colors[0]}, ${colors[1] || colors[0]})`;
+          const series = normalize(priceData[idx.id] || []);
+          const latest = series.at(-1) || 1;
+          const change = formatPercent(latest);
+          card.innerHTML = `
+            <div class="index-top">
+              <div>
+                <div class="index-name">${idx.flag} ${idx.name}</div>
+                <div class="index-sub">${idx.country}</div>
+              </div>
+              <div class="index-change">${change}</div>
+            </div>
+          `;
+          card.onclick = () => {
+            if (state.selected.includes(idx.id)) {
+              state.selected = state.selected.filter((x) => x !== idx.id);
+            } else {
+              state.selected.push(idx.id);
+            }
+            buildChart();
+            renderCards();
+          };
+          container.appendChild(card);
+        });
+      const title = document.getElementById('chart-title');
+      title.textContent = state.selected.length
+        ? `${state.selected.length} Indexe – Basis ${ranges.find(r => r.id === state.range)?.label || 'Max'}, ${state.scale === 'log' ? 'logarithmisch' : 'linear'}`
+        : 'Bitte Index auswählen';
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      state.search = e.target.value;
+      renderCards();
+    });
+
+    renderRanges();
+    renderScales();
+    renderRegions();
+    renderCards();
+    buildChart();
   </script>
 </body>
 </html>
