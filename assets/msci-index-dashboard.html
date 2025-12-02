@@ -15,25 +15,25 @@
 
     /* Widget namespace */
     .msci-overlay {
-      --bg-gradient: radial-gradient(42% 50% at 16% 20%, rgba(126, 217, 87, 0.16), transparent),
-        radial-gradient(36% 42% at 86% 18%, rgba(91, 124, 250, 0.14), transparent),
-        linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
-      --panel: rgba(255, 255, 255, 0.82);
-      --panel-strong: rgba(255, 255, 255, 0.94);
+      --bg-gradient: radial-gradient(48% 60% at 16% 16%, rgba(126, 217, 87, 0.10), transparent),
+        radial-gradient(44% 52% at 84% 14%, rgba(91, 124, 250, 0.10), transparent),
+        linear-gradient(180deg, #f9fbff 0%, #eef2ff 60%, #f8f9ff 100%);
+      --panel: rgba(255, 255, 255, 0.9);
+      --panel-strong: rgba(255, 255, 255, 0.98);
       --text-strong: #0f172a;
-      --text-muted: #5f6a86;
-      --border-soft: rgba(17, 24, 39, 0.07);
-      --shadow-strong: 0 24px 56px rgba(15, 23, 42, 0.13);
-      --shadow-soft: 0 18px 42px rgba(15, 23, 42, 0.08);
-      --radius-shell: 28px;
-      --radius-card: 18px;
-      --radius-chip: 14px;
-      --blur: 12px;
+      --text-muted: #606b86;
+      --border-soft: rgba(17, 24, 39, 0.06);
+      --shadow-strong: 0 22px 52px rgba(15, 23, 42, 0.12);
+      --shadow-soft: 0 16px 36px rgba(15, 23, 42, 0.07);
+      --radius-shell: 30px;
+      --radius-card: 20px;
+      --radius-chip: 16px;
+      --blur: 14px;
       font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
       background: var(--bg-gradient);
       border-radius: var(--radius-shell);
       border: 1px solid var(--border-soft);
-      padding: 30px 26px 26px;
+      padding: 32px 26px 26px;
       box-shadow: var(--shadow-strong);
       backdrop-filter: blur(var(--blur));
       color: var(--text-strong);
@@ -81,8 +81,8 @@
     h1 {
       font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
       font-weight: 800;
-      letter-spacing: -0.38px;
-      font-size: clamp(32px, 3.2vw, 44px);
+      letter-spacing: -0.36px;
+      font-size: clamp(34px, 3vw, 46px);
       margin: 8px 0 4px;
       color: var(--text-strong);
     }
@@ -114,9 +114,9 @@
     }
 
     .input {
-      background: var(--panel);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 247, 252, 0.92));
       border: 1px solid var(--border-soft);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 12px 14px;
       font-size: 14px;
       min-width: 260px;
@@ -136,8 +136,8 @@
     .chip {
       border: 1px solid var(--border-soft);
       border-radius: var(--radius-chip);
-      padding: 9px 13px;
-      background: var(--panel);
+      padding: 9px 14px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(244, 247, 252, 0.9));
       color: var(--text-strong);
       font-weight: 700;
       font-size: 13px;
@@ -155,17 +155,17 @@
     .chip:hover { transform: translateY(-1px); background: var(--panel-strong); }
 
     .chip.active {
-      background: linear-gradient(135deg, rgba(126, 217, 87, 0.16), rgba(91, 124, 250, 0.14));
-      border-color: rgba(91, 124, 250, 0.28);
+      background: linear-gradient(135deg, rgba(126, 217, 87, 0.12), rgba(91, 124, 250, 0.10));
+      border-color: rgba(91, 124, 250, 0.22);
       color: #0f172a;
-      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.07);
       transform: translateY(-1px);
     }
 
     .chart-card {
-      background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(243, 246, 255, 0.82));
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(240, 245, 255, 0.9));
       border: 1px solid var(--border-soft);
-      border-radius: 20px;
+      border-radius: 22px;
       box-shadow: var(--shadow-soft);
       padding: 18px 18px 14px;
       overflow: hidden;
@@ -193,23 +193,23 @@
 
     .index-card {
       position: relative;
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 16px 16px 14px;
-      color: var(--text-strong);
+      color: #f8fbff;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.6);
       cursor: pointer;
       transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
-      background: linear-gradient(140deg, rgba(255, 255, 255, 0.86), rgba(248, 250, 252, 0.9));
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.16), rgba(248, 250, 252, 0.12));
     }
 
     .index-card::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), transparent 70%);
-      opacity: 0.92;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), transparent 70%);
+      opacity: 0.94;
       pointer-events: none;
       transition: opacity 0.25s ease;
     }
@@ -218,8 +218,8 @@
     .index-card:hover::after { opacity: 0.82; }
 
     .index-card.selected {
-      border-color: rgba(126, 217, 87, 0.38);
-      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.15);
+      border-color: rgba(126, 217, 87, 0.42);
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.13);
       transform: translateY(-2px);
     }
 
@@ -232,10 +232,10 @@
       z-index: 1;
     }
 
-    .index-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+    .index-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
     .index-flag { font-size: 20px; }
-    .index-sub { font-size: 13px; opacity: 0.92; font-weight: 700; }
-    .index-change { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
+    .index-sub { font-size: 13px; opacity: 0.94; font-weight: 700; color: rgba(255,255,255,0.88); }
+    .index-change { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
 
     .disclaimer {
       margin-top: 16px;
@@ -251,7 +251,7 @@
     }
   </style>
 </head>
-  <body style="margin:0; padding:14px; background:linear-gradient(180deg,#eef2ff 0%,#e5ecff 60%,#eef2ff 100%);">
+  <body style="margin:0; padding:14px; background:linear-gradient(180deg,#eef2ff 0%,#e5ecff 60%,#f6f8ff 100%);">
   <div class="msci-overlay">
     <div class="topline">
       <div>
@@ -287,25 +287,25 @@
   <script>
     const indexCatalog = [
       { id: 'ACWI', name: 'MSCI ACWI', country: 'Global', region: 'Global', flag: '🌍', colors: ['#3dd067', '#0f9c4a'] },
-      { id: 'USA', name: 'MSCI USA', country: 'USA', region: 'Amerika', flag: '🇺🇸', colors: ['#d02630', '#1f3a93'] },
-      { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', region: 'Amerika', flag: '🇨🇦', colors: ['#d40019', '#f2f2f2'] },
-      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', region: 'Amerika', flag: '🇧🇷', colors: ['#0f8a1a', '#f5d028'] },
-      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', region: 'Amerika', flag: '🇲🇽', colors: ['#006341', '#bf0a30'] },
-      { id: 'GER', name: 'MSCI Deutschland', country: 'Deutschland', region: 'Europa', flag: '🇩🇪', colors: ['#000000', '#e00025', '#ffce00'] },
-      { id: 'FRA', name: 'MSCI Frankreich', country: 'Frankreich', region: 'Europa', flag: '🇫🇷', colors: ['#00437a', '#e00025'] },
-      { id: 'ITA', name: 'MSCI Italien', country: 'Italien', region: 'Europa', flag: '🇮🇹', colors: ['#008c45', '#ce2b37'] },
-      { id: 'ESP', name: 'MSCI Spanien', country: 'Spanien', region: 'Europa', flag: '🇪🇸', colors: ['#aa151b', '#f1bf00'] },
-      { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', region: 'Europa', flag: '🇬🇧', colors: ['#012169', '#c8102e'] },
-      { id: 'SWE', name: 'MSCI Schweden', country: 'Schweden', region: 'Europa', flag: '🇸🇪', colors: ['#006aa7', '#fecc00'] },
-      { id: 'CHE', name: 'MSCI Schweiz', country: 'Schweiz', region: 'Europa', flag: '🇨🇭', colors: ['#d52b1e', '#ffffff'] },
-      { id: 'AUS', name: 'MSCI Australien', country: 'Australien', region: 'Asien', flag: '🇦🇺', colors: ['#002664', '#e4002b'] },
-      { id: 'JPN', name: 'MSCI Japan', country: 'Japan', region: 'Asien', flag: '🇯🇵', colors: ['#bc002d', '#ffffff'] },
-      { id: 'CHN', name: 'MSCI China', country: 'China', region: 'Asien', flag: '🇨🇳', colors: ['#de2910', '#ffde00'] },
-      { id: 'IND', name: 'MSCI Indien', country: 'Indien', region: 'Asien', flag: '🇮🇳', colors: ['#ff9933', '#138808', '#000080'] },
-      { id: 'KOR', name: 'MSCI Korea', country: 'Südkorea', region: 'Asien', flag: '🇰🇷', colors: ['#0f4c81', '#c7001e'] },
-      { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', region: 'Afrika', flag: '🇿🇦', colors: ['#007a4d', '#e03c31', '#002395'] },
-      { id: 'SAU', name: 'MSCI Saudi-Arabien', country: 'Saudi-Arabien', region: 'Nahost', flag: '🇸🇦', colors: ['#006c35', '#ffffff'] },
-      { id: 'ARE', name: 'MSCI VAE', country: 'VAE', region: 'Nahost', flag: '🇦🇪', colors: ['#00732f', '#000000', '#ff0000'] },
+      { id: 'USA', name: 'MSCI USA', country: 'USA', region: 'Amerika', flag: '🇺🇸', colors: ['#e24c61', '#4b6cb7'] },
+      { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', region: 'Amerika', flag: '🇨🇦', colors: ['#e15c68', '#f4f7fb'] },
+      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', region: 'Amerika', flag: '🇧🇷', colors: ['#3bbf74', '#eedf64'] },
+      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', region: 'Amerika', flag: '🇲🇽', colors: ['#4aa18f', '#d96b72'] },
+      { id: 'GER', name: 'MSCI Deutschland', country: 'Deutschland', region: 'Europa', flag: '🇩🇪', colors: ['#d95d5d', '#f8d25d'] },
+      { id: 'FRA', name: 'MSCI Frankreich', country: 'Frankreich', region: 'Europa', flag: '🇫🇷', colors: ['#6a8bd8', '#f0b0c3']},
+      { id: 'ITA', name: 'MSCI Italien', country: 'Italien', region: 'Europa', flag: '🇮🇹', colors: ['#60c18a', '#f28b8b'] },
+      { id: 'ESP', name: 'MSCI Spanien', country: 'Spanien', region: 'Europa', flag: '🇪🇸', colors: ['#e86b6b', '#f4c54f'] },
+      { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', region: 'Europa', flag: '🇬🇧', colors: ['#6e8ad6', '#dd7c8a'] },
+      { id: 'SWE', name: 'MSCI Schweden', country: 'Schweden', region: 'Europa', flag: '🇸🇪', colors: ['#7aa6f8', '#f5d865'] },
+      { id: 'CHE', name: 'MSCI Schweiz', country: 'Schweiz', region: 'Europa', flag: '🇨🇭', colors: ['#e46b6b', '#f4f4f4'] },
+      { id: 'AUS', name: 'MSCI Australien', country: 'Australien', region: 'Asien', flag: '🇦🇺', colors: ['#6a8adf', '#e99595'] },
+      { id: 'JPN', name: 'MSCI Japan', country: 'Japan', region: 'Asien', flag: '🇯🇵', colors: ['#e77b8f', '#f9f0f0'] },
+      { id: 'CHN', name: 'MSCI China', country: 'China', region: 'Asien', flag: '🇨🇳', colors: ['#e66f5f', '#f7d76f'] },
+      { id: 'IND', name: 'MSCI Indien', country: 'Indien', region: 'Asien', flag: '🇮🇳', colors: ['#f7a35c', '#7fc68c'] },
+      { id: 'KOR', name: 'MSCI Korea', country: 'Südkorea', region: 'Asien', flag: '🇰🇷', colors: ['#7aa0e8', '#e57b8a'] },
+      { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', region: 'Afrika', flag: '🇿🇦', colors: ['#4dad8a', '#ef916c'] },
+      { id: 'SAU', name: 'MSCI Saudi-Arabien', country: 'Saudi-Arabien', region: 'Nahost', flag: '🇸🇦', colors: ['#63b786', '#f3fff7'] },
+      { id: 'ARE', name: 'MSCI VAE', country: 'VAE', region: 'Nahost', flag: '🇦🇪', colors: ['#61bfa4', '#e98c8c'] },
     ];
 
     // demo data generator
@@ -367,11 +367,27 @@
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
+    function pastelize(hex, mix = 0.25, alpha = 1) {
+      if (hex.startsWith('rgb')) return hex;
+      const parsed = hex.replace('#', '');
+      const bigint = parseInt(parsed.length === 3 ? parsed.split('').map(c => c + c).join('') : parsed, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      const blend = (v) => Math.round(v * (1 - mix) + 255 * mix);
+      return `rgba(${blend(r)}, ${blend(g)}, ${blend(b)}, ${alpha})`;
+    }
+
     function blendColors(colors) {
-      if (!colors.length) return ['#5b7cfa', '#7ed957'];
-      const primary = hexToRgba(colors[0], 0.72);
-      const secondary = hexToRgba(colors[1] || colors[0], 0.4);
+      if (!colors.length) return ['rgba(91, 124, 250, 0.9)', 'rgba(126, 217, 87, 0.5)'];
+      const primary = pastelize(colors[0], 0.22, 0.9);
+      const secondary = pastelize(colors[1] || colors[0], 0.32, 0.62);
       return [primary, secondary];
+    }
+
+    function setAlpha(color, alpha) {
+      if (color.startsWith('rgba')) return color.replace(/rgba\(([^)]+), [0-9.]+\)/, `rgba($1, ${alpha})`);
+      return hexToRgba(color, alpha);
     }
 
     function normalize(series) {
@@ -396,7 +412,8 @@
       const [start, end] = blendColors(colors);
       const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 0.9);
       gradient.addColorStop(0, start);
-      gradient.addColorStop(1, hexToRgba(end, 0.04));
+      const tail = end.replace(/rgba\(([^)]+), [0-9.]+\)/, 'rgba($1, 0.18)');
+      gradient.addColorStop(1, tail);
       return gradient;
     }
 
@@ -413,7 +430,7 @@
         const norm = normalize(raw);
         const { dates, series } = sliceRange(baseDates, norm);
         const [colorPrimary] = blendColors(info.colors);
-        const borderColor = hexToRgba(info.colors[0], 0.9);
+        const borderColor = pastelize(info.colors[0], 0.16, 0.88);
         const gradient = pickGradient(ctx, info.colors);
         datasets.push({
           label: `${info.name}`,
@@ -421,7 +438,7 @@
           borderColor,
           backgroundColor: gradient,
           tension: 0.32,
-          borderWidth: id === 'ACWI' ? 2.8 : 2,
+          borderWidth: id === 'ACWI' ? 3 : 2.2,
           fill: true,
           pointRadius: 0,
           pointHitRadius: 10,
@@ -534,7 +551,9 @@
           const card = document.createElement('div');
           card.className = 'index-card' + (state.selected.includes(idx.id) ? ' selected' : '');
           const colors = blendColors(idx.colors);
-          card.style.backgroundImage = `linear-gradient(145deg, ${hexToRgba(colors[0], 0.16)}, ${hexToRgba(colors[1], 0.12)}), linear-gradient(160deg, ${colors[0]}, ${colors[1]})`;
+          const softA = setAlpha(colors[0], 0.32);
+          const softB = setAlpha(colors[1], 0.24);
+          card.style.backgroundImage = `linear-gradient(145deg, ${softA}, ${softB}), linear-gradient(160deg, ${colors[0]}, ${colors[1]})`;
           if (idx.id === 'ACWI') {
             card.style.borderColor = 'rgba(126, 217, 87, 0.5)';
           }
