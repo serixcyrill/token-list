@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vemo Bitcoin Erlebnis</title>
+  <title>Vemo Bitcoin vs. Gold</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@500;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap');
 
     /* Scope everything to the widget container so WordPress layouts stay intact. */
     .vemo-btc {
@@ -32,7 +32,7 @@
       --radius-pill: 999px;
       --radius-input: 14px;
       box-sizing: border-box;
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
       color: var(--text);
       background:
         radial-gradient(circle at 16% 24%, rgba(126, 217, 87, 0.1), transparent 42%),
@@ -105,9 +105,9 @@
 
     .vemo-btc h1 {
       margin: 0;
-      font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      font-family: 'Poppins', system-ui, sans-serif;
       font-weight: 800;
-      font-size: clamp(24px, 2.6vw, 30px);
+      font-size: clamp(24px, 2.6vw, 32px);
       letter-spacing: -0.25px;
       color: var(--text);
     }
@@ -161,7 +161,7 @@
     }
 
     .vemo-btc .price {
-      font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      font-family: 'Poppins', system-ui, sans-serif;
       font-size: clamp(34px, 5vw, 40px);
       font-weight: 800;
       letter-spacing: -0.02em;
@@ -548,7 +548,7 @@
     }
 
     .vemo-btc .compare-chip strong {
-      font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+      font-family: 'Poppins', system-ui, sans-serif;
       font-size: 16px;
       letter-spacing: -0.01em;
     }
@@ -633,8 +633,12 @@
       <div class="title">
         <span class="badge">Vemo</span>
         <div>
-          <h1>Bitcoin Live Erlebnis</h1>
-          <div class="subtitle">Konvertiere BTC ↔ EUR, beobachte den Markt und feiere die Kurve.</div>
+          <h1>Bitcoin vs. Gold Performance</h1>
+          <div class="subtitle">Live Prozententwicklung, BTC und Gold (PAXG) übereinander gelegt.</div>
+          <div class="status" aria-live="polite">
+            <span class="dot" aria-hidden="true"></span>
+            <span id="statusText">Lädt Daten von CoinGecko …</span>
+          </div>
         </div>
       </div>
       <button id="refresh" class="ghost-btn" type="button">↻ Frische Daten laden</button>
@@ -665,37 +669,12 @@
         </div>
       </article>
 
-      <article class="card" aria-label="Converter">
-        <div class="pill">Konverter</div>
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="amount">Betrag</label>
-            <input id="amount" type="number" min="0" step="0.00000001" value="1" />
-          </div>
-          <div class="input-group">
-            <label>Richtung</label>
-            <div class="direction-toggle" role="group" aria-label="Richtung wechseln">
-              <button class="toggle-btn active" data-direction="btc-eur" type="button">BTC → EUR</button>
-              <button class="toggle-btn" data-direction="eur-btc" type="button">EUR → BTC</button>
-            </div>
-            <select id="direction" hidden>
-              <option value="btc-eur" selected>BTC zu EUR</option>
-              <option value="eur-btc">EUR zu BTC</option>
-            </select>
-          </div>
-        </div>
-        <button class="primary-btn" id="convertButton" type="button" disabled>Betrag umrechnen</button>
-        <div id="result" class="result-box">Warte auf Live-Preis …</div>
-        <div class="status">
-          <span class="dot" aria-hidden="true"></span>
-          <span id="statusText">Lädt Daten von CoinGecko …</span>
-        </div>
-      </article>
+      
     </section>
 
     <section class="chart-card" aria-label="Performance und Sparkline">
       <div class="chart-header">
-        <div class="pill" id="chartTitle">Bitcoin Preisverlauf</div>
+        <div class="pill" id="chartTitle">BTC vs. Gold · % Veränderung</div>
         <div class="range-controls" aria-label="Zeitbereich wechseln">
           <div class="range-buttons" role="group">
             <button type="button" class="range-btn active" data-days="7">7T</button>
@@ -802,11 +781,6 @@
     const volumeElement = document.getElementById('volume');
     const marketcapElement = document.getElementById('marketcap');
     const statusText = document.getElementById('statusText');
-    const resultElement = document.getElementById('result');
-    const amountInput = document.getElementById('amount');
-    const directionSelect = document.getElementById('direction');
-    const toggleButtons = document.querySelectorAll('.toggle-btn');
-    const convertButton = document.getElementById('convertButton');
     const refreshButton = document.getElementById('refresh');
     const sparklineCanvas = document.getElementById('sparkline');
     const sparklineInfo = document.getElementById('sparklineInfo');
@@ -879,20 +853,6 @@
       return Math.max(Math.round((last - first) / (24 * 3600 * 1000)), 1);
     }
 
-    function setDirection(direction) {
-      directionSelect.value = direction;
-      toggleButtons.forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.direction === direction);
-      });
-      convert();
-    }
-
-    toggleButtons.forEach((btn) => {
-      btn.addEventListener('click', () => setDirection(btn.dataset.direction));
-    });
-
-    amountInput.addEventListener('input', () => convert());
-    convertButton.addEventListener('click', () => convert());
     refreshButton.addEventListener('click', () => {
       loadData(true);
       loadHistory(true);
@@ -982,28 +942,6 @@
       changeBadge.classList.remove('positive', 'negative');
       if (change > 0) changeBadge.classList.add('positive');
       if (change < 0) changeBadge.classList.add('negative');
-    }
-
-    function convert() {
-      if (!btcEurRate) {
-        resultElement.textContent = 'Kein Preis geladen.';
-        return;
-      }
-
-      const amount = Number(amountInput.value);
-      if (Number.isNaN(amount) || amount < 0) {
-        resultElement.textContent = 'Bitte einen gültigen Betrag eingeben.';
-        return;
-      }
-
-      const direction = directionSelect.value;
-      if (direction === 'btc-eur') {
-        const eur = amount * btcEurRate;
-        resultElement.textContent = `${amount} BTC ≈ ${euro(eur)} EUR.`;
-      } else {
-        const btcValue = amount / btcEurRate;
-        resultElement.textContent = `${euro(amount)} EUR ≈ ${btc(btcValue)} BTC.`;
-      }
     }
 
     function updateWindowStats(btcPoints, goldPoints) {
@@ -1213,7 +1151,6 @@
 
     async function loadData(manual = false) {
       statusText.textContent = manual ? 'Aktualisiere …' : 'Lädt Daten von CoinGecko …';
-      convertButton.disabled = true;
 
       try {
         const res = await fetch(
@@ -1252,14 +1189,13 @@
         marketcapElement.textContent = market.market_cap?.eur ? `€ ${euro(market.market_cap.eur)}` : '–';
 
         renderSparkline();
-        convert();
         statusText.textContent = 'Live Preis geladen.';
       } catch (err) {
         console.error(err);
         statusText.textContent = 'Live-Preis konnte nicht geladen werden. Versuche Fallback …';
         await loadFallback();
       } finally {
-        convertButton.disabled = !btcEurRate;
+        // no-op
       }
     }
 
@@ -1450,12 +1386,10 @@
         sparklineRange.textContent = 'Keine Zeitreihe geladen';
         updateWindowStats([], []);
         drawSparkline([], []);
-        convert();
         statusText.textContent = 'Einfacher Preis geladen (Fallback).';
       } catch (fallbackError) {
         console.error(fallbackError);
         statusText.textContent = 'Keine Daten verfügbar. Bitte später erneut versuchen.';
-        resultElement.textContent = 'Keine Daten verfügbar.';
       }
     }
 
