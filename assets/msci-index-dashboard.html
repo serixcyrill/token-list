@@ -15,15 +15,15 @@
 
     /* Widget namespace */
     .msci-overlay {
-      --bg-gradient: radial-gradient(60% 74% at 16% 18%, rgba(126, 217, 87, 0.12), transparent),
-        radial-gradient(54% 68% at 88% 8%, rgba(91, 124, 250, 0.12), transparent),
-        linear-gradient(180deg, #fbfdff 0%, #eef4ff 54%, #e9f1ff 100%);
+      --bg-gradient: radial-gradient(62% 80% at 12% 20%, rgba(126, 217, 87, 0.18), transparent),
+        radial-gradient(52% 74% at 88% 6%, rgba(91, 124, 250, 0.18), transparent),
+        linear-gradient(180deg, #f9fbff 0%, #eef3ff 50%, #e7eeff 100%);
       --panel: rgba(255, 255, 255, 0.92);
       --panel-strong: rgba(255, 255, 255, 0.98);
       --text-strong: #0b162c;
       --text-muted: #5b6b82;
-      --border-soft: rgba(17, 24, 39, 0.04);
-      --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.06);
+      --border-soft: rgba(17, 24, 39, 0.06);
+      --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.08);
       --radius-card: 18px;
       --radius-chip: 16px;
       font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -107,13 +107,14 @@
     }
 
     .input {
-      background: rgba(255, 255, 255, 0.86);
-      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(15, 23, 42, 0.06);
       border-radius: 18px;
       padding: 14px 16px;
       font-size: 14px;
       min-width: 260px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 10px 20px rgba(15, 23, 42, 0.05);
+      color: #0b162c;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 18px rgba(15, 23, 42, 0.05);
       transition: all 0.18s ease;
     }
 
@@ -124,13 +125,15 @@
       background: var(--panel-strong);
     }
 
+    .input::placeholder { color: rgba(91, 107, 130, 0.8); }
+
     .chip-group { display: inline-flex; flex-wrap: wrap; gap: 8px; }
 
     .chip {
       border: 1px solid var(--border-soft);
       border-radius: var(--radius-chip);
       padding: 9px 14px;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       color: var(--text-strong);
       font-weight: 700;
       font-size: 13px;
@@ -147,7 +150,7 @@
     .chip:hover { transform: translateY(-1px); background: var(--panel-strong); }
 
     .chip.active {
-      background: linear-gradient(135deg, rgba(91, 124, 250, 0.14), rgba(126, 217, 87, 0.12));
+      background: linear-gradient(135deg, rgba(91, 124, 250, 0.14), rgba(126, 217, 87, 0.1));
       border-color: rgba(91, 124, 250, 0.26);
       color: #0f172a;
       box-shadow: 0 12px 22px rgba(15, 23, 42, 0.06);
@@ -155,7 +158,7 @@
     }
 
     .chart-card {
-      background: linear-gradient(150deg, rgba(255, 255, 255, 0.92), rgba(248, 251, 255, 0.88));
+      background: linear-gradient(150deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.92));
       border: 1px solid var(--border-soft);
       border-radius: 22px;
       box-shadow: var(--shadow-soft);
@@ -187,13 +190,13 @@
       position: relative;
       border-radius: 18px;
       padding: 16px 16px 14px;
-      color: var(--text-strong);
+      color: #f8fafc;
       overflow: hidden;
-      border: 1px solid var(--border-soft);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       cursor: pointer;
-      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, color 0.16s ease;
-      box-shadow: var(--shadow-soft);
-      background: var(--panel-strong);
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.18);
+      background: linear-gradient(165deg, #111827, #0b1222);
       backdrop-filter: blur(2px);
     }
 
@@ -212,9 +215,10 @@
 
     .index-card.selected {
       color: #ffffff;
-      border-color: rgba(91, 124, 250, 0.32);
+      border-color: rgba(255, 255, 255, 0.22);
       box-shadow: 0 18px 30px rgba(15, 23, 42, 0.12);
       transform: translateY(-2px);
+      background: linear-gradient(165deg, #0f172a, #0b1222);
     }
 
     .index-top {
@@ -226,10 +230,10 @@
       z-index: 1;
     }
 
-    .index-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: var(--text-strong); }
+    .index-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: #f8fafc; }
     .index-flag { font-size: 20px; }
-    .index-sub { font-size: 13px; opacity: 0.92; font-weight: 700; color: var(--text-muted); }
-    .index-change { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; color: #0f9a5f; }
+    .index-sub { font-size: 13px; opacity: 0.92; font-weight: 700; color: rgba(255, 255, 255, 0.75); }
+    .index-change { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; color: #8af5b0; }
 
     .index-card.selected .index-name,
     .index-card.selected .index-sub,
@@ -255,9 +259,9 @@
   <div class="msci-overlay">
     <div class="topline">
       <div>
-        <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Demo-Daten</div>
+        <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live/Free API mit Fallback</div>
         <h1>Globale Index-Performance</h1>
-        <p class="subtitle">Vergleiche Märkte übereinander – prozentual ab gleichem Startpunkt, bereit für echte API-Feeds.</p>
+        <p class="subtitle">Vergleiche Märkte übereinander – prozentual ab gleichem Startpunkt, Log-Standard, Stooq-Feed mit lokaler Rückfallebene.</p>
       </div>
     </div>
 
@@ -278,109 +282,30 @@
     </div>
 
     <div class="grid-cards" id="cards"></div>
-    <div class="disclaimer">API: Demo-Daten zur Veranschaulichung – bitte mit echter Quelle verdrahten. Angaben ohne Gewähr, keine Haftung für die Richtigkeit der Daten.</div>
+    <div class="disclaimer">API: Kostenlose Stooq-Daten (Fallback lokal) – Angaben ohne Gewähr, keine Haftung für die Richtigkeit der Daten.</div>
   </div>
 
   <script>
     const indexCatalog = [
-      { id: 'ACWI', name: 'MSCI ACWI', country: 'Global', region: 'Global', flag: '🌍', colors: ['#6fd394', '#9ce6c0'] },
-      { id: 'USA', name: 'MSCI USA', country: 'USA', region: 'Amerika', flag: '🇺🇸', colors: ['#88b8f6', '#f4a9c1'] },
-      { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', region: 'Amerika', flag: '🇨🇦', colors: ['#f28f9a', '#f7d7df'] },
-      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', region: 'Amerika', flag: '🇧🇷', colors: ['#74d7a2', '#f2e8a0'] },
-      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', region: 'Amerika', flag: '🇲🇽', colors: ['#7cc4ad', '#f1b1b7'] },
-      { id: 'GER', name: 'MSCI Deutschland', country: 'Deutschland', region: 'Europa', flag: '🇩🇪', colors: ['#f28a8a', '#f6d48a'] },
-      { id: 'FRA', name: 'MSCI Frankreich', country: 'Frankreich', region: 'Europa', flag: '🇫🇷', colors: ['#8fb2f4', '#f3c1d5']},
-      { id: 'ITA', name: 'MSCI Italien', country: 'Italien', region: 'Europa', flag: '🇮🇹', colors: ['#7fd3a6', '#f5a6a6'] },
-      { id: 'ESP', name: 'MSCI Spanien', country: 'Spanien', region: 'Europa', flag: '🇪🇸', colors: ['#f39c9c', '#f6d780'] },
-      { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', region: 'Europa', flag: '🇬🇧', colors: ['#8da8f2', '#f3a9bb'] },
-      { id: 'SWE', name: 'MSCI Schweden', country: 'Schweden', region: 'Europa', flag: '🇸🇪', colors: ['#9bc1fb', '#f7e08e'] },
-      { id: 'CHE', name: 'MSCI Schweiz', country: 'Schweiz', region: 'Europa', flag: '🇨🇭', colors: ['#f09b9b', '#f6f2f2'] },
-      { id: 'AUS', name: 'MSCI Australien', country: 'Australien', region: 'Asien', flag: '🇦🇺', colors: ['#8daaf5', '#f3b1b1'] },
-      { id: 'JPN', name: 'MSCI Japan', country: 'Japan', region: 'Asien', flag: '🇯🇵', colors: ['#f0a2b3', '#f8f0f0'] },
-      { id: 'CHN', name: 'MSCI China', country: 'China', region: 'Asien', flag: '🇨🇳', colors: ['#f39d8c', '#f7e3a4'] },
-      { id: 'IND', name: 'MSCI Indien', country: 'Indien', region: 'Asien', flag: '🇮🇳', colors: ['#f7b17a', '#8dd4a3'] },
-      { id: 'KOR', name: 'MSCI Korea', country: 'Südkorea', region: 'Asien', flag: '🇰🇷', colors: ['#99b7f6', '#f0a0b4'] },
-      { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', region: 'Afrika', flag: '🇿🇦', colors: ['#7fc8ab', '#f2a98a'] },
-      { id: 'SAU', name: 'MSCI Saudi-Arabien', country: 'Saudi-Arabien', region: 'Nahost', flag: '🇸🇦', colors: ['#7ed0a2', '#f1fff6'] },
-      { id: 'ARE', name: 'MSCI VAE', country: 'VAE', region: 'Nahost', flag: '🇦🇪', colors: ['#7fd2b6', '#f3b0b0'] },
+      { id: 'ACWI', name: 'MSCI ACWI', country: 'Global', flag: '🌍', colors: ['#7ed957', '#5b7cfa'], symbol: 'acwi.us' },
+      { id: 'USA', name: 'MSCI USA', country: 'USA', flag: '🇺🇸', colors: ['#7aa5f9', '#f1b5c8'], symbol: 'spy.us' },
+      { id: 'GER', name: 'MSCI Deutschland', country: 'Deutschland', flag: '🇩🇪', colors: ['#f6c28f', '#f49fa7'], symbol: 'ewg.us' },
+      { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', flag: '🇬🇧', colors: ['#9bb7ff', '#f2b1c0'], symbol: 'ewu.us' },
+      { id: 'FRA', name: 'MSCI Frankreich', country: 'Frankreich', flag: '🇫🇷', colors: ['#92b6ff', '#f6c3d8'], symbol: 'ewq.us' },
+      { id: 'ITA', name: 'MSCI Italien', country: 'Italien', flag: '🇮🇹', colors: ['#9adab6', '#f2b5b5'], symbol: 'ewi.us' },
+      { id: 'ESP', name: 'MSCI Spanien', country: 'Spanien', flag: '🇪🇸', colors: ['#f6c490', '#f5a1aa'], symbol: 'ewp.us' },
+      { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', flag: '🇨🇦', colors: ['#f29aa5', '#f7d7df'], symbol: 'ewc.us' },
+      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', flag: '🇧🇷', colors: ['#7fd9b0', '#f5e3a4'], symbol: 'ewz.us' },
+      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', flag: '🇲🇽', colors: ['#7acdb0', '#f2b7bf'], symbol: 'eww.us' },
+      { id: 'AUS', name: 'MSCI Australien', country: 'Australien', flag: '🇦🇺', colors: ['#92b9ff', '#f3b8c1'], symbol: 'ewa.us' },
+      { id: 'JPN', name: 'MSCI Japan', country: 'Japan', flag: '🇯🇵', colors: ['#f2a2b8', '#f8e9ea'], symbol: 'ewj.us' },
+      { id: 'CHN', name: 'MSCI China', country: 'China', flag: '🇨🇳', colors: ['#f3a590', '#f7e7b0'], symbol: 'mchi.us' },
+      { id: 'IND', name: 'MSCI Indien', country: 'Indien', flag: '🇮🇳', colors: ['#f6bb86', '#8fd8b0'], symbol: 'indy.us' },
+      { id: 'KOR', name: 'MSCI Korea', country: 'Südkorea', flag: '🇰🇷', colors: ['#9ac1ff', '#f0a3ba'], symbol: 'ewy.us' },
+      { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', flag: '🇿🇦', colors: ['#7fc7b3', '#f2b59a'], symbol: 'eza.us' },
+      { id: 'SAU', name: 'MSCI Saudi-Arabien', country: 'Saudi-Arabien', flag: '🇸🇦', colors: ['#7ed4aa', '#f1fff6'], symbol: 'ksa.us' },
+      { id: 'ARE', name: 'MSCI VAE', country: 'VAE', flag: '🇦🇪', colors: ['#7fd2b6', '#f3b0b0'], symbol: 'uae.us' },
     ];
-
-    // demo data generator
-    const baseDates = (() => {
-      const dates = [];
-      const start = new Date();
-      start.setFullYear(start.getFullYear() - 10);
-      for (let i = 0; i <= 120; i++) {
-        const d = new Date(start);
-        d.setMonth(start.getMonth() + i);
-        dates.push(d.toISOString().slice(0, 10));
-      }
-      return dates;
-    })();
-
-    // deterministic, more varied growth paths per index (normalized later)
-    function seededRandom(seed) {
-      let t = seed + 0x6d2b79f5;
-      return () => {
-        t += 0x6d2b79f5;
-        let x = t;
-        x = Math.imul(x ^ (x >>> 15), 1 | x);
-        x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
-        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
-      };
-    }
-
-    const growthBias = {
-      ACWI: 0.0063,
-      USA: 0.0078,
-      CAN: 0.0064,
-      GER: 0.0066,
-      FRA: 0.0061,
-      ITA: 0.0058,
-      ESP: 0.0059,
-      UK: 0.0057,
-      SWE: 0.0060,
-      CHE: 0.0062,
-      AUS: 0.0061,
-      JPN: 0.0060,
-      CHN: 0.0068,
-      IND: 0.0082,
-      KOR: 0.0067,
-      ZAF: 0.0065,
-      SAU: 0.0060,
-      ARE: 0.0062,
-      BRA: 0.0069,
-      MEX: 0.0066,
-    };
-
-    const volBias = {
-      IND: 0.006,
-      BRA: 0.008,
-      MEX: 0.006,
-      ZAF: 0.006,
-      CHN: 0.006,
-    };
-
-    function createSeries(id, index) {
-      const seed = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + index * 31;
-      const rand = seededRandom(seed);
-      const baseDrift = growthBias[id] ?? 0.006;
-      const vol = 0.012 + (volBias[id] ?? 0.0);
-      let value = 1;
-      const series = [];
-      baseDates.forEach((_, i) => {
-        const cycle = Math.sin(i / 11) * 0.18 + Math.cos(i / 6.5) * 0.12;
-        const shock = (rand() - 0.5) * vol * 2.2;
-        const monthlyReturn = baseDrift * (1 + cycle) + shock;
-        value *= Math.max(0.97, 1 + monthlyReturn);
-        value = Math.max(value, 0.35); // prevent collapse
-        series.push(value * 100);
-      });
-      return series;
-    }
-
-    // Replace createSeries(...) with real API payload mapping when wiring to production data
-    const priceData = Object.fromEntries(indexCatalog.map((idx, i) => [idx.id, createSeries(idx.id, i)]));
 
     const ranges = [
       { id: 'max', label: 'Max', months: null },
@@ -399,21 +324,24 @@
 
     const chartEl = document.getElementById('chart');
     let chart;
+    let labelTimeline = [];
+    const normalizedSeries = {};
 
+    // --- helpers ---
     function hexToRgba(hex, alpha = 1) {
       if (hex.startsWith('rgb')) return hex;
       const parsed = hex.replace('#', '');
-      const bigint = parseInt(parsed.length === 3 ? parsed.split('').map(c => c + c).join('') : parsed, 16);
+      const bigint = parseInt(parsed.length === 3 ? parsed.split('').map((c) => c + c).join('') : parsed, 16);
       const r = (bigint >> 16) & 255;
       const g = (bigint >> 8) & 255;
       const b = bigint & 255;
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
-    function pastelize(hex, mix = 0.32, alpha = 1) {
+    function pastelize(hex, mix = 0.28, alpha = 1) {
       if (hex.startsWith('rgb')) return hex;
       const parsed = hex.replace('#', '');
-      const bigint = parseInt(parsed.length === 3 ? parsed.split('').map(c => c + c).join('') : parsed, 16);
+      const bigint = parseInt(parsed.length === 3 ? parsed.split('').map((c) => c + c).join('') : parsed, 16);
       const r = (bigint >> 16) & 255;
       const g = (bigint >> 8) & 255;
       const b = bigint & 255;
@@ -423,8 +351,8 @@
 
     function blendColors(colors) {
       if (!colors.length) return ['rgba(91, 124, 250, 0.86)', 'rgba(126, 217, 87, 0.5)'];
-      const primary = pastelize(colors[0], 0.14, 0.9);
-      const secondary = pastelize(colors[1] || colors[0], 0.22, 0.72);
+      const primary = pastelize(colors[0], 0.12, 0.92);
+      const secondary = pastelize(colors[1] || colors[0], 0.22, 0.7);
       return [primary, secondary];
     }
 
@@ -433,59 +361,147 @@
       return hexToRgba(color, alpha);
     }
 
-    function normalize(series) {
-      if (!series.length) return [];
-      const first = series[0];
-      return series.map(v => v / first); // growth factor, 1 = 0%
-    }
-
-    function sliceRange(dates, series) {
-      const range = ranges.find(r => r.id === state.range);
-      if (!range || !range.months) return { dates, series };
-      const startIndex = Math.max(0, dates.length - range.months - 1);
-      return { dates: dates.slice(startIndex), series: series.slice(startIndex) };
-    }
-
     function formatPercent(factor) {
       const pct = (factor - 1) * 100;
       return `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
     }
 
+    function sliceRange(dates, series) {
+      const range = ranges.find((r) => r.id === state.range);
+      if (!range || !range.months) return { dates, series };
+      const startIndex = Math.max(0, dates.length - range.months - 1);
+      return { dates: dates.slice(startIndex), series: series.slice(startIndex) };
+    }
+
     function pickGradient(ctx, colors) {
       const [start, end] = blendColors(colors);
       const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 0.9);
-      gradient.addColorStop(0, setAlpha(start, 0.32));
-      const tail = end.replace(/rgba\(([^)]+), [0-9.]+\)/, 'rgba($1, 0.10)');
+      gradient.addColorStop(0, setAlpha(start, 0.28));
+      const tail = end.replace(/rgba\(([^)]+), [0-9.]+\)/, 'rgba($1, 0.08)');
       gradient.addColorStop(1, tail);
       return gradient;
     }
 
+    // --- data ---
+    function seededRandom(seed) {
+      let t = seed + 0x6d2b79f5;
+      return () => {
+        t += 0x6d2b79f5;
+        let x = t;
+        x = Math.imul(x ^ (x >>> 15), 1 | x);
+        x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    const growthBias = { ACWI: 0.0065, USA: 0.0075, GER: 0.0066, FRA: 0.0062, ITA: 0.0059, ESP: 0.0059, UK: 0.0058, CAN: 0.0063, BRA: 0.0069, MEX: 0.0065, AUS: 0.0061, JPN: 0.006, CHN: 0.0066, IND: 0.008, KOR: 0.0066, ZAF: 0.0062, SAU: 0.0061, ARE: 0.0062 };
+    const volBias = { IND: 0.006, BRA: 0.008, MEX: 0.006, ZAF: 0.006, CHN: 0.006 };
+
+    function createFallbackSeries(id, index, labels) {
+      const seed = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + index * 17;
+      const rand = seededRandom(seed);
+      const baseDrift = growthBias[id] ?? 0.006;
+      const vol = 0.012 + (volBias[id] ?? 0.0);
+      let value = 1;
+      const series = [];
+      labels.forEach((_, i) => {
+        const cycle = Math.sin(i / 10.5) * 0.16 + Math.cos(i / 7.5) * 0.11;
+        const shock = (rand() - 0.5) * vol * 2.1;
+        const monthlyReturn = baseDrift * (1 + cycle) + shock;
+        value *= Math.max(0.97, 1 + monthlyReturn);
+        value = Math.max(value, 0.4);
+        series.push(value);
+      });
+      return { dates: labels, values: series };
+    }
+
+    async function fetchStooqSeries(symbol) {
+      const res = await fetch(`https://stooq.pl/q/d/l/?s=${symbol}&i=d`);
+      if (!res.ok) throw new Error('Fetch failed');
+      const text = await res.text();
+      const lines = text.trim().split('\n').slice(1);
+      const dates = [];
+      const values = [];
+      lines.forEach((line) => {
+        const [date, open, high, low, close] = line.split(',');
+        const closeNum = parseFloat(close);
+        if (!Number.isFinite(closeNum)) return;
+        dates.push(date);
+        values.push(closeNum);
+      });
+      return { dates, values };
+    }
+
+    function normalizeToLabels(baseLabels, dates, values) {
+      if (!dates.length || !values.length) return Array(baseLabels.length).fill(null);
+      const start = values.find((v) => Number.isFinite(v)) ?? values[0];
+      const map = new Map();
+      dates.forEach((d, i) => map.set(d, values[i] / start));
+      return baseLabels.map((d) => (map.has(d) ? map.get(d) : null));
+    }
+
+    async function loadData() {
+      let acwiSeries;
+      try {
+        acwiSeries = await fetchStooqSeries(indexCatalog[0].symbol);
+      } catch (e) {
+        const fallbackLabels = Array.from({ length: 120 }, (_, i) => {
+          const d = new Date();
+          d.setMonth(d.getMonth() - (120 - i));
+          return d.toISOString().slice(0, 10);
+        });
+        acwiSeries = createFallbackSeries('ACWI', 0, fallbackLabels);
+      }
+
+      labelTimeline = acwiSeries.dates;
+      normalizedSeries['ACWI'] = normalizeToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values);
+
+      await Promise.all(
+        indexCatalog.slice(1).map(async (idx, i) => {
+          try {
+            const live = await fetchStooqSeries(idx.symbol);
+            normalizedSeries[idx.id] = normalizeToLabels(labelTimeline, live.dates, live.values);
+          } catch (err) {
+            const fallback = createFallbackSeries(idx.id, i + 1, labelTimeline);
+            normalizedSeries[idx.id] = normalizeToLabels(labelTimeline, fallback.dates, fallback.values);
+          }
+        })
+      );
+
+      renderRanges();
+      renderScales();
+      renderCards();
+      buildChart();
+    }
+
+    // --- UI ---
     function buildChart() {
       const ctx = chartEl.getContext('2d');
       const datasets = [];
       const legend = document.getElementById('legend');
       legend.innerHTML = '';
       if (!state.selected.length) state.selected = ['ACWI'];
+
       state.selected.forEach((id) => {
         const info = indexCatalog.find((i) => i.id === id);
         if (!info) return;
-        const raw = priceData[id] || [];
-        const norm = normalize(raw);
-        const { dates, series } = sliceRange(baseDates, norm);
+        const series = normalizedSeries[id] || [];
+        const { dates, series: slicedSeries } = sliceRange(labelTimeline, series);
         const [colorPrimary, colorSecondary] = blendColors(info.colors);
         const borderColor = setAlpha(colorPrimary, id === 'ACWI' ? 0.9 : 0.82);
         const gradient = id === 'ACWI' ? pickGradient(ctx, [colorPrimary, colorSecondary]) : 'transparent';
         datasets.push({
           label: `${info.name}`,
-          data: series,
+          data: slicedSeries,
           borderColor,
           backgroundColor: gradient,
-          tension: 0.32,
-          borderWidth: id === 'ACWI' ? 3 : 2.2,
+          tension: 0.3,
+          borderWidth: id === 'ACWI' ? 3 : 2.1,
           fill: id === 'ACWI',
           pointRadius: 0,
           pointHitRadius: 10,
         });
+
         const chip = document.createElement('div');
         chip.className = 'chip active';
         chip.style.background = colorPrimary;
@@ -504,7 +520,7 @@
         legend.appendChild(chip);
       });
 
-      const labels = sliceRange(baseDates, normalize(priceData[state.selected[0]] || [])).dates;
+      const labels = sliceRange(labelTimeline, normalizedSeries[state.selected[0]] || []).dates;
 
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
@@ -557,7 +573,11 @@
         const chip = document.createElement('div');
         chip.className = 'chip' + (state.range === r.id ? ' active' : '');
         chip.textContent = r.label;
-        chip.onclick = () => { state.range = r.id; buildChart(); renderCards(); };
+        chip.onclick = () => {
+          state.range = r.id;
+          buildChart();
+          renderCards();
+        };
         wrap.appendChild(chip);
       });
     }
@@ -569,7 +589,10 @@
         const chip = document.createElement('div');
         chip.className = 'chip' + (state.scale === s ? ' active' : '');
         chip.textContent = s === 'log' ? 'Log' : 'Linear';
-        chip.onclick = () => { state.scale = s; buildChart(); };
+        chip.onclick = () => {
+          state.scale = s;
+          buildChart();
+        };
         wrap.appendChild(chip);
       });
     }
@@ -585,20 +608,18 @@
           const isSelected = state.selected.includes(idx.id);
           card.className = 'index-card' + (isSelected ? ' selected' : '');
           const colors = blendColors(idx.colors);
-          const softA = setAlpha(colors[0], 0.26);
-          const softB = setAlpha(colors[1], 0.18);
+          const softA = setAlpha(colors[0], 0.34);
+          const softB = setAlpha(colors[1], 0.24);
           if (isSelected) {
-            card.style.backgroundImage = `linear-gradient(145deg, ${softA}, ${softB}), linear-gradient(160deg, ${colors[0]}, ${colors[1]})`;
+            card.style.backgroundImage = `linear-gradient(145deg, ${softA}, ${softB}), linear-gradient(160deg, #0f172a, #0b1222)`;
+            card.style.borderColor = setAlpha(colors[0], 0.45);
           } else {
             card.style.backgroundImage = 'none';
-            card.style.backgroundColor = 'var(--panel-strong)';
-            card.style.borderColor = 'var(--border-soft)';
+            card.style.backgroundColor = '#0f172a';
+            card.style.borderColor = 'rgba(255,255,255,0.06)';
           }
-          if (idx.id === 'ACWI' && isSelected) {
-            card.style.borderColor = 'rgba(126, 217, 87, 0.5)';
-          }
-          const series = normalize(priceData[idx.id] || []);
-          const latest = series.at(-1) || 1;
+          const series = normalizedSeries[idx.id] || [];
+          const latest = series.filter((v) => v !== null).at(-1) || 1;
           const change = formatPercent(latest);
           card.innerHTML = `
             <div class="index-top">
@@ -622,7 +643,7 @@
         });
       const title = document.getElementById('chart-title');
       title.textContent = state.selected.length
-        ? `${state.selected.length} Indexe – Basis ${ranges.find(r => r.id === state.range)?.label || 'Max'}, ${state.scale === 'log' ? 'logarithmisch' : 'linear'}`
+        ? `${state.selected.length} Indexe – Basis ${ranges.find((r) => r.id === state.range)?.label || 'Max'}, ${state.scale === 'log' ? 'logarithmisch' : 'linear'}`
         : 'Bitte Index auswählen';
     }
 
@@ -631,10 +652,7 @@
       renderCards();
     });
 
-    renderRanges();
-    renderScales();
-    renderCards();
-    buildChart();
+    loadData();
   </script>
 </body>
 </html>
