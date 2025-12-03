@@ -335,7 +335,8 @@
     const state = {
       search: '',
       range: 'max',
-      scale: 'log',
+      // Start on linear to keep divergences like MSCI USA vs. ACWI visually apparent; log remains toggleable
+      scale: 'linear',
       selected: ['ACWI', 'USA', 'GER'],
     };
 
