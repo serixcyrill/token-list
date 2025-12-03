@@ -177,7 +177,7 @@
       width: 10%;
       pointer-events: none;
       z-index: 2;
-      background: linear-gradient(90deg, rgba(255, 255, 255, 0.86), transparent 70%);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), transparent 70%);
     }
 
     .chart-card::after {
@@ -278,7 +278,7 @@
       <div>
         <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live FMP API</div>
         <h1>Globale Index-Performance</h1>
-        <p class="subtitle">Vergleiche Märkte übereinander – prozentual ab gleichem Startpunkt, log als Standard, FMP-Feed mit fallback.</p>
+        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Basis, log als Standard, FMP-Feed mit fallback.</p>
       </div>
     </div>
 
@@ -342,6 +342,7 @@
     const chartEl = document.getElementById('chart');
     let chart;
     let labelTimeline = [];
+    let usdToEur = 0.92;
     const normalizedSeries = {};
 
     // --- helpers ---
@@ -378,9 +379,9 @@
       return hexToRgba(color, alpha);
     }
 
-    function formatPercent(factor) {
-      const pct = (factor - 1) * 100;
-      return `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+    function formatCurrency(value) {
+      if (!Number.isFinite(value)) return '';
+      return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
     }
 
     function sliceRange(dates, series) {
@@ -430,14 +431,14 @@
       const rand = seededRandom(seed);
       const baseDrift = growthBias[id] ?? 0.006;
       const vol = 0.012 + (volBias[id] ?? 0.0);
-      let value = 1;
+      let value = 10500 + index * 900;
       const series = [];
       labels.forEach((_, i) => {
         const cycle = Math.sin(i / 10.5) * 0.16 + Math.cos(i / 7.5) * 0.11;
         const shock = (rand() - 0.5) * vol * 2.1;
         const monthlyReturn = baseDrift * (1 + cycle) + shock;
         value *= Math.max(0.97, 1 + monthlyReturn);
-        value = Math.max(value, 0.4);
+        value = Math.max(value, 1200);
         series.push(value);
       });
       return { dates: labels, values: series };
@@ -445,6 +446,15 @@
 
     // Replace with your own FMP API key for production use
     const FMP_API_KEY = 'demo';
+
+    async function fetchUsdToEurRate() {
+      const res = await fetch(`https://financialmodelingprep.com/api/v3/quote-short/EURUSD?apikey=${FMP_API_KEY}`);
+      if (!res.ok) throw new Error('FX fetch failed');
+      const data = await res.json();
+      const price = Array.isArray(data) ? data[0]?.price : data?.price;
+      if (!price || price <= 0) throw new Error('No FX price');
+      return 1 / price;
+    }
 
     async function fetchFmpSeries(symbol) {
       const res = await fetch(
@@ -460,15 +470,21 @@
       return { dates, values };
     }
 
-    function normalizeToLabels(baseLabels, dates, values) {
+    function alignToLabels(baseLabels, dates, values, fx) {
       if (!dates.length || !values.length) return Array(baseLabels.length).fill(null);
-      const start = values.find((v) => Number.isFinite(v)) ?? values[0];
       const map = new Map();
-      dates.forEach((d, i) => map.set(d, values[i] / start));
+      const factor = fx && fx > 0 ? fx : 1;
+      dates.forEach((d, i) => map.set(d, (values[i] ?? null) * factor));
       return baseLabels.map((d) => (map.has(d) ? map.get(d) : null));
     }
 
     async function loadData() {
+      try {
+        usdToEur = await fetchUsdToEurRate();
+      } catch (e) {
+        usdToEur = 0.92;
+      }
+
       let acwiSeries;
       try {
         acwiSeries = await fetchFmpSeries(indexCatalog[0].symbol);
@@ -482,16 +498,16 @@
       }
 
       labelTimeline = acwiSeries.dates;
-      normalizedSeries['ACWI'] = normalizeToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values);
+      normalizedSeries['ACWI'] = alignToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values, usdToEur);
 
       await Promise.all(
         indexCatalog.slice(1).map(async (idx, i) => {
           try {
             const live = await fetchFmpSeries(idx.symbol);
-            normalizedSeries[idx.id] = normalizeToLabels(labelTimeline, live.dates, live.values);
+            normalizedSeries[idx.id] = alignToLabels(labelTimeline, live.dates, live.values, usdToEur);
           } catch (err) {
             const fallback = createFallbackSeries(idx.id, i + 1, labelTimeline);
-            normalizedSeries[idx.id] = normalizeToLabels(labelTimeline, fallback.dates, fallback.values);
+            normalizedSeries[idx.id] = alignToLabels(labelTimeline, fallback.dates, fallback.values, usdToEur);
           }
         })
       );
@@ -563,7 +579,7 @@
             y: {
               type: state.scale === 'log' ? 'logarithmic' : 'linear',
               ticks: {
-                callback: (val) => formatPercent(val),
+                callback: (val) => formatCurrency(val),
                 maxTicksLimit: 6,
               },
               grid: { color: 'rgba(15,23,42,0.05)' },
@@ -579,7 +595,7 @@
               mode: 'nearest',
               intersect: false,
               callbacks: {
-                label: (ctx) => `${ctx.dataset.label}: ${formatPercent(ctx.parsed.y)}`,
+                label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`,
                 title: (items) => items[0]?.label || '',
               },
               backgroundColor: '#0f172a',
