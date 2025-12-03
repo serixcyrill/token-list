@@ -634,7 +634,9 @@
         <span class="badge">Vemo</span>
         <div>
           <h1>Bitcoin vs. Gold Performance</h1>
-          <div class="subtitle">Live Prozententwicklung, BTC und Gold (PAXG) übereinander gelegt.</div>
+          <div class="subtitle">
+            Live Prozententwicklung, BTC und Gold (<span id="goldSourceLabel">XAU</span>) übereinander gelegt.
+          </div>
           <div class="status" aria-live="polite">
             <span class="dot" aria-hidden="true"></span>
             <span id="statusText">Lädt Daten von CoinGecko …</span>
@@ -755,7 +757,7 @@
 
       <div class="chart-legend">
         <span><span class="legend-dot legend-btc"></span>BTC % seit Fenster-Start</span>
-        <span><span class="legend-dot legend-gold"></span>Gold % (PAXG) seit Fenster-Start</span>
+        <span><span class="legend-dot legend-gold"></span>Gold % (<span id="goldLegendLabel">XAU</span>) seit Fenster-Start</span>
         <span>Hover/Touch: Exakter %-Wert + Datum</span>
       </div>
 
@@ -804,6 +806,8 @@
     const timelineWindow = document.getElementById('timelineWindow');
     const timelinePoints = document.getElementById('timelinePoints');
     const timelineHint = document.getElementById('timelineHint');
+    const goldSourceLabel = document.getElementById('goldSourceLabel');
+    const goldLegendLabel = document.getElementById('goldLegendLabel');
     const btcReturn = document.getElementById('btcReturn');
     const goldReturn = document.getElementById('goldReturn');
     const spreadReturn = document.getElementById('spreadReturn');
@@ -820,6 +824,7 @@
     let goldLoaded = false;
     let historyLabel = '';
     let goldLabel = '';
+    let goldCoinId = '';
     let currentWindow = { btc: [], gold: [] };
     let hoverTs = null;
     rangeSlider.disabled = true;
@@ -835,6 +840,13 @@
         hour: withTime ? '2-digit' : undefined,
         minute: withTime ? '2-digit' : undefined,
       });
+
+    const syncGoldLabels = (label = 'Gold') => {
+      goldSourceLabel.textContent = label;
+      goldLegendLabel.textContent = label;
+    };
+
+    syncGoldLabels('XAU');
 
     function setRangeValue(value) {
       activeRange = value;
@@ -945,13 +957,14 @@
     }
 
     function updateWindowStats(btcPoints, goldPoints) {
+      const goldShort = goldLegendLabel.textContent || 'Gold';
       if (!btcPoints || btcPoints.length < 2) {
         btcReturn.textContent = '–';
-        goldReturn.textContent = goldPoints?.length ? '–' : 'Kein Gold';
+        goldReturn.textContent = goldPoints?.length ? '–' : `Kein ${goldShort}`;
         spreadReturn.textContent = '–';
         btcBaseLabel.textContent = 'Keine Basis';
-        goldBaseLabel.textContent = goldPoints?.length ? 'Lade …' : 'Keine Gold-Daten';
-        compareStatus.textContent = goldLoaded ? 'Gold geladen' : 'Gold noch laden';
+        goldBaseLabel.textContent = goldPoints?.length ? 'Lade …' : `Keine ${goldShort}-Daten`;
+        compareStatus.textContent = goldLoaded ? `${goldShort} geladen` : `${goldShort} noch laden`;
         windowRangeValue.textContent = '–';
         windowRangeLabel.textContent = 'Keine Ansicht';
         windowPointCount.textContent = '0 BTC / 0 Gold Punkte';
@@ -981,18 +994,18 @@
 
       btcReturn.textContent = percent(btcChange);
       btcBaseLabel.textContent = `Basis: € ${euro(btcStart.price)} · ${formatDate(btcStart.ts, false)}`;
-      goldReturn.textContent = hasGold ? percent(goldChange) : '–';
+      goldReturn.textContent = hasGold ? percent(goldChange) : `Kein ${goldShort}`;
       goldBaseLabel.textContent = hasGold
         ? `Basis: € ${euro(goldPoints[0].price)} · ${formatDate(goldPoints[0].ts, false)}`
-        : 'Gold wird nicht angezeigt';
+        : `${goldShort} wird nicht angezeigt`;
 
       if (hasGold) {
         const spread = btcChange - goldChange;
         spreadReturn.textContent = percent(spread);
-        compareStatus.textContent = spread >= 0 ? 'BTC liegt vorn' : 'Gold liegt vorn';
+        compareStatus.textContent = spread >= 0 ? 'BTC liegt vorn' : `${goldShort} liegt vorn`;
       } else {
         spreadReturn.textContent = '–';
-        compareStatus.textContent = goldLoaded ? 'Gold fehlte im Fenster' : 'Gold lädt …';
+        compareStatus.textContent = goldLoaded ? `${goldShort} fehlte im Fenster` : `${goldShort} lädt …`;
       }
 
       windowRangeValue.textContent = `${formatDate(btcStart.ts, false)} – ${formatDate(btcEnd.ts, false)}`;
@@ -1001,7 +1014,7 @@
       windowAverage.textContent = percent(btcAvg);
       windowVolatility.textContent = percent(btcMax - btcMin);
       volatilityLabel.textContent = `Bandbreite: ${percent(btcMin)} bis ${percent(btcMax)}`;
-      windowChangePct.textContent = hasGold ? `Überlappung: ${goldRangeLabel}` : 'Nur BTC im Fenster';
+      windowChangePct.textContent = hasGold ? `${goldShort} Überlappung: ${goldRangeLabel}` : 'Nur BTC im Fenster';
 
       const axisTop = Math.max(btcMax, hasGold ? Math.max(...goldPoints.map((p) => p.pct)) : btcMax);
       const axisBottom = Math.min(btcMin, hasGold ? Math.min(...goldPoints.map((p) => p.pct)) : btcMin);
@@ -1247,15 +1260,16 @@
 
       const btcPoints = windowed.btc || [];
       const goldPoints = windowed.gold || [];
+      const goldShort = goldLegendLabel.textContent || 'Gold';
 
       if (btcPoints.length > 1) {
         const first = new Date(btcPoints[0].ts).toLocaleDateString('de-DE');
         const last = new Date(btcPoints[btcPoints.length - 1].ts).toLocaleDateString('de-DE');
         sparklineRange.textContent = `${first} – ${last}`;
         const windowLabel = activeRange === 'max' ? 'Gesamte BTC-Historie' : `Fenster: ${activeRange} Tage`;
-        const goldLabelText = goldPoints.length ? 'Gold Overlay aktiv' : 'Gold Overlay leer';
+        const goldLabelText = goldPoints.length ? `${goldShort} Overlay aktiv` : `${goldShort} Overlay leer`;
         sparklineInfo.textContent = `${windowLabel} · ${goldLabelText}`;
-        chartTitle.textContent = 'BTC vs. Gold (% Veränderung)';
+        chartTitle.textContent = `BTC vs. ${goldShort} (% Veränderung)`;
         rangeLabel.textContent = rangeSlider.disabled
           ? 'Gesamte Historie sichtbar'
           : `${rangeSlider.value}% der ausgewählten Historie (BTC-Basis)`;
@@ -1282,6 +1296,8 @@
       goldPrices = [];
       historyLabel = '';
       goldLabel = '';
+      goldCoinId = '';
+      syncGoldLabels('XAU');
       rangeSlider.disabled = true;
 
       const btcSources = [
@@ -1292,9 +1308,12 @@
       ];
 
       const goldSources = [
-        { query: 'days=max&interval=daily', label: 'Gold: Volle Historie (täglich)' },
-        { query: 'days=1825&interval=daily', label: 'Gold: Letzte 5 Jahre (täglich)' },
-        { query: 'days=365&interval=daily', label: 'Gold: Letztes Jahr (täglich)' },
+        { coin: 'tether-gold', query: 'days=max&interval=daily', label: 'XAUt volle Historie', short: 'XAUt' },
+        { coin: 'pax-gold', query: 'days=max&interval=daily', label: 'PAXG volle Historie', short: 'PAXG' },
+        { coin: 'tether-gold', query: 'days=1825&interval=daily', label: 'XAUt 5 Jahre', short: 'XAUt' },
+        { coin: 'pax-gold', query: 'days=1825&interval=daily', label: 'PAXG 5 Jahre', short: 'PAXG' },
+        { coin: 'tether-gold', query: 'days=365&interval=daily', label: 'XAUt letztes Jahr', short: 'XAUt' },
+        { coin: 'pax-gold', query: 'days=365&interval=daily', label: 'PAXG letztes Jahr', short: 'PAXG' },
       ];
 
       let btcError = null;
@@ -1324,8 +1343,9 @@
       for (const source of goldSources) {
         try {
           compareStatus.textContent = `Lade ${source.label} …`;
+          syncGoldLabels(source.short || 'Gold');
           const chartRes = await fetch(
-            `https://api.coingecko.com/api/v3/coins/pax-gold/market_chart?vs_currency=eur&${source.query}`,
+            `https://api.coingecko.com/api/v3/coins/${source.coin}/market_chart?vs_currency=eur&${source.query}`,
             { headers: { accept: 'application/json' } }
           );
           if (!chartRes.ok) throw new Error(`Gold Fehler: HTTP ${chartRes.status}`);
@@ -1334,6 +1354,8 @@
             goldPrices = chartData.prices.map(([ts, price]) => [ts, price]);
             goldLoaded = true;
             goldLabel = source.label;
+            goldCoinId = source.coin;
+            syncGoldLabels(source.short || source.coin.toUpperCase());
             break;
           }
           goldError = new Error('Leere Gold-Reihe erhalten');
@@ -1351,6 +1373,9 @@
 
       if (!goldLoaded) {
         compareStatus.textContent = `Gold-Overlay fehlt (${goldError?.message ?? 'keine Daten'})`;
+        syncGoldLabels('XAU');
+      } else {
+        compareStatus.textContent = `${goldLabel} geladen`;
       }
 
       renderSparkline();
