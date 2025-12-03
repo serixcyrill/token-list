@@ -420,7 +420,7 @@
 
     .vemo-btc .chart-wrap {
       position: relative;
-      height: 340px;
+      height: 420px;
       margin-top: 6px;
       border-radius: 14px;
       overflow: hidden;
@@ -747,7 +747,7 @@
           <span id="axisMid">–</span>
           <span id="axisMin">–</span>
         </div>
-        <canvas id="sparkline" width="900" height="220"></canvas>
+        <canvas id="sparkline" width="1100" height="320"></canvas>
         <div class="chart-tooltip" id="chartTooltip"></div>
       </div>
       <div class="chart-footer">
@@ -1287,6 +1287,30 @@
       drawSparkline(btcPoints, goldPoints);
     }
 
+    async function fetchCoingeckoChart(coin, query, label) {
+      const res = await fetch(
+        `https://api.coingecko.com/api/v3/coins/${coin}/market_chart?vs_currency=eur&${query}`,
+        { headers: { accept: 'application/json' } }
+      );
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data?.prices) || !data.prices.length) {
+        throw new Error(`${label} keine Reihe`);
+      }
+      return data.prices.map(([ts, price]) => [ts, price]);
+    }
+
+    async function fetchBinanceSeries(symbol, interval, limit, label) {
+      const res = await fetch(
+        `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`,
+        { headers: { accept: 'application/json' } }
+      );
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) throw new Error(`${label} leer`);
+      return data.map((row) => [Number(row[0]), Number(row[4])]);
+    }
+
     async function loadHistory(force = false) {
       if (historyLoaded && goldLoaded && !force) return;
 
@@ -1301,33 +1325,33 @@
       rangeSlider.disabled = true;
 
       const btcSources = [
-        { query: 'days=max&interval=daily', label: 'BTC: Volle Historie (täglich)' },
-        { query: 'days=1825&interval=daily', label: 'BTC: Letzte 5 Jahre (täglich)' },
-        { query: 'days=365&interval=daily', label: 'BTC: Letztes Jahr (täglich)' },
-        { query: 'days=90&interval=hourly', label: 'BTC: Letzte 90 Tage (stündlich)' },
+        { type: 'cg', coin: 'bitcoin', query: 'days=max&interval=daily', label: 'BTC: Volle Historie (täglich)' },
+        { type: 'cg', coin: 'bitcoin', query: 'days=1825&interval=daily', label: 'BTC: Letzte 5 Jahre (täglich)' },
+        { type: 'cg', coin: 'bitcoin', query: 'days=365&interval=daily', label: 'BTC: Letztes Jahr (täglich)' },
+        { type: 'cg', coin: 'bitcoin', query: 'days=90&interval=hourly', label: 'BTC: Letzte 90 Tage (stündlich)' },
+        { type: 'binance', symbol: 'BTCUSDT', interval: '1d', limit: 1200, label: 'BTC: Binance Tagesdaten' },
       ];
 
       const goldSources = [
-        { coin: 'tether-gold', query: 'days=max&interval=daily', label: 'XAUt volle Historie', short: 'XAUt' },
-        { coin: 'pax-gold', query: 'days=max&interval=daily', label: 'PAXG volle Historie', short: 'PAXG' },
-        { coin: 'tether-gold', query: 'days=1825&interval=daily', label: 'XAUt 5 Jahre', short: 'XAUt' },
-        { coin: 'pax-gold', query: 'days=1825&interval=daily', label: 'PAXG 5 Jahre', short: 'PAXG' },
-        { coin: 'tether-gold', query: 'days=365&interval=daily', label: 'XAUt letztes Jahr', short: 'XAUt' },
-        { coin: 'pax-gold', query: 'days=365&interval=daily', label: 'PAXG letztes Jahr', short: 'PAXG' },
+        { type: 'cg', coin: 'tether-gold', query: 'days=max&interval=daily', label: 'XAUt volle Historie', short: 'XAUt' },
+        { type: 'cg', coin: 'pax-gold', query: 'days=max&interval=daily', label: 'PAXG volle Historie', short: 'PAXG' },
+        { type: 'cg', coin: 'tether-gold', query: 'days=1825&interval=daily', label: 'XAUt 5 Jahre', short: 'XAUt' },
+        { type: 'cg', coin: 'pax-gold', query: 'days=1825&interval=daily', label: 'PAXG 5 Jahre', short: 'PAXG' },
+        { type: 'cg', coin: 'tether-gold', query: 'days=365&interval=daily', label: 'XAUt letztes Jahr', short: 'XAUt' },
+        { type: 'cg', coin: 'pax-gold', query: 'days=365&interval=daily', label: 'PAXG letztes Jahr', short: 'PAXG' },
+        { type: 'binance', symbol: 'XAUTUSDT', interval: '1d', limit: 1200, label: 'Binance XAUt Tagesdaten', short: 'XAUt' },
       ];
 
       let btcError = null;
       for (const source of btcSources) {
         try {
           sparklineInfo.textContent = `Lade ${source.label} …`;
-          const chartRes = await fetch(
-            `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&${source.query}`,
-            { headers: { accept: 'application/json' } }
-          );
-          if (!chartRes.ok) throw new Error(`Historie Fehler: HTTP ${chartRes.status}`);
-          const chartData = await chartRes.json();
-          if (Array.isArray(chartData?.prices) && chartData.prices.length) {
-            historyPrices = chartData.prices.map(([ts, price]) => [ts, price]);
+          const series =
+            source.type === 'binance'
+              ? await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label)
+              : await fetchCoingeckoChart(source.coin, source.query, source.label);
+          if (series.length) {
+            historyPrices = series;
             historyLoaded = true;
             historyLabel = source.label;
             break;
@@ -1344,18 +1368,16 @@
         try {
           compareStatus.textContent = `Lade ${source.label} …`;
           syncGoldLabels(source.short || 'Gold');
-          const chartRes = await fetch(
-            `https://api.coingecko.com/api/v3/coins/${source.coin}/market_chart?vs_currency=eur&${source.query}`,
-            { headers: { accept: 'application/json' } }
-          );
-          if (!chartRes.ok) throw new Error(`Gold Fehler: HTTP ${chartRes.status}`);
-          const chartData = await chartRes.json();
-          if (Array.isArray(chartData?.prices) && chartData.prices.length) {
-            goldPrices = chartData.prices.map(([ts, price]) => [ts, price]);
+          const series =
+            source.type === 'binance'
+              ? await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label)
+              : await fetchCoingeckoChart(source.coin, source.query, source.label);
+          if (series.length) {
+            goldPrices = series;
             goldLoaded = true;
             goldLabel = source.label;
-            goldCoinId = source.coin;
-            syncGoldLabels(source.short || source.coin.toUpperCase());
+            goldCoinId = source.coin || source.symbol;
+            syncGoldLabels(source.short || source.coin?.toUpperCase() || 'XAU');
             break;
           }
           goldError = new Error('Leere Gold-Reihe erhalten');
