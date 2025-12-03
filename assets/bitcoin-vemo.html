@@ -10,12 +10,12 @@
     /* Scope everything to the widget container so WordPress layouts stay intact. */
     .vemo-btc {
       --bg: #f7f8fb;
-      --bg-soft: rgba(248, 250, 252, 0.58);
-      --panel: rgba(255, 255, 255, 0.62);
+      --bg-soft: rgba(248, 250, 252, 0.7);
+      --panel: rgba(255, 255, 255, 0.7);
       --panel-strong: #ffffff;
       --border: rgba(17, 24, 39, 0.08);
       --border-accent: rgba(126, 217, 87, 0.35);
-      --border-blue: rgba(91, 124, 250, 0.14);
+      --border-blue: rgba(91, 124, 250, 0.16);
       --text: #0f172a;
       --muted: #6b7280;
       --muted-strong: #475569;
@@ -23,8 +23,8 @@
       --accent: #7ed957;
       --accent-blue: #5b7cfa;
       --accent-text: #14532d;
-      --shadow-main: 0 18px 40px rgba(15, 23, 42, 0.1);
-      --shadow-panel: 0 14px 32px rgba(15, 23, 42, 0.08);
+      --shadow-main: 0 22px 46px rgba(15, 23, 42, 0.12);
+      --shadow-panel: 0 16px 36px rgba(15, 23, 42, 0.08);
       --shadow-kpi: 0 12px 28px rgba(15, 23, 42, 0.06);
       --radius-shell: 26px;
       --radius-panel: 22px;
@@ -35,8 +35,9 @@
       font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 16% 24%, rgba(126, 217, 87, 0.1), transparent 42%),
-        radial-gradient(circle at 86% 16%, rgba(91, 124, 250, 0.1), transparent 38%),
+        radial-gradient(circle at 18% 22%, rgba(126, 217, 87, 0.12), transparent 42%),
+        radial-gradient(circle at 86% 12%, rgba(91, 124, 250, 0.12), transparent 32%),
+        radial-gradient(circle at 50% 90%, rgba(91, 124, 250, 0.08), transparent 38%),
         linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
       padding: 28px 16px 60px;
       width: 100%;
@@ -57,7 +58,7 @@
       border-radius: var(--radius-shell);
       box-shadow: var(--shadow-main);
       backdrop-filter: blur(10px);
-      padding: 22px 24px 32px;
+      padding: 26px 26px 34px;
     }
 
     .vemo-btc header.header {
@@ -71,6 +72,7 @@
       align-items: flex-start;
       justify-content: space-between;
       margin-bottom: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .vemo-btc .title {
@@ -107,7 +109,7 @@
       margin: 0;
       font-family: 'Poppins', system-ui, sans-serif;
       font-weight: 800;
-      font-size: clamp(24px, 2.6vw, 32px);
+      font-size: clamp(24px, 2.8vw, 34px);
       letter-spacing: -0.25px;
       color: var(--text);
     }
@@ -121,17 +123,18 @@
     .vemo-btc .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px;
+      gap: 18px;
     }
 
     .vemo-btc .card {
       background: var(--panel-strong);
       border: 1px solid var(--border);
       border-radius: var(--radius-panel);
-      padding: 18px 18px 16px;
+      padding: 20px 18px 16px;
       position: relative;
       overflow: hidden;
       box-shadow: var(--shadow-panel);
+      backdrop-filter: blur(6px);
     }
 
     .vemo-btc .pill {
@@ -310,10 +313,11 @@
       background: var(--bg-soft);
       border: 1px solid var(--border);
       border-radius: var(--radius-card);
-      padding: 18px 18px 12px;
+      padding: 20px 18px 16px;
       box-shadow: var(--shadow-panel);
       margin-top: 16px;
       position: relative;
+      overflow: hidden;
     }
 
     .vemo-btc .chart-meta {
@@ -420,14 +424,16 @@
 
     .vemo-btc .chart-wrap {
       position: relative;
-      height: 420px;
+      height: 460px;
       margin-top: 6px;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
       border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.014), rgba(15, 23, 42, 0.02)), #fff;
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.024), rgba(15, 23, 42, 0.04)),
+        linear-gradient(120deg, rgba(126, 217, 87, 0.04), rgba(91, 124, 250, 0.04));
       cursor: grab;
-      transition: box-shadow 0.2s ease;
+      transition: box-shadow 0.2s ease, transform 0.18s ease;
     }
 
     .vemo-btc .chart-wrap:active {
@@ -830,6 +836,7 @@
     rangeSlider.disabled = true;
 
     const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const usd = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const btc = (value) => Number(value).toFixed(8);
     const percent = (value, fraction = 2) => `${value >= 0 ? '+' : ''}${value.toFixed(fraction)}%`;
     const formatDate = (ts, withTime = true) =>
@@ -840,6 +847,34 @@
         hour: withTime ? '2-digit' : undefined,
         minute: withTime ? '2-digit' : undefined,
       });
+
+    const formatGoldPrice = (value) => {
+      const currency = goldCoinId === 'XAU' ? 'USD' : '€';
+      const formatter = currency === 'USD' ? usd : euro;
+      return `${currency} ${formatter(value)}`;
+    };
+
+    async function fetchStooqGold(label) {
+      const res = await fetch('https://stooq.pl/q/d/l/?s=xauusd&i=d', {
+        headers: { accept: 'text/csv' },
+      });
+      if (!res.ok) throw new Error(`Stooq Fehler ${res.status}`);
+      const text = await res.text();
+      const lines = text.trim().split(/\r?\n/).slice(1);
+      const series = lines
+        .map((line) => line.split(','))
+        .filter((parts) => parts.length >= 5)
+        .map((parts) => {
+          const ts = Date.parse(`${parts[0]}T00:00:00Z`);
+          const close = Number(parts[4]);
+          return { ts, close };
+        })
+        .filter((p) => Number.isFinite(p.ts) && Number.isFinite(p.close) && p.ts >= 915148800000);
+
+      if (!series.length) throw new Error('Stooq lieferte keine Golddaten');
+      const sorted = series.map(({ ts, close }) => [ts, close]).sort((a, b) => a[0] - b[0]);
+      return sorted;
+    }
 
     const syncGoldLabels = (label = 'Gold') => {
       goldSourceLabel.textContent = label;
@@ -996,7 +1031,7 @@
       btcBaseLabel.textContent = `Basis: € ${euro(btcStart.price)} · ${formatDate(btcStart.ts, false)}`;
       goldReturn.textContent = hasGold ? percent(goldChange) : `Kein ${goldShort}`;
       goldBaseLabel.textContent = hasGold
-        ? `Basis: € ${euro(goldPoints[0].price)} · ${formatDate(goldPoints[0].ts, false)}`
+        ? `Basis: ${formatGoldPrice(goldPoints[0].price)} · ${formatDate(goldPoints[0].ts, false)}`
         : `${goldShort} wird nicht angezeigt`;
 
       if (hasGold) {
@@ -1138,7 +1173,7 @@
             )}</span></div>`
           : '';
         const goldText = hoverPointGold
-          ? `<div class="muted-row"><span>Gold</span><span>${percent(hoverPointGold.pct, 2)} · € ${euro(
+          ? `<div class="muted-row"><span>Gold</span><span>${percent(hoverPointGold.pct, 2)} · ${formatGoldPrice(
               hoverPointGold.price
             )}</span></div>`
           : '<div class="muted-row"><span>Gold</span><span>kein Punkt</span></div>';
@@ -1333,6 +1368,7 @@
       ];
 
       const goldSources = [
+        { type: 'stooq', label: 'Stooq Spot XAUUSD (historisch)', short: 'XAU' },
         { type: 'cg', coin: 'tether-gold', query: 'days=max&interval=daily', label: 'XAUt volle Historie', short: 'XAUt' },
         { type: 'cg', coin: 'pax-gold', query: 'days=max&interval=daily', label: 'PAXG volle Historie', short: 'PAXG' },
         { type: 'cg', coin: 'tether-gold', query: 'days=1825&interval=daily', label: 'XAUt 5 Jahre', short: 'XAUt' },
@@ -1368,15 +1404,19 @@
         try {
           compareStatus.textContent = `Lade ${source.label} …`;
           syncGoldLabels(source.short || 'Gold');
-          const series =
-            source.type === 'binance'
-              ? await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label)
-              : await fetchCoingeckoChart(source.coin, source.query, source.label);
+          let series = [];
+          if (source.type === 'binance') {
+            series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label);
+          } else if (source.type === 'stooq') {
+            series = await fetchStooqGold(source.label);
+          } else {
+            series = await fetchCoingeckoChart(source.coin, source.query, source.label);
+          }
           if (series.length) {
             goldPrices = series;
             goldLoaded = true;
             goldLabel = source.label;
-            goldCoinId = source.coin || source.symbol;
+            goldCoinId = source.coin || source.symbol || 'XAU';
             syncGoldLabels(source.short || source.coin?.toUpperCase() || 'XAU');
             break;
           }
