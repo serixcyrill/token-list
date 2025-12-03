@@ -456,18 +456,27 @@
       return 1 / price;
     }
 
+    function toMonthlySeries(sorted) {
+      const buckets = new Map();
+      sorted.forEach((item) => {
+        const date = new Date(item.date);
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+        buckets.set(key, item.close);
+      });
+      const entries = Array.from(buckets.entries()).sort((a, b) => new Date(a[0]) - new Date(b[0]));
+      return { dates: entries.map((e) => e[0]), values: entries.map((e) => e[1]) };
+    }
+
     async function fetchFmpSeries(symbol) {
       const res = await fetch(
-        `https://financialmodelingprep.com/api/v3/historical-price-full/${symbol}?serietype=line&timeseries=2000&apikey=${FMP_API_KEY}`
+        `https://financialmodelingprep.com/api/v3/historical-price-full/${symbol}?from=1987-01-01&serietype=line&apikey=${FMP_API_KEY}`
       );
       if (!res.ok) throw new Error('Fetch failed');
       const data = await res.json();
       const historical = data?.historical;
       if (!historical?.length) throw new Error('No data');
       const sorted = [...historical].sort((a, b) => new Date(a.date) - new Date(b.date));
-      const dates = sorted.map((item) => item.date);
-      const values = sorted.map((item) => item.close);
-      return { dates, values };
+      return toMonthlySeries(sorted);
     }
 
     function alignToLabels(baseLabels, dates, values, fx) {
