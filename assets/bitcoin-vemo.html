@@ -849,10 +849,43 @@
       });
 
     const formatGoldPrice = (value) => {
-      const currency = goldCoinId === 'XAU' ? 'USD' : '€';
+      const currency = goldCoinId === 'XAU' ? 'USD' : goldCoinId === 'PLN' ? 'PLN' : '€';
       const formatter = currency === 'USD' ? usd : euro;
       return `${currency} ${formatter(value)}`;
     };
+
+    async function fetchNbpGoldHistory(label) {
+      const today = new Date();
+      const thisYear = today.getFullYear();
+      const pad = (n) => String(n).padStart(2, '0');
+      const toDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const all = [];
+
+      for (let year = 2010; year <= thisYear; year++) {
+        const start = new Date(`${year}-01-01T00:00:00Z`);
+        const endDate =
+          year === thisYear
+            ? today
+            : new Date(`${year}-12-31T00:00:00Z`);
+
+        const url = `https://api.nbp.pl/api/cenyzlota/${toDate(start)}/${toDate(endDate)}?format=json`;
+        const res = await fetch(url, { headers: { accept: 'application/json' } });
+        if (!res.ok) throw new Error(`${label} ${year} HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data) || !data.length) continue;
+
+        data.forEach((entry) => {
+          const ts = Date.parse(`${entry.data}T00:00:00Z`);
+          const close = Number(entry.cena);
+          if (Number.isFinite(ts) && Number.isFinite(close)) {
+            all.push([ts, close]);
+          }
+        });
+      }
+
+      if (!all.length) throw new Error(`${label} leer`);
+      return all.sort((a, b) => a[0] - b[0]);
+    }
 
     async function fetchStooqGold(label) {
       const res = await fetch('https://stooq.pl/q/d/l/?s=xauusd&i=d', {
@@ -1368,6 +1401,7 @@
       ];
 
       const goldSources = [
+        { type: 'nbp', label: 'NBP Gold PLN (täglich)', short: 'XAU', coin: 'PLN' },
         { type: 'stooq', label: 'Stooq Spot XAUUSD (historisch)', short: 'XAU' },
         { type: 'cg', coin: 'tether-gold', query: 'days=max&interval=daily', label: 'XAUt volle Historie', short: 'XAUt' },
         { type: 'cg', coin: 'pax-gold', query: 'days=max&interval=daily', label: 'PAXG volle Historie', short: 'PAXG' },
@@ -1407,6 +1441,8 @@
           let series = [];
           if (source.type === 'binance') {
             series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label);
+          } else if (source.type === 'nbp') {
+            series = await fetchNbpGoldHistory(source.label);
           } else if (source.type === 'stooq') {
             series = await fetchStooqGold(source.label);
           } else {
