@@ -278,7 +278,7 @@
       <div>
         <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live FMP API</div>
         <h1>Globale Index-Performance</h1>
-        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Basis, log als Standard, FMP-Feed mit fallback.</p>
+        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Basis (auf 100 rebasiert), linearer Start, Log-Umschaltung, FMP-Feed mit Fallback.</p>
       </div>
     </div>
 
@@ -488,6 +488,15 @@
       return baseLabels.map((d) => (map.has(d) ? map.get(d) : null));
     }
 
+    function rebaseToFirstValue(series) {
+      let base = null;
+      return series.map((v) => {
+        if (v == null || !Number.isFinite(v) || v <= 0) return null;
+        if (base === null) base = v;
+        return (v / base) * 100;
+      });
+    }
+
     async function loadData() {
       try {
         usdToEur = await fetchUsdToEurRate();
@@ -508,16 +517,20 @@
       }
 
       labelTimeline = acwiSeries.dates;
-      normalizedSeries['ACWI'] = alignToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values, usdToEur);
+      normalizedSeries['ACWI'] = rebaseToFirstValue(alignToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values, usdToEur));
 
       await Promise.all(
         indexCatalog.slice(1).map(async (idx, i) => {
           try {
             const live = await fetchFmpSeries(idx.symbol);
-            normalizedSeries[idx.id] = alignToLabels(labelTimeline, live.dates, live.values, usdToEur);
+            normalizedSeries[idx.id] = rebaseToFirstValue(
+              alignToLabels(labelTimeline, live.dates, live.values, usdToEur)
+            );
           } catch (err) {
             const fallback = createFallbackSeries(idx.id, i + 1, labelTimeline);
-            normalizedSeries[idx.id] = alignToLabels(labelTimeline, fallback.dates, fallback.values, usdToEur);
+            normalizedSeries[idx.id] = rebaseToFirstValue(
+              alignToLabels(labelTimeline, fallback.dates, fallback.values, usdToEur)
+            );
           }
         })
       );
