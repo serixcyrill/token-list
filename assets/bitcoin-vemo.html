@@ -440,15 +440,16 @@
     .vemo-btc .chart-tooltip {
       position: absolute;
       pointer-events: none;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.96);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px 12px;
+      padding: 12px 14px;
       box-shadow: var(--shadow-panel);
       font-size: 13px;
       color: var(--text);
       display: none;
-      min-width: 160px;
+      min-width: 240px;
+      max-width: 340px;
     }
 
     .vemo-btc .chart-tooltip .muted-row {
@@ -816,6 +817,8 @@
     let goldCoinId = '';
     let currentWindow = { btc: [], gold: [] };
     let hoverTs = null;
+    let hoverNextTs = null;
+    let hoverScheduled = false;
 
     const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const usd = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -952,6 +955,17 @@
       stepRange(direction);
     });
 
+    function requestHoverDraw(nextTs) {
+      hoverNextTs = nextTs;
+      if (hoverScheduled) return;
+      hoverScheduled = true;
+      requestAnimationFrame(() => {
+        hoverScheduled = false;
+        hoverTs = hoverNextTs;
+        drawSparkline(currentWindow.btc || [], currentWindow.gold || []);
+      });
+    }
+
     function updateHoverFromClientX(clientX) {
       const base = currentWindow?.btc?.length ? currentWindow.btc : currentWindow?.gold || [];
       if (!base.length) return;
@@ -959,8 +973,8 @@
       const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
       const minTime = base[0].ts;
       const maxTime = base[base.length - 1].ts;
-      hoverTs = minTime + ratio * Math.max(maxTime - minTime, 1);
-      drawSparkline(currentWindow.btc || [], currentWindow.gold || []);
+      const nextTs = minTime + ratio * Math.max(maxTime - minTime, 1);
+      requestHoverDraw(nextTs);
     }
 
     sparklineCanvas.addEventListener('mousemove', (evt) => updateHoverFromClientX(evt.clientX));
@@ -969,11 +983,13 @@
     });
     sparklineCanvas.addEventListener('mouseleave', () => {
       hoverTs = null;
+      hoverNextTs = null;
       chartTooltip.style.display = 'none';
-      drawSparkline(currentWindow.btc || [], currentWindow.gold || []);
+      requestHoverDraw(null);
     });
     sparklineCanvas.addEventListener('touchend', () => {
       hoverTs = null;
+      hoverNextTs = null;
       chartTooltip.style.display = 'none';
     });
 
@@ -1255,18 +1271,7 @@
       const endTs = lastTs;
 
       const btcWindow = btcSource.filter(([ts]) => ts >= startTs && ts <= endTs);
-      const goldWindowRaw = goldSource.filter(([ts]) => ts >= startTs && ts <= endTs);
-
-      let goldWindow = goldWindowRaw;
-      let btcAligned = btcWindow;
-      if (goldWindowRaw.length) {
-        const overlapStart = Math.max(btcWindow[0]?.[0] ?? startTs, goldWindowRaw[0][0]);
-        const overlapEnd = Math.min(btcWindow[btcWindow.length - 1]?.[0] ?? endTs, goldWindowRaw[goldWindowRaw.length - 1][0]);
-        if (overlapEnd > overlapStart) {
-          goldWindow = goldWindowRaw.filter(([ts]) => ts >= overlapStart && ts <= overlapEnd);
-          btcAligned = btcWindow.filter(([ts]) => ts >= overlapStart && ts <= overlapEnd);
-        }
-      }
+      const goldWindow = goldSource.filter(([ts]) => ts >= startTs && ts <= endTs);
 
       const toPercentSeries = (series) => {
         if (!series.length) return [];
@@ -1274,7 +1279,7 @@
         return series.map(([ts, price]) => ({ ts, price, pct: base ? ((price - base) / base) * 100 : 0 }));
       };
 
-      return { btc: toPercentSeries(btcAligned), gold: toPercentSeries(goldWindow) };
+      return { btc: toPercentSeries(btcWindow), gold: toPercentSeries(goldWindow) };
     }
 
     function renderSparkline() {
@@ -1358,6 +1363,31 @@
       return all.sort((a, b) => a[0] - b[0]);
     }
 
+    async function fetchCryptoCompareAllDaily(symbol, label) {
+      const res = await fetch(
+        `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=USD&allData=true`,
+        { headers: { accept: 'application/json' } }
+      );
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data?.Data?.Data) || !data.Data.Data.length) throw new Error(`${label} leer`);
+      return data.Data.Data.filter((row) => Number.isFinite(row.time) && Number.isFinite(row.close)).map((row) => [
+        row.time * 1000,
+        row.close,
+      ]);
+    }
+
+    async function fetchBlockchainHistory(label) {
+      const res = await fetch('https://api.blockchain.info/charts/market-price?timespan=all&format=json');
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data?.values) || !data.values.length) throw new Error(`${label} leer`);
+      return data.values
+        .filter((row) => Number.isFinite(row.x) && Number.isFinite(row.y))
+        .map((row) => [row.x * 1000, row.y])
+        .sort((a, b) => a[0] - b[0]);
+    }
+
     async function loadHistory(force = false) {
       if (historyLoaded && goldLoaded && !force) return;
 
@@ -1372,6 +1402,8 @@
 
       const btcSources = [
         { type: 'cg', coin: 'bitcoin', query: 'days=max&interval=daily', label: 'BTC: Volle Historie (täglich)' },
+        { type: 'cc', symbol: 'BTC', label: 'BTC: CryptoCompare alle Tage' },
+        { type: 'chain', label: 'BTC: Blockchain.com Historie' },
         { type: 'paprika', coin: 'btc-bitcoin', start: '2010-07-18', label: 'BTC: Coinpaprika Historie' },
         { type: 'cg', coin: 'bitcoin', query: 'days=1825&interval=daily', label: 'BTC: Letzte 5 Jahre (täglich)' },
         { type: 'cg', coin: 'bitcoin', query: 'days=365&interval=daily', label: 'BTC: Letztes Jahr (täglich)' },
@@ -1400,6 +1432,10 @@
           let series = [];
           if (source.type === 'binance') {
             series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label, 14);
+          } else if (source.type === 'cc') {
+            series = await fetchCryptoCompareAllDaily(source.symbol, source.label);
+          } else if (source.type === 'chain') {
+            series = await fetchBlockchainHistory(source.label);
           } else if (source.type === 'paprika') {
             series = await fetchCoinpaprikaHistory(source.coin, `${source.start}T00:00:00Z`, source.label);
           } else {
