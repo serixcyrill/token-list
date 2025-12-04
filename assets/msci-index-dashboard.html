@@ -307,17 +307,22 @@
       { id: 'ACWI', name: 'MSCI ACWI', country: 'Global', flag: '🌍', colors: ['#7ed957', '#5b7cfa'], symbol: 'ACWI' },
       { id: 'USA', name: 'MSCI USA', country: 'USA', flag: '🇺🇸', colors: ['#7aa5f9', '#f1b5c8'], symbol: 'SPY' },
       { id: 'GER', name: 'MSCI Deutschland', country: 'Deutschland', flag: '🇩🇪', colors: ['#f6c28f', '#f49fa7'], symbol: 'EWG' },
+      { id: 'SUI', name: 'MSCI Schweiz', country: 'Schweiz', flag: '🇨🇭', colors: ['#f2a4ab', '#f8d9dd'], symbol: 'EWL' },
       { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', flag: '🇬🇧', colors: ['#9bb7ff', '#f2b1c0'], symbol: 'EWU' },
       { id: 'FRA', name: 'MSCI Frankreich', country: 'Frankreich', flag: '🇫🇷', colors: ['#92b6ff', '#f6c3d8'], symbol: 'EWQ' },
       { id: 'ITA', name: 'MSCI Italien', country: 'Italien', flag: '🇮🇹', colors: ['#9adab6', '#f2b5b5'], symbol: 'EWI' },
       { id: 'ESP', name: 'MSCI Spanien', country: 'Spanien', flag: '🇪🇸', colors: ['#f6c490', '#f5a1aa'], symbol: 'EWP' },
+      { id: 'NLD', name: 'MSCI Niederlande', country: 'Niederlande', flag: '🇳🇱', colors: ['#9fb9ff', '#f4c0c8'], symbol: 'EWN' },
+      { id: 'SWE', name: 'MSCI Schweden', country: 'Schweden', flag: '🇸🇪', colors: ['#b1d4ff', '#f7d99f'], symbol: 'EWD' },
+      { id: 'NOR', name: 'MSCI Norwegen', country: 'Norwegen', flag: '🇳🇴', colors: ['#9db5e8', '#f3b3c2'], symbol: 'ENOR' },
       { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', flag: '🇨🇦', colors: ['#f29aa5', '#f7d7df'], symbol: 'EWC' },
-      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', flag: '🇧🇷', colors: ['#7fd9b0', '#f5e3a4'], symbol: 'EWZ' },
-      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', flag: '🇲🇽', colors: ['#7acdb0', '#f2b7bf'], symbol: 'EWW' },
       { id: 'AUS', name: 'MSCI Australien', country: 'Australien', flag: '🇦🇺', colors: ['#92b9ff', '#f3b8c1'], symbol: 'EWA' },
       { id: 'JPN', name: 'MSCI Japan', country: 'Japan', flag: '🇯🇵', colors: ['#f2a2b8', '#f8e9ea'], symbol: 'EWJ' },
+      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', flag: '🇧🇷', colors: ['#7fd9b0', '#f5e3a4'], symbol: 'EWZ' },
+      { id: 'MEX', name: 'MSCI Mexiko', country: 'Mexiko', flag: '🇲🇽', colors: ['#7acdb0', '#f2b7bf'], symbol: 'EWW' },
       { id: 'CHN', name: 'MSCI China', country: 'China', flag: '🇨🇳', colors: ['#f3a590', '#f7e7b0'], symbol: 'MCHI' },
       { id: 'IND', name: 'MSCI Indien', country: 'Indien', flag: '🇮🇳', colors: ['#f6bb86', '#8fd8b0'], symbol: 'INDY' },
+      { id: 'SGP', name: 'MSCI Singapur', country: 'Singapur', flag: '🇸🇬', colors: ['#f5a6b2', '#f7e4e7'], symbol: 'EWS' },
       { id: 'KOR', name: 'MSCI Korea', country: 'Südkorea', flag: '🇰🇷', colors: ['#9ac1ff', '#f0a3ba'], symbol: 'EWY' },
       { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', flag: '🇿🇦', colors: ['#7fc7b3', '#f2b59a'], symbol: 'EZA' },
       { id: 'SAU', name: 'MSCI Saudi-Arabien', country: 'Saudi-Arabien', flag: '🇸🇦', colors: ['#7ed4aa', '#f1fff6'], symbol: 'KSA' },
@@ -435,8 +440,8 @@
       return labels;
     }
 
-    const growthBias = { ACWI: 0.0065, USA: 0.0075, GER: 0.0066, FRA: 0.0062, ITA: 0.0059, ESP: 0.0059, UK: 0.0058, CAN: 0.0063, BRA: 0.0069, MEX: 0.0065, AUS: 0.0061, JPN: 0.006, CHN: 0.0066, IND: 0.008, KOR: 0.0066, ZAF: 0.0062, SAU: 0.0061, ARE: 0.0062 };
-    const volBias = { IND: 0.006, BRA: 0.008, MEX: 0.006, ZAF: 0.006, CHN: 0.006 };
+    const growthBias = { ACWI: 0.0065, USA: 0.0075, GER: 0.0066, SUI: 0.0065, UK: 0.0058, FRA: 0.0062, ITA: 0.0059, ESP: 0.0059, NLD: 0.0063, SWE: 0.0062, NOR: 0.0061, CAN: 0.0063, AUS: 0.0061, JPN: 0.006, BRA: 0.0069, MEX: 0.0065, CHN: 0.0066, IND: 0.008, SGP: 0.0062, KOR: 0.0066, ZAF: 0.0062, SAU: 0.0061, ARE: 0.0062 };
+    const volBias = { IND: 0.006, BRA: 0.008, MEX: 0.006, ZAF: 0.006, CHN: 0.006, SGP: 0.0045 };
 
     function createFallbackSeries(id, index, labels) {
       const seed = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + index * 17;
@@ -591,9 +596,11 @@
           label: `${info.name}`,
           data: slicedSeries,
           borderColor,
+          baseColor: borderColor,
           backgroundColor: gradient,
           tension: 0.32,
           borderWidth: id === 'ACWI' ? 3 : 2.3,
+          baseWidth: id === 'ACWI' ? 3 : 2.3,
           fill: id === 'ACWI',
           pointRadius: 0,
           pointHitRadius: 10,
@@ -660,8 +667,27 @@
               displayColors: false,
             },
           },
+          onHover: (evt, activeEls) => updateHoverStyles(activeEls),
+          onLeave: () => updateHoverStyles([]),
         },
       });
+    }
+
+    function updateHoverStyles(activeEls) {
+      if (!chart) return;
+      chart.data.datasets.forEach((ds) => {
+        ds.borderWidth = ds.baseWidth;
+        ds.borderColor = ds.baseColor;
+      });
+      if (activeEls && activeEls.length) {
+        const idx = activeEls[0].datasetIndex;
+        const target = chart.data.datasets[idx];
+        if (target) {
+          target.borderWidth = (target.baseWidth || 2) + 1.2;
+          target.borderColor = setAlpha(target.baseColor || '#0f172a', 1);
+        }
+      }
+      chart.update('none');
     }
 
     function renderRanges() {
