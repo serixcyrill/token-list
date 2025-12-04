@@ -406,22 +406,6 @@
       color: var(--text);
     }
 
-    .vemo-btc .range-slider {
-      display: grid;
-      gap: 2px;
-      min-width: 220px;
-    }
-
-    .vemo-btc .range-slider input[type='range'] {
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    .vemo-btc .range-slider small {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
     .vemo-btc .chart-wrap {
       position: relative;
       height: 460px;
@@ -685,24 +669,19 @@
         <div class="pill" id="chartTitle">BTC vs. Gold · % Veränderung</div>
         <div class="range-controls" aria-label="Zeitbereich wechseln">
           <div class="range-buttons" role="group">
-            <button type="button" class="range-btn active" data-days="7">7T</button>
+            <button type="button" class="range-btn" data-days="7">7T</button>
             <button type="button" class="range-btn" data-days="30">30T</button>
             <button type="button" class="range-btn" data-days="90">90T</button>
             <button type="button" class="range-btn" data-days="365">1J</button>
             <button type="button" class="range-btn" data-days="1825">5J</button>
-            <button type="button" class="range-btn" data-days="max">Max</button>
+            <button type="button" class="range-btn active" data-days="max">Max</button>
           </div>
-          <label class="range-slider">
-            <span>Zoomen/Scrollen</span>
-            <input type="range" min="0" max="100" value="100" id="rangeSlider" />
-            <small id="rangeLabel">100% = aktuellster Ausschnitt</small>
-          </label>
         </div>
       </div>
 
       <div class="chart-hint">
         <span class="dot" aria-hidden="true"></span>
-        <span>Scroll oder klicke &amp; ziehe im Chart zum Pannen · Shift+Scroll zoomt den Ausschnitt.</span>
+        <span>Wähle ein Fenster oder nutze Scrollen zum Zoomen · Hovern zeigt exakte Werte.</span>
       </div>
 
       <div class="compare-meta">
@@ -795,8 +774,6 @@
     const sparklineRange = document.getElementById('sparklineRange');
     const chartTitle = document.getElementById('chartTitle');
     const rangeButtons = document.querySelectorAll('.range-btn');
-    const rangeSlider = document.getElementById('rangeSlider');
-    const rangeLabel = document.getElementById('rangeLabel');
     const windowStartTime = document.getElementById('windowStartTime');
     const windowChangePct = document.getElementById('windowChangePct');
     const windowRangeValue = document.getElementById('windowRange');
@@ -825,7 +802,7 @@
     let lastPrices = [];
     let historyPrices = [];
     let goldPrices = [];
-    let activeRange = '7';
+    let activeRange = 'max';
     let historyLoaded = false;
     let goldLoaded = false;
     let historyLabel = '';
@@ -833,7 +810,6 @@
     let goldCoinId = '';
     let currentWindow = { btc: [], gold: [] };
     let hoverTs = null;
-    rangeSlider.disabled = true;
 
     const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const usd = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -936,10 +912,6 @@
     function setRangeValue(value) {
       activeRange = value;
       rangeButtons.forEach((b) => b.classList.toggle('active', b.dataset.days === value));
-      rangeSlider.disabled = historyPrices.length < 2 || activeRange === 'max';
-      if (rangeSlider.disabled) {
-        rangeSlider.value = 100;
-      }
       renderSparkline();
     }
 
@@ -954,58 +926,24 @@
       loadData(true);
       loadHistory(true);
     });
-    rangeSlider.addEventListener('input', () => renderSparkline());
     rangeButtons.forEach((btn) => {
       btn.addEventListener('click', () => setRangeValue(btn.dataset.days));
     });
 
-    function adjustPan(deltaPercent) {
-      if (rangeSlider.disabled) return;
-      const next = Math.min(Math.max(Number(rangeSlider.value) + deltaPercent, 0), 100);
-      rangeSlider.value = next;
-      renderSparkline();
+    const orderedRanges = ['7', '30', '90', '365', '1825', 'max'];
+    function stepRange(direction) {
+      const currentIndex = orderedRanges.indexOf(activeRange);
+      const nextIndex = Math.min(Math.max(currentIndex + direction, 0), orderedRanges.length - 1);
+      const nextRange = orderedRanges[nextIndex];
+      if (nextRange !== activeRange) {
+        setRangeValue(nextRange);
+      }
     }
-
-    let draggingChart = false;
-    let dragStartX = 0;
-    let dragStartValue = 100;
-
-    sparklineCanvas.addEventListener('pointerdown', (evt) => {
-      if (rangeSlider.disabled) return;
-      draggingChart = true;
-      dragStartX = evt.clientX;
-      dragStartValue = Number(rangeSlider.value);
-      sparklineCanvas.setPointerCapture?.(evt.pointerId);
-    });
-
-    sparklineCanvas.addEventListener('pointermove', (evt) => {
-      if (!draggingChart) return;
-      const rect = sparklineCanvas.getBoundingClientRect();
-      const delta = ((evt.clientX - dragStartX) / rect.width) * 100;
-      const next = Math.min(Math.max(dragStartValue - delta, 0), 100);
-      rangeSlider.value = next;
-      renderSparkline();
-    });
-
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((eventName) => {
-      sparklineCanvas.addEventListener(eventName, () => {
-        draggingChart = false;
-      });
-    });
 
     sparklineCanvas.addEventListener('wheel', (evt) => {
       evt.preventDefault();
-      if (evt.shiftKey) {
-        const baseDays = activeRange === 'max' ? getHistorySpanDays() : Number(activeRange) || 30;
-        const step = Math.max(3, Math.round(baseDays * 0.08));
-        const direction = evt.deltaY > 0 ? 1 : -1;
-        const maxDays = Math.max(getHistorySpanDays(), baseDays);
-        const next = Math.min(Math.max(baseDays + direction * step, 7), maxDays);
-        setRangeValue(`${next}`);
-        return;
-      }
-      const scrollStep = evt.deltaY > 0 ? 4 : -4;
-      adjustPan(scrollStep);
+      const direction = evt.deltaY > 0 ? 1 : -1;
+      stepRange(direction);
     });
 
     function updateHoverFromClientX(clientX) {
@@ -1303,18 +1241,12 @@
       if (!btcSource?.length) return { btc: [], gold: [] };
 
       const useFull = activeRange === 'max' || btcSource.length < 3;
-      const days = Number(activeRange) || 7;
-      const windowMs = useFull ? Number.MAX_SAFE_INTEGER : days * 24 * 3600 * 1000;
-      const firstTs = btcSource[0][0];
+      const days = Number(activeRange) || getHistorySpanDays();
       const lastTs = btcSource[btcSource.length - 1][0];
-      const spanMs = Math.max(lastTs - firstTs, 1);
-      const usableSpan = Math.max(spanMs - windowMs, 0);
-      const ratio = Math.min(Math.max(Number(rangeSlider.value) / 100, 0), 1);
-      const startCandidate = firstTs + usableSpan * ratio;
-      const startTs = useFull
-        ? firstTs
-        : Math.min(Math.max(startCandidate, firstTs), Math.max(lastTs - windowMs, firstTs));
-      const endTs = useFull ? lastTs : Math.min(startTs + windowMs, lastTs);
+      const firstTs = btcSource[0][0];
+      const windowMs = useFull ? Number.MAX_SAFE_INTEGER : days * 24 * 3600 * 1000;
+      const startTs = useFull ? firstTs : Math.max(lastTs - windowMs, firstTs);
+      const endTs = lastTs;
 
       const btcWindow = btcSource.filter(([ts]) => ts >= startTs && ts <= endTs);
       const goldWindowRaw = goldSource.filter(([ts]) => ts >= startTs && ts <= endTs);
@@ -1355,16 +1287,10 @@
         const goldLabelText = goldPoints.length ? `${goldShort} Overlay aktiv` : `${goldShort} Overlay leer`;
         sparklineInfo.textContent = `${windowLabel} · ${goldLabelText}`;
         chartTitle.textContent = `BTC vs. ${goldShort} (% Veränderung)`;
-        rangeLabel.textContent = rangeSlider.disabled
-          ? 'Gesamte Historie sichtbar'
-          : `${rangeSlider.value}% der ausgewählten Historie (BTC-Basis)`;
-        timelineHint.textContent = rangeSlider.disabled
-          ? 'Komplette Historie aktiv · Shift+Scroll zoomt'
-          : 'Scrollen/Ziehen zum Pannen · Shift+Scroll zoomt';
+        timelineHint.textContent = 'Scroll zum Zoomen · Buttons für fixe Fenster';
       } else {
         sparklineInfo.textContent = 'Keine Zeitreihe gefunden';
         sparklineRange.textContent = '–';
-        rangeLabel.textContent = 'Keine Historie verfügbar';
         timelineHint.textContent = 'Keine Daten zum Navigieren';
       }
 
@@ -1407,7 +1333,6 @@
       goldLabel = '';
       goldCoinId = '';
       syncGoldLabels('XAU');
-      rangeSlider.disabled = true;
 
       const btcSources = [
         { type: 'cg', coin: 'bitcoin', query: 'days=max&interval=daily', label: 'BTC: Volle Historie (täglich)' },
@@ -1483,8 +1408,6 @@
           goldError = chartErr;
         }
       }
-
-      rangeSlider.disabled = historyPrices.length < 2 || activeRange === 'max';
 
       if (!historyLoaded) {
         sparklineInfo.textContent = `Historie nicht verfügbar (${btcError?.message ?? 'unbekannt'}). Nutze 7-Tage-Ansicht.`;
