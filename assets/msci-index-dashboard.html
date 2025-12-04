@@ -276,9 +276,9 @@
   <div class="msci-overlay">
     <div class="topline">
       <div>
-        <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live FMP API</div>
+        <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live Alpha Vantage API</div>
         <h1>Globale Index-Performance</h1>
-        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Kurse direkt aus der FMP-API, linearer Start mit Log-Umschaltung, Fallback bei Ausfällen.</p>
+        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Kurse direkt aus Alpha Vantage (mit FX-Konvertierung), linearer Start mit Log-Umschaltung, Fallback bei Ausfällen.</p>
       </div>
     </div>
 
@@ -299,7 +299,7 @@
     </div>
 
     <div class="grid-cards" id="cards"></div>
-    <div class="disclaimer">API: Financial Modeling Prep (FMP) – Angaben ohne Gewähr, keine Haftung für die Richtigkeit der Daten.</div>
+    <div class="disclaimer">API: Alpha Vantage – Angaben ohne Gewähr, keine Haftung für die Richtigkeit der Daten.</div>
   </div>
 
   <script>
@@ -343,7 +343,6 @@
     const chartEl = document.getElementById('chart');
     let chart;
     let labelTimeline = [];
-    let usdToEur = 0.92;
     const priceSeries = {};
 
     // --- helpers ---
@@ -445,59 +444,88 @@
       return { dates: labels, values: series };
     }
 
-    // Replace with your own FMP API key for production use
-    const FMP_API_KEY = 'demo';
+    // Replace with your own Alpha Vantage API key for production use
+    const AV_API_KEY = 'demo';
 
-    async function fetchUsdToEurRate() {
-      const res = await fetch(`https://financialmodelingprep.com/api/v3/quote-short/EURUSD?apikey=${FMP_API_KEY}`);
+    async function fetchFxLookup() {
+      const res = await fetch(
+        `https://www.alphavantage.co/query?function=FX_MONTHLY&from_symbol=USD&to_symbol=EUR&apikey=${AV_API_KEY}`
+      );
       if (!res.ok) throw new Error('FX fetch failed');
       const data = await res.json();
-      const price = Array.isArray(data) ? data[0]?.price : data?.price;
-      if (!price || price <= 0) throw new Error('No FX price');
-      return 1 / price;
+      const series = data?.['Time Series FX (Monthly)'];
+      if (!series) throw new Error('No FX series');
+      const sorted = Object.entries(series)
+        .map(([date, val]) => ({ date, rate: parseFloat(val['4. close']) }))
+        .filter((d) => !Number.isNaN(d.rate))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      if (!sorted.length) throw new Error('No FX points');
+      return (date) => {
+        const target = new Date(date);
+        let rate = sorted[0].rate;
+        for (let i = 0; i < sorted.length; i++) {
+          const d = new Date(sorted[i].date);
+          if (d <= target) {
+            rate = sorted[i].rate;
+          } else {
+            break;
+          }
+        }
+        return rate > 0 ? rate : 1;
+      };
     }
 
-    function toMonthlySeries(sorted) {
+    function toMonthlySeries(sorted, fxLookup) {
       const buckets = new Map();
       sorted.forEach((item) => {
         const date = new Date(item.date);
         const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
-        buckets.set(key, item.close);
+        const fx = typeof fxLookup === 'function' ? fxLookup(item.date) : 1;
+        const val = (item.close ?? item.adjustedClose ?? 0) * (fx > 0 ? fx : 1);
+        buckets.set(key, val);
       });
       const entries = Array.from(buckets.entries()).sort((a, b) => new Date(a[0]) - new Date(b[0]));
       return { dates: entries.map((e) => e[0]), values: entries.map((e) => e[1]) };
     }
 
-    async function fetchFmpSeries(symbol) {
+    async function fetchAlphaSeries(symbol, fxLookup) {
       const res = await fetch(
-        `https://financialmodelingprep.com/api/v3/historical-price-full/${symbol}?from=1987-01-01&serietype=line&apikey=${FMP_API_KEY}`
+        `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${symbol}&apikey=${AV_API_KEY}`
       );
       if (!res.ok) throw new Error('Fetch failed');
       const data = await res.json();
-      const historical = data?.historical;
-      if (!historical?.length) throw new Error('No data');
-      const sorted = [...historical].sort((a, b) => new Date(a.date) - new Date(b.date));
-      return toMonthlySeries(sorted);
+      const series = data['Monthly Adjusted Time Series'] || data['Monthly Time Series'];
+      if (!series) throw new Error('No data');
+      const parsed = Object.entries(series)
+        .map(([date, val]) => ({
+          date,
+          close: parseFloat(
+            val['4. close'] ?? val['4. close (USD)'] ?? val['5. adjusted close'] ?? val['4b. close (USD)']
+          ),
+        }))
+        .filter((d) => !Number.isNaN(d.close))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      return toMonthlySeries(parsed, fxLookup);
     }
 
-    function alignToLabels(baseLabels, dates, values, fx) {
+    function alignToLabels(baseLabels, dates, values) {
       if (!dates.length || !values.length) return Array(baseLabels.length).fill(null);
       const map = new Map();
-      const factor = fx && fx > 0 ? fx : 1;
-      dates.forEach((d, i) => map.set(d, (values[i] ?? null) * factor));
+      dates.forEach((d, i) => map.set(d, values[i] ?? null));
       return baseLabels.map((d) => (map.has(d) ? map.get(d) : null));
     }
 
     async function loadData() {
+      let fxLookup = () => 0.92;
       try {
-        usdToEur = await fetchUsdToEurRate();
+        fxLookup = await fetchFxLookup();
       } catch (e) {
-        usdToEur = 0.92;
+        fxLookup = () => 0.92;
       }
 
       let acwiSeries;
       try {
-        acwiSeries = await fetchFmpSeries(indexCatalog[0].symbol);
+        acwiSeries = await fetchAlphaSeries(indexCatalog[0].symbol, fxLookup);
       } catch (e) {
         const fallbackLabels = Array.from({ length: 120 }, (_, i) => {
           const d = new Date();
@@ -508,16 +536,16 @@
       }
 
       labelTimeline = acwiSeries.dates;
-      priceSeries['ACWI'] = alignToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values, usdToEur);
+      priceSeries['ACWI'] = alignToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values);
 
       await Promise.all(
         indexCatalog.slice(1).map(async (idx, i) => {
           try {
-            const live = await fetchFmpSeries(idx.symbol);
-            priceSeries[idx.id] = alignToLabels(labelTimeline, live.dates, live.values, usdToEur);
+            const live = await fetchAlphaSeries(idx.symbol, fxLookup);
+            priceSeries[idx.id] = alignToLabels(labelTimeline, live.dates, live.values);
           } catch (err) {
             const fallback = createFallbackSeries(idx.id, i + 1, labelTimeline);
-            priceSeries[idx.id] = alignToLabels(labelTimeline, fallback.dates, fallback.values, usdToEur);
+            priceSeries[idx.id] = alignToLabels(labelTimeline, fallback.dates, fallback.values);
           }
         })
       );
