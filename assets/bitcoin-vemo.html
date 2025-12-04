@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vemo Bitcoin vs. Gold</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap');
+
+    /* Scope everything to the widget container so WordPress layouts stay intact. */
+    .vemo-btc {
+      --bg: #f7f8fb;
+      --bg-soft: rgba(248, 250, 252, 0.72);
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-strong: #ffffff;
+      --border: rgba(17, 24, 39, 0.08);
+      --border-accent: rgba(126, 217, 87, 0.35);
+      --border-blue: rgba(91, 124, 250, 0.2);
+      --text: #0f172a;
+      --muted: #6b7280;
+      --muted-strong: #475569;
+      --muted-soft: #94a3b8;
+      --accent: #7ed957;
+      --accent-blue: #5b7cfa;
+      --accent-text: #14532d;
+      --shadow-main: 0 26px 60px rgba(15, 23, 42, 0.12);
+      --shadow-panel: 0 18px 44px rgba(15, 23, 42, 0.1);
+      --shadow-kpi: 0 12px 28px rgba(15, 23, 42, 0.06);
+      --radius-shell: 26px;
+      --radius-panel: 22px;
+      --radius-card: 18px;
+      --radius-pill: 999px;
+      --radius-input: 14px;
+      box-sizing: border-box;
+      font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 22%, rgba(126, 217, 87, 0.14), transparent 42%),
+        radial-gradient(circle at 86% 12%, rgba(91, 124, 250, 0.14), transparent 32%),
+        radial-gradient(circle at 50% 90%, rgba(91, 124, 250, 0.08), transparent 36%),
+        linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
+      padding: 32px 18px 64px;
+      width: 100%;
+      display: block;
+    }
+
+    .vemo-btc *,
+    .vemo-btc *::before,
+    .vemo-btc *::after {
+      box-sizing: border-box;
+    }
+
+    .vemo-btc .app-shell {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-shell);
+      box-shadow: var(--shadow-main);
+      backdrop-filter: blur(10px);
+      padding: 26px 26px 34px;
+    }
+
+    .vemo-btc header.header {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.22));
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius-shell) - 6px);
+      padding: 14px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .vemo-btc .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .vemo-btc .badge {
+      padding: 8px 11px;
+      border-radius: var(--radius-pill);
+      background: rgba(248, 250, 252, 0.85);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+    }
+
+    .vemo-btc .badge::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .vemo-btc h1 {
+      margin: 0;
+      font-family: 'Poppins', system-ui, sans-serif;
+      font-weight: 800;
+      font-size: clamp(24px, 2.8vw, 34px);
+      letter-spacing: -0.25px;
+      color: var(--text);
+    }
+
+    .vemo-btc .subtitle {
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
+    .vemo-btc .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .vemo-btc .card {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-panel);
+      padding: 22px 20px 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-panel);
+      backdrop-filter: blur(10px);
+      transition: transform 0.18s ease, box-shadow 0.2s ease;
+    }
+
+    .vemo-btc .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 44px rgba(15, 23, 42, 0.12);
+    }
+
+    .vemo-btc .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(248, 250, 252, 0.85);
+      border: 1px solid var(--border);
+      color: var(--muted-strong);
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.2px;
+    }
+
+    .vemo-btc .pill.positive {
+      color: var(--accent-text);
+      border-color: var(--border-accent);
+      background: linear-gradient(180deg, rgba(126, 217, 87, 0.12), rgba(126, 217, 87, 0.06));
+    }
+
+    .vemo-btc .pill.negative {
+      color: #b91c1c;
+      border-color: rgba(248, 113, 113, 0.45);
+      background: rgba(248, 113, 113, 0.08);
+    }
+
+    .vemo-btc .price {
+      font-family: 'Poppins', system-ui, sans-serif;
+      font-size: clamp(34px, 5vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 10px 0 4px;
+      color: var(--text);
+    }
+
+    .vemo-btc .meta-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .vemo-btc .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 2px;
+      font-weight: 700;
+    }
+
+    .vemo-btc .value {
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .vemo-btc .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .vemo-btc .input-group label {
+      display: block;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .vemo-btc input,
+    .vemo-btc select,
+    .vemo-btc button {
+      font: inherit;
+    }
+
+    .vemo-btc input,
+    .vemo-btc select {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: var(--radius-input);
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .vemo-btc input:focus,
+    .vemo-btc select:focus {
+      border-color: var(--border-accent);
+      box-shadow: 0 0 0 4px rgba(126, 217, 87, 0.15);
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .vemo-btc .direction-toggle {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .vemo-btc .toggle-btn {
+      padding: 11px 12px;
+      border-radius: var(--radius-input);
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 700;
+    }
+
+    .vemo-btc .toggle-btn.active {
+      border-color: var(--border-accent);
+      background: linear-gradient(180deg, rgba(126, 217, 87, 0.12), rgba(126, 217, 87, 0.06));
+      box-shadow: 0 12px 24px rgba(126, 217, 87, 0.12);
+      color: var(--accent-text);
+    }
+
+    .vemo-btc .primary-btn,
+    .vemo-btc .ghost-btn {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: transform 0.12s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      font-size: 15px;
+    }
+
+    .vemo-btc .primary-btn {
+      background: linear-gradient(120deg, #7ed957, #5b7cfa);
+      color: #052e16;
+      box-shadow: 0 16px 45px rgba(91, 124, 250, 0.18);
+      letter-spacing: 0.01em;
+      border-color: var(--border-blue);
+    }
+
+    .vemo-btc .primary-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .vemo-btc .primary-btn:not(:disabled):active {
+      transform: translateY(1px);
+    }
+
+    .vemo-btc .ghost-btn {
+      background: var(--bg-soft);
+      color: var(--text);
+      border-color: var(--border);
+      box-shadow: var(--shadow-kpi);
+      width: auto;
+    }
+
+    .vemo-btc .result-box {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--border);
+      min-height: 42px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .vemo-btc .chart-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 20px 18px 16px;
+      box-shadow: var(--shadow-panel);
+      margin-top: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vemo-btc .chart-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+      margin-top: 6px;
+    }
+
+    .vemo-btc .stat-chip {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      display: grid;
+      gap: 4px;
+    }
+
+    .vemo-btc .stat-chip .label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .vemo-btc .stat-chip .value {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .vemo-btc .chart-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .vemo-btc .chart-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .vemo-btc .chart-hint .dot {
+      box-shadow: none;
+    }
+
+    .vemo-btc .range-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .vemo-btc .range-buttons {
+      display: grid;
+      grid-auto-flow: column;
+      gap: 6px;
+    }
+
+    .vemo-btc .range-btn {
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .vemo-btc .range-btn.active {
+      border-color: var(--border-blue);
+      background: linear-gradient(180deg, rgba(91, 124, 250, 0.12), rgba(91, 124, 250, 0.06));
+      box-shadow: 0 12px 24px rgba(91, 124, 250, 0.12);
+      color: var(--text);
+    }
+
+    .vemo-btc .chart-wrap {
+      position: relative;
+      height: 520px;
+      margin-top: 10px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.06)),
+        linear-gradient(135deg, rgba(126, 217, 87, 0.06), rgba(91, 124, 250, 0.04));
+      cursor: grab;
+      transition: box-shadow 0.2s ease, transform 0.18s ease;
+    }
+
+    .vemo-btc .chart-wrap:active {
+      cursor: grabbing;
+      box-shadow: 0 12px 26px rgba(91, 124, 250, 0.12);
+    }
+
+    .vemo-btc canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .vemo-btc .chart-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow-panel);
+      font-size: 13px;
+      color: var(--text);
+      display: none;
+      min-width: 240px;
+      max-width: 340px;
+    }
+
+    .vemo-btc .chart-tooltip .muted-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .vemo-btc .chart-tooltip strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .vemo-btc .chart-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    .vemo-btc .chart-axis-labels {
+      position: absolute;
+      left: 10px;
+      top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      display: grid;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .vemo-btc .chart-footer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      align-items: center;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      gap: 8px;
+    }
+
+    .vemo-btc .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .vemo-btc .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #7ed957, #5b7cfa);
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .vemo-btc .legend-dot.legend-btc {
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+    }
+
+    .vemo-btc .legend-dot.legend-gold {
+      background: #5b7cfa;
+      box-shadow: 0 0 0 4px rgba(91, 124, 250, 0.14);
+    }
+
+    .vemo-btc .compare-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 10px 0 4px;
+    }
+
+    .vemo-btc .compare-chip {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: grid;
+      gap: 2px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .vemo-btc .compare-chip strong {
+      font-family: 'Poppins', system-ui, sans-serif;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .vemo-btc .compare-chip small {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .vemo-btc .timeline-bar {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      background: rgba(255, 255, 255, 0.72);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .vemo-btc .timeline-bar strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .vemo-btc .status {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .vemo-btc .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(126, 217, 87, 0.15);
+    }
+
+    .vemo-btc .muted {
+      margin-top: 18px;
+      color: var(--muted-soft);
+      line-height: 1.55;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    @media (max-width: 680px) {
+      .vemo-btc {
+        padding: 22px 12px 44px;
+      }
+
+      .vemo-btc .app-shell {
+        border-radius: 18px;
+      }
+
+      .vemo-btc header.header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .vemo-btc .direction-toggle {
+        grid-template-columns: 1fr;
+      }
+
+      .vemo-btc .range-slider {
+        min-width: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="vemo-btc">
+    <main class="app-shell">
+    <header class="header">
+      <div class="title">
+        <span class="badge">Vemo</span>
+        <div>
+          <h1>Bitcoin vs. Gold Performance</h1>
+          <div class="subtitle">
+            Live Prozententwicklung, BTC und Gold (<span id="goldSourceLabel">XAU</span>) übereinander gelegt.
+          </div>
+          <div class="status" aria-live="polite">
+            <span class="dot" aria-hidden="true"></span>
+            <span id="statusText">Lädt Daten von CoinGecko …</span>
+          </div>
+        </div>
+      </div>
+      <button id="refresh" class="ghost-btn" type="button">↻ Frische Daten laden</button>
+    </header>
+
+    <section class="card-grid" aria-label="BTC Karten">
+      <article class="card" aria-label="Preisblock">
+        <div class="pill" id="changeBadge">24h Veränderung lädt …</div>
+        <div class="price" id="price">–</div>
+        <div class="subtitle">Letztes Update: <span id="updated">–</span></div>
+        <div class="meta-row">
+          <div>
+            <div class="label">24h Hoch</div>
+            <div class="value" id="high">–</div>
+          </div>
+          <div>
+            <div class="label">24h Tief</div>
+            <div class="value" id="low">–</div>
+          </div>
+          <div>
+            <div class="label">Volumen 24h</div>
+            <div class="value" id="volume">–</div>
+          </div>
+          <div>
+            <div class="label">Marktkapitalisierung</div>
+            <div class="value" id="marketcap">–</div>
+          </div>
+        </div>
+      </article>
+
+      
+    </section>
+
+    <section class="chart-card" aria-label="Performance und Sparkline">
+      <div class="chart-header">
+        <div class="pill" id="chartTitle">BTC vs. Gold · % Veränderung</div>
+        <div class="range-controls" aria-label="Zeitbereich wechseln">
+          <div class="range-buttons" role="group">
+            <button type="button" class="range-btn" data-days="7">7T</button>
+            <button type="button" class="range-btn" data-days="30">30T</button>
+            <button type="button" class="range-btn" data-days="90">90T</button>
+            <button type="button" class="range-btn" data-days="365">1J</button>
+            <button type="button" class="range-btn" data-days="1825">5J</button>
+            <button type="button" class="range-btn active" data-days="max">Max</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-hint">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Wähle ein Fenster oder nutze Scrollen zum Zoomen · Hovern zeigt exakte Werte.</span>
+      </div>
+
+      <div class="compare-meta">
+        <div class="compare-chip">
+          <small>BTC Fenster-Performance</small>
+          <strong id="btcReturn">–</strong>
+          <small id="btcBaseLabel">–</small>
+        </div>
+        <div class="compare-chip">
+          <small>Gold (% seit Start)</small>
+          <strong id="goldReturn">–</strong>
+          <small id="goldBaseLabel">–</small>
+        </div>
+        <div class="compare-chip">
+          <small>BTC vs Gold</small>
+          <strong id="spreadReturn">–</strong>
+          <small id="compareStatus">Lade Gold …</small>
+        </div>
+      </div>
+
+      <div class="chart-meta">
+        <div class="stat-chip">
+          <span class="label">Sichtfenster</span>
+          <span class="value" id="windowRange">–</span>
+          <small id="windowRangeLabel" class="label"></small>
+        </div>
+        <div class="stat-chip">
+          <span class="label">BTC Bandbreite</span>
+          <span class="value" id="windowVolatility">–</span>
+          <small id="volatilityLabel" class="label">Max - Min</small>
+        </div>
+        <div class="stat-chip">
+          <span class="label">BTC Ø Veränderung</span>
+          <span class="value" id="windowAverage">–</span>
+          <small class="label" id="windowChangePct">arithmetisch</small>
+        </div>
+        <div class="stat-chip">
+          <span class="label">Punkt-Details</span>
+          <span class="value" id="windowPointCount">–</span>
+          <small id="windowStartTime" class="label"></small>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-grid" aria-hidden="true"></div>
+        <div class="chart-axis-labels" aria-hidden="true">
+          <span id="axisMax">–</span>
+          <span id="axisMid">–</span>
+          <span id="axisMin">–</span>
+        </div>
+        <canvas id="sparkline" width="1100" height="320"></canvas>
+        <div class="chart-tooltip" id="chartTooltip"></div>
+      </div>
+      <div class="chart-footer">
+        <span id="sparklineInfo">Lade Verlauf …</span>
+        <span id="sparklineRange">–</span>
+      </div>
+
+      <div class="chart-legend">
+        <span><span class="legend-dot legend-btc"></span>BTC % seit Fenster-Start</span>
+        <span><span class="legend-dot legend-gold"></span>Gold % (<span id="goldLegendLabel">XAU</span>) seit Fenster-Start</span>
+        <span>Hover/Touch: Exakter %-Wert + Datum</span>
+      </div>
+
+      <div class="timeline-bar">
+        <span>Fenster: <strong id="timelineWindow">–</strong></span>
+        <span>Punkte sichtbar: <strong id="timelinePoints">–</strong></span>
+        <span id="timelineHint">Scrollen &amp; Ziehen für Navigation</span>
+      </div>
+    </section>
+
+    <p class="muted">
+      Quelle: CoinGecko Simple Price &amp; Markets API. Keine Garantie auf Richtigkeit. Keine Empfehlung, keine Anlageberatung,
+      keine Finanzdienstleistung. UI ist clientseitig, bitte Cache und API-Limits beachten.
+    </p>
+  </main>
+
+  <script>
+    const priceElement = document.getElementById('price');
+    const changeBadge = document.getElementById('changeBadge');
+    const updatedElement = document.getElementById('updated');
+    const highElement = document.getElementById('high');
+    const lowElement = document.getElementById('low');
+    const volumeElement = document.getElementById('volume');
+    const marketcapElement = document.getElementById('marketcap');
+    const statusText = document.getElementById('statusText');
+    const refreshButton = document.getElementById('refresh');
+    const sparklineCanvas = document.getElementById('sparkline');
+    const sparklineInfo = document.getElementById('sparklineInfo');
+    const sparklineRange = document.getElementById('sparklineRange');
+    const chartTitle = document.getElementById('chartTitle');
+    const rangeButtons = document.querySelectorAll('.range-btn');
+    const windowStartTime = document.getElementById('windowStartTime');
+    const windowChangePct = document.getElementById('windowChangePct');
+    const windowRangeValue = document.getElementById('windowRange');
+    const windowRangeLabel = document.getElementById('windowRangeLabel');
+    const windowPointCount = document.getElementById('windowPointCount');
+    const windowAverage = document.getElementById('windowAverage');
+    const windowVolatility = document.getElementById('windowVolatility');
+    const volatilityLabel = document.getElementById('volatilityLabel');
+    const chartTooltip = document.getElementById('chartTooltip');
+    const axisMax = document.getElementById('axisMax');
+    const axisMid = document.getElementById('axisMid');
+    const axisMin = document.getElementById('axisMin');
+    const timelineWindow = document.getElementById('timelineWindow');
+    const timelinePoints = document.getElementById('timelinePoints');
+    const timelineHint = document.getElementById('timelineHint');
+    const goldSourceLabel = document.getElementById('goldSourceLabel');
+    const goldLegendLabel = document.getElementById('goldLegendLabel');
+    const btcReturn = document.getElementById('btcReturn');
+    const goldReturn = document.getElementById('goldReturn');
+    const spreadReturn = document.getElementById('spreadReturn');
+    const btcBaseLabel = document.getElementById('btcBaseLabel');
+    const goldBaseLabel = document.getElementById('goldBaseLabel');
+    const compareStatus = document.getElementById('compareStatus');
+
+    let btcEurRate = null;
+    let lastPrices = [];
+    let historyPrices = [];
+    let goldPrices = [];
+    let activeRange = 'max';
+    let historyLoaded = false;
+    let goldLoaded = false;
+    let historyLabel = '';
+    let goldLabel = '';
+    let goldCoinId = '';
+    let currentWindow = { btc: [], gold: [] };
+    let hoverTs = null;
+    let hoverNextTs = null;
+    let hoverScheduled = false;
+
+    const euro = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const usd = (value) => value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const btc = (value) => Number(value).toFixed(8);
+    const percent = (value, fraction = 2) => `${value >= 0 ? '+' : ''}${value.toFixed(fraction)}%`;
+    const formatDate = (ts, withTime = true) =>
+      new Date(ts).toLocaleString('de-DE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: withTime ? '2-digit' : undefined,
+        minute: withTime ? '2-digit' : undefined,
+      });
+
+    const formatGoldPrice = (value) => {
+      const usdLike = ['XAU', 'XAUT', 'XAUt', 'PAXG'];
+      const currency = usdLike.includes(goldCoinId) ? 'USD' : goldCoinId === 'PLN' ? 'PLN' : '€';
+      const formatter = currency === 'USD' ? usd : euro;
+      return `${currency} ${formatter(value)}`;
+    };
+
+    async function fetchNbpGoldHistory(label) {
+      const today = new Date();
+      const thisYear = today.getFullYear();
+      const pad = (n) => String(n).padStart(2, '0');
+      const toDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const all = [];
+
+      for (let year = 2010; year <= thisYear; year++) {
+        const start = new Date(`${year}-01-01T00:00:00Z`);
+        const endDate =
+          year === thisYear
+            ? today
+            : new Date(`${year}-12-31T00:00:00Z`);
+
+        const url = `https://api.nbp.pl/api/cenyzlota/${toDate(start)}/${toDate(endDate)}?format=json`;
+        const res = await fetch(url, { headers: { accept: 'application/json' } });
+        if (!res.ok) throw new Error(`${label} ${year} HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data) || !data.length) continue;
+
+        data.forEach((entry) => {
+          const ts = Date.parse(`${entry.data}T00:00:00Z`);
+          const close = Number(entry.cena);
+          if (Number.isFinite(ts) && Number.isFinite(close)) {
+            all.push([ts, close]);
+          }
+        });
+      }
+
+      if (!all.length) throw new Error(`${label} leer`);
+      return all.sort((a, b) => a[0] - b[0]);
+    }
+
+    async function fetchStooqGold(label) {
+      const res = await fetch('https://stooq.pl/q/d/l/?s=xauusd&i=d', {
+        headers: { accept: 'text/csv' },
+      });
+      if (!res.ok) throw new Error(`Stooq Fehler ${res.status}`);
+      const text = await res.text();
+      const lines = text.trim().split(/\r?\n/).slice(1);
+      const series = lines
+        .map((line) => line.split(','))
+        .filter((parts) => parts.length >= 5)
+        .map((parts) => {
+          const ts = Date.parse(`${parts[0]}T00:00:00Z`);
+          const close = Number(parts[4]);
+          return { ts, close };
+        })
+        .filter((p) => Number.isFinite(p.ts) && Number.isFinite(p.close) && p.ts >= 915148800000);
+
+      if (!series.length) throw new Error('Stooq lieferte keine Golddaten');
+      const sorted = series.map(({ ts, close }) => [ts, close]).sort((a, b) => a[0] - b[0]);
+      return sorted;
+    }
+
+    async function fetchKrakenOhlc(pair, interval, label) {
+      const res = await fetch(
+        `https://api.kraken.com/0/public/OHLC?pair=${pair}&interval=${interval}`,
+        { headers: { accept: 'application/json' } }
+      );
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data?.error) && data.error.length) {
+        throw new Error(`${label} Fehler: ${data.error.join(', ')}`);
+      }
+      const seriesKey = Object.keys(data?.result || {}).find((k) => k !== 'last');
+      const rows = seriesKey ? data.result[seriesKey] : null;
+      if (!rows || !rows.length) throw new Error(`${label} leer`);
+      return rows.map((row) => [Number(row[0]) * 1000, Number(row[4])]);
+    }
+
+    const syncGoldLabels = (label = 'Gold') => {
+      goldSourceLabel.textContent = label;
+      goldLegendLabel.textContent = label;
+    };
+
+    syncGoldLabels('XAU');
+
+    function setRangeValue(value) {
+      activeRange = value;
+      rangeButtons.forEach((b) => b.classList.toggle('active', b.dataset.days === value));
+      renderSparkline();
+    }
+
+    function getHistorySpanDays() {
+      if (!historyPrices.length) return 365;
+      const first = historyPrices[0][0];
+      const last = historyPrices[historyPrices.length - 1][0];
+      return Math.max(Math.round((last - first) / (24 * 3600 * 1000)), 1);
+    }
+
+    refreshButton.addEventListener('click', () => {
+      loadData(true);
+      loadHistory(true);
+    });
+    rangeButtons.forEach((btn) => {
+      btn.addEventListener('click', () => setRangeValue(btn.dataset.days));
+    });
+
+    const orderedRanges = ['7', '30', '90', '365', '1825', 'max'];
+    function stepRange(direction) {
+      const currentIndex = orderedRanges.indexOf(activeRange);
+      const nextIndex = Math.min(Math.max(currentIndex + direction, 0), orderedRanges.length - 1);
+      const nextRange = orderedRanges[nextIndex];
+      if (nextRange !== activeRange) {
+        setRangeValue(nextRange);
+      }
+    }
+
+    sparklineCanvas.addEventListener('wheel', (evt) => {
+      evt.preventDefault();
+      const direction = evt.deltaY > 0 ? 1 : -1;
+      stepRange(direction);
+    });
+
+    function requestHoverDraw(nextTs) {
+      hoverNextTs = nextTs;
+      if (hoverScheduled) return;
+      hoverScheduled = true;
+      requestAnimationFrame(() => {
+        hoverScheduled = false;
+        hoverTs = hoverNextTs;
+        drawSparkline(currentWindow.btc || [], currentWindow.gold || []);
+      });
+    }
+
+    function updateHoverFromClientX(clientX) {
+      const base = currentWindow?.btc?.length ? currentWindow.btc : currentWindow?.gold || [];
+      if (!base.length) return;
+      const rect = sparklineCanvas.getBoundingClientRect();
+      const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+      const minTime = base[0].ts;
+      const maxTime = base[base.length - 1].ts;
+      const nextTs = minTime + ratio * Math.max(maxTime - minTime, 1);
+      requestHoverDraw(nextTs);
+    }
+
+    sparklineCanvas.addEventListener('mousemove', (evt) => updateHoverFromClientX(evt.clientX));
+    sparklineCanvas.addEventListener('touchmove', (evt) => {
+      if (evt.touches?.[0]) updateHoverFromClientX(evt.touches[0].clientX);
+    });
+    sparklineCanvas.addEventListener('mouseleave', () => {
+      hoverTs = null;
+      hoverNextTs = null;
+      chartTooltip.style.display = 'none';
+      requestHoverDraw(null);
+    });
+    sparklineCanvas.addEventListener('touchend', () => {
+      hoverTs = null;
+      hoverNextTs = null;
+      chartTooltip.style.display = 'none';
+    });
+
+    function setBadge(change) {
+      const rounded = change.toFixed(2);
+      changeBadge.textContent = `${rounded}% in 24h`;
+      changeBadge.classList.remove('positive', 'negative');
+      if (change > 0) changeBadge.classList.add('positive');
+      if (change < 0) changeBadge.classList.add('negative');
+    }
+
+    function updateWindowStats(btcPoints, goldPoints) {
+      const goldShort = goldLegendLabel.textContent || 'Gold';
+      if (!btcPoints || btcPoints.length < 2) {
+        btcReturn.textContent = '–';
+        goldReturn.textContent = goldPoints?.length ? '–' : `Kein ${goldShort}`;
+        spreadReturn.textContent = '–';
+        btcBaseLabel.textContent = 'Keine Basis';
+        goldBaseLabel.textContent = goldPoints?.length ? 'Lade …' : `Keine ${goldShort}-Daten`;
+        compareStatus.textContent = goldLoaded ? `${goldShort} geladen` : `${goldShort} noch laden`;
+        windowRangeValue.textContent = '–';
+        windowRangeLabel.textContent = 'Keine Ansicht';
+        windowPointCount.textContent = '0 BTC / 0 Gold Punkte';
+        windowAverage.textContent = '–';
+        windowVolatility.textContent = '–';
+        axisMax.textContent = '–';
+        axisMid.textContent = '–';
+        axisMin.textContent = '–';
+        timelineWindow.textContent = '–';
+        timelinePoints.textContent = '–';
+        return;
+      }
+
+      const btcStart = btcPoints[0];
+      const btcEnd = btcPoints[btcPoints.length - 1];
+      const btcValues = btcPoints.map((p) => p.pct);
+      const btcMin = Math.min(...btcValues);
+      const btcMax = Math.max(...btcValues);
+      const btcAvg = btcValues.reduce((a, b) => a + b, 0) / btcValues.length;
+      const btcChange = btcEnd.pct;
+
+      const hasGold = goldPoints && goldPoints.length > 1;
+      const goldChange = hasGold ? goldPoints[goldPoints.length - 1].pct : null;
+      const goldRangeLabel = hasGold
+        ? `${formatDate(goldPoints[0].ts, false)} – ${formatDate(goldPoints[goldPoints.length - 1].ts, false)}`
+        : 'Gold-Zeitreihe fehlt';
+
+      btcReturn.textContent = percent(btcChange);
+      btcBaseLabel.textContent = `Basis: € ${euro(btcStart.price)} · ${formatDate(btcStart.ts, false)}`;
+      goldReturn.textContent = hasGold ? percent(goldChange) : `Kein ${goldShort}`;
+      goldBaseLabel.textContent = hasGold
+        ? `Basis: ${formatGoldPrice(goldPoints[0].price)} · ${formatDate(goldPoints[0].ts, false)}`
+        : `${goldShort} wird nicht angezeigt`;
+
+      if (hasGold) {
+        const spread = btcChange - goldChange;
+        spreadReturn.textContent = percent(spread);
+        compareStatus.textContent = spread >= 0 ? 'BTC liegt vorn' : `${goldShort} liegt vorn`;
+      } else {
+        spreadReturn.textContent = '–';
+        compareStatus.textContent = goldLoaded ? `${goldShort} fehlte im Fenster` : `${goldShort} lädt …`;
+      }
+
+      windowRangeValue.textContent = `${formatDate(btcStart.ts, false)} – ${formatDate(btcEnd.ts, false)}`;
+      windowRangeLabel.textContent = activeRange === 'max' ? 'Gesamte BTC-Historie' : `${activeRange} Tage (BTC-Basis)`;
+      windowPointCount.textContent = `${btcPoints.length} BTC / ${goldPoints?.length ?? 0} Gold Punkte`;
+      windowAverage.textContent = percent(btcAvg);
+      windowVolatility.textContent = percent(btcMax - btcMin);
+      volatilityLabel.textContent = `Bandbreite: ${percent(btcMin)} bis ${percent(btcMax)}`;
+      windowChangePct.textContent = hasGold ? `${goldShort} Überlappung: ${goldRangeLabel}` : 'Nur BTC im Fenster';
+
+      const axisTop = Math.max(btcMax, hasGold ? Math.max(...goldPoints.map((p) => p.pct)) : btcMax);
+      const axisBottom = Math.min(btcMin, hasGold ? Math.min(...goldPoints.map((p) => p.pct)) : btcMin);
+      axisMax.textContent = percent(axisTop);
+      axisMin.textContent = percent(axisBottom);
+      axisMid.textContent = percent((axisTop + axisBottom) / 2);
+      timelineWindow.textContent = `${formatDate(btcStart.ts, false)} – ${formatDate(btcEnd.ts, false)}`;
+      timelinePoints.textContent = `${btcPoints.length + (goldPoints?.length || 0)} Punkte gesamt`;
+    }
+
+    function drawSparkline(btcPoints, goldPoints) {
+      const ctx = sparklineCanvas.getContext('2d');
+      const pixelRatio = window.devicePixelRatio || 1;
+      const displayWidth = sparklineCanvas.clientWidth || sparklineCanvas.width;
+      const displayHeight = sparklineCanvas.clientHeight || sparklineCanvas.height;
+      sparklineCanvas.width = displayWidth * pixelRatio;
+      sparklineCanvas.height = displayHeight * pixelRatio;
+      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+      const hasBtc = Array.isArray(btcPoints) && btcPoints.length;
+      const hasGold = Array.isArray(goldPoints) && goldPoints.length;
+
+      if (!hasBtc && !hasGold) {
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+        ctx.font = '600 14px Inter, system-ui, sans-serif';
+        ctx.fillText('Keine Zeitreihe verfügbar', 16, displayHeight / 2);
+        chartTooltip.style.display = 'none';
+        return;
+      }
+
+      const allPoints = [...(btcPoints || []), ...(goldPoints || [])];
+      const minTime = allPoints.reduce((min, p) => Math.min(min, p.ts), allPoints[0].ts);
+      const maxTime = allPoints.reduce((max, p) => Math.max(max, p.ts), allPoints[0].ts);
+      const spanTime = Math.max(maxTime - minTime, 1);
+      const values = allPoints.map((p) => p.pct);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const range = max - min || 1;
+
+      const xFor = (ts) => ((ts - minTime) / spanTime) * displayWidth;
+      const yFor = (val) => displayHeight - ((val - min) / range) * displayHeight;
+
+      const drawLine = (series, color, fill) => {
+        if (!series.length) return;
+        ctx.beginPath();
+        series.forEach((p, idx) => {
+          const x = xFor(p.ts);
+          const y = yFor(p.pct);
+          if (idx === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+        if (fill) {
+          ctx.lineTo(displayWidth, displayHeight);
+          ctx.lineTo(0, displayHeight);
+          ctx.closePath();
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        const lastPoint = series[series.length - 1];
+        const lx = xFor(lastPoint.ts);
+        const ly = yFor(lastPoint.pct);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(lx, ly, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      };
+
+      const btcGradient = ctx.createLinearGradient(0, 0, 0, displayHeight);
+      btcGradient.addColorStop(0, 'rgba(34, 197, 94, 0.28)');
+      btcGradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+      drawLine(btcPoints, '#22c55e', btcGradient);
+
+      if (hasGold) {
+        const goldGradient = ctx.createLinearGradient(0, 0, 0, displayHeight);
+        goldGradient.addColorStop(0, 'rgba(91, 124, 250, 0.3)');
+        goldGradient.addColorStop(1, 'rgba(91, 124, 250, 0)');
+        drawLine(goldPoints, '#5b7cfa', goldGradient);
+      }
+
+      let hoverPointBtc = null;
+      let hoverPointGold = null;
+      if (hoverTs) {
+        if (hasBtc) {
+          hoverPointBtc = btcPoints.reduce((closest, point) => {
+            return Math.abs(point.ts - hoverTs) < Math.abs(closest.ts - hoverTs) ? point : closest;
+          }, btcPoints[0]);
+        }
+        if (hasGold) {
+          hoverPointGold = goldPoints.reduce((closest, point) => {
+            return Math.abs(point.ts - hoverTs) < Math.abs(closest.ts - hoverTs) ? point : closest;
+          }, goldPoints[0]);
+        }
+      }
+
+      const hoverPoint = hoverPointBtc || hoverPointGold;
+      if (hoverPoint) {
+        const hx = xFor(hoverPoint.ts);
+        const hy = yFor(hoverPoint.pct);
+        ctx.save();
+        ctx.setLineDash([4, 6]);
+        ctx.strokeStyle = 'rgba(91, 124, 250, 0.7)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(hx, 0);
+        ctx.lineTo(hx, displayHeight);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(hx, hy, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        const btcText = hoverPointBtc
+          ? `<div class="muted-row"><span>BTC</span><span>${percent(hoverPointBtc.pct, 2)} · € ${euro(
+              hoverPointBtc.price
+            )}</span></div>`
+          : '';
+        const goldText = hoverPointGold
+          ? `<div class="muted-row"><span>Gold</span><span>${percent(hoverPointGold.pct, 2)} · ${formatGoldPrice(
+              hoverPointGold.price
+            )}</span></div>`
+          : '<div class="muted-row"><span>Gold</span><span>kein Punkt</span></div>';
+
+        chartTooltip.style.display = 'block';
+        chartTooltip.innerHTML = `<strong>${formatDate(hoverPoint.ts)}</strong>${btcText}${goldText}`;
+
+        const wrapRect = sparklineCanvas.parentElement.getBoundingClientRect();
+        const tooltipWidth = chartTooltip.offsetWidth || 220;
+        const tooltipHeight = chartTooltip.offsetHeight || 100;
+        const relX = (hx / displayWidth) * wrapRect.width;
+        const relY = (hy / displayHeight) * wrapRect.height;
+        let left = relX - tooltipWidth / 2;
+        left = Math.min(Math.max(left, 8), wrapRect.width - tooltipWidth - 8);
+        const top = Math.max(relY - tooltipHeight - 10, 8);
+        chartTooltip.style.left = `${left}px`;
+        chartTooltip.style.top = `${top}px`;
+        chartTooltip.style.transform = 'none';
+      } else {
+        chartTooltip.style.display = 'none';
+      }
+    }
+
+    async function loadData(manual = false) {
+      statusText.textContent = manual ? 'Aktualisiere …' : 'Lädt Daten von CoinGecko …';
+
+      try {
+        const res = await fetch(
+          'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true',
+          { headers: { accept: 'application/json' } }
+        );
+
+        if (!res.ok) {
+          throw new Error(`API Fehler: ${res.status}`);
+        }
+
+        const data = await res.json();
+        const market = data?.market_data;
+        const spark = data?.market_data?.sparkline_in_7d?.price || [];
+
+        if (!market?.current_price?.eur) {
+          throw new Error('API fehlte current_price, starte Fallback.');
+        }
+
+        btcEurRate = market.current_price.eur;
+        if (Array.isArray(spark) && spark.length) {
+          const startTime = Date.now() - (spark.length - 1) * 3600_000;
+          lastPrices = spark.map((value, idx) => [startTime + idx * 3600_000, value]);
+        } else {
+          lastPrices = [];
+        }
+
+        priceElement.textContent = `€ ${euro(btcEurRate)}`;
+        updatedElement.textContent = data?.last_updated
+          ? new Date(data.last_updated).toLocaleString('de-DE')
+          : '–';
+        setBadge(market.price_change_percentage_24h ?? 0);
+        highElement.textContent = market.high_24h?.eur ? `€ ${euro(market.high_24h.eur)}` : '–';
+        lowElement.textContent = market.low_24h?.eur ? `€ ${euro(market.low_24h.eur)}` : '–';
+        volumeElement.textContent = market.total_volume?.eur ? `€ ${euro(market.total_volume.eur)}` : '–';
+        marketcapElement.textContent = market.market_cap?.eur ? `€ ${euro(market.market_cap.eur)}` : '–';
+
+        renderSparkline();
+        statusText.textContent = 'Live Preis geladen.';
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = 'Live-Preis konnte nicht geladen werden. Versuche Fallback …';
+        await loadFallback();
+      } finally {
+        // no-op
+      }
+    }
+
+    function computeWindowedPrices() {
+      const btcSource = historyPrices.length ? historyPrices : lastPrices;
+      const goldSource = goldPrices;
+      if (!btcSource?.length) return { btc: [], gold: [] };
+
+      const useFull = activeRange === 'max' || btcSource.length < 3;
+      const days = Number(activeRange) || getHistorySpanDays();
+      const lastTs = btcSource[btcSource.length - 1][0];
+      const firstTs = btcSource[0][0];
+      const windowMs = useFull ? Number.MAX_SAFE_INTEGER : days * 24 * 3600 * 1000;
+      const startTs = useFull ? firstTs : Math.max(lastTs - windowMs, firstTs);
+      const endTs = lastTs;
+
+      const btcWindow = btcSource.filter(([ts]) => ts >= startTs && ts <= endTs);
+      const goldWindow = goldSource.filter(([ts]) => ts >= startTs && ts <= endTs);
+
+      const toPercentSeries = (series) => {
+        if (!series.length) return [];
+        const base = series[0][1] || 1;
+        return series.map(([ts, price]) => ({ ts, price, pct: base ? ((price - base) / base) * 100 : 0 }));
+      };
+
+      return { btc: toPercentSeries(btcWindow), gold: toPercentSeries(goldWindow) };
+    }
+
+    function renderSparkline() {
+      const windowed = computeWindowedPrices();
+      currentWindow = windowed;
+
+      const btcPoints = windowed.btc || [];
+      const goldPoints = windowed.gold || [];
+      const goldShort = goldLegendLabel.textContent || 'Gold';
+
+      if (btcPoints.length > 1) {
+        const first = new Date(btcPoints[0].ts).toLocaleDateString('de-DE');
+        const last = new Date(btcPoints[btcPoints.length - 1].ts).toLocaleDateString('de-DE');
+        sparklineRange.textContent = `${first} – ${last}`;
+        const windowLabel = activeRange === 'max' ? 'Gesamte BTC-Historie' : `Fenster: ${activeRange} Tage`;
+        const goldLabelText = goldPoints.length ? `${goldShort} Overlay aktiv` : `${goldShort} Overlay leer`;
+        sparklineInfo.textContent = `${windowLabel} · ${goldLabelText}`;
+        chartTitle.textContent = `BTC vs. ${goldShort} (% Veränderung)`;
+        timelineHint.textContent = 'Scroll zum Zoomen · Buttons für fixe Fenster';
+      } else {
+        sparklineInfo.textContent = 'Keine Zeitreihe gefunden';
+        sparklineRange.textContent = '–';
+        timelineHint.textContent = 'Keine Daten zum Navigieren';
+      }
+
+      updateWindowStats(btcPoints, goldPoints);
+      drawSparkline(btcPoints, goldPoints);
+    }
+
+    async function fetchCoingeckoChart(coin, query, label) {
+      const res = await fetch(
+        `https://api.coingecko.com/api/v3/coins/${coin}/market_chart?vs_currency=eur&${query}`,
+        { headers: { accept: 'application/json' } }
+      );
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data?.prices) || !data.prices.length) {
+        throw new Error(`${label} keine Reihe`);
+      }
+      return data.prices.map(([ts, price]) => [ts, price]);
+    }
+
+    async function fetchCoinpaprikaHistory(coinId, startIso, label) {
+      const res = await fetch(
+        `https://api.coinpaprika.com/v1/tickers/${coinId}/historical?start=${startIso}&interval=1d`,
+        { headers: { accept: 'application/json' } }
+      );
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) throw new Error(`${label} leer`);
+      return data
+        .map((row) => [Date.parse(row.timestamp), Number(row.price)])
+        .filter((row) => Number.isFinite(row[0]) && Number.isFinite(row[1]))
+        .sort((a, b) => a[0] - b[0]);
+    }
+
+    async function fetchBinanceSeries(symbol, interval, limit, label, maxChunks = 8) {
+      let endTime = Date.now();
+      const all = [];
+
+      for (let i = 0; i < maxChunks; i++) {
+        const url =
+          `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}` +
+          (endTime ? `&endTime=${endTime}` : '');
+        const res = await fetch(url, { headers: { accept: 'application/json' } });
+        if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data) || !data.length) break;
+
+        const rows = data.map((row) => [Number(row[0]), Number(row[4])]).filter((r) => Number.isFinite(r[0]));
+        if (!rows.length) break;
+        all.unshift(...rows); // prepend so earliest stays first
+
+        const firstTs = rows[0][0];
+        if (rows.length < limit || !firstTs || firstTs === endTime) break;
+        endTime = firstTs - 1;
+      }
+
+      if (!all.length) throw new Error(`${label} leer`);
+      // ensure sorted ascending
+      return all.sort((a, b) => a[0] - b[0]);
+    }
+
+    async function fetchCryptoCompareAllDaily(symbol, label) {
+      const res = await fetch(
+        `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=USD&allData=true`,
+        { headers: { accept: 'application/json' } }
+      );
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data?.Data?.Data) || !data.Data.Data.length) throw new Error(`${label} leer`);
+      return data.Data.Data.filter((row) => Number.isFinite(row.time) && Number.isFinite(row.close)).map((row) => [
+        row.time * 1000,
+        row.close,
+      ]);
+    }
+
+    async function fetchBlockchainHistory(label) {
+      const res = await fetch('https://api.blockchain.info/charts/market-price?timespan=all&format=json');
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data?.values) || !data.values.length) throw new Error(`${label} leer`);
+      return data.values
+        .filter((row) => Number.isFinite(row.x) && Number.isFinite(row.y))
+        .map((row) => [row.x * 1000, row.y])
+        .sort((a, b) => a[0] - b[0]);
+    }
+
+    async function loadHistory(force = false) {
+      if (historyLoaded && goldLoaded && !force) return;
+
+      historyLoaded = false;
+      goldLoaded = false;
+      historyPrices = [];
+      goldPrices = [];
+      historyLabel = '';
+      goldLabel = '';
+      goldCoinId = '';
+      syncGoldLabels('XAU');
+
+      const btcSources = [
+        { type: 'cg', coin: 'bitcoin', query: 'days=max&interval=daily', label: 'BTC: Volle Historie (täglich)' },
+        { type: 'cc', symbol: 'BTC', label: 'BTC: CryptoCompare alle Tage' },
+        { type: 'chain', label: 'BTC: Blockchain.com Historie' },
+        { type: 'paprika', coin: 'btc-bitcoin', start: '2010-07-18', label: 'BTC: Coinpaprika Historie' },
+        { type: 'cg', coin: 'bitcoin', query: 'days=1825&interval=daily', label: 'BTC: Letzte 5 Jahre (täglich)' },
+        { type: 'cg', coin: 'bitcoin', query: 'days=365&interval=daily', label: 'BTC: Letztes Jahr (täglich)' },
+        { type: 'cg', coin: 'bitcoin', query: 'days=90&interval=hourly', label: 'BTC: Letzte 90 Tage (stündlich)' },
+        { type: 'binance', symbol: 'BTCUSDT', interval: '1d', limit: 1000, label: 'BTC: Binance Tagesdaten' },
+      ];
+
+      const goldSources = [
+        { type: 'stooq', label: 'Stooq Spot XAUUSD (historisch)', short: 'XAU' },
+        { type: 'nbp', label: 'NBP Gold PLN (täglich)', short: 'XAU', coin: 'PLN' },
+        { type: 'kraken', pair: 'PAXGUSD', interval: 1440, label: 'Kraken PAXGUSD (täglich)', short: 'PAXG' },
+        { type: 'kraken', pair: 'XAUTUSD', interval: 1440, label: 'Kraken XAUTUSD (täglich)', short: 'XAUT' },
+        { type: 'cg', coin: 'tether-gold', query: 'days=max&interval=daily', label: 'XAUt volle Historie', short: 'XAUt' },
+        { type: 'cg', coin: 'pax-gold', query: 'days=max&interval=daily', label: 'PAXG volle Historie', short: 'PAXG' },
+        { type: 'cg', coin: 'tether-gold', query: 'days=1825&interval=daily', label: 'XAUt 5 Jahre', short: 'XAUt' },
+        { type: 'cg', coin: 'pax-gold', query: 'days=1825&interval=daily', label: 'PAXG 5 Jahre', short: 'PAXG' },
+        { type: 'cg', coin: 'tether-gold', query: 'days=365&interval=daily', label: 'XAUt letztes Jahr', short: 'XAUt' },
+        { type: 'cg', coin: 'pax-gold', query: 'days=365&interval=daily', label: 'PAXG letztes Jahr', short: 'PAXG' },
+        { type: 'binance', symbol: 'XAUTUSDT', interval: '1d', limit: 1000, label: 'Binance XAUt Tagesdaten', short: 'XAUt' },
+      ];
+
+      let btcError = null;
+      for (const source of btcSources) {
+        try {
+          sparklineInfo.textContent = `Lade ${source.label} …`;
+          let series = [];
+          if (source.type === 'binance') {
+            series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label, 14);
+          } else if (source.type === 'cc') {
+            series = await fetchCryptoCompareAllDaily(source.symbol, source.label);
+          } else if (source.type === 'chain') {
+            series = await fetchBlockchainHistory(source.label);
+          } else if (source.type === 'paprika') {
+            series = await fetchCoinpaprikaHistory(source.coin, `${source.start}T00:00:00Z`, source.label);
+          } else {
+            series = await fetchCoingeckoChart(source.coin, source.query, source.label);
+          }
+          if (series.length) {
+            historyPrices = series;
+            historyLoaded = true;
+            historyLabel = source.label;
+            break;
+          }
+          btcError = new Error('Leere Historie erhalten');
+        } catch (chartErr) {
+          console.error('Konnte BTC Historie nicht laden', chartErr);
+          btcError = chartErr;
+        }
+      }
+
+      let goldError = null;
+      for (const source of goldSources) {
+        try {
+          compareStatus.textContent = `Lade ${source.label} …`;
+          syncGoldLabels(source.short || 'Gold');
+          let series = [];
+          if (source.type === 'binance') {
+            series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label, 10);
+          } else if (source.type === 'kraken') {
+            series = await fetchKrakenOhlc(source.pair, source.interval, source.label);
+          } else if (source.type === 'nbp') {
+            series = await fetchNbpGoldHistory(source.label);
+          } else if (source.type === 'stooq') {
+            series = await fetchStooqGold(source.label);
+          } else {
+            series = await fetchCoingeckoChart(source.coin, source.query, source.label);
+          }
+          if (series.length) {
+            goldPrices = series;
+            goldLoaded = true;
+            goldLabel = source.label;
+            goldCoinId = (source.short || source.coin || source.symbol || source.pair || 'XAU').toUpperCase();
+            syncGoldLabels(source.short || source.coin?.toUpperCase() || 'XAU');
+            break;
+          }
+          goldError = new Error('Leere Gold-Reihe erhalten');
+        } catch (chartErr) {
+          console.error('Konnte Gold Historie nicht laden', chartErr);
+          goldError = chartErr;
+        }
+      }
+
+      if (!historyLoaded) {
+        sparklineInfo.textContent = `Historie nicht verfügbar (${btcError?.message ?? 'unbekannt'}). Nutze 7-Tage-Ansicht.`;
+      }
+
+      if (!goldLoaded) {
+        compareStatus.textContent = `Gold-Overlay fehlt (${goldError?.message ?? 'keine Daten'})`;
+        syncGoldLabels('XAU');
+      } else {
+        compareStatus.textContent = `${goldLabel} geladen`;
+      }
+
+      renderSparkline();
+    }
+
+    async function loadFallback() {
+      try {
+        const res = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_last_updated_at=true&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true',
+          { headers: { accept: 'application/json' } }
+        );
+
+        if (!res.ok) {
+          throw new Error(`Fallback Fehler: ${res.status}`);
+        }
+
+        const data = await res.json();
+        const fallback = data.bitcoin;
+        btcEurRate = fallback?.eur ?? null;
+        lastPrices = [];
+
+        priceElement.textContent = btcEurRate ? `€ ${euro(btcEurRate)}` : '–';
+        const updated = fallback?.last_updated_at
+          ? new Date(fallback.last_updated_at * 1000).toLocaleString('de-DE')
+          : 'Keine Zeitangabe';
+        updatedElement.textContent = updated;
+        setBadge(fallback?.eur_24h_change ?? 0);
+        highElement.textContent = '–';
+        lowElement.textContent = '–';
+        volumeElement.textContent = fallback?.eur_24h_vol ? `€ ${euro(fallback.eur_24h_vol)}` : '–';
+        marketcapElement.textContent = fallback?.eur_market_cap ? `€ ${euro(fallback.eur_market_cap)}` : '–';
+        sparklineInfo.textContent = 'Fallback Preis ohne Zeitreihe';
+        sparklineRange.textContent = 'Keine Zeitreihe geladen';
+        updateWindowStats([], []);
+        drawSparkline([], []);
+        statusText.textContent = 'Einfacher Preis geladen (Fallback).';
+      } catch (fallbackError) {
+        console.error(fallbackError);
+        statusText.textContent = 'Keine Daten verfügbar. Bitte später erneut versuchen.';
+      }
+    }
+
+    loadData();
+    loadHistory();
+  </script>
+  </div>
+</body>
+</html>
