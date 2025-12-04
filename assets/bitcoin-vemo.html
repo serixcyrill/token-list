@@ -10,12 +10,12 @@
     /* Scope everything to the widget container so WordPress layouts stay intact. */
     .vemo-btc {
       --bg: #f7f8fb;
-      --bg-soft: rgba(248, 250, 252, 0.7);
-      --panel: rgba(255, 255, 255, 0.7);
+      --bg-soft: rgba(248, 250, 252, 0.72);
+      --panel: rgba(255, 255, 255, 0.78);
       --panel-strong: #ffffff;
       --border: rgba(17, 24, 39, 0.08);
       --border-accent: rgba(126, 217, 87, 0.35);
-      --border-blue: rgba(91, 124, 250, 0.16);
+      --border-blue: rgba(91, 124, 250, 0.2);
       --text: #0f172a;
       --muted: #6b7280;
       --muted-strong: #475569;
@@ -23,8 +23,8 @@
       --accent: #7ed957;
       --accent-blue: #5b7cfa;
       --accent-text: #14532d;
-      --shadow-main: 0 22px 46px rgba(15, 23, 42, 0.12);
-      --shadow-panel: 0 16px 36px rgba(15, 23, 42, 0.08);
+      --shadow-main: 0 26px 60px rgba(15, 23, 42, 0.12);
+      --shadow-panel: 0 18px 44px rgba(15, 23, 42, 0.1);
       --shadow-kpi: 0 12px 28px rgba(15, 23, 42, 0.06);
       --radius-shell: 26px;
       --radius-panel: 22px;
@@ -35,11 +35,11 @@
       font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 18% 22%, rgba(126, 217, 87, 0.12), transparent 42%),
-        radial-gradient(circle at 86% 12%, rgba(91, 124, 250, 0.12), transparent 32%),
-        radial-gradient(circle at 50% 90%, rgba(91, 124, 250, 0.08), transparent 38%),
-        linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
-      padding: 28px 16px 60px;
+        radial-gradient(circle at 18% 22%, rgba(126, 217, 87, 0.14), transparent 42%),
+        radial-gradient(circle at 86% 12%, rgba(91, 124, 250, 0.14), transparent 32%),
+        radial-gradient(circle at 50% 90%, rgba(91, 124, 250, 0.08), transparent 36%),
+        linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
+      padding: 32px 18px 64px;
       width: 100%;
       display: block;
     }
@@ -130,11 +130,17 @@
       background: var(--panel-strong);
       border: 1px solid var(--border);
       border-radius: var(--radius-panel);
-      padding: 20px 18px 16px;
+      padding: 22px 20px 18px;
       position: relative;
       overflow: hidden;
       box-shadow: var(--shadow-panel);
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(10px);
+      transition: transform 0.18s ease, box-shadow 0.2s ease;
+    }
+
+    .vemo-btc .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 44px rgba(15, 23, 42, 0.12);
     }
 
     .vemo-btc .pill {
@@ -408,14 +414,14 @@
 
     .vemo-btc .chart-wrap {
       position: relative;
-      height: 460px;
-      margin-top: 6px;
-      border-radius: 16px;
+      height: 520px;
+      margin-top: 10px;
+      border-radius: 18px;
       overflow: hidden;
       border: 1px solid var(--border);
       background:
-        linear-gradient(180deg, rgba(15, 23, 42, 0.024), rgba(15, 23, 42, 0.04)),
-        linear-gradient(120deg, rgba(126, 217, 87, 0.04), rgba(91, 124, 250, 0.04));
+        linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.06)),
+        linear-gradient(135deg, rgba(126, 217, 87, 0.06), rgba(91, 124, 250, 0.04));
       cursor: grab;
       transition: box-shadow 0.2s ease, transform 0.18s ease;
     }
@@ -1311,15 +1317,45 @@
       return data.prices.map(([ts, price]) => [ts, price]);
     }
 
-    async function fetchBinanceSeries(symbol, interval, limit, label) {
+    async function fetchCoinpaprikaHistory(coinId, startIso, label) {
       const res = await fetch(
-        `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`,
+        `https://api.coinpaprika.com/v1/tickers/${coinId}/historical?start=${startIso}&interval=1d`,
         { headers: { accept: 'application/json' } }
       );
       if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
       const data = await res.json();
       if (!Array.isArray(data) || !data.length) throw new Error(`${label} leer`);
-      return data.map((row) => [Number(row[0]), Number(row[4])]);
+      return data
+        .map((row) => [Date.parse(row.timestamp), Number(row.price)])
+        .filter((row) => Number.isFinite(row[0]) && Number.isFinite(row[1]))
+        .sort((a, b) => a[0] - b[0]);
+    }
+
+    async function fetchBinanceSeries(symbol, interval, limit, label, maxChunks = 8) {
+      let endTime = Date.now();
+      const all = [];
+
+      for (let i = 0; i < maxChunks; i++) {
+        const url =
+          `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}` +
+          (endTime ? `&endTime=${endTime}` : '');
+        const res = await fetch(url, { headers: { accept: 'application/json' } });
+        if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data) || !data.length) break;
+
+        const rows = data.map((row) => [Number(row[0]), Number(row[4])]).filter((r) => Number.isFinite(r[0]));
+        if (!rows.length) break;
+        all.unshift(...rows); // prepend so earliest stays first
+
+        const firstTs = rows[0][0];
+        if (rows.length < limit || !firstTs || firstTs === endTime) break;
+        endTime = firstTs - 1;
+      }
+
+      if (!all.length) throw new Error(`${label} leer`);
+      // ensure sorted ascending
+      return all.sort((a, b) => a[0] - b[0]);
     }
 
     async function loadHistory(force = false) {
@@ -1336,34 +1372,39 @@
 
       const btcSources = [
         { type: 'cg', coin: 'bitcoin', query: 'days=max&interval=daily', label: 'BTC: Volle Historie (täglich)' },
+        { type: 'paprika', coin: 'btc-bitcoin', start: '2010-07-18', label: 'BTC: Coinpaprika Historie' },
         { type: 'cg', coin: 'bitcoin', query: 'days=1825&interval=daily', label: 'BTC: Letzte 5 Jahre (täglich)' },
         { type: 'cg', coin: 'bitcoin', query: 'days=365&interval=daily', label: 'BTC: Letztes Jahr (täglich)' },
         { type: 'cg', coin: 'bitcoin', query: 'days=90&interval=hourly', label: 'BTC: Letzte 90 Tage (stündlich)' },
-        { type: 'binance', symbol: 'BTCUSDT', interval: '1d', limit: 1200, label: 'BTC: Binance Tagesdaten' },
+        { type: 'binance', symbol: 'BTCUSDT', interval: '1d', limit: 1000, label: 'BTC: Binance Tagesdaten' },
       ];
 
       const goldSources = [
+        { type: 'stooq', label: 'Stooq Spot XAUUSD (historisch)', short: 'XAU' },
+        { type: 'nbp', label: 'NBP Gold PLN (täglich)', short: 'XAU', coin: 'PLN' },
         { type: 'kraken', pair: 'PAXGUSD', interval: 1440, label: 'Kraken PAXGUSD (täglich)', short: 'PAXG' },
         { type: 'kraken', pair: 'XAUTUSD', interval: 1440, label: 'Kraken XAUTUSD (täglich)', short: 'XAUT' },
-        { type: 'nbp', label: 'NBP Gold PLN (täglich)', short: 'XAU', coin: 'PLN' },
-        { type: 'stooq', label: 'Stooq Spot XAUUSD (historisch)', short: 'XAU' },
         { type: 'cg', coin: 'tether-gold', query: 'days=max&interval=daily', label: 'XAUt volle Historie', short: 'XAUt' },
         { type: 'cg', coin: 'pax-gold', query: 'days=max&interval=daily', label: 'PAXG volle Historie', short: 'PAXG' },
         { type: 'cg', coin: 'tether-gold', query: 'days=1825&interval=daily', label: 'XAUt 5 Jahre', short: 'XAUt' },
         { type: 'cg', coin: 'pax-gold', query: 'days=1825&interval=daily', label: 'PAXG 5 Jahre', short: 'PAXG' },
         { type: 'cg', coin: 'tether-gold', query: 'days=365&interval=daily', label: 'XAUt letztes Jahr', short: 'XAUt' },
         { type: 'cg', coin: 'pax-gold', query: 'days=365&interval=daily', label: 'PAXG letztes Jahr', short: 'PAXG' },
-        { type: 'binance', symbol: 'XAUTUSDT', interval: '1d', limit: 1200, label: 'Binance XAUt Tagesdaten', short: 'XAUt' },
+        { type: 'binance', symbol: 'XAUTUSDT', interval: '1d', limit: 1000, label: 'Binance XAUt Tagesdaten', short: 'XAUt' },
       ];
 
       let btcError = null;
       for (const source of btcSources) {
         try {
           sparklineInfo.textContent = `Lade ${source.label} …`;
-          const series =
-            source.type === 'binance'
-              ? await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label)
-              : await fetchCoingeckoChart(source.coin, source.query, source.label);
+          let series = [];
+          if (source.type === 'binance') {
+            series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label, 14);
+          } else if (source.type === 'paprika') {
+            series = await fetchCoinpaprikaHistory(source.coin, `${source.start}T00:00:00Z`, source.label);
+          } else {
+            series = await fetchCoingeckoChart(source.coin, source.query, source.label);
+          }
           if (series.length) {
             historyPrices = series;
             historyLoaded = true;
@@ -1384,7 +1425,7 @@
           syncGoldLabels(source.short || 'Gold');
           let series = [];
           if (source.type === 'binance') {
-            series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label);
+            series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label, 10);
           } else if (source.type === 'kraken') {
             series = await fetchKrakenOhlc(source.pair, source.interval, source.label);
           } else if (source.type === 'nbp') {
