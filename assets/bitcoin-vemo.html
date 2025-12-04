@@ -849,7 +849,8 @@
       });
 
     const formatGoldPrice = (value) => {
-      const currency = goldCoinId === 'XAU' ? 'USD' : goldCoinId === 'PLN' ? 'PLN' : '€';
+      const usdLike = ['XAU', 'XAUT', 'XAUt', 'PAXG'];
+      const currency = usdLike.includes(goldCoinId) ? 'USD' : goldCoinId === 'PLN' ? 'PLN' : '€';
       const formatter = currency === 'USD' ? usd : euro;
       return `${currency} ${formatter(value)}`;
     };
@@ -907,6 +908,22 @@
       if (!series.length) throw new Error('Stooq lieferte keine Golddaten');
       const sorted = series.map(({ ts, close }) => [ts, close]).sort((a, b) => a[0] - b[0]);
       return sorted;
+    }
+
+    async function fetchKrakenOhlc(pair, interval, label) {
+      const res = await fetch(
+        `https://api.kraken.com/0/public/OHLC?pair=${pair}&interval=${interval}`,
+        { headers: { accept: 'application/json' } }
+      );
+      if (!res.ok) throw new Error(`${label} HTTP ${res.status}`);
+      const data = await res.json();
+      if (Array.isArray(data?.error) && data.error.length) {
+        throw new Error(`${label} Fehler: ${data.error.join(', ')}`);
+      }
+      const seriesKey = Object.keys(data?.result || {}).find((k) => k !== 'last');
+      const rows = seriesKey ? data.result[seriesKey] : null;
+      if (!rows || !rows.length) throw new Error(`${label} leer`);
+      return rows.map((row) => [Number(row[0]) * 1000, Number(row[4])]);
     }
 
     const syncGoldLabels = (label = 'Gold') => {
@@ -1401,6 +1418,8 @@
       ];
 
       const goldSources = [
+        { type: 'kraken', pair: 'PAXGUSD', interval: 1440, label: 'Kraken PAXGUSD (täglich)', short: 'PAXG' },
+        { type: 'kraken', pair: 'XAUTUSD', interval: 1440, label: 'Kraken XAUTUSD (täglich)', short: 'XAUT' },
         { type: 'nbp', label: 'NBP Gold PLN (täglich)', short: 'XAU', coin: 'PLN' },
         { type: 'stooq', label: 'Stooq Spot XAUUSD (historisch)', short: 'XAU' },
         { type: 'cg', coin: 'tether-gold', query: 'days=max&interval=daily', label: 'XAUt volle Historie', short: 'XAUt' },
@@ -1441,6 +1460,8 @@
           let series = [];
           if (source.type === 'binance') {
             series = await fetchBinanceSeries(source.symbol, source.interval, source.limit, source.label);
+          } else if (source.type === 'kraken') {
+            series = await fetchKrakenOhlc(source.pair, source.interval, source.label);
           } else if (source.type === 'nbp') {
             series = await fetchNbpGoldHistory(source.label);
           } else if (source.type === 'stooq') {
@@ -1452,7 +1473,7 @@
             goldPrices = series;
             goldLoaded = true;
             goldLabel = source.label;
-            goldCoinId = source.coin || source.symbol || 'XAU';
+            goldCoinId = (source.short || source.coin || source.symbol || source.pair || 'XAU').toUpperCase();
             syncGoldLabels(source.short || source.coin?.toUpperCase() || 'XAU');
             break;
           }
