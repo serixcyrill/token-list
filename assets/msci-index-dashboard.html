@@ -278,7 +278,7 @@
       <div>
         <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live FMP API</div>
         <h1>Globale Index-Performance</h1>
-        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Basis (auf 100 rebasiert), linearer Start, Log-Umschaltung, FMP-Feed mit Fallback.</p>
+        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Kurse direkt aus der FMP-API, linearer Start mit Log-Umschaltung, Fallback bei Ausfällen.</p>
       </div>
     </div>
 
@@ -344,7 +344,7 @@
     let chart;
     let labelTimeline = [];
     let usdToEur = 0.92;
-    const normalizedSeries = {};
+    const priceSeries = {};
 
     // --- helpers ---
     function hexToRgba(hex, alpha = 1) {
@@ -488,15 +488,6 @@
       return baseLabels.map((d) => (map.has(d) ? map.get(d) : null));
     }
 
-    function rebaseToFirstValue(series) {
-      let base = null;
-      return series.map((v) => {
-        if (v == null || !Number.isFinite(v) || v <= 0) return null;
-        if (base === null) base = v;
-        return (v / base) * 100;
-      });
-    }
-
     async function loadData() {
       try {
         usdToEur = await fetchUsdToEurRate();
@@ -517,20 +508,16 @@
       }
 
       labelTimeline = acwiSeries.dates;
-      normalizedSeries['ACWI'] = rebaseToFirstValue(alignToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values, usdToEur));
+      priceSeries['ACWI'] = alignToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values, usdToEur);
 
       await Promise.all(
         indexCatalog.slice(1).map(async (idx, i) => {
           try {
             const live = await fetchFmpSeries(idx.symbol);
-            normalizedSeries[idx.id] = rebaseToFirstValue(
-              alignToLabels(labelTimeline, live.dates, live.values, usdToEur)
-            );
+            priceSeries[idx.id] = alignToLabels(labelTimeline, live.dates, live.values, usdToEur);
           } catch (err) {
             const fallback = createFallbackSeries(idx.id, i + 1, labelTimeline);
-            normalizedSeries[idx.id] = rebaseToFirstValue(
-              alignToLabels(labelTimeline, fallback.dates, fallback.values, usdToEur)
-            );
+            priceSeries[idx.id] = alignToLabels(labelTimeline, fallback.dates, fallback.values, usdToEur);
           }
         })
       );
@@ -552,7 +539,7 @@
       state.selected.forEach((id) => {
         const info = indexCatalog.find((i) => i.id === id);
         if (!info) return;
-        const series = normalizedSeries[id] || [];
+        const series = priceSeries[id] || [];
         const { dates, series: slicedSeries } = sliceRange(labelTimeline, series);
         const [colorPrimary, colorSecondary] = blendColors(info.colors);
         const borderColor = setAlpha(colorPrimary, id === 'ACWI' ? 0.9 : 0.82);
@@ -588,7 +575,7 @@
         legend.appendChild(chip);
       });
 
-      const labels = sliceRange(labelTimeline, normalizedSeries[state.selected[0]] || []).dates;
+      const labels = sliceRange(labelTimeline, priceSeries[state.selected[0]] || []).dates;
 
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
