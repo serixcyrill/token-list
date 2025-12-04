@@ -278,7 +278,7 @@
       <div>
         <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live Alpha Vantage API</div>
         <h1>Globale Index-Performance</h1>
-        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Kurse direkt aus Alpha Vantage (mit FX-Konvertierung), linearer Start mit Log-Umschaltung, Fallback bei Ausfällen.</p>
+        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Kurse direkt aus Alpha Vantage (volle Historie mit FX-Konvertierung), linearer Start mit Log-Umschaltung, Fallback bei Ausfällen.</p>
       </div>
     </div>
 
@@ -423,6 +423,18 @@
       };
     }
 
+    function generateMonthlyLabels(count = 360) {
+      const labels = [];
+      const cursor = new Date();
+      cursor.setDate(1);
+      for (let i = count - 1; i >= 0; i--) {
+        const d = new Date(cursor);
+        d.setMonth(cursor.getMonth() - i);
+        labels.push(d.toISOString().slice(0, 10));
+      }
+      return labels;
+    }
+
     const growthBias = { ACWI: 0.0065, USA: 0.0075, GER: 0.0066, FRA: 0.0062, ITA: 0.0059, ESP: 0.0059, UK: 0.0058, CAN: 0.0063, BRA: 0.0069, MEX: 0.0065, AUS: 0.0061, JPN: 0.006, CHN: 0.0066, IND: 0.008, KOR: 0.0066, ZAF: 0.0062, SAU: 0.0061, ARE: 0.0062 };
     const volBias = { IND: 0.006, BRA: 0.008, MEX: 0.006, ZAF: 0.006, CHN: 0.006 };
 
@@ -449,7 +461,7 @@
 
     async function fetchFxLookup() {
       const res = await fetch(
-        `https://www.alphavantage.co/query?function=FX_MONTHLY&from_symbol=USD&to_symbol=EUR&apikey=${AV_API_KEY}`
+        `https://www.alphavantage.co/query?function=FX_MONTHLY&from_symbol=USD&to_symbol=EUR&apikey=${AV_API_KEY}&outputsize=full`
       );
       if (!res.ok) throw new Error('FX fetch failed');
       const data = await res.json();
@@ -490,7 +502,7 @@
 
     async function fetchAlphaSeries(symbol, fxLookup) {
       const res = await fetch(
-        `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${symbol}&apikey=${AV_API_KEY}`
+        `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${symbol}&apikey=${AV_API_KEY}&outputsize=full`
       );
       if (!res.ok) throw new Error('Fetch failed');
       const data = await res.json();
@@ -523,32 +535,35 @@
         fxLookup = () => 0.92;
       }
 
-      let acwiSeries;
-      try {
-        acwiSeries = await fetchAlphaSeries(indexCatalog[0].symbol, fxLookup);
-      } catch (e) {
-        const fallbackLabels = Array.from({ length: 120 }, (_, i) => {
-          const d = new Date();
-          d.setMonth(d.getMonth() - (120 - i));
-          return d.toISOString().slice(0, 10);
-        });
-        acwiSeries = createFallbackSeries('ACWI', 0, fallbackLabels);
-      }
-
-      labelTimeline = acwiSeries.dates;
-      priceSeries['ACWI'] = alignToLabels(labelTimeline, acwiSeries.dates, acwiSeries.values);
+      const labelSet = new Set();
+      const rawSeries = new Map();
 
       await Promise.all(
-        indexCatalog.slice(1).map(async (idx, i) => {
+        indexCatalog.map(async (idx, i) => {
           try {
             const live = await fetchAlphaSeries(idx.symbol, fxLookup);
-            priceSeries[idx.id] = alignToLabels(labelTimeline, live.dates, live.values);
+            rawSeries.set(idx.id, live);
+            live.dates.forEach((d) => labelSet.add(d));
           } catch (err) {
-            const fallback = createFallbackSeries(idx.id, i + 1, labelTimeline);
-            priceSeries[idx.id] = alignToLabels(labelTimeline, fallback.dates, fallback.values);
+            const fallbackLabels = generateMonthlyLabels(360);
+            const fallback = createFallbackSeries(idx.id, i, fallbackLabels);
+            rawSeries.set(idx.id, fallback);
+            fallback.dates.forEach((d) => labelSet.add(d));
           }
         })
       );
+
+      if (!labelSet.size) {
+        generateMonthlyLabels(360).forEach((d) => labelSet.add(d));
+      }
+
+      labelTimeline = Array.from(labelSet).sort((a, b) => new Date(a) - new Date(b));
+
+      indexCatalog.forEach((idx) => {
+        const series = rawSeries.get(idx.id);
+        const aligned = alignToLabels(labelTimeline, series?.dates || [], series?.values || []);
+        priceSeries[idx.id] = aligned;
+      });
 
       renderRanges();
       renderScales();
