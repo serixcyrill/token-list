@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MSCI Index Overlay · Vemo UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    /* Widget namespace */
+    .msci-overlay {
+      --bg-gradient: radial-gradient(64% 80% at 10% 12%, rgba(126, 217, 87, 0.12), transparent),
+        radial-gradient(52% 74% at 88% 6%, rgba(91, 124, 250, 0.12), transparent),
+        linear-gradient(180deg, #fbfcff 0%, #eef3ff 55%, #eaf0ff 100%);
+      --panel: rgba(255, 255, 255, 0.9);
+      --panel-strong: rgba(255, 255, 255, 0.98);
+      --text-strong: #0b162c;
+      --text-muted: #60708c;
+      --border-soft: rgba(17, 24, 39, 0.05);
+      --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --radius-card: 18px;
+      --radius-chip: 18px;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg-gradient);
+      padding: 28px 18px 22px;
+      color: var(--text-strong);
+      max-width: none;
+      margin: 0;
+    }
+
+    .msci-overlay *,
+    .msci-overlay *::before,
+    .msci-overlay *::after {
+      box-sizing: border-box;
+    }
+
+    .topline {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(248, 250, 252, 0.9);
+      border: 1px solid var(--border-soft);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #1d9c59;
+    }
+
+    .eyebrow .dot {
+      width: 8px;
+      height: 8px;
+      background: #7ed957;
+      border-radius: 50%;
+    }
+
+    h1 {
+      font-family: "Poppins", system-ui, sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      font-size: clamp(38px, 3.2vw, 52px);
+      margin: 12px 0 4px;
+      color: var(--text-strong);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-weight: 600;
+      margin: 0;
+      letter-spacing: 0.1px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+      font-weight: 700;
+      color: var(--text-strong);
+      font-size: 13px;
+    }
+
+    .pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      margin: 18px 0 6px;
+    }
+
+    @media (max-width: 900px) {
+      .controls-grid { grid-template-columns: 1fr; }
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .input {
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 14px;
+      min-width: 280px;
+      color: #0b162c;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 12px 28px rgba(15, 23, 42, 0.06);
+      transition: all 0.2s ease;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: rgba(91, 124, 250, 0.28);
+      box-shadow: 0 0 0 6px rgba(91, 124, 250, 0.12);
+      background: var(--panel-strong);
+    }
+
+    .input::placeholder { color: rgba(91, 107, 130, 0.8); }
+
+    .chip-group { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+
+    .chip {
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-chip);
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--text-strong);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    .chip .dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.03); }
+
+    .chip:hover { transform: translateY(-1px); background: var(--panel-strong); }
+
+    .chip.active {
+      background: linear-gradient(135deg, rgba(91, 124, 250, 0.16), rgba(126, 217, 87, 0.14));
+      border-color: rgba(91, 124, 250, 0.32);
+      color: #0f172a;
+      box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .chart-card {
+      position: relative;
+      background: linear-gradient(150deg, rgba(255, 255, 255, 0.9), rgba(248, 251, 255, 0.92));
+      border: none;
+      border-radius: 22px;
+      box-shadow: var(--shadow-soft);
+      padding: 16px 16px 12px;
+      overflow: hidden;
+      backdrop-filter: blur(6px);
+    }
+
+    .chart-card::before,
+    .chart-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 10%;
+      pointer-events: none;
+      z-index: 2;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), transparent 70%);
+    }
+
+    .chart-card::after {
+      right: 0;
+      transform: scaleX(-1);
+    }
+
+    .chart-card::before { left: 0; }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      z-index: 3;
+      position: relative;
+    }
+
+    .chart-title { font-size: 15px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.2px; }
+
+    canvas { width: 100% !important; height: 420px !important; }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .index-card {
+      position: relative;
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      color: #0b162c;
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+      background: #ffffff;
+      backdrop-filter: blur(2px);
+    }
+
+    .index-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.28), transparent 70%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    .index-card:hover { transform: translateY(-2px); }
+    .index-card:hover::after { opacity: 0.24; }
+
+    .index-card.selected {
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .index-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .index-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: inherit; }
+    .index-flag { font-size: 20px; }
+    .index-sub { font-size: 13px; opacity: 0.92; font-weight: 700; color: rgba(15, 23, 42, 0.65); }
+
+    .index-card.selected .index-sub { color: rgba(255, 255, 255, 0.82); }
+
+    .disclaimer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: right;
+      font-weight: 600;
+    }
+
+    @media (max-width: 720px) {
+      canvas { height: 340px !important; }
+      .input { min-width: 100%; }
+    }
+  </style>
+</head>
+  <body style="margin:0; padding:0; background:linear-gradient(180deg,#fbfcff 0%,#eef3ff 55%,#eaf0ff 100%);">
+  <div class="msci-overlay">
+    <div class="topline">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live EODHD API</div>
+        <h1>Globale Index-Performance</h1>
+        <p class="subtitle">Vergleiche Märkte übereinander – prozentuale Veränderung ab gemeinsamem Startpunkt (EODHD Vollhistorie), linearer Start mit optionaler Log-Umschaltung und Fallback bei Ausfällen.</p>
+        <div class="status-row">
+          <div class="pill" id="live-pill"><span class="dot" style="background:#22c55e"></span><span id="live-count">Live</span></div>
+          <div class="pill" id="fallback-pill"><span class="dot" style="background:#f59e0b"></span><span id="fallback-count">Fallback</span></div>
+          <div class="pill"><span class="dot" style="background:#5b7cfa"></span>Bitte eigenen EODHD Key eintragen – sonst Demo-Daten möglich.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-grid">
+      <div class="control-row">
+        <input class="input" id="search" type="search" placeholder="Suchen nach Land oder Index" />
+        <div class="chip-group" id="range-chips"></div>
+        <div class="chip-group" id="scale-chips"></div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title" id="chart-title">MSCI World plus ausgewählte Märkte</div>
+        <div class="chip-group" id="legend"></div>
+      </div>
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="grid-cards" id="cards"></div>
+    <div class="disclaimer">API: EODHD – Angaben ohne Gewähr, keine Haftung für die Richtigkeit der Daten.</div>
+  </div>
+
+  <script>
+    const EODHD_API_KEY = 'MEIN_EODHD_KEY';
+    const FINNHUB_API_KEY = 'MEIN_FINNHUB_KEY';
+    const indexCatalog = [
+      { id: 'WORLD', name: 'MSCI World', country: 'Global', flag: '🌍', colors: ['#7ed957', '#5b7cfa'], symbol: 'URTH.US' },
+      { id: 'EM', name: 'MSCI Emerging Markets', country: 'Emerging Markets', flag: '🌐', colors: ['#9fd3c7', '#b0c8ff'], symbol: 'EEM.US' },
+      { id: 'CHN', name: 'MSCI China', country: 'China', flag: '🇨🇳', colors: ['#f3a590', '#f7e7b0'], symbol: 'MCHI.US' },
+      { id: 'BRA', name: 'MSCI Brasilien', country: 'Brasilien', flag: '🇧🇷', colors: ['#7fd9b0', '#f5e3a4'], symbol: 'EWZ.US' },
+      { id: 'ZAF', name: 'MSCI Südafrika', country: 'Südafrika', flag: '🇿🇦', colors: ['#7fc7b3', '#f2b59a'], symbol: 'EZA.US' },
+      { id: 'AUS', name: 'MSCI Australien', country: 'Australien', flag: '🇦🇺', colors: ['#92b9ff', '#f3b8c1'], symbol: 'EWA.US' },
+      { id: 'JPN', name: 'MSCI Japan', country: 'Japan', flag: '🇯🇵', colors: ['#f2a2b8', '#f8e9ea'], symbol: 'EWJ.US' },
+      { id: 'CAN', name: 'MSCI Kanada', country: 'Kanada', flag: '🇨🇦', colors: ['#f29aa5', '#f7d7df'], symbol: 'EWC.US' },
+      { id: 'UK', name: 'MSCI UK', country: 'Vereinigtes Königreich', flag: '🇬🇧', colors: ['#9bb7ff', '#f2b1c0'], symbol: 'EWU.US' },
+      { id: 'EUR', name: 'MSCI Europa', country: 'Europa', flag: '🇪🇺', colors: ['#9ec3ff', '#c0d4ff'], symbol: 'IEUR.US' },
+    ];
+
+    const ranges = [
+      { id: 'max', label: 'Max', months: null },
+      { id: '5y', label: '5J', months: 60 },
+      { id: '3y', label: '3J', months: 36 },
+      { id: '1y', label: '1J', months: 12 },
+      { id: '6m', label: '6M', months: 6 },
+    ];
+
+    const state = {
+      search: '',
+      range: 'max',
+      // Start on linear to keep divergences visible; log remains toggleable
+      scale: 'linear',
+      selected: ['WORLD', 'EM', 'JPN'],
+    };
+
+    const chartEl = document.getElementById('chart');
+    let chart;
+    let labelTimeline = [];
+    const priceSeries = {};
+
+    // --- helpers ---
+    function hexToRgba(hex, alpha = 1) {
+      if (hex.startsWith('rgb')) return hex;
+      const parsed = hex.replace('#', '');
+      const bigint = parseInt(parsed.length === 3 ? parsed.split('').map((c) => c + c).join('') : parsed, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function pastelize(hex, mix = 0.28, alpha = 1) {
+      if (hex.startsWith('rgb')) return hex;
+      const parsed = hex.replace('#', '');
+      const bigint = parseInt(parsed.length === 3 ? parsed.split('').map((c) => c + c).join('') : parsed, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      const blend = (v) => Math.round(v * (1 - mix) + 255 * mix);
+      return `rgba(${blend(r)}, ${blend(g)}, ${blend(b)}, ${alpha})`;
+    }
+
+    function blendColors(colors) {
+      if (!colors.length) return ['rgba(91, 124, 250, 0.86)', 'rgba(126, 217, 87, 0.5)'];
+      const primary = pastelize(colors[0], 0.12, 0.92);
+      const secondary = pastelize(colors[1] || colors[0], 0.22, 0.7);
+      return [primary, secondary];
+    }
+
+    function setAlpha(color, alpha) {
+      if (color.startsWith('rgba')) return color.replace(/rgba\(([^)]+), [0-9.]+\)/, `rgba($1, ${alpha})`);
+      return hexToRgba(color, alpha);
+    }
+
+    function formatPercent(value) {
+      if (!Number.isFinite(value)) return '';
+      return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 }).format(value) + ' %';
+    }
+
+    function normalizeSeries(series) {
+      const first = series.find((v) => Number.isFinite(v) && v > 0);
+      if (!Number.isFinite(first) || first <= 0) return { percent: [], ratio: [] };
+      const percent = series.map((v) => (Number.isFinite(v) && v > 0 ? ((v / first - 1) * 100) : null));
+      const ratio = series.map((v) => (Number.isFinite(v) && v > 0 ? v / first : null));
+      return { percent, ratio };
+    }
+
+    function getCommonAlignedSeries(selectedIds) {
+      const firstValid = selectedIds
+        .map((id) => (priceSeries[id] || []).findIndex((v) => Number.isFinite(v) && v > 0))
+        .filter((idx) => idx >= 0);
+      const startIndex = firstValid.length ? Math.max(...firstValid) : 0;
+
+      const dates = labelTimeline.slice(startIndex);
+      const map = {};
+      selectedIds.forEach((id) => {
+        map[id] = (priceSeries[id] || []).slice(startIndex);
+      });
+      return { dates, seriesById: map };
+    }
+
+    function sliceRange(dates, series) {
+      const range = ranges.find((r) => r.id === state.range);
+      if (!range || !range.months) return { dates, series };
+      const tailDate = new Date(dates[dates.length - 1]);
+      const cutoff = new Date(tailDate);
+      cutoff.setMonth(cutoff.getMonth() - range.months);
+      const slicedDates = [];
+      const slicedSeries = [];
+      dates.forEach((d, i) => {
+        const dt = new Date(d);
+        if (dt >= cutoff) {
+          slicedDates.push(d);
+          slicedSeries.push(series[i]);
+        }
+      });
+      return { dates: slicedDates, series: slicedSeries };
+    }
+
+    function pickGradient(ctx, colors) {
+      const [start, end] = blendColors(colors);
+      const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 0.9);
+      gradient.addColorStop(0, setAlpha(start, 0.28));
+      const tail = end.replace(/rgba\(([^)]+), [0-9.]+\)/, 'rgba($1, 0.08)');
+      gradient.addColorStop(1, tail);
+      return gradient;
+    }
+
+    // --- data ---
+    const seriesMeta = {};
+    let indexData = {};
+    window.indexData = indexData;
+
+    function alignToLabels(baseLabels, dates, values) {
+      if (!dates.length || !values.length) return Array(baseLabels.length).fill(null);
+      const map = new Map();
+      dates.forEach((d, i) => map.set(d, values[i] ?? null));
+      return baseLabels.map((d) => (map.has(d) ? map.get(d) : null));
+    }
+
+    function normalizeLocalSeries(records) {
+      if (!Array.isArray(records) || !records.length) return [];
+      const base = records[0]?.adjusted_close;
+      if (!Number.isFinite(base) || base <= 0) return [];
+      return records.map((row) => ({
+        date: row.date,
+        value: Number.isFinite(row.adjusted_close) ? (row.adjusted_close / base) * 100 : null,
+      }));
+    }
+
+    async function fetchLocalData() {
+      const res = await fetch('/data/index-data.json');
+      if (!res.ok) throw new Error('index-data.json not available');
+      return res.json();
+    }
+
+    function toIsoDate(input) {
+      const d = new Date(input);
+      if (Number.isNaN(d.getTime())) return null;
+      return d.toISOString().slice(0, 10);
+    }
+
+    async function initData() {
+      const labelSet = new Set();
+      const rawSeries = new Map();
+
+      try {
+        indexData = await fetchLocalData();
+        window.indexData = indexData;
+      } catch (err) {
+        console.error(err);
+        indexData = {};
+        window.indexData = indexData;
+      }
+
+      indexCatalog.forEach((idx) => {
+        const source = indexData[idx.symbol] || [];
+        const normalized = normalizeLocalSeries(source);
+        const parsed = (normalized || [])
+          .map((p) => ({ date: toIsoDate(p.date), value: p.value }))
+          .filter((p) => p.date && Number.isFinite(p.value));
+        parsed.forEach((p) => labelSet.add(p.date));
+        rawSeries.set(idx.id, {
+          dates: parsed.map((p) => p.date),
+          values: parsed.map((p) => p.value),
+        });
+        seriesMeta[idx.id] = { live: true };
+      });
+
+      labelTimeline = Array.from(labelSet).sort((a, b) => new Date(a) - new Date(b));
+
+      indexCatalog.forEach((idx) => {
+        const series = rawSeries.get(idx.id);
+        const aligned = alignToLabels(labelTimeline, series?.dates || [], series?.values || []);
+        priceSeries[idx.id] = aligned;
+      });
+
+      renderRanges();
+      renderScales();
+      renderStatus();
+      renderCards();
+      buildChart();
+    }
+
+    // --- UI ---
+    function buildChart() {
+      const ctx = chartEl.getContext('2d');
+      const datasets = [];
+      const legend = document.getElementById('legend');
+      legend.innerHTML = '';
+      if (!state.selected.length) state.selected = ['WORLD'];
+
+      const { dates: alignedDates, seriesById } = getCommonAlignedSeries(state.selected);
+      let labels = alignedDates;
+
+      state.selected.forEach((id) => {
+        const info = indexCatalog.find((i) => i.id === id);
+        if (!info) return;
+        const series = seriesById[id] || [];
+        const { dates, series: slicedSeries } = sliceRange(alignedDates, series);
+        labels = dates;
+        const normalized = normalizeSeries(slicedSeries);
+        const dataPoints = state.scale === 'log' ? normalized.ratio : normalized.percent;
+        if (!dataPoints.length) return;
+        const [colorPrimary, colorSecondary] = blendColors(info.colors);
+        const borderColor = setAlpha(colorPrimary, id === 'WORLD' ? 0.9 : 0.82);
+        const gradient = id === 'WORLD' ? pickGradient(ctx, [colorPrimary, colorSecondary]) : 'transparent';
+        datasets.push({
+          label: `${info.name}`,
+          data: dataPoints,
+          borderColor,
+          baseColor: borderColor,
+          backgroundColor: gradient,
+          tension: 0.32,
+          borderWidth: id === 'WORLD' ? 3 : 2.3,
+          baseWidth: id === 'WORLD' ? 3 : 2.3,
+          fill: id === 'WORLD',
+          pointRadius: 0,
+          pointHitRadius: 10,
+          spanGaps: true,
+        });
+
+        const chip = document.createElement('div');
+        chip.className = 'chip active';
+        chip.style.background = colorPrimary;
+        chip.style.color = '#ffffff';
+        chip.style.borderColor = setAlpha(colorPrimary, 0.6);
+        chip.innerHTML = `<span class="dot" style="background:${setAlpha(colorPrimary,0.82)}"></span>${info.flag} ${info.name}`;
+        chip.onclick = () => {
+          if (state.selected.includes(id)) {
+            state.selected = state.selected.filter((x) => x !== id);
+          } else {
+            state.selected.push(id);
+          }
+          buildChart();
+          renderCards();
+        };
+        legend.appendChild(chip);
+      });
+
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          animation: { duration: 500 },
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: state.scale === 'log' ? 'logarithmic' : 'linear',
+              ticks: {
+                callback: (val) => {
+                  const pct = state.scale === 'log' ? (val - 1) * 100 : val;
+                  return formatPercent(pct);
+                },
+                maxTicksLimit: 6,
+              },
+              grid: { color: 'rgba(15,23,42,0.05)' },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { maxTicksLimit: 6 },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'nearest',
+              intersect: false,
+              callbacks: {
+                label: (ctx) => {
+                  const raw = ctx.parsed.y;
+                  const pct = state.scale === 'log' ? (raw - 1) * 100 : raw;
+                  return `${ctx.dataset.label}: ${formatPercent(pct)}`;
+                },
+                title: (items) => items[0]?.label || '',
+              },
+              backgroundColor: '#0f172a',
+              borderColor: 'rgba(255,255,255,0.3)',
+              borderWidth: 1,
+              titleColor: '#fff',
+              bodyColor: '#e2e8f0',
+              padding: 10,
+              displayColors: false,
+            },
+          },
+          onHover: (evt, activeEls) => updateHoverStyles(activeEls),
+          onLeave: () => updateHoverStyles([]),
+        },
+      });
+    }
+
+    function updateHoverStyles(activeEls) {
+      if (!chart) return;
+      chart.data.datasets.forEach((ds) => {
+        ds.borderWidth = ds.baseWidth;
+        ds.borderColor = ds.baseColor;
+      });
+      if (activeEls && activeEls.length) {
+        const idx = activeEls[0].datasetIndex;
+        const target = chart.data.datasets[idx];
+        if (target) {
+          target.borderWidth = (target.baseWidth || 2) + 1.2;
+          target.borderColor = setAlpha(target.baseColor || '#0f172a', 1);
+        }
+      }
+      chart.update('none');
+    }
+
+    function renderRanges() {
+      const wrap = document.getElementById('range-chips');
+      wrap.innerHTML = '';
+      ranges.forEach((r) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (state.range === r.id ? ' active' : '');
+        chip.textContent = r.label;
+        chip.onclick = () => {
+          state.range = r.id;
+          buildChart();
+          renderCards();
+        };
+        wrap.appendChild(chip);
+      });
+    }
+
+    function renderStatus() {
+      const live = Object.values(seriesMeta).filter((m) => m.live).length;
+      const fallback = Object.values(seriesMeta).filter((m) => m.live === false).length;
+      const liveLabel = document.getElementById('live-count');
+      const fallLabel = document.getElementById('fallback-count');
+      if (liveLabel) liveLabel.textContent = `${live}× Live`;
+      if (fallLabel) fallLabel.textContent = `${fallback}× Fallback`;
+      const livePill = document.getElementById('live-pill');
+      const fallPill = document.getElementById('fallback-pill');
+      if (livePill) livePill.style.opacity = live ? '1' : '0.65';
+      if (fallPill) fallPill.style.opacity = fallback ? '1' : '0.65';
+    }
+
+    function renderScales() {
+      const wrap = document.getElementById('scale-chips');
+      wrap.innerHTML = '';
+      ['linear', 'log'].forEach((s) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (state.scale === s ? ' active' : '');
+        chip.textContent = s === 'log' ? 'Log' : 'Linear';
+        chip.onclick = () => {
+          state.scale = s;
+          buildChart();
+        };
+        wrap.appendChild(chip);
+      });
+    }
+
+    function renderCards() {
+      const container = document.getElementById('cards');
+      container.innerHTML = '';
+      const search = state.search.trim().toLowerCase();
+      indexCatalog
+        .filter((i) => !search || i.name.toLowerCase().includes(search) || i.country.toLowerCase().includes(search))
+        .forEach((idx) => {
+          const card = document.createElement('div');
+          const isSelected = state.selected.includes(idx.id);
+          card.className = 'index-card' + (isSelected ? ' selected' : '');
+          const colors = blendColors(idx.colors);
+          const softA = setAlpha(colors[0], 0.4);
+          const softB = setAlpha(colors[1], 0.26);
+          const meta = seriesMeta[idx.id] || { live: false };
+          if (isSelected) {
+            card.style.backgroundImage = `linear-gradient(145deg, ${softA}, ${softB}), linear-gradient(160deg, #0f172a, #0b1222)`;
+            card.style.borderColor = setAlpha(colors[0], 0.45);
+            card.style.color = '#ffffff';
+          } else {
+            card.style.backgroundImage = 'none';
+            card.style.backgroundColor = '#ffffff';
+            card.style.borderColor = 'rgba(15,23,42,0.08)';
+            card.style.color = '#0b162c';
+          }
+          card.innerHTML = `
+            <div class="index-top">
+              <div>
+                <div class="index-name">${idx.flag} ${idx.name}</div>
+                <div class="index-sub">${idx.country} · ${meta.live ? 'Live' : 'Fallback'}</div>
+              </div>
+            </div>
+          `;
+          card.onclick = () => {
+            if (state.selected.includes(idx.id)) {
+              state.selected = state.selected.filter((x) => x !== idx.id);
+            } else {
+              state.selected.push(idx.id);
+            }
+            buildChart();
+            renderCards();
+          };
+          container.appendChild(card);
+        });
+      const title = document.getElementById('chart-title');
+      title.textContent = state.selected.length
+        ? `${state.selected.length} Indexe – Basis ${ranges.find((r) => r.id === state.range)?.label || 'Max'}, ${
+            state.scale === 'log' ? 'logarithmisch' : 'linear'
+          }`
+        : 'Bitte Index auswählen';
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      state.search = e.target.value;
+      renderCards();
+    });
+
+    initData();
+  </script>
+</body>
+</html>
