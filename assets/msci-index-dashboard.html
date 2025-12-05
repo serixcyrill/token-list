@@ -426,6 +426,20 @@
       return { percent, ratio };
     }
 
+    function getCommonAlignedSeries(selectedIds) {
+      const firstValid = selectedIds
+        .map((id) => (priceSeries[id] || []).findIndex((v) => Number.isFinite(v) && v > 0))
+        .filter((idx) => idx >= 0);
+      const startIndex = firstValid.length ? Math.max(...firstValid) : 0;
+
+      const dates = labelTimeline.slice(startIndex);
+      const map = {};
+      selectedIds.forEach((id) => {
+        map[id] = (priceSeries[id] || []).slice(startIndex);
+      });
+      return { dates, seriesById: map };
+    }
+
     function sliceRange(dates, series) {
       const range = ranges.find((r) => r.id === state.range);
       if (!range || !range.months) return { dates, series };
@@ -625,11 +639,15 @@
       legend.innerHTML = '';
       if (!state.selected.length) state.selected = ['ACWI'];
 
+      const { dates: alignedDates, seriesById } = getCommonAlignedSeries(state.selected);
+      let labels = alignedDates;
+
       state.selected.forEach((id) => {
         const info = indexCatalog.find((i) => i.id === id);
         if (!info) return;
-        const series = priceSeries[id] || [];
-        const { dates, series: slicedSeries } = sliceRange(labelTimeline, series);
+        const series = seriesById[id] || [];
+        const { dates, series: slicedSeries } = sliceRange(alignedDates, series);
+        labels = dates;
         const normalized = normalizeSeries(slicedSeries);
         const dataPoints = state.scale === 'log' ? normalized.ratio : normalized.percent;
         if (!dataPoints.length) return;
@@ -668,8 +686,6 @@
         };
         legend.appendChild(chip);
       });
-
-      const labels = sliceRange(labelTimeline, priceSeries[state.selected[0]] || []).dates;
 
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
