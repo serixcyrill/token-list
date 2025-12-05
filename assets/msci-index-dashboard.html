@@ -302,7 +302,7 @@
       <div>
         <div class="eyebrow"><span class="dot"></span> MSCI Overlay · Live Alpha Vantage API</div>
         <h1>Globale Index-Performance</h1>
-        <p class="subtitle">Vergleiche Märkte übereinander – Euro-Kurse direkt aus Alpha Vantage (volle Historie mit FX-Konvertierung), linearer Start mit Log-Umschaltung, Fallback bei Ausfällen.</p>
+        <p class="subtitle">Vergleiche Märkte übereinander – prozentuale Veränderung ab gemeinsamem Startpunkt (Alpha Vantage Vollhistorie mit FX-Konvertierung), linearer Start mit optionaler Log-Umschaltung und Fallback bei Ausfällen.</p>
         <div class="status-row">
           <div class="pill" id="live-pill"><span class="dot" style="background:#22c55e"></span><span id="live-count">Live</span></div>
           <div class="pill" id="fallback-pill"><span class="dot" style="background:#f59e0b"></span><span id="fallback-count">Fallback</span></div>
@@ -413,9 +413,17 @@
       return hexToRgba(color, alpha);
     }
 
-    function formatCurrency(value) {
+    function formatPercent(value) {
       if (!Number.isFinite(value)) return '';
-      return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+      return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 }).format(value) + ' %';
+    }
+
+    function normalizeSeries(series) {
+      const first = series.find((v) => Number.isFinite(v) && v > 0);
+      if (!Number.isFinite(first) || first <= 0) return { percent: [], ratio: [] };
+      const percent = series.map((v) => (Number.isFinite(v) && v > 0 ? ((v / first - 1) * 100) : null));
+      const ratio = series.map((v) => (Number.isFinite(v) && v > 0 ? v / first : null));
+      return { percent, ratio };
     }
 
     function sliceRange(dates, series) {
@@ -622,12 +630,15 @@
         if (!info) return;
         const series = priceSeries[id] || [];
         const { dates, series: slicedSeries } = sliceRange(labelTimeline, series);
+        const normalized = normalizeSeries(slicedSeries);
+        const dataPoints = state.scale === 'log' ? normalized.ratio : normalized.percent;
+        if (!dataPoints.length) return;
         const [colorPrimary, colorSecondary] = blendColors(info.colors);
         const borderColor = setAlpha(colorPrimary, id === 'ACWI' ? 0.9 : 0.82);
         const gradient = id === 'ACWI' ? pickGradient(ctx, [colorPrimary, colorSecondary]) : 'transparent';
         datasets.push({
           label: `${info.name}`,
-          data: slicedSeries,
+          data: dataPoints,
           borderColor,
           baseColor: borderColor,
           backgroundColor: gradient,
@@ -672,7 +683,10 @@
             y: {
               type: state.scale === 'log' ? 'logarithmic' : 'linear',
               ticks: {
-                callback: (val) => formatCurrency(val),
+                callback: (val) => {
+                  const pct = state.scale === 'log' ? (val - 1) * 100 : val;
+                  return formatPercent(pct);
+                },
                 maxTicksLimit: 6,
               },
               grid: { color: 'rgba(15,23,42,0.05)' },
@@ -688,7 +702,11 @@
               mode: 'nearest',
               intersect: false,
               callbacks: {
-                label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`,
+                label: (ctx) => {
+                  const raw = ctx.parsed.y;
+                  const pct = state.scale === 'log' ? (raw - 1) * 100 : raw;
+                  return `${ctx.dataset.label}: ${formatPercent(pct)}`;
+                },
                 title: (items) => items[0]?.label || '',
               },
               backgroundColor: '#0f172a',
