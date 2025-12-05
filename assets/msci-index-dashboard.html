@@ -332,6 +332,9 @@
   </div>
 
   <script>
+    const EODHD_API_KEY = '6932ecd58615a2.77224961';
+    const FINNHUB_API_KEY = 'd4pf031r01qjpnaut0n0d4pf031r01qjpnaut0ng';
+    const cache = {};
     const indexCatalog = [
       { id: 'ACWI', name: 'MSCI ACWI', country: 'Global', flag: '🌍', colors: ['#7ed957', '#5b7cfa'], symbol: 'URTH.US' },
       { id: 'USA', name: 'MSCI USA', country: 'USA', flag: '🇺🇸', colors: ['#7aa5f9', '#f1b5c8'], symbol: 'SPY.US' },
@@ -470,84 +473,7 @@
     }
 
     // --- data ---
-    function seededRandom(seed) {
-      let t = seed + 0x6d2b79f5;
-      return () => {
-        t += 0x6d2b79f5;
-        let x = t;
-        x = Math.imul(x ^ (x >>> 15), 1 | x);
-        x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
-        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
-      };
-    }
-
-    function generateMonthlyLabels(count = 360) {
-      const labels = [];
-      const cursor = new Date();
-      cursor.setDate(1);
-      for (let i = count - 1; i >= 0; i--) {
-        const d = new Date(cursor);
-        d.setMonth(cursor.getMonth() - i);
-        labels.push(d.toISOString().slice(0, 10));
-      }
-      return labels;
-    }
-
-    const growthBias = { ACWI: 0.0065, USA: 0.0075, GER: 0.0066, SUI: 0.0065, UK: 0.0058, FRA: 0.0062, ITA: 0.0059, ESP: 0.0059, NLD: 0.0063, SWE: 0.0062, NOR: 0.0061, CAN: 0.0063, AUS: 0.0061, JPN: 0.006, BRA: 0.0069, MEX: 0.0065, CHN: 0.0066, IND: 0.008, SGP: 0.0062, KOR: 0.0066, ZAF: 0.0062, SAU: 0.0061, ARE: 0.0062 };
-    const volBias = { IND: 0.006, BRA: 0.008, MEX: 0.006, ZAF: 0.006, CHN: 0.006, SGP: 0.0045 };
-
-    function createFallbackSeries(id, index, labels) {
-      const seed = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + index * 17;
-      const rand = seededRandom(seed);
-      const baseDrift = growthBias[id] ?? 0.006;
-      const vol = 0.012 + (volBias[id] ?? 0.0);
-      let value = 100;
-      const series = [];
-      labels.forEach((_, i) => {
-        const cycle = Math.sin(i / 10.5) * 0.16 + Math.cos(i / 7.5) * 0.11;
-        const shock = (rand() - 0.5) * vol * 2.1;
-        const monthlyReturn = baseDrift * (1 + cycle) + shock;
-        value *= Math.max(0.97, 1 + monthlyReturn);
-        value = Math.max(value, 1200);
-        series.push(value);
-      });
-      return { dates: labels, values: series };
-    }
-
-    // Replace with your own EODHD API key for production use
-    const EOD_API_KEY = '6932ecd58615a2.77224961';
     const seriesMeta = {};
-    function toMonthlySeries(sorted) {
-      const buckets = new Map();
-      sorted.forEach((item) => {
-        const date = new Date(item.date);
-        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
-        const val = item.close ?? item.adjustedClose ?? 0;
-        buckets.set(key, val);
-      });
-      const entries = Array.from(buckets.entries()).sort((a, b) => new Date(a[0]) - new Date(b[0]));
-      return { dates: entries.map((e) => e[0]), values: entries.map((e) => e[1]) };
-    }
-
-    async function fetchEodSeries(symbol) {
-      const res = await fetch(
-        `https://eodhd.com/api/eod/${symbol}?api_token=${EOD_API_KEY}&from=1990-01-01&order=a&fmt=json`
-      );
-      if (!res.ok) throw new Error('Fetch failed');
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error('No data');
-      const parsed = data
-        .map((row) => ({ date: row.date, close: parseFloat(row.adjusted_close) }))
-        .filter((d) => !Number.isNaN(d.close))
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
-      const monthly = toMonthlySeries(parsed);
-      const base = monthly.values.find((v) => Number.isFinite(v) && v > 0);
-      if (!Number.isFinite(base) || base <= 0) return monthly;
-      return {
-        dates: monthly.dates,
-        values: monthly.values.map((v) => (Number.isFinite(v) && v > 0 ? (v / base) * 100 : null)),
-      };
-    }
 
     function alignToLabels(baseLabels, dates, values) {
       if (!dates.length || !values.length) return Array(baseLabels.length).fill(null);
@@ -556,30 +482,70 @@
       return baseLabels.map((d) => (map.has(d) ? map.get(d) : null));
     }
 
-    async function loadData() {
+    function normalize(data) {
+      if (!Array.isArray(data) || !data.length) return [];
+      const base = data[0].adjusted_close;
+      return data.map((p) => ({
+        date: p.date,
+        value: (p.adjusted_close / base) * 100,
+      }));
+    }
+
+    function normalizeFinnhub(data) {
+      if (!data || !Array.isArray(data.c) || !data.c.length) return [];
+      const base = data.c[0];
+      return data.c.map((p, i) => ({
+        date: data.t[i] * 1000,
+        value: (p / base) * 100,
+      }));
+    }
+
+    async function loadData(symbol) {
+      if (cache[symbol]) return cache[symbol].data;
+
+      try {
+        const r = await fetch(
+          `https://eodhd.com/api/eod/${symbol}?api_token=${EODHD_API_KEY}&from=1990-01-01&order=a&fmt=json`
+        );
+        if (r.status === 429 || !r.ok) throw new Error('Limit reached');
+        const data = await r.json();
+        cache[symbol] = { data: normalize(data), live: true };
+        return cache[symbol].data;
+      } catch (e) {
+        const r2 = await fetch(
+          `https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=D&token=${FINNHUB_API_KEY}`
+        );
+        const data2 = await r2.json();
+        cache[symbol] = { data: normalizeFinnhub(data2), live: false };
+        return cache[symbol].data;
+      }
+    }
+
+    function toIsoDate(input) {
+      const d = new Date(input);
+      if (Number.isNaN(d.getTime())) return null;
+      return d.toISOString().slice(0, 10);
+    }
+
+    async function initData() {
       const labelSet = new Set();
       const rawSeries = new Map();
 
       await Promise.all(
-        indexCatalog.map(async (idx, i) => {
-          try {
-            const live = await fetchEodSeries(idx.symbol);
-            rawSeries.set(idx.id, live);
-            seriesMeta[idx.id] = { live: true };
-            live.dates.forEach((d) => labelSet.add(d));
-          } catch (err) {
-            const fallbackLabels = generateMonthlyLabels(360);
-            const fallback = createFallbackSeries(idx.id, i, fallbackLabels);
-            rawSeries.set(idx.id, fallback);
-            seriesMeta[idx.id] = { live: false };
-            fallback.dates.forEach((d) => labelSet.add(d));
-          }
+        indexCatalog.map(async (idx) => {
+          const series = await loadData(idx.symbol);
+          const parsed = (series || [])
+            .map((p) => ({ date: toIsoDate(p.date), value: p.value }))
+            .filter((p) => p.date && Number.isFinite(p.value));
+          parsed.forEach((p) => labelSet.add(p.date));
+          rawSeries.set(idx.id, {
+            dates: parsed.map((p) => p.date),
+            values: parsed.map((p) => p.value),
+          });
+          const meta = cache[idx.symbol];
+          seriesMeta[idx.id] = { live: meta?.live !== false };
         })
       );
-
-      if (!labelSet.size) {
-        generateMonthlyLabels(360).forEach((d) => labelSet.add(d));
-      }
 
       labelTimeline = Array.from(labelSet).sort((a, b) => new Date(a) - new Date(b));
 
@@ -822,7 +788,7 @@
       renderCards();
     });
 
-    loadData();
+    initData();
   </script>
 </body>
 </html>
