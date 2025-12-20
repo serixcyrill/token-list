@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vemo Kontaktbuch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: #f4f7fb;
+      --card-bg: #ffffff;
+      --text: #1f2741;
+      --accent: #72d27a;
+      --accent-strong: #7ed957;
+      --accent-hover: #6ac66e;
+      --muted: #6b7080;
+      --shadow: 0 10px 30px rgba(40, 47, 71, 0.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(118, 208, 98, 0.12), transparent 32%),
+        radial-gradient(circle at 85% 10%, rgba(125, 211, 252, 0.14), transparent 28%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--text);
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+      width: min(1180px, 94vw);
+      margin: 30px auto 46px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(40, 47, 71, 0.06);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 20px;
+      align-items: center;
+      background: linear-gradient(120deg, rgba(114, 210, 122, 0.14), #ffffff 50%, rgba(126, 217, 87, 0.1));
+      border: 1px solid rgba(114, 210, 122, 0.35);
+    }
+
+    .hero h1 {
+      margin: 8px 0 6px;
+      font-size: 28px;
+      letter-spacing: 0.2px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #eef6ef;
+      color: #0f1a2a;
+      font-weight: 700;
+      border-radius: 999px;
+      letter-spacing: 0.2px;
+      font-size: 12px;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border 0.2s ease;
+    }
+
+    .btn.primary {
+      background: var(--accent-strong);
+      color: #ffffff;
+      box-shadow: 0 12px 28px rgba(114, 210, 122, 0.28);
+    }
+
+    .btn.primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn.ghost { background: #f1f3f8; color: var(--text); border-color: #dfe3ec; }
+    .btn.ghost:hover { border-color: rgba(114, 210, 122, 0.55); color: #0f1a2a; }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid #e4e8f0;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.14);
+    }
+
+    .metric h3 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0.2px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .section-heading h2 { margin: 0; font-size: 18px; }
+    .section-heading p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .filters {
+      display: grid;
+      gap: 12px;
+    }
+
+    .filters-row {
+      display: grid;
+      grid-template-columns: 1.3fr repeat(4, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .filters-row select,
+    .filters-row input {
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid #dfe3ec;
+      background: #f8fbff;
+      font-family: inherit;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #dfe3ec;
+      background: #ffffff;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .chip.accent {
+      background: #eef6ef;
+      color: #0f1a2a;
+      border-color: rgba(114, 210, 122, 0.45);
+    }
+
+    .toggles {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid #e5e9f2;
+      cursor: pointer;
+      background: #ffffff;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .toggle input { display: none; }
+    .toggle.active {
+      background: #eef6ef;
+      border-color: rgba(114, 210, 122, 0.45);
+      color: #0f1a2a;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .contact-card {
+      border: 1px solid #e3e9f2;
+      border-radius: 16px;
+      padding: 16px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+      position: relative;
+    }
+
+    .contact-card.highlight::before {
+      content: "Top Kontakt";
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: linear-gradient(135deg, #7ed957, #54c19a);
+      color: #0c1f14;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      box-shadow: 0 8px 18px rgba(114, 210, 122, 0.3);
+    }
+
+    .contact-header {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #e8f8ec, #dfe9ff);
+      border: 1px solid #dbe5f0;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
+      border-radius: 16px;
+      pointer-events: none;
+    }
+
+    .contact-meta h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .contact-meta .role {
+      display: inline-flex;
+      padding: 5px 10px;
+      background: #eef6ef;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1c3a2c;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
+      margin-top: 4px;
+    }
+
+    .contact-meta p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: #f1f3f8;
+      color: #0f1a2a;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .badge.accent { background: #eef6ef; border: 1px solid rgba(114, 210, 122, 0.3); }
+
+    .contact-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .contact-actions a {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      background: #ffffff;
+      color: var(--text);
+      font-weight: 700;
+      border-radius: 12px;
+      border: 1px solid #dfe3ec;
+      transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .contact-actions a.primary {
+      background: var(--accent-strong);
+      color: #0f1a2a;
+      box-shadow: 0 10px 24px rgba(114, 210, 122, 0.25);
+      border: 1px solid rgba(114, 210, 122, 0.45);
+    }
+
+    .contact-actions a:hover { transform: translateY(-1px); background: #f8fbff; }
+    .contact-actions a.primary:hover { background: var(--accent-hover); }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px 0;
+      font-weight: 700;
+    }
+
+    .sheet {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 120px;
+      gap: 10px;
+    }
+
+    .sheet input {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #dfe3ec;
+      background: #f8fbff;
+      font-family: inherit;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      background: #f39c12;
+      box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.12);
+    }
+
+    .status-dot.ok { background: #72d27a; box-shadow: 0 0 0 4px rgba(114, 210, 122, 0.15); }
+    .status-dot.err { background: #e74c3c; box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.12); }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .filters-row { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .sheet { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main>
+      <section class="card hero">
+        <div>
+          <span class="eyebrow">Kontakt-Interface für Power-Netzwerke</span>
+          <h1>Onboarding von starken Kontakten in jeder Branche</h1>
+          <p>
+            Verbunden mit Google Sheets, gefiltert nach Branchen, Rollen und Verfügbarkeit.
+            Baue dein Kontaktbuch aus, teile Termine oder Profile, und halte alles über ein zentrales Interface synchron.
+          </p>
+          <div class="hero-actions">
+            <button class="btn primary" id="refreshFromSheet">Spreadsheet Sync</button>
+            <button class="btn ghost" id="resetFilters">Filter zurücksetzen</button>
+          </div>
+        </div>
+        <div class="hero-metrics" id="metricPanel"></div>
+      </section>
+
+      <section class="card filters">
+        <div class="section-heading">
+          <div>
+            <h2>Filter & Kategorien</h2>
+            <p>Suche nach Personen, Branchen, Standorten oder Sofort-Verfügbarkeit.</p>
+          </div>
+          <div class="chip accent" id="resultCounter">0 Ergebnisse</div>
+        </div>
+
+        <div class="filters-row">
+          <input type="search" id="searchInput" placeholder="Suche nach Name, Rolle, Tags..." />
+          <select id="industrySelect"></select>
+          <select id="categorySelect"></select>
+          <select id="locationSelect"></select>
+          <select id="sortSelect">
+            <option value="priority">Sortierung: Priorität</option>
+            <option value="name">Sortierung: Name</option>
+            <option value="availability">Sortierung: Verfügbarkeit</option>
+          </select>
+        </div>
+
+        <div class="toggles">
+          <label class="toggle" id="toggleTop">
+            <input type="checkbox" />
+            Top Kontakte
+          </label>
+          <label class="toggle" id="toggleAvailability">
+            <input type="checkbox" />
+            Sofort verfügbar
+          </label>
+          <label class="toggle" id="toggleWarmIntro">
+            <input type="checkbox" />
+            Warm Intro bevorzugt
+          </label>
+        </div>
+
+        <div class="filter-chips" id="tagChips"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <h2>Spreadsheet Connector</h2>
+            <p>Öffentliches Google Sheet (Publish to Web) verbinden: ID + GID eintragen, dann synchronisieren.</p>
+          </div>
+          <div class="chip" id="sheetStatus"><span class="status-dot"></span> Status: offline</div>
+        </div>
+        <div class="sheet">
+          <input type="text" id="sheetIdInput" placeholder="Sheet Base ID (e.g. 2PACX-...)" />
+          <input type="number" id="sheetGidInput" placeholder="GID (Tab ID)" />
+          <button class="btn primary" id="saveSheet">Sheet speichern</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <h2>Kontaktbuch</h2>
+            <p>Gefiltert, sortiert, bereit zum Teilen oder für weitere Automatisierung.</p>
+          </div>
+          <div class="chip accent" id="lastUpdated">Letztes Update: –</div>
+        </div>
+        <div class="contact-grid" id="contactGrid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      filters: 'vemo_contact_filters',
+      sheet: 'vemo_contact_sheet_config',
+    };
+
+    const contactGrid = document.getElementById('contactGrid');
+    const metricPanel = document.getElementById('metricPanel');
+    const resultCounter = document.getElementById('resultCounter');
+    const sheetStatus = document.getElementById('sheetStatus');
+    const tagChips = document.getElementById('tagChips');
+    const lastUpdated = document.getElementById('lastUpdated');
+    const searchInput = document.getElementById('searchInput');
+    const industrySelect = document.getElementById('industrySelect');
+    const categorySelect = document.getElementById('categorySelect');
+    const locationSelect = document.getElementById('locationSelect');
+    const sortSelect = document.getElementById('sortSelect');
+    const toggleTop = document.getElementById('toggleTop');
+    const toggleAvailability = document.getElementById('toggleAvailability');
+    const toggleWarmIntro = document.getElementById('toggleWarmIntro');
+    const refreshFromSheet = document.getElementById('refreshFromSheet');
+    const resetFiltersBtn = document.getElementById('resetFilters');
+    const sheetIdInput = document.getElementById('sheetIdInput');
+    const sheetGidInput = document.getElementById('sheetGidInput');
+    const saveSheetBtn = document.getElementById('saveSheet');
+
+    const defaultContacts = [
+      {
+        id: 'clara',
+        name: 'Clara Wenger',
+        role: 'Investor Relations',
+        description: 'Verknüpft Climate-Tech Funds mit Growth Teams; priorisiert schnelle VC-Intros.',
+        industry: 'Venture Capital',
+        category: 'Investor / LP',
+        location: 'Zürich',
+        availability: 'Sofort',
+        warmIntro: false,
+        tags: ['Climate', 'Growth', 'Fundraising', 'DACH'],
+        priority: 9.7,
+        score: 5,
+        highlight: true,
+        avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
+        email: 'clara@vemo.network',
+        phone: '+41 44 000 11 22',
+        link: 'https://calendly.com',
+        note: 'Top für Climate/Impact Intros.'
+      },
+      {
+        id: 'diego',
+        name: 'Diego Berchtold',
+        role: 'Honorarberater',
+        description: 'Vorsorgemantel, Modellübersichten und Ablaufmanagement; kennt Pensionskassen inside-out.',
+        industry: 'Finanzen',
+        category: 'Beratung',
+        location: 'Basel',
+        availability: 'Nächste 7 Tage',
+        warmIntro: true,
+        tags: ['Pension', 'Vorsorge', 'Ablauf', 'Modelle'],
+        priority: 9.1,
+        score: 4,
+        highlight: true,
+        avatarUrl: '',
+        email: 'diego@vemo.network',
+        phone: '+41 79 123 45 67',
+        link: 'https://calendly.com/diego-vemo/telefontermin',
+        note: 'Bestehender Vemo Flow.'
+      },
+      {
+        id: 'lara',
+        name: 'Lara Steiner',
+        role: 'Senior Honorarberaterin',
+        description: 'Nachhaltige Modellübersichten, steueroptimierte Auszahlungspfade.',
+        industry: 'Finanzen',
+        category: 'Beratung',
+        location: 'Zürich',
+        availability: 'Sofort',
+        warmIntro: false,
+        tags: ['Nachhaltig', 'Auszahlung', 'Strategie'],
+        priority: 8.8,
+        score: 5,
+        highlight: false,
+        avatarUrl: '',
+        email: 'lara@vemo.network',
+        phone: '+41 79 890 00 90',
+        link: 'https://calendly.com/diego-vemo/telefontermin',
+        note: 'Steuer-Spezialistin.'
+      },
+      {
+        id: 'marco',
+        name: 'Marco Keller',
+        role: 'Honorarberater',
+        description: 'Risikoabsicherung und Liquiditätsplanung; kombiniert Banking & FinTech Know-how.',
+        industry: 'Finanzen',
+        category: 'Beratung',
+        location: 'Bern',
+        availability: 'Nächste 14 Tage',
+        warmIntro: true,
+        tags: ['Risikomanagement', 'Liquidität', 'FinTech'],
+        priority: 8.2,
+        score: 4,
+        highlight: false,
+        avatarUrl: '',
+        email: 'marco@vemo.network',
+        phone: '+41 31 222 33 44',
+        link: 'https://calendly.com/diego-vemo/telefontermin',
+        note: 'Perfekt für Liquiditätsfragen.'
+      },
+      {
+        id: 'hana',
+        name: 'Hana Scherrer',
+        role: 'People Lead',
+        description: 'Spezialisiert auf Leadership-Search in DeepTech und Product.',
+        industry: 'Recruiting',
+        category: 'Talent / HR',
+        location: 'Berlin',
+        availability: 'Sofort',
+        warmIntro: true,
+        tags: ['Leadership', 'Product', 'DeepTech', 'Hiring'],
+        priority: 8.6,
+        score: 5,
+        highlight: true,
+        avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80',
+        email: 'hana@vemo.network',
+        phone: '+49 30 1234 555',
+        link: 'https://www.linkedin.com',
+        note: 'Hält Shortlists ready.'
+      },
+      {
+        id: 'amir',
+        name: 'Amir Rahman',
+        role: 'Go-to-Market Advisor',
+        description: 'Baut Sales-Playbooks und Partnerschaften in Mobility & AI.',
+        industry: 'Mobility / AI',
+        category: 'Advisor',
+        location: 'München',
+        availability: 'Nächste 7 Tage',
+        warmIntro: false,
+        tags: ['GTM', 'Partnerships', 'Enterprise'],
+        priority: 8.4,
+        score: 4,
+        highlight: false,
+        avatarUrl: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=600&q=80',
+        email: 'amir@vemo.network',
+        phone: '+49 89 111 22 33',
+        link: 'https://calendly.com',
+        note: 'Kennt Mobility-Entscheider.'
+      }
+    ];
+
+    const filterState = loadJson(STORAGE_KEYS.filters, {
+      query: '',
+      industry: 'Alle Branchen',
+      category: 'Alle Kategorien',
+      location: 'Alle Orte',
+      sort: 'priority',
+      topOnly: false,
+      availableOnly: false,
+      warmIntroOnly: false,
+      tags: [],
+    });
+
+    const sheetConfig = loadJson(STORAGE_KEYS.sheet, {
+      sheetBaseId: '2PACX-1vQg29x92Do82OV6r7f19UCrbTBZURRu305Nu-GMH9UlnqvcBhe44-8oqMJBTLFaRUNhKXeG8JKDBDYc',
+      gid: '832064159',
+    });
+
+    let contacts = [...defaultContacts];
+    let filtered = [...contacts];
+    let availableTags = [];
+
+    function loadJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveJson(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {}
+    }
+
+    function buildCsvUrl(sheetBaseId, gid) {
+      const base = 'https://docs.google.com/spreadsheets/d/e/' + sheetBaseId + '/pub';
+      const params = new URLSearchParams({
+        gid: String(gid || '0'),
+        single: 'true',
+        output: 'csv',
+        cacheBust: String(Date.now()),
+      });
+      return base + '?' + params.toString();
+    }
+
+    async function fetchSheetCsv(sheetBaseId, gid) {
+      const url = buildCsvUrl(sheetBaseId, gid);
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Sheet Request fehlgeschlagen: ' + res.status);
+      return res.text();
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let current = '';
+      let inQuotes = false;
+      let row = [];
+
+      for (let i = 0; i < text.length; i += 1) {
+        const char = text[i];
+        if (char === '"') {
+          if (inQuotes && text[i + 1] === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(current);
+          current = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (current !== '' || row.length) {
+            row.push(current);
+            rows.push(row);
+            row = [];
+            current = '';
+          }
+        } else {
+          current += char;
+        }
+      }
+
+      if (current !== '' || row.length) {
+        row.push(current);
+        rows.push(row);
+      }
+
+      return rows.map((cols) => cols.map((cell) => (cell || '').trim()));
+    }
+
+    function normalizeKey(key) {
+      return (key || '').toLowerCase().replace(/[^a-z0-9äöüß]/gi, '');
+    }
+
+    function parseContactsFromSheet(rows) {
+      if (!rows.length) return [];
+      const header = rows[0].map(normalizeKey);
+      const getIndex = (keys) =>
+        header.findIndex((h) =>
+          keys.some((k) => normalizeKey(k) === h || h.includes(normalizeKey(k)))
+        );
+
+      const idx = {
+        name: getIndex(['name', 'vorname']),
+        role: getIndex(['rolle', 'role', 'funktion']),
+        description: getIndex(['beschreibung', 'shortbio', 'kurztext']),
+        industry: getIndex(['branche', 'industry']),
+        category: getIndex(['kategorie', 'category']),
+        location: getIndex(['ort', 'stadt', 'location']),
+        availability: getIndex(['verfugbarkeit', 'availability']),
+        warmIntro: getIndex(['warmeintro', 'warmintro']),
+        tags: getIndex(['tags', 'schlagworte']),
+        priority: getIndex(['prioritat', 'priority', 'score']),
+        avatarUrl: getIndex(['avatar', 'avatarurl', 'bild']),
+        email: getIndex(['email', 'mail']),
+        phone: getIndex(['telefon', 'phone']),
+        link: getIndex(['link', 'termin', 'calendly', 'url']),
+        note: getIndex(['notiz', 'note', 'hinweis']),
+      };
+
+      return rows.slice(1).map((cols, rowIndex) => {
+        const pick = (key) => (idx[key] >= 0 ? cols[idx[key]] || '' : '');
+        const tagsRaw = pick('tags');
+        const tags = tagsRaw
+          ? tagsRaw.split(/[,;]+/).map((t) => t.trim()).filter(Boolean)
+          : [];
+        const warmIntro = String(pick('warmIntro')).toLowerCase() === 'true';
+        const priority = parseFloat(pick('priority')) || 0;
+
+        return {
+          id: 'sheet_' + rowIndex,
+          name: pick('name') || 'Unbenannt',
+          role: pick('role') || 'Kontakt',
+          description: pick('description') || '',
+          industry: pick('industry') || 'Unsortiert',
+          category: pick('category') || 'Kontakt',
+          location: pick('location') || 'Remote',
+          availability: pick('availability') || 'Auf Anfrage',
+          warmIntro,
+          tags,
+          priority,
+          score: 4,
+          highlight: priority >= 8 || warmIntro,
+          avatarUrl: pick('avatarUrl'),
+          email: pick('email'),
+          phone: pick('phone'),
+          link: pick('link'),
+          note: pick('note'),
+        };
+      });
+    }
+
+    async function syncFromSheet() {
+      updateSheetStatus('syncing');
+      try {
+        const csv = await fetchSheetCsv(sheetConfig.sheetBaseId, sheetConfig.gid);
+        const rows = parseCsv(csv);
+        const parsed = parseContactsFromSheet(rows).filter((c) => c.name);
+        contacts = parsed.length ? parsed : [...defaultContacts];
+        updateSheetStatus('ok');
+        setLastUpdated();
+        applyFilters();
+      } catch (err) {
+        contacts = [...defaultContacts];
+        updateSheetStatus('error');
+        console.warn('Sheet Sync fehlgeschlagen', err);
+        applyFilters();
+      }
+    }
+
+    function setLastUpdated() {
+      const date = new Date();
+      lastUpdated.textContent = `Letztes Update: ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    }
+
+    function applyFilters() {
+      const query = filterState.query.toLowerCase();
+      filtered = contacts
+        .filter((contact) => {
+          const matchesQuery =
+            !query ||
+            [contact.name, contact.role, contact.description, (contact.tags || []).join(' ')]
+              .join(' ')
+              .toLowerCase()
+              .includes(query);
+
+          const matchesIndustry =
+            filterState.industry === 'Alle Branchen' || contact.industry === filterState.industry;
+          const matchesCategory =
+            filterState.category === 'Alle Kategorien' || contact.category === filterState.category;
+          const matchesLocation =
+            filterState.location === 'Alle Orte' || contact.location === filterState.location;
+          const matchesTop = !filterState.topOnly || contact.highlight;
+          const matchesAvailability =
+            !filterState.availableOnly ||
+            (contact.availability || '').toLowerCase().includes('sofort');
+          const matchesWarmIntro = !filterState.warmIntroOnly || contact.warmIntro;
+          const matchesTags =
+            !filterState.tags.length ||
+            filterState.tags.every((tag) => (contact.tags || []).includes(tag));
+
+          return (
+            matchesQuery &&
+            matchesIndustry &&
+            matchesCategory &&
+            matchesLocation &&
+            matchesTop &&
+            matchesAvailability &&
+            matchesWarmIntro &&
+            matchesTags
+          );
+        })
+        .sort((a, b) => {
+          if (filterState.sort === 'name') return a.name.localeCompare(b.name);
+          if (filterState.sort === 'availability') {
+            return (a.availability || '').localeCompare(b.availability || '');
+          }
+          return (b.priority || 0) - (a.priority || 0);
+        });
+
+      renderContacts();
+      updateResultCounter();
+      updateMetrics();
+      renderAvailableTags();
+      saveJson(STORAGE_KEYS.filters, filterState);
+    }
+
+    function renderContacts() {
+      contactGrid.innerHTML = '';
+      if (!filtered.length) {
+        contactGrid.innerHTML = '<div class="empty">Keine Kontakte mit den aktuellen Filtern.</div>';
+        return;
+      }
+
+      filtered.forEach((contact) => {
+        const card = document.createElement('article');
+        card.className = 'contact-card';
+        if (contact.highlight) card.classList.add('highlight');
+
+        const header = document.createElement('div');
+        header.className = 'contact-header';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        if (contact.avatarUrl) {
+          avatar.style.backgroundImage = `url('${contact.avatarUrl}')`;
+        }
+
+        const meta = document.createElement('div');
+        meta.className = 'contact-meta';
+
+        const nameEl = document.createElement('h3');
+        nameEl.textContent = contact.name;
+
+        const roleEl = document.createElement('div');
+        roleEl.className = 'role';
+        roleEl.textContent = contact.role;
+
+        const descEl = document.createElement('p');
+        descEl.textContent = contact.description || 'Noch keine Kurzbeschreibung hinterlegt.';
+
+        meta.appendChild(nameEl);
+        meta.appendChild(roleEl);
+        meta.appendChild(descEl);
+
+        header.appendChild(avatar);
+        header.appendChild(meta);
+
+        const badges = document.createElement('div');
+        badges.className = 'badges';
+        badges.appendChild(createBadge(contact.industry, true));
+        badges.appendChild(createBadge(contact.category, false));
+        badges.appendChild(createBadge(contact.location, false));
+        if (contact.availability) badges.appendChild(createBadge(contact.availability, true));
+        if (contact.warmIntro) badges.appendChild(createBadge('Warm Intro', true));
+
+        (contact.tags || []).forEach((tag) => badges.appendChild(createBadge(tag, false)));
+
+        const actions = document.createElement('div');
+        actions.className = 'contact-actions';
+
+        if (contact.email) {
+          const email = document.createElement('a');
+          email.href = 'mailto:' + contact.email;
+          email.textContent = 'E-Mail';
+          actions.appendChild(email);
+        }
+
+        if (contact.phone) {
+          const phone = document.createElement('a');
+          phone.href = 'tel:' + contact.phone;
+          phone.textContent = 'Call';
+          actions.appendChild(phone);
+        }
+
+        if (contact.link) {
+          const link = document.createElement('a');
+          link.href = contact.link;
+          link.target = '_blank';
+          link.rel = 'noreferrer';
+          link.textContent = 'Termin / Profil';
+          link.className = 'primary';
+          actions.appendChild(link);
+        }
+
+        if (contact.note) {
+          const note = document.createElement('div');
+          note.className = 'badge';
+          note.textContent = contact.note;
+          note.style.marginTop = '6px';
+          actions.appendChild(note);
+        }
+
+        card.appendChild(header);
+        card.appendChild(badges);
+        card.appendChild(actions);
+        contactGrid.appendChild(card);
+      });
+    }
+
+    function createBadge(text, accent) {
+      const el = document.createElement('span');
+      el.className = 'badge' + (accent ? ' accent' : '');
+      el.textContent = text;
+      return el;
+    }
+
+    function updateResultCounter() {
+      resultCounter.textContent = `${filtered.length} Ergebnisse`;
+    }
+
+    function updateMetrics() {
+      const industries = new Set(contacts.map((c) => c.industry));
+      const categories = new Set(contacts.map((c) => c.category));
+      const available = contacts.filter((c) =>
+        (c.availability || '').toLowerCase().includes('sofort')
+      ).length;
+      const warmIntros = contacts.filter((c) => c.warmIntro).length;
+
+      metricPanel.innerHTML = '';
+      [
+        { label: 'Kontakte', value: contacts.length },
+        { label: 'Branchen', value: industries.size },
+        { label: 'Kategorien', value: categories.size },
+        { label: 'Sofort verfügbar', value: available },
+        { label: 'Warm Intro', value: warmIntros },
+      ].forEach((item) => {
+        const box = document.createElement('div');
+        box.className = 'metric';
+        box.innerHTML = `<span>${item.label}</span><h3>${item.value}</h3>`;
+        metricPanel.appendChild(box);
+      });
+    }
+
+    function renderAvailableTags() {
+      const tagCount = {};
+      contacts.forEach((c) => (c.tags || []).forEach((t) => {
+        tagCount[t] = (tagCount[t] || 0) + 1;
+      }));
+      availableTags = Object.entries(tagCount)
+        .sort((a, b) => b[1] - a[1])
+        .map(([tag]) => tag);
+
+      tagChips.innerHTML = '';
+      availableTags.slice(0, 12).forEach((tag) => {
+        const chip = document.createElement('button');
+        chip.className = 'chip' + (filterState.tags.includes(tag) ? ' accent' : '');
+        chip.textContent = tag;
+        chip.type = 'button';
+        chip.addEventListener('click', () => toggleTag(tag));
+        tagChips.appendChild(chip);
+      });
+    }
+
+    function toggleTag(tag) {
+      if (filterState.tags.includes(tag)) {
+        filterState.tags = filterState.tags.filter((t) => t !== tag);
+      } else {
+        filterState.tags = [...filterState.tags, tag];
+      }
+      applyFilters();
+    }
+
+    function populateSelect(select, items, label) {
+      select.innerHTML = '';
+      const allValue = 'Alle ' + label;
+      [allValue, ...items].forEach((item) => {
+        const option = document.createElement('option');
+        option.value = item;
+        option.textContent = item;
+        select.appendChild(option);
+      });
+    }
+
+    function rebuildFilters() {
+      const industries = Array.from(new Set(contacts.map((c) => c.industry || 'Unsortiert'))).sort();
+      const categories = Array.from(new Set(contacts.map((c) => c.category || 'Kontakt'))).sort();
+      const locations = Array.from(new Set(contacts.map((c) => c.location || 'Remote'))).sort();
+
+      populateSelect(industrySelect, industries, 'Branchen');
+      populateSelect(categorySelect, categories, 'Kategorien');
+      populateSelect(locationSelect, locations, 'Orte');
+
+      industrySelect.value = filterState.industry;
+      categorySelect.value = filterState.category;
+      locationSelect.value = filterState.location;
+      sortSelect.value = filterState.sort;
+      toggleTop.classList.toggle('active', filterState.topOnly);
+      toggleTop.querySelector('input').checked = filterState.topOnly;
+      toggleAvailability.classList.toggle('active', filterState.availableOnly);
+      toggleAvailability.querySelector('input').checked = filterState.availableOnly;
+      toggleWarmIntro.classList.toggle('active', filterState.warmIntroOnly);
+      toggleWarmIntro.querySelector('input').checked = filterState.warmIntroOnly;
+      searchInput.value = filterState.query;
+    }
+
+    function updateSheetStatus(state) {
+      const dot = sheetStatus.querySelector('.status-dot');
+      if (state === 'syncing') {
+        sheetStatus.innerHTML = '<span class="status-dot"></span> Sync läuft ...';
+      } else if (state === 'ok') {
+        sheetStatus.innerHTML = '<span class="status-dot ok"></span> Sheet verbunden';
+      } else if (state === 'error') {
+        sheetStatus.innerHTML = '<span class="status-dot err"></span> Fallback: Default-Daten';
+      } else {
+        sheetStatus.innerHTML = '<span class="status-dot"></span> Status: offline';
+      }
+    }
+
+    function handleFilterChange() {
+      filterState.query = searchInput.value.trim();
+      filterState.industry = industrySelect.value;
+      filterState.category = categorySelect.value;
+      filterState.location = locationSelect.value;
+      filterState.sort = sortSelect.value;
+      filterState.topOnly = toggleTop.querySelector('input').checked;
+      filterState.availableOnly = toggleAvailability.querySelector('input').checked;
+      filterState.warmIntroOnly = toggleWarmIntro.querySelector('input').checked;
+      applyFilters();
+    }
+
+    function resetFilters() {
+      filterState.query = '';
+      filterState.industry = 'Alle Branchen';
+      filterState.category = 'Alle Kategorien';
+      filterState.location = 'Alle Orte';
+      filterState.sort = 'priority';
+      filterState.topOnly = false;
+      filterState.availableOnly = false;
+      filterState.warmIntroOnly = false;
+      filterState.tags = [];
+      rebuildFilters();
+      applyFilters();
+    }
+
+    function saveSheetConfig() {
+      sheetConfig.sheetBaseId = sheetIdInput.value.trim() || sheetConfig.sheetBaseId;
+      sheetConfig.gid = sheetGidInput.value.trim() || sheetConfig.gid;
+      saveJson(STORAGE_KEYS.sheet, sheetConfig);
+      syncFromSheet();
+    }
+
+    function init() {
+      sheetIdInput.value = sheetConfig.sheetBaseId;
+      sheetGidInput.value = sheetConfig.gid;
+      rebuildFilters();
+      updateSheetStatus('idle');
+      setLastUpdated();
+      bindEvents();
+      applyFilters();
+      syncFromSheet();
+    }
+
+    function bindEvents() {
+      searchInput.addEventListener('input', handleFilterChange);
+      industrySelect.addEventListener('change', handleFilterChange);
+      categorySelect.addEventListener('change', handleFilterChange);
+      locationSelect.addEventListener('change', handleFilterChange);
+      sortSelect.addEventListener('change', handleFilterChange);
+      toggleTop.addEventListener('click', () => {
+        toggleTop.classList.toggle('active');
+        toggleTop.querySelector('input').checked = !filterState.topOnly;
+        handleFilterChange();
+      });
+      toggleAvailability.addEventListener('click', () => {
+        toggleAvailability.classList.toggle('active');
+        toggleAvailability.querySelector('input').checked = !filterState.availableOnly;
+        handleFilterChange();
+      });
+      toggleWarmIntro.addEventListener('click', () => {
+        toggleWarmIntro.classList.toggle('active');
+        toggleWarmIntro.querySelector('input').checked = !filterState.warmIntroOnly;
+        handleFilterChange();
+      });
+      refreshFromSheet.addEventListener('click', syncFromSheet);
+      resetFiltersBtn.addEventListener('click', resetFilters);
+      saveSheetBtn.addEventListener('click', saveSheetConfig);
+    }
+
+    init();
+  </script>
+</body>
+</html>
