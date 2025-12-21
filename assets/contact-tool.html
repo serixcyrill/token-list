@@ -396,28 +396,31 @@
 
     async function fetchSheetCsv(sheetBaseId, gid) {
       const primary = buildCsvUrl(sheetBaseId, gid);
-      const fallback = buildCsvUrl(sheetBaseId, (sheetConfig().fallbackGid || '0'));
       const alt = sheetBaseId.includes('docs.google.com/spreadsheets/d/')
         ? `https://docs.google.com/spreadsheets/d/e/${sheetBaseId}/pub?gid=${gid || '0'}&single=true&output=csv&cacheBust=${Date.now()}`
         : primary;
+      const fallback = buildCsvUrl(sheetBaseId, (sheetConfig().fallbackGid || '0'));
 
-      const tryFetch = async (url) => {
-        const res = await fetch(url, { cache: 'no-store', mode: 'cors' });
-        if (!res.ok) throw new Error('Request fehlgeschlagen: ' + res.status);
-        return res.text();
-      };
+      const sources = Array.from(new Set([primary, alt, fallback].filter(Boolean)));
+      const withProxies = (url) => [
+        url,
+        `https://cors.isomorphic-git.org/${url}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+      ];
 
-      try {
-        return await tryFetch(primary);
-      } catch (e) {
-        if (alt !== primary) {
-          try { return await tryFetch(alt); } catch (_) {}
+      const queue = sources.flatMap(withProxies);
+
+      for (const url of queue) {
+        try {
+          const res = await fetch(url, { cache: 'no-store', mode: 'cors' });
+          if (!res.ok) continue;
+          return await res.text();
+        } catch {
+          // try next url
         }
-        if (fallback && fallback !== primary) {
-          return tryFetch(fallback);
-        }
-        throw e;
       }
+
+      throw new Error('Alle Sheet-Quellen fehlgeschlagen');
     }
 
     function parseCsv(text) {
