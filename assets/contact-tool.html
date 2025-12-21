@@ -53,7 +53,7 @@
 
     .hero {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
+      grid-template-columns: 1.1fr 1fr;
       gap: 20px;
       align-items: center;
       background: linear-gradient(120deg, rgba(114, 210, 122, 0.16), #ffffff 45%, rgba(126, 217, 87, 0.1));
@@ -77,27 +77,9 @@
       box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
     }
 
-    .hero-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .hero-actions { display: none; }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-weight: 700;
-      border: 1px solid transparent;
-      cursor: pointer;
-      font-family: inherit;
-      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border 0.2s ease;
-    }
-
-    .btn.primary { background: var(--accent-strong); color: #0f1a2a; box-shadow: 0 12px 28px rgba(114, 210, 122, 0.28); }
-    .btn.primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
-    .btn.ghost { background: #f1f3f8; color: var(--text); border-color: #dfe3ec; }
-    .btn.ghost:hover { border-color: rgba(114, 210, 122, 0.55); color: #0f1a2a; }
-
-    .hero-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+    .hero-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
 
     .metric { background: #ffffff; border-radius: 12px; padding: 12px; border: 1px solid #e4e8f0; box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.14); }
     .metric h3 { margin: 0; font-size: 26px; letter-spacing: 0.2px; }
@@ -149,17 +131,9 @@
 
     .empty { text-align: center; color: var(--muted); padding: 24px 0; font-weight: 700; }
 
-    .source-row { display: grid; grid-template-columns: 1.2fr 0.9fr 120px; gap: 10px; }
-    .source-row input { padding: 10px 12px; border-radius: 12px; border: 1px solid #dfe3ec; background: #f8fbff; font-family: inherit; }
-
-    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: #f39c12; box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.12); }
-    .status-dot.ok { background: #72d27a; box-shadow: 0 0 0 4px rgba(114, 210, 122, 0.15); }
-    .status-dot.err { background: #e74c3c; box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.12); }
-
     @media (max-width: 980px) {
       .hero { grid-template-columns: 1fr; }
       .filters-row { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-      .source-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -171,13 +145,9 @@
           <span class="eyebrow">Kuratiertes Netzwerk, sofort filterbar</span>
           <h1>Das kraftvolle Kontaktbuch für deine stärksten Intros</h1>
           <p>
-            Bündelt Branchen, Rollen, Standorte und Sprachen in einem edlen Interface. Kuratiere Empfohlene,
-            priorisiere kostenlose Ersttermine und teile relevante Profile im Handumdrehen.
+            Schlanke Übersicht für deine Premium-Kontakte – mit Rollen-, Kategorien- und Standort-Filtern,
+            Empfohlen-Flag und Schnellblick auf Vorteile.
           </p>
-          <div class="hero-actions">
-            <button class="btn primary" id="refreshFromSheet">Aktualisieren</button>
-            <button class="btn ghost" id="resetFilters">Filter zurücksetzen</button>
-          </div>
         </div>
         <div class="hero-metrics" id="metricPanel"></div>
       </section>
@@ -210,21 +180,6 @@
         </div>
 
         <div class="filter-chips" id="tagChips"></div>
-      </section>
-
-      <section class="card">
-        <div class="section-heading">
-          <div>
-            <h2>Datenquelle konfigurieren</h2>
-            <p>Quelle wählen, speichern, aktualisieren.</p>
-          </div>
-          <div class="chip" id="sheetStatus"><span class="status-dot"></span> Status: bereit</div>
-        </div>
-        <div class="source-row">
-          <input type="text" id="sheetIdInput" placeholder="Quellen-ID" />
-          <input type="number" id="sheetGidInput" placeholder="Tab-ID" />
-          <button class="btn primary" id="saveSheet">Speichern</button>
-        </div>
       </section>
 
       <section class="card">
@@ -278,7 +233,6 @@
     const contactGrid = document.getElementById('contactGrid');
     const metricPanel = document.getElementById('metricPanel');
     const resultCounter = document.getElementById('resultCounter');
-    const sheetStatus = document.getElementById('sheetStatus');
     const tagChips = document.getElementById('tagChips');
     const lastUpdated = document.getElementById('lastUpdated');
     const searchInput = document.getElementById('searchInput');
@@ -287,11 +241,7 @@
     const locationSelect = document.getElementById('locationSelect');
     const toggleRecommended = document.getElementById('toggleRecommended');
     const toggleFree = document.getElementById('toggleFree');
-    const refreshFromSheet = document.getElementById('refreshFromSheet');
     const resetFiltersBtn = document.getElementById('resetFilters');
-    const sheetIdInput = document.getElementById('sheetIdInput');
-    const sheetGidInput = document.getElementById('sheetGidInput');
-    const saveSheetBtn = document.getElementById('saveSheet');
 
     const defaultContacts = [
       {
@@ -414,10 +364,10 @@
       tags: [],
     });
 
-    const sheetConfig = loadJson(STORAGE_KEYS.sheet, {
+    const sheetConfig = {
       sheetBaseId: '2PACX-1vQg29x92Do82OV6r7f19UCrbTBZURRu305Nu-GMH9UlnqvcBhe44-8oqMJBTLFaRUNhKXeG8JKDBDYc',
       gid: '832064159',
-    });
+    };
 
     let contacts = [...defaultContacts];
     let filtered = [...contacts];
@@ -547,19 +497,16 @@
     }
 
     async function syncFromSheet() {
-      updateSheetStatus('syncing');
       try {
         const csv = await fetchSheetCsv(sheetConfig.sheetBaseId, sheetConfig.gid);
         const rows = parseCsv(csv);
         const parsed = parseContactsFromSheet(rows).filter((c) => c.name);
         contacts = parsed.length ? parsed : [...defaultContacts];
-        updateSheetStatus('ok');
         setLastUpdated();
         rebuildFilters();
         applyFilters();
       } catch (err) {
         contacts = [...defaultContacts];
-        updateSheetStatus('error');
         console.warn('Sync fehlgeschlagen', err);
         rebuildFilters();
         applyFilters();
@@ -771,18 +718,6 @@
       searchInput.value = filterState.query;
     }
 
-    function updateSheetStatus(state) {
-      if (state === 'syncing') {
-        sheetStatus.innerHTML = '<span class="status-dot"></span> Aktualisierung läuft...';
-      } else if (state === 'ok') {
-        sheetStatus.innerHTML = '<span class="status-dot ok"></span> Daten geladen';
-      } else if (state === 'error') {
-        sheetStatus.innerHTML = '<span class="status-dot err"></span> Fallback aktiv';
-      } else {
-        sheetStatus.innerHTML = '<span class="status-dot"></span> Status: bereit';
-      }
-    }
-
     function handleFilterChange() {
       filterState.query = searchInput.value.trim();
       filterState.role = roleSelect.value;
@@ -805,18 +740,8 @@
       applyFilters();
     }
 
-    function saveSheetConfig() {
-      sheetConfig.sheetBaseId = sheetIdInput.value.trim() || sheetConfig.sheetBaseId;
-      sheetConfig.gid = sheetGidInput.value.trim() || sheetConfig.gid;
-      saveJson(STORAGE_KEYS.sheet, sheetConfig);
-      syncFromSheet();
-    }
-
     function init() {
-      sheetIdInput.value = sheetConfig.sheetBaseId;
-      sheetGidInput.value = sheetConfig.gid;
       rebuildFilters();
-      updateSheetStatus('idle');
       setLastUpdated();
       bindEvents();
       applyFilters();
@@ -838,9 +763,7 @@
         toggleFree.querySelector('input').checked = !filterState.freeOnly;
         handleFilterChange();
       });
-      refreshFromSheet.addEventListener('click', syncFromSheet);
       resetFiltersBtn.addEventListener('click', resetFilters);
-      saveSheetBtn.addEventListener('click', saveSheetConfig);
     }
 
     init();
