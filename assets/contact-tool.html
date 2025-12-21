@@ -402,6 +402,151 @@
       try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
     }
 
+    /* =========================
+       SHEET FETCH & PARSE
+    ========================= */
+
+    function buildCsvUrl(base, gid) {
+      return `${base}/pub?gid=${encodeURIComponent(gid || '0')}&single=true&output=csv&cacheBust=${Date.now()}`;
+    }
+
+    async function fetchSheetCsv(base, gid) {
+      const direct = buildCsvUrl(base, gid);
+      const gviz = `${base}/gviz/tq?tqx=out:csv&gid=${encodeURIComponent(gid || '0')}`;
+      const variants = [direct, gviz];
+
+      const queue = [];
+      variants.forEach((url) => {
+        if (!url) return;
+        queue.push(url);
+        queue.push(`https://cors.isomorphic-git.org/${url}`);
+        queue.push(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+      });
+
+      for (let i = 0; i < queue.length; i += 1) {
+        const url = queue[i];
+        try {
+          const res = await fetch(url, { cache: 'no-store', mode: 'cors', redirect: 'follow' });
+          if (!res.ok) continue;
+          const text = await res.text();
+          if (text && text.trim().toLowerCase().startsWith('<html')) continue;
+          if (text && text.trim().toLowerCase().startsWith('<!doctype')) continue;
+          return text;
+        } catch (e) {
+          dbg('CSV fetch fail', url, e.message || e);
+        }
+      }
+      throw new Error('CSV-Fetch fehlgeschlagen');
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let current = '';
+      let inQuotes = false;
+      let row = [];
+
+      for (let i = 0; i < text.length; i += 1) {
+        const char = text[i];
+        if (char === '"') {
+          if (inQuotes && text[i + 1] === '"') { current += '"'; i += 1; } else { inQuotes = !inQuotes; }
+        } else if (char === ',' && !inQuotes) {
+          row.push(current);
+          current = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (current !== '' || row.length) { row.push(current); rows.push(row); row = []; current = ''; }
+        } else { current += char; }
+      }
+
+      if (current !== '' || row.length) { row.push(current); rows.push(row); }
+      return rows.map((cols) => cols.map((cell) => (cell || '').trim()));
+    }
+
+    function normalizeKey(key) { return (key || '').toLowerCase().replace(/[^a-z0-9äöüß]/gi, ''); }
+
+    function parseContactsFromSheet(rows) {
+      if (!rows.length) return [];
+      const fieldIndex = new Map();
+      rows.forEach((r, idx) => {
+        const norm = normalizeKey(r[0]);
+        if (norm) fieldIndex.set(norm, idx);
+      });
+
+      const personCount = (rows[0] || []).length - 1;
+      const result = [];
+
+      const getRowIndex = (field) => {
+        const norm = normalizeKey(field);
+        if (fieldIndex.has(norm)) return fieldIndex.get(norm);
+        const aliases = FIELD_ALIASES[field] || [];
+        for (const alias of aliases) {
+          const aliasNorm = normalizeKey(alias);
+          if (fieldIndex.has(aliasNorm)) return fieldIndex.get(aliasNorm);
+        }
+        return undefined;
+      };
+
+      for (let col = 1; col <= personCount; col += 1) {
+        const name = (rows[0][col] || '').trim();
+        if (!name) continue;
+
+        const contact = { id: 'sheet_' + col, name };
+
+        FIELD_ORDER.forEach((field) => {
+          if (field === 'Feld') return;
+          const rowIdx = getRowIndex(field);
+          const raw = rowIdx !== undefined ? rows[rowIdx][col] : '';
+          const trimmed = typeof raw === 'string' ? raw.trim() : raw;
+
+          if (BOOLEAN_FIELDS.includes(field)) {
+            if (trimmed === '' || trimmed === null || trimmed === undefined) {
+              contact[field] = null;
+            } else {
+              const val = String(trimmed).toLowerCase();
+              contact[field] = ['true', 'ja', 'yes', '1', 'x'].includes(val);
+            }
+            return;
+          }
+
+          if (NUMBER_FIELDS.includes(field)) {
+            if (trimmed === '' || trimmed === null || trimmed === undefined) {
+              contact[field] = null;
+            } else {
+              const num = parseFloat(trimmed);
+              contact[field] = Number.isFinite(num) ? num : null;
+            }
+            return;
+          }
+
+          contact[field] = trimmed === '' || trimmed === null || trimmed === undefined ? null : trimmed;
+        });
+
+        contact.highlight = contact.Empfohlen === true || (contact.Community_Rating || 0) >= 8;
+        contact.tags = buildTags(contact);
+        contact.score = contact.Community_Rating || 0;
+        result.push(contact);
+      }
+
+      return result;
+    }
+
+    function buildTags(contact) {
+      const tags = [];
+      [contact.Kategorie, contact.Rolle, contact.Standort, contact.Sprache, contact.Kontaktart, contact.Preiskategorie, contact.Regulatorischer_Status]
+        .filter(Boolean)
+        .forEach((t) => tags.push(t));
+
+      if (contact.Zielgruppe) {
+        contact.Zielgruppe.split(/[,;]+/).map((t) => t.trim()).filter(Boolean).forEach((t) => tags.push(t));
+      }
+
+      if (contact.Ausbildung_Zertifikate) {
+        contact.Ausbildung_Zertifikate.split(/[,;]+/).map((t) => t.trim()).filter(Boolean).forEach((t) => tags.push(t));
+      }
+
+      if (contact.Vemo_Vorteil_Titel) tags.push(contact.Vemo_Vorteil_Titel);
+      return tags;
+    }
+
     function resetFilterState() {
       filterState.query = '';
       filterState.role = 'Alle Rollen';
@@ -532,10 +677,10 @@
 
         const metaLine = document.createElement('div');
         metaLine.className = 'meta-line';
-        if (c.Preiskategorie) metaLine.appendChild(createBadge('Preis: ' + c.Preiskategorie, false));
-        if (c.Abrechnungsart) metaLine.appendChild(createBadge(c.Abrechnungsart, false));
-        if (c.Ersttermin_kostenlos === true) metaLine.appendChild(createBadge('Ersttermin kostenlos', true));
-        if (c.Honorar_Betrag) metaLine.appendChild(createBadge(String(c.Honorar_Betrag) + (c.Honorar_Einheit ? ' ' + c.Honorar_Einheit : ''), false));
+        if (contact.Preiskategorie) metaLine.appendChild(createBadge('Preis: ' + contact.Preiskategorie, false));
+        if (contact.Abrechnungsart) metaLine.appendChild(createBadge(contact.Abrechnungsart, false));
+        if (contact.Ersttermin_kostenlos === true) metaLine.appendChild(createBadge('Ersttermin kostenlos', true));
+        if (contact.Honorar_Betrag) metaLine.appendChild(createBadge(String(contact.Honorar_Betrag) + (contact.Honorar_Einheit ? ' ' + contact.Honorar_Einheit : ''), false));
 
         const actions = document.createElement('div');
         actions.className = 'contact-actions';
