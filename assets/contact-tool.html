@@ -400,23 +400,34 @@
         ? `https://docs.google.com/spreadsheets/d/e/${sheetBaseId}/pub?gid=${gid || '0'}&single=true&output=csv&cacheBust=${Date.now()}`
         : primary;
       const fallback = buildCsvUrl(sheetBaseId, (sheetConfig().fallbackGid || '0'));
+      const csvVariants = [
+        primary,
+        alt,
+        primary.replace('&single=true', ''),
+        primary.replace('output=csv', 'output=csv&single=true'),
+        buildCsvUrl(sheetBaseId, gid) + '&headers=false',
+        `https://docs.google.com/spreadsheets/d/e/${sheetBaseId}/pub?gid=${gid || '0'}&output=csv`,
+        `https://docs.google.com/spreadsheets/d/e/${sheetBaseId}/pub?gid=${gid || '0'}&output=csv&headers=false`,
+        fallback,
+      ].filter(Boolean);
 
-      const sources = Array.from(new Set([primary, alt, fallback].filter(Boolean)));
       const withProxies = (url) => [
         url,
         `https://cors.isomorphic-git.org/${url}`,
         `https://corsproxy.io/?${encodeURIComponent(url)}`,
       ];
 
-      const queue = sources.flatMap(withProxies);
+      const queue = Array.from(new Set(csvVariants.flatMap(withProxies)));
 
       for (const url of queue) {
         try {
-          const res = await fetch(url, { cache: 'no-store', mode: 'cors' });
+          const res = await fetch(url, { cache: 'no-store', mode: 'cors', redirect: 'follow' });
           if (!res.ok) continue;
-          return await res.text();
-        } catch {
-          // try next url
+          const text = await res.text();
+          if (text && text.trim().startsWith('<')) continue; // skip HTML error pages
+          return text;
+        } catch (err) {
+          console.warn('CSV Fetch fallback fehlgeschlagen', url, err);
         }
       }
 
@@ -520,6 +531,16 @@
       return tags;
     }
 
+    function resetFilterState() {
+      filterState.query = '';
+      filterState.role = 'Alle Rollen';
+      filterState.category = 'Alle Kategorien';
+      filterState.location = 'Alle Orte';
+      filterState.recommendedOnly = false;
+      filterState.freeOnly = false;
+      filterState.tags = [];
+    }
+
     async function syncFromSheet() {
       try {
         const cfg = sheetConfig();
@@ -535,12 +556,14 @@
         }
 
         contacts = parsed && parsed.length ? parsed : [...defaultContacts];
+        if (!parsed || !parsed.length) resetFilterState();
         setLastUpdated();
         rebuildFilters();
         applyFilters();
       } catch (err) {
         contacts = [...defaultContacts];
         console.warn('Sync fehlgeschlagen', err);
+        resetFilterState();
         rebuildFilters();
         applyFilters();
       }
