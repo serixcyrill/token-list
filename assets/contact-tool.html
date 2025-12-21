@@ -361,7 +361,8 @@
 
     const DEFAULT_SHEET_CONFIG = {
       sheetBaseId: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQgqOtew9_JeLc2wbAjAKeG49R_1LBixvpwddvTg_DzMxIwQ_fjbtHwk1l59MhxLyH7bqX1C4cZKMf',
-      gid: '0',
+      gid: '1604969561', // Tabellenblatt: Kontakt
+      fallbackGid: '1550997336', // weiteres Tabellenblatt falls benötigt
     };
     const sheetConfig = () => (window.__VEMO_SHEET_CONFIG || DEFAULT_SHEET_CONFIG);
 
@@ -395,6 +396,7 @@
 
     async function fetchSheetCsv(sheetBaseId, gid) {
       const primary = buildCsvUrl(sheetBaseId, gid);
+      const fallback = buildCsvUrl(sheetBaseId, (sheetConfig().fallbackGid || '0'));
       const alt = sheetBaseId.includes('docs.google.com/spreadsheets/d/')
         ? `https://docs.google.com/spreadsheets/d/e/${sheetBaseId}/pub?gid=${gid || '0'}&single=true&output=csv&cacheBust=${Date.now()}`
         : primary;
@@ -408,7 +410,12 @@
       try {
         return await tryFetch(primary);
       } catch (e) {
-        if (alt !== primary) return tryFetch(alt);
+        if (alt !== primary) {
+          try { return await tryFetch(alt); } catch (_) {}
+        }
+        if (fallback && fallback !== primary) {
+          return tryFetch(fallback);
+        }
         throw e;
       }
     }
