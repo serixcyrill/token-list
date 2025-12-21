@@ -194,7 +194,6 @@
   <script>
     const STORAGE_KEYS = {
       filters: 'vemo_contact_filters_v2',
-      sheet: 'vemo_contact_sheet_config_v2',
     };
 
     const FIELD_ORDER = [
@@ -360,10 +359,11 @@
       tags: [],
     });
 
-    const sheetConfig = {
+    const DEFAULT_SHEET_CONFIG = {
       sheetBaseId: '2PACX-1vQg29x92Do82OV6r7f19UCrbTBZURRu305Nu-GMH9UlnqvcBhe44-8oqMJBTLFaRUNhKXeG8JKDBDYc',
       gid: '832064159',
     };
+    const sheetConfig = () => (window.__VEMO_SHEET_CONFIG || DEFAULT_SHEET_CONFIG);
 
     let contacts = [...defaultContacts];
     let filtered = [...contacts];
@@ -383,16 +383,34 @@
     }
 
     function buildCsvUrl(sheetBaseId, gid) {
-      const base = 'https://docs.google.com/spreadsheets/d/e/' + sheetBaseId + '/pub';
-      const params = new URLSearchParams({ gid: String(gid || '0'), single: 'true', output: 'csv', cacheBust: String(Date.now()) });
-      return base + '?' + params.toString();
+      const cacheBust = String(Date.now());
+      if (sheetBaseId.includes('docs.google.com/spreadsheets/d/')) {
+        return `${sheetBaseId}/gviz/tq?tqx=out:csv&gid=${gid || '0'}&cacheBust=${cacheBust}`;
+      }
+      if (sheetBaseId.includes('docs.google.com/spreadsheets/d/e/')) {
+        return `${sheetBaseId}/pub?gid=${gid || '0'}&single=true&output=csv&cacheBust=${cacheBust}`;
+      }
+      return `https://docs.google.com/spreadsheets/d/e/${sheetBaseId}/pub?gid=${gid || '0'}&single=true&output=csv&cacheBust=${cacheBust}`;
     }
 
     async function fetchSheetCsv(sheetBaseId, gid) {
-      const url = buildCsvUrl(sheetBaseId, gid);
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error('Request fehlgeschlagen: ' + res.status);
-      return res.text();
+      const primary = buildCsvUrl(sheetBaseId, gid);
+      const alt = sheetBaseId.includes('docs.google.com/spreadsheets/d/')
+        ? `https://docs.google.com/spreadsheets/d/e/${sheetBaseId}/pub?gid=${gid || '0'}&single=true&output=csv&cacheBust=${Date.now()}`
+        : primary;
+
+      const tryFetch = async (url) => {
+        const res = await fetch(url, { cache: 'no-store', mode: 'cors' });
+        if (!res.ok) throw new Error('Request fehlgeschlagen: ' + res.status);
+        return res.text();
+      };
+
+      try {
+        return await tryFetch(primary);
+      } catch (e) {
+        if (alt !== primary) return tryFetch(alt);
+        throw e;
+      }
     }
 
     function parseCsv(text) {
@@ -494,7 +512,8 @@
 
     async function syncFromSheet() {
       try {
-        const csv = await fetchSheetCsv(sheetConfig.sheetBaseId, sheetConfig.gid);
+        const cfg = sheetConfig();
+        const csv = await fetchSheetCsv(cfg.sheetBaseId, cfg.gid);
         const rows = parseCsv(csv);
         const parsed = parseContactsFromSheet(rows).filter((c) => c.name);
         contacts = parsed.length ? parsed : [...defaultContacts];
@@ -736,12 +755,12 @@
       applyFilters();
     }
 
-    function init() {
+    async function init() {
       rebuildFilters();
       setLastUpdated();
       bindEvents();
       applyFilters();
-      syncFromSheet();
+      await syncFromSheet();
     }
 
     function bindEvents() {
