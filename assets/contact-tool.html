@@ -53,15 +53,25 @@
 
     .hero {
       display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: 20px;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
       align-items: center;
-      background: linear-gradient(120deg, rgba(114, 210, 122, 0.16), #ffffff 45%, rgba(126, 217, 87, 0.1));
+      background: linear-gradient(135deg, rgba(114, 210, 122, 0.18), rgba(114, 210, 122, 0.08));
       border: 1px solid rgba(114, 210, 122, 0.35);
+      position: relative;
+      overflow: hidden;
     }
 
-    .hero h1 { margin: 8px 0 6px; font-size: 28px; letter-spacing: 0.2px; }
-    .hero p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 85% 20%, rgba(126, 217, 87, 0.2), transparent 38%);
+      pointer-events: none;
+    }
+
+    .hero h1 { margin: 8px 0 4px; font-size: 28px; letter-spacing: 0.2px; }
+    .hero p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 14px; }
 
     .eyebrow {
       display: inline-flex;
@@ -79,7 +89,7 @@
 
     .hero-actions { display: none; }
 
-    .hero-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+    .hero-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; position: relative; }
 
     .metric { background: #ffffff; border-radius: 12px; padding: 12px; border: 1px solid #e4e8f0; box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.14); }
     .metric h3 { margin: 0; font-size: 26px; letter-spacing: 0.2px; }
@@ -91,7 +101,7 @@
 
     .filters { display: grid; gap: 12px; }
 
-    .filters-row { display: grid; grid-template-columns: 1.2fr repeat(3, minmax(160px, 1fr)); gap: 10px; }
+    .filters-row { display: grid; grid-template-columns: 1.4fr repeat(3, minmax(160px, 1fr)); gap: 10px; }
 
     .filters-row select,
     .filters-row input { padding: 12px 12px; border-radius: 12px; border: 1px solid #dfe3ec; background: #f8fbff; font-family: inherit; }
@@ -102,12 +112,13 @@
     .toggle.active { background: #eef6ef; border-color: rgba(114, 210, 122, 0.45); color: #0f1a2a; }
 
     .filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #dfe3ec; background: #ffffff; color: var(--muted); font-weight: 700; font-size: 12px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #dfe3ec; background: #ffffff; color: var(--muted); font-weight: 700; font-size: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04); }
     .chip.accent { background: #eef6ef; color: #0f1a2a; border-color: rgba(114, 210, 122, 0.45); }
 
-    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; }
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
 
-    .contact-card { border: 1px solid #e3e9f2; border-radius: 16px; padding: 16px; background: #ffffff; box-shadow: var(--shadow); display: grid; gap: 12px; position: relative; }
+    .contact-card { border: 1px solid #e3e9f2; border-radius: 16px; padding: 16px; background: #ffffff; box-shadow: var(--shadow); display: grid; gap: 12px; position: relative; transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease; }
+    .contact-card:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(40, 47, 71, 0.12); border-color: rgba(114, 210, 122, 0.55); }
     .contact-card.highlight::before { content: "Empfohlen"; position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #7ed957, #54c19a); color: #0c1f14; font-weight: 800; font-size: 11px; padding: 6px 10px; border-radius: 999px; box-shadow: 0 8px 18px rgba(114, 210, 122, 0.3); }
 
     .contact-header { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
@@ -123,11 +134,13 @@
     .badge { padding: 6px 10px; border-radius: 10px; background: #f1f3f8; color: #0f1a2a; font-weight: 700; font-size: 12px; }
     .badge.accent { background: #eef6ef; border: 1px solid rgba(114, 210, 122, 0.3); }
 
-    .contact-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .contact-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .contact-actions a { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 10px 12px; background: #ffffff; color: var(--text); font-weight: 700; border-radius: 12px; border: 1px solid #dfe3ec; transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease; }
     .contact-actions a.primary { background: var(--accent-strong); color: #0f1a2a; box-shadow: 0 10px 24px rgba(114, 210, 122, 0.25); border: 1px solid rgba(114, 210, 122, 0.45); }
     .contact-actions a:hover { transform: translateY(-1px); background: #f8fbff; }
     .contact-actions a.primary:hover { background: var(--accent-hover); }
+
+    .meta-line { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--muted); }
 
     .empty { text-align: center; color: var(--muted); padding: 24px 0; font-weight: 700; }
 
@@ -151,8 +164,8 @@
       <section class="card filters">
         <div class="section-heading">
           <div>
-            <h2>Filter & Kategorien</h2>
-            <p>Suche nach Name, Rolle, Hauptkategorie oder Standort – inklusive Empfohlen & kostenlose Ersttermine.</p>
+            <h2>Filter und Kategorien</h2>
+            <p>Suche nach Name, Rolle, Kategorie oder Standort. Optional Empfohlen und kostenloser Ersttermin.</p>
           </div>
           <div class="chip accent" id="resultCounter">0 Ergebnisse</div>
         </div>
@@ -249,7 +262,7 @@
         id: 'clara',
         name: 'Clara Wenger',
         Rolle: 'Investor Relations',
-        Hauptkategorie: 'Investor / LP',
+        Kategorie: 'Investor / LP',
         Kurzbeschreibung: 'Climate-Tech Fund Intros, Growth Teams, schnelle VC-Deals.',
         Standort: 'Zürich',
         Sprache: 'DE / EN',
@@ -276,7 +289,7 @@
         id: 'diego',
         name: 'Diego Berchtold',
         Rolle: 'Honorarberater',
-        Hauptkategorie: 'Beratung',
+        Kategorie: 'Beratung',
         Kurzbeschreibung: 'Vorsorgemantel, Modellübersichten, Ablaufmanagement.',
         Standort: 'Basel',
         Sprache: 'DE',
@@ -303,7 +316,7 @@
         id: 'lara',
         name: 'Lara Steiner',
         Rolle: 'Senior Honorarberaterin',
-        Hauptkategorie: 'Beratung',
+        Kategorie: 'Beratung',
         Kurzbeschreibung: 'Nachhaltige Modellübersichten, steueroptimierte Auszahlungspfade.',
         Standort: 'Zürich',
         Sprache: 'DE / EN',
@@ -330,7 +343,7 @@
         id: 'hana',
         name: 'Hana Scherrer',
         Rolle: 'People Lead',
-        Hauptkategorie: 'Talent / HR',
+        Kategorie: 'Talent / HR',
         Kurzbeschreibung: 'Leadership-Search in DeepTech und Product.',
         Standort: 'Berlin',
         Sprache: 'DE / EN',
@@ -676,6 +689,13 @@
 
         (contact.tags || []).forEach((tag) => badges.appendChild(createBadge(tag, false)));
 
+        const metaLine = document.createElement('div');
+        metaLine.className = 'meta-line';
+        if (c.Preiskategorie) metaLine.appendChild(createBadge('Preis: ' + c.Preiskategorie, false));
+        if (c.Abrechnungsart) metaLine.appendChild(createBadge(c.Abrechnungsart, false));
+        if (c.Ersttermin_kostenlos === true) metaLine.appendChild(createBadge('Ersttermin kostenlos', true));
+        if (c.Honorar_Betrag) metaLine.appendChild(createBadge(String(c.Honorar_Betrag) + (c.Honorar_Einheit ? ' ' + c.Honorar_Einheit : ''), false));
+
         const actions = document.createElement('div');
         actions.className = 'contact-actions';
 
@@ -697,6 +717,7 @@
 
         card.appendChild(header);
         card.appendChild(badges);
+        card.appendChild(metaLine);
         card.appendChild(actions);
         contactGrid.appendChild(card);
       });
