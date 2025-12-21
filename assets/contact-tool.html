@@ -197,8 +197,9 @@
     };
 
     const FIELD_ORDER = [
+      'Feld',
       'Rolle',
-      'Hauptkategorie',
+      'Kategorie',
       'Kurzbeschreibung',
       'Standort',
       'Sprache',
@@ -206,7 +207,7 @@
       'Fokus_Angebot',
       'TerminLink',
       'Kontaktart',
-      'Ersttermin_kostenlos',
+      'Erstermin_kostenlos',
       'Abrechnungsart',
       'Honorar_Betrag',
       'Honorar_Einheit',
@@ -222,8 +223,13 @@
       'Interne_Notizen',
     ];
 
+    const FIELD_ALIASES = {
+      Kategorie: ['Hauptkategorie'],
+      Erstermin_kostenlos: ['Ersttermin_kostenlos', 'Ersttermin'],
+    };
+
     const NUMBER_FIELDS = ['Honorar_Betrag', 'Mindestbetrag', 'Community_Rating'];
-    const BOOLEAN_FIELDS = ['Ersttermin_kostenlos', 'Empfohlen'];
+    const BOOLEAN_FIELDS = ['Erstermin_kostenlos', 'Empfohlen', 'Ersttermin_kostenlos'];
 
     const contactGrid = document.getElementById('contactGrid');
     const metricPanel = document.getElementById('metricPanel');
@@ -469,6 +475,17 @@
       const personCount = (rows[0] || []).length - 1;
       const result = [];
 
+      const getRowIndex = (field) => {
+        const norm = normalizeKey(field);
+        if (fieldIndex.has(norm)) return fieldIndex.get(norm);
+        const aliases = FIELD_ALIASES[field] || [];
+        for (const alias of aliases) {
+          const aliasNorm = normalizeKey(alias);
+          if (fieldIndex.has(aliasNorm)) return fieldIndex.get(aliasNorm);
+        }
+        return undefined;
+      };
+
       for (let col = 1; col <= personCount; col += 1) {
         const name = (rows[0][col] || '').trim();
         if (!name) continue;
@@ -476,8 +493,8 @@
         const contact = { id: 'sheet_' + col, name };
 
         FIELD_ORDER.forEach((field) => {
-          const norm = normalizeKey(field);
-          const rowIdx = fieldIndex.get(norm);
+          if (field === 'Feld') return;
+          const rowIdx = getRowIndex(field);
           const raw = rowIdx !== undefined ? rows[rowIdx][col] : '';
           const trimmed = typeof raw === 'string' ? raw.trim() : raw;
 
@@ -515,7 +532,7 @@
 
     function buildTags(contact) {
       const tags = [];
-      [contact.Hauptkategorie, contact.Rolle, contact.Standort, contact.Sprache, contact.Kontaktart, contact.Preiskategorie, contact.Regulatorischer_Status]
+      [contact.Kategorie, contact.Rolle, contact.Standort, contact.Sprache, contact.Kontaktart, contact.Preiskategorie, contact.Regulatorischer_Status]
         .filter(Boolean)
         .forEach((t) => tags.push(t));
 
@@ -580,10 +597,10 @@
         .filter((contact) => {
           const matchesQuery =
             !query ||
-            [contact.name, contact.Rolle, contact.Hauptkategorie, contact.Kurzbeschreibung, (contact.tags || []).join(' ')].join(' ').toLowerCase().includes(query);
+            [contact.name, contact.Rolle, contact.Kategorie, contact.Kurzbeschreibung, (contact.tags || []).join(' ')].join(' ').toLowerCase().includes(query);
 
           const matchesRole = filterState.role === 'Alle Rollen' || contact.Rolle === filterState.role;
-          const matchesCategory = filterState.category === 'Alle Kategorien' || contact.Hauptkategorie === filterState.category;
+          const matchesCategory = filterState.category === 'Alle Kategorien' || contact.Kategorie === filterState.category;
           const matchesLocation = filterState.location === 'Alle Orte' || contact.Standort === filterState.location;
           const matchesRecommended = !filterState.recommendedOnly || contact.Empfohlen === true;
           const matchesFree = !filterState.freeOnly || contact.Ersttermin_kostenlos === true;
@@ -649,7 +666,7 @@
 
         const badges = document.createElement('div');
         badges.className = 'badges';
-        if (contact.Hauptkategorie) badges.appendChild(createBadge(contact.Hauptkategorie, true));
+        if (contact.Kategorie) badges.appendChild(createBadge(contact.Kategorie, true));
         if (contact.Standort) badges.appendChild(createBadge(contact.Standort, false));
         if (contact.Sprache) badges.appendChild(createBadge(contact.Sprache, false));
         if (contact.Kontaktart) badges.appendChild(createBadge(contact.Kontaktart, true));
@@ -695,7 +712,7 @@
     function updateResultCounter() { resultCounter.textContent = `${filtered.length} Ergebnisse`; }
 
     function updateMetrics() {
-      const categories = new Set(contacts.map((c) => c.Hauptkategorie).filter(Boolean));
+      const categories = new Set(contacts.map((c) => c.Kategorie).filter(Boolean));
       const roles = new Set(contacts.map((c) => c.Rolle).filter(Boolean));
       const recommended = contacts.filter((c) => c.Empfohlen === true).length;
       const free = contacts.filter((c) => c.Ersttermin_kostenlos === true).length;
@@ -757,7 +774,7 @@
 
     function rebuildFilters() {
       const roles = Array.from(new Set(contacts.map((c) => c.Rolle || ''))).filter(Boolean).sort();
-      const categories = Array.from(new Set(contacts.map((c) => c.Hauptkategorie || ''))).filter(Boolean).sort();
+      const categories = Array.from(new Set(contacts.map((c) => c.Kategorie || ''))).filter(Boolean).sort();
       const locations = Array.from(new Set(contacts.map((c) => c.Standort || ''))).filter(Boolean).sort();
 
       populateSelect(roleSelect, roles, 'Rollen');
