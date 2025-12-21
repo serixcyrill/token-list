@@ -32,11 +32,7 @@
       color: var(--text);
     }
 
-    .page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    .page { min-height: 100vh; display: flex; flex-direction: column; }
 
     main {
       flex: 1;
@@ -57,25 +53,15 @@
 
     .hero {
       display: grid;
-      grid-template-columns: 1.3fr 1fr;
+      grid-template-columns: 1.2fr 1fr;
       gap: 20px;
       align-items: center;
-      background: linear-gradient(120deg, rgba(114, 210, 122, 0.14), #ffffff 50%, rgba(126, 217, 87, 0.1));
+      background: linear-gradient(120deg, rgba(114, 210, 122, 0.16), #ffffff 45%, rgba(126, 217, 87, 0.1));
       border: 1px solid rgba(114, 210, 122, 0.35);
     }
 
-    .hero h1 {
-      margin: 8px 0 6px;
-      font-size: 28px;
-      letter-spacing: 0.2px;
-    }
-
-    .hero p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 14px;
-    }
+    .hero h1 { margin: 8px 0 6px; font-size: 28px; letter-spacing: 0.2px; }
+    .hero p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
 
     .eyebrow {
       display: inline-flex;
@@ -91,12 +77,7 @@
       box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
     }
 
-    .hero-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
+    .hero-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
 
     .btn {
       display: inline-flex;
@@ -111,294 +92,74 @@
       transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border 0.2s ease;
     }
 
-    .btn.primary {
-      background: var(--accent-strong);
-      color: #ffffff;
-      box-shadow: 0 12px 28px rgba(114, 210, 122, 0.28);
-    }
-
+    .btn.primary { background: var(--accent-strong); color: #0f1a2a; box-shadow: 0 12px 28px rgba(114, 210, 122, 0.28); }
     .btn.primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
     .btn.ghost { background: #f1f3f8; color: var(--text); border-color: #dfe3ec; }
     .btn.ghost:hover { border-color: rgba(114, 210, 122, 0.55); color: #0f1a2a; }
 
-    .hero-metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-    }
+    .hero-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
 
-    .metric {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 12px;
-      border: 1px solid #e4e8f0;
-      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.14);
-    }
+    .metric { background: #ffffff; border-radius: 12px; padding: 12px; border: 1px solid #e4e8f0; box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.14); }
+    .metric h3 { margin: 0; font-size: 26px; letter-spacing: 0.2px; }
+    .metric span { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
 
-    .metric h3 {
-      margin: 0;
-      font-size: 26px;
-      letter-spacing: 0.2px;
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-
-    .section-heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
+    .section-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
     .section-heading h2 { margin: 0; font-size: 18px; }
     .section-heading p { margin: 0; color: var(--muted); font-size: 13px; }
 
-    .filters {
-      display: grid;
-      gap: 12px;
-    }
+    .filters { display: grid; gap: 12px; }
 
-    .filters-row {
-      display: grid;
-      grid-template-columns: 1.3fr repeat(4, minmax(140px, 1fr));
-      gap: 10px;
-    }
+    .filters-row { display: grid; grid-template-columns: 1.2fr repeat(3, minmax(160px, 1fr)); gap: 10px; }
 
     .filters-row select,
-    .filters-row input {
-      padding: 12px 12px;
-      border-radius: 12px;
-      border: 1px solid #dfe3ec;
-      background: #f8fbff;
-      font-family: inherit;
-    }
+    .filters-row input { padding: 12px 12px; border-radius: 12px; border: 1px solid #dfe3ec; background: #f8fbff; font-family: inherit; }
 
-    .filter-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid #dfe3ec;
-      background: #ffffff;
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 12px;
-    }
-
-    .chip.accent {
-      background: #eef6ef;
-      color: #0f1a2a;
-      border-color: rgba(114, 210, 122, 0.45);
-    }
-
-    .toggles {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: 12px;
-      border: 1px solid #e5e9f2;
-      cursor: pointer;
-      background: #ffffff;
-      font-weight: 700;
-      color: var(--muted);
-    }
-
+    .toggles { display: flex; gap: 10px; flex-wrap: wrap; }
+    .toggle { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; border: 1px solid #e5e9f2; cursor: pointer; background: #ffffff; font-weight: 700; color: var(--muted); }
     .toggle input { display: none; }
-    .toggle.active {
-      background: #eef6ef;
-      border-color: rgba(114, 210, 122, 0.45);
-      color: #0f1a2a;
-    }
+    .toggle.active { background: #eef6ef; border-color: rgba(114, 210, 122, 0.45); color: #0f1a2a; }
 
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
-    }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #dfe3ec; background: #ffffff; color: var(--muted); font-weight: 700; font-size: 12px; }
+    .chip.accent { background: #eef6ef; color: #0f1a2a; border-color: rgba(114, 210, 122, 0.45); }
 
-    .contact-card {
-      border: 1px solid #e3e9f2;
-      border-radius: 16px;
-      padding: 16px;
-      background: #ffffff;
-      box-shadow: var(--shadow);
-      display: grid;
-      gap: 12px;
-      position: relative;
-    }
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; }
 
-    .contact-card.highlight::before {
-      content: "Top Kontakt";
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: linear-gradient(135deg, #7ed957, #54c19a);
-      color: #0c1f14;
-      font-weight: 800;
-      font-size: 11px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      box-shadow: 0 8px 18px rgba(114, 210, 122, 0.3);
-    }
+    .contact-card { border: 1px solid #e3e9f2; border-radius: 16px; padding: 16px; background: #ffffff; box-shadow: var(--shadow); display: grid; gap: 12px; position: relative; }
+    .contact-card.highlight::before { content: "Empfohlen"; position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #7ed957, #54c19a); color: #0c1f14; font-weight: 800; font-size: 11px; padding: 6px 10px; border-radius: 999px; box-shadow: 0 8px 18px rgba(114, 210, 122, 0.3); }
 
-    .contact-header {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 12px;
-      align-items: center;
-    }
+    .contact-header { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
 
-    .avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #e8f8ec, #dfe9ff);
-      border: 1px solid #dbe5f0;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      overflow: hidden;
-    }
+    .avatar { width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, #e8f8ec, #dfe9ff); border: 1px solid #dbe5f0; background-size: cover; background-position: center; position: relative; overflow: hidden; }
+    .avatar::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35); border-radius: 16px; pointer-events: none; }
 
-    .avatar::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
-      border-radius: 16px;
-      pointer-events: none;
-    }
+    .contact-meta h3 { margin: 0; font-size: 17px; font-weight: 700; }
+    .contact-meta .role { display: inline-flex; padding: 5px 10px; background: #eef6ef; border-radius: 999px; font-size: 12px; font-weight: 700; color: #1c3a2c; box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4); margin-top: 4px; }
+    .contact-meta p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 
-    .contact-meta h3 {
-      margin: 0;
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    .contact-meta .role {
-      display: inline-flex;
-      padding: 5px 10px;
-      background: #eef6ef;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #1c3a2c;
-      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
-      margin-top: 4px;
-    }
-
-    .contact-meta p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .badge {
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: #f1f3f8;
-      color: #0f1a2a;
-      font-weight: 700;
-      font-size: 12px;
-    }
-
+    .badges { display: flex; flex-wrap: wrap; gap: 6px; }
+    .badge { padding: 6px 10px; border-radius: 10px; background: #f1f3f8; color: #0f1a2a; font-weight: 700; font-size: 12px; }
     .badge.accent { background: #eef6ef; border: 1px solid rgba(114, 210, 122, 0.3); }
 
-    .contact-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .contact-actions a {
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 12px;
-      background: #ffffff;
-      color: var(--text);
-      font-weight: 700;
-      border-radius: 12px;
-      border: 1px solid #dfe3ec;
-      transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .contact-actions a.primary {
-      background: var(--accent-strong);
-      color: #0f1a2a;
-      box-shadow: 0 10px 24px rgba(114, 210, 122, 0.25);
-      border: 1px solid rgba(114, 210, 122, 0.45);
-    }
-
+    .contact-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .contact-actions a { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 10px 12px; background: #ffffff; color: var(--text); font-weight: 700; border-radius: 12px; border: 1px solid #dfe3ec; transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease; }
+    .contact-actions a.primary { background: var(--accent-strong); color: #0f1a2a; box-shadow: 0 10px 24px rgba(114, 210, 122, 0.25); border: 1px solid rgba(114, 210, 122, 0.45); }
     .contact-actions a:hover { transform: translateY(-1px); background: #f8fbff; }
     .contact-actions a.primary:hover { background: var(--accent-hover); }
 
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 24px 0;
-      font-weight: 700;
-    }
+    .empty { text-align: center; color: var(--muted); padding: 24px 0; font-weight: 700; }
 
-    .sheet {
-      display: grid;
-      grid-template-columns: 1.2fr 0.9fr 120px;
-      gap: 10px;
-    }
+    .source-row { display: grid; grid-template-columns: 1.2fr 0.9fr 120px; gap: 10px; }
+    .source-row input { padding: 10px 12px; border-radius: 12px; border: 1px solid #dfe3ec; background: #f8fbff; font-family: inherit; }
 
-    .sheet input {
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid #dfe3ec;
-      background: #f8fbff;
-      font-family: inherit;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-      background: #f39c12;
-      box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.12);
-    }
-
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: #f39c12; box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.12); }
     .status-dot.ok { background: #72d27a; box-shadow: 0 0 0 4px rgba(114, 210, 122, 0.15); }
     .status-dot.err { background: #e74c3c; box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.12); }
 
     @media (max-width: 980px) {
       .hero { grid-template-columns: 1fr; }
       .filters-row { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-      .sheet { grid-template-columns: 1fr; }
+      .source-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -407,14 +168,14 @@
     <main>
       <section class="card hero">
         <div>
-          <span class="eyebrow">Kontakt-Interface für Power-Netzwerke</span>
-          <h1>Onboarding von starken Kontakten in jeder Branche</h1>
+          <span class="eyebrow">Kuratiertes Netzwerk, sofort filterbar</span>
+          <h1>Das kraftvolle Kontaktbuch für deine stärksten Intros</h1>
           <p>
-            Verbunden mit Google Sheets, gefiltert nach Branchen, Rollen und Verfügbarkeit.
-            Baue dein Kontaktbuch aus, teile Termine oder Profile, und halte alles über ein zentrales Interface synchron.
+            Bündelt Branchen, Rollen, Standorte und Sprachen in einem edlen Interface. Kuratiere Empfohlene,
+            priorisiere kostenlose Ersttermine und teile relevante Profile im Handumdrehen.
           </p>
           <div class="hero-actions">
-            <button class="btn primary" id="refreshFromSheet">Spreadsheet Sync</button>
+            <button class="btn primary" id="refreshFromSheet">Aktualisieren</button>
             <button class="btn ghost" id="resetFilters">Filter zurücksetzen</button>
           </div>
         </div>
@@ -425,35 +186,26 @@
         <div class="section-heading">
           <div>
             <h2>Filter & Kategorien</h2>
-            <p>Suche nach Personen, Branchen, Standorten oder Sofort-Verfügbarkeit.</p>
+            <p>Suche nach Name, Rolle, Hauptkategorie oder Standort – inklusive Empfohlen & kostenlose Ersttermine.</p>
           </div>
           <div class="chip accent" id="resultCounter">0 Ergebnisse</div>
         </div>
 
         <div class="filters-row">
-          <input type="search" id="searchInput" placeholder="Suche nach Name, Rolle, Tags..." />
-          <select id="industrySelect"></select>
+          <input type="search" id="searchInput" placeholder="Suche nach Name, Rolle, Kategorie..." />
+          <select id="roleSelect"></select>
           <select id="categorySelect"></select>
           <select id="locationSelect"></select>
-          <select id="sortSelect">
-            <option value="priority">Sortierung: Priorität</option>
-            <option value="name">Sortierung: Name</option>
-            <option value="availability">Sortierung: Verfügbarkeit</option>
-          </select>
         </div>
 
         <div class="toggles">
-          <label class="toggle" id="toggleTop">
+          <label class="toggle" id="toggleRecommended">
             <input type="checkbox" />
-            Top Kontakte
+            Empfohlen
           </label>
-          <label class="toggle" id="toggleAvailability">
+          <label class="toggle" id="toggleFree">
             <input type="checkbox" />
-            Sofort verfügbar
-          </label>
-          <label class="toggle" id="toggleWarmIntro">
-            <input type="checkbox" />
-            Warm Intro bevorzugt
+            Kostenloser Ersttermin
           </label>
         </div>
 
@@ -463,15 +215,15 @@
       <section class="card">
         <div class="section-heading">
           <div>
-            <h2>Spreadsheet Connector</h2>
-            <p>Öffentliches Google Sheet (Publish to Web) verbinden: ID + GID eintragen, dann synchronisieren.</p>
+            <h2>Datenquelle konfigurieren</h2>
+            <p>Quelle wählen, speichern, aktualisieren.</p>
           </div>
-          <div class="chip" id="sheetStatus"><span class="status-dot"></span> Status: offline</div>
+          <div class="chip" id="sheetStatus"><span class="status-dot"></span> Status: bereit</div>
         </div>
-        <div class="sheet">
-          <input type="text" id="sheetIdInput" placeholder="Sheet Base ID (e.g. 2PACX-...)" />
-          <input type="number" id="sheetGidInput" placeholder="GID (Tab ID)" />
-          <button class="btn primary" id="saveSheet">Sheet speichern</button>
+        <div class="source-row">
+          <input type="text" id="sheetIdInput" placeholder="Quellen-ID" />
+          <input type="number" id="sheetGidInput" placeholder="Tab-ID" />
+          <button class="btn primary" id="saveSheet">Speichern</button>
         </div>
       </section>
 
@@ -479,7 +231,7 @@
         <div class="section-heading">
           <div>
             <h2>Kontaktbuch</h2>
-            <p>Gefiltert, sortiert, bereit zum Teilen oder für weitere Automatisierung.</p>
+            <p>Gefilterte Profile mit klaren Vorteilen, Notizen und Handlungs-Links.</p>
           </div>
           <div class="chip accent" id="lastUpdated">Letztes Update: –</div>
         </div>
@@ -490,9 +242,38 @@
 
   <script>
     const STORAGE_KEYS = {
-      filters: 'vemo_contact_filters',
-      sheet: 'vemo_contact_sheet_config',
+      filters: 'vemo_contact_filters_v2',
+      sheet: 'vemo_contact_sheet_config_v2',
     };
+
+    const FIELD_ORDER = [
+      'Rolle',
+      'Hauptkategorie',
+      'Kurzbeschreibung',
+      'Standort',
+      'Sprache',
+      'AnzeigeBild_URL',
+      'Fokus_Angebot',
+      'TerminLink',
+      'Kontaktart',
+      'Ersttermin_kostenlos',
+      'Abrechnungsart',
+      'Honorar_Betrag',
+      'Honorar_Einheit',
+      'Mindestbetrag',
+      'Preiskategorie',
+      'Vemo_Vorteil_Titel',
+      'Vemo_Vorteil_Beschreibung',
+      'Regulatorischer_Status',
+      'Ausbildung_Zertifikate',
+      'Zielgruppe',
+      'Community_Rating',
+      'Empfohlen',
+      'Interne_Notizen',
+    ];
+
+    const NUMBER_FIELDS = ['Honorar_Betrag', 'Mindestbetrag', 'Community_Rating'];
+    const BOOLEAN_FIELDS = ['Ersttermin_kostenlos', 'Empfohlen'];
 
     const contactGrid = document.getElementById('contactGrid');
     const metricPanel = document.getElementById('metricPanel');
@@ -501,13 +282,11 @@
     const tagChips = document.getElementById('tagChips');
     const lastUpdated = document.getElementById('lastUpdated');
     const searchInput = document.getElementById('searchInput');
-    const industrySelect = document.getElementById('industrySelect');
+    const roleSelect = document.getElementById('roleSelect');
     const categorySelect = document.getElementById('categorySelect');
     const locationSelect = document.getElementById('locationSelect');
-    const sortSelect = document.getElementById('sortSelect');
-    const toggleTop = document.getElementById('toggleTop');
-    const toggleAvailability = document.getElementById('toggleAvailability');
-    const toggleWarmIntro = document.getElementById('toggleWarmIntro');
+    const toggleRecommended = document.getElementById('toggleRecommended');
+    const toggleFree = document.getElementById('toggleFree');
     const refreshFromSheet = document.getElementById('refreshFromSheet');
     const resetFiltersBtn = document.getElementById('resetFilters');
     const sheetIdInput = document.getElementById('sheetIdInput');
@@ -518,134 +297,120 @@
       {
         id: 'clara',
         name: 'Clara Wenger',
-        role: 'Investor Relations',
-        description: 'Verknüpft Climate-Tech Funds mit Growth Teams; priorisiert schnelle VC-Intros.',
-        industry: 'Venture Capital',
-        category: 'Investor / LP',
-        location: 'Zürich',
-        availability: 'Sofort',
-        warmIntro: false,
-        tags: ['Climate', 'Growth', 'Fundraising', 'DACH'],
-        priority: 9.7,
-        score: 5,
-        highlight: true,
-        avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
-        email: 'clara@vemo.network',
-        phone: '+41 44 000 11 22',
-        link: 'https://calendly.com',
-        note: 'Top für Climate/Impact Intros.'
+        Rolle: 'Investor Relations',
+        Hauptkategorie: 'Investor / LP',
+        Kurzbeschreibung: 'Climate-Tech Fund Intros, Growth Teams, schnelle VC-Deals.',
+        Standort: 'Zürich',
+        Sprache: 'DE / EN',
+        AnzeigeBild_URL: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
+        Fokus_Angebot: 'Fundraising-Intros, Climate & Impact',
+        TerminLink: 'https://calendly.com',
+        Kontaktart: 'Warm Intro',
+        Ersttermin_kostenlos: true,
+        Abrechnungsart: 'Retainer',
+        Honorar_Betrag: 0,
+        Honorar_Einheit: 'CHF',
+        Mindestbetrag: 0,
+        Preiskategorie: 'A',
+        Vemo_Vorteil_Titel: 'Sofort verfügbare Climate LPs',
+        Vemo_Vorteil_Beschreibung: 'Direkter Zugriff auf Impact-orientierte Investoren.',
+        Regulatorischer_Status: 'Advisor',
+        Ausbildung_Zertifikate: 'MBA, Climate Finance',
+        Zielgruppe: 'Climate-Tech, Growth, DACH',
+        Community_Rating: 9.4,
+        Empfohlen: true,
+        Interne_Notizen: 'Top für Climate/Impact Intros.',
       },
       {
         id: 'diego',
         name: 'Diego Berchtold',
-        role: 'Honorarberater',
-        description: 'Vorsorgemantel, Modellübersichten und Ablaufmanagement; kennt Pensionskassen inside-out.',
-        industry: 'Finanzen',
-        category: 'Beratung',
-        location: 'Basel',
-        availability: 'Nächste 7 Tage',
-        warmIntro: true,
-        tags: ['Pension', 'Vorsorge', 'Ablauf', 'Modelle'],
-        priority: 9.1,
-        score: 4,
-        highlight: true,
-        avatarUrl: '',
-        email: 'diego@vemo.network',
-        phone: '+41 79 123 45 67',
-        link: 'https://calendly.com/diego-vemo/telefontermin',
-        note: 'Bestehender Vemo Flow.'
+        Rolle: 'Honorarberater',
+        Hauptkategorie: 'Beratung',
+        Kurzbeschreibung: 'Vorsorgemantel, Modellübersichten, Ablaufmanagement.',
+        Standort: 'Basel',
+        Sprache: 'DE',
+        AnzeigeBild_URL: '',
+        Fokus_Angebot: 'Pension, Auszahlungsszenarien',
+        TerminLink: 'https://calendly.com/diego-vemo/telefontermin',
+        Kontaktart: 'Call',
+        Ersttermin_kostenlos: true,
+        Abrechnungsart: 'Honorar',
+        Honorar_Betrag: 250,
+        Honorar_Einheit: 'CHF',
+        Mindestbetrag: 250,
+        Preiskategorie: 'B',
+        Vemo_Vorteil_Titel: 'FIDLEG-ready',
+        Vemo_Vorteil_Beschreibung: 'Strukturierte Beratung inkl. Ablaufplänen.',
+        Regulatorischer_Status: 'FIDLEG',
+        Ausbildung_Zertifikate: 'VBV Versicherung & Vorsorge',
+        Zielgruppe: 'Bestandskunden, Pension',
+        Community_Rating: 9.1,
+        Empfohlen: true,
+        Interne_Notizen: 'Bestehender Vemo Flow.',
       },
       {
         id: 'lara',
         name: 'Lara Steiner',
-        role: 'Senior Honorarberaterin',
-        description: 'Nachhaltige Modellübersichten, steueroptimierte Auszahlungspfade.',
-        industry: 'Finanzen',
-        category: 'Beratung',
-        location: 'Zürich',
-        availability: 'Sofort',
-        warmIntro: false,
-        tags: ['Nachhaltig', 'Auszahlung', 'Strategie'],
-        priority: 8.8,
-        score: 5,
-        highlight: false,
-        avatarUrl: '',
-        email: 'lara@vemo.network',
-        phone: '+41 79 890 00 90',
-        link: 'https://calendly.com/diego-vemo/telefontermin',
-        note: 'Steuer-Spezialistin.'
-      },
-      {
-        id: 'marco',
-        name: 'Marco Keller',
-        role: 'Honorarberater',
-        description: 'Risikoabsicherung und Liquiditätsplanung; kombiniert Banking & FinTech Know-how.',
-        industry: 'Finanzen',
-        category: 'Beratung',
-        location: 'Bern',
-        availability: 'Nächste 14 Tage',
-        warmIntro: true,
-        tags: ['Risikomanagement', 'Liquidität', 'FinTech'],
-        priority: 8.2,
-        score: 4,
-        highlight: false,
-        avatarUrl: '',
-        email: 'marco@vemo.network',
-        phone: '+41 31 222 33 44',
-        link: 'https://calendly.com/diego-vemo/telefontermin',
-        note: 'Perfekt für Liquiditätsfragen.'
+        Rolle: 'Senior Honorarberaterin',
+        Hauptkategorie: 'Beratung',
+        Kurzbeschreibung: 'Nachhaltige Modellübersichten, steueroptimierte Auszahlungspfade.',
+        Standort: 'Zürich',
+        Sprache: 'DE / EN',
+        AnzeigeBild_URL: '',
+        Fokus_Angebot: 'Nachhaltige Modelle, Steuern',
+        TerminLink: 'https://calendly.com/diego-vemo/telefontermin',
+        Kontaktart: 'Video',
+        Ersttermin_kostenlos: false,
+        Abrechnungsart: 'Honorar',
+        Honorar_Betrag: 280,
+        Honorar_Einheit: 'CHF',
+        Mindestbetrag: 280,
+        Preiskategorie: 'B',
+        Vemo_Vorteil_Titel: 'Sustainable Finance',
+        Vemo_Vorteil_Beschreibung: 'Steuer-optimierte Auszahlungspfade.',
+        Regulatorischer_Status: 'FIDLEG',
+        Ausbildung_Zertifikate: 'Master Finance & Risk; CAS Sustainable Finance',
+        Zielgruppe: 'Nachhaltige Anlegende',
+        Community_Rating: 8.8,
+        Empfohlen: true,
+        Interne_Notizen: 'Steuer-Spezialistin.',
       },
       {
         id: 'hana',
         name: 'Hana Scherrer',
-        role: 'People Lead',
-        description: 'Spezialisiert auf Leadership-Search in DeepTech und Product.',
-        industry: 'Recruiting',
-        category: 'Talent / HR',
-        location: 'Berlin',
-        availability: 'Sofort',
-        warmIntro: true,
-        tags: ['Leadership', 'Product', 'DeepTech', 'Hiring'],
-        priority: 8.6,
-        score: 5,
-        highlight: true,
-        avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80',
-        email: 'hana@vemo.network',
-        phone: '+49 30 1234 555',
-        link: 'https://www.linkedin.com',
-        note: 'Hält Shortlists ready.'
+        Rolle: 'People Lead',
+        Hauptkategorie: 'Talent / HR',
+        Kurzbeschreibung: 'Leadership-Search in DeepTech und Product.',
+        Standort: 'Berlin',
+        Sprache: 'DE / EN',
+        AnzeigeBild_URL: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80',
+        Fokus_Angebot: 'Leadership Hiring',
+        TerminLink: 'https://www.linkedin.com',
+        Kontaktart: 'Intro',
+        Ersttermin_kostenlos: true,
+        Abrechnungsart: 'Retainer',
+        Honorar_Betrag: 0,
+        Honorar_Einheit: 'EUR',
+        Mindestbetrag: 0,
+        Preiskategorie: 'A',
+        Vemo_Vorteil_Titel: 'Shortlists ready',
+        Vemo_Vorteil_Beschreibung: 'Kurze Time-to-Hire bei C- und VP-Rollen.',
+        Regulatorischer_Status: 'Recruiting',
+        Ausbildung_Zertifikate: 'Psychologie, Leadership Coaching',
+        Zielgruppe: 'DeepTech, Product',
+        Community_Rating: 8.6,
+        Empfohlen: true,
+        Interne_Notizen: 'Hält Shortlists ready.',
       },
-      {
-        id: 'amir',
-        name: 'Amir Rahman',
-        role: 'Go-to-Market Advisor',
-        description: 'Baut Sales-Playbooks und Partnerschaften in Mobility & AI.',
-        industry: 'Mobility / AI',
-        category: 'Advisor',
-        location: 'München',
-        availability: 'Nächste 7 Tage',
-        warmIntro: false,
-        tags: ['GTM', 'Partnerships', 'Enterprise'],
-        priority: 8.4,
-        score: 4,
-        highlight: false,
-        avatarUrl: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=600&q=80',
-        email: 'amir@vemo.network',
-        phone: '+49 89 111 22 33',
-        link: 'https://calendly.com',
-        note: 'Kennt Mobility-Entscheider.'
-      }
     ];
 
     const filterState = loadJson(STORAGE_KEYS.filters, {
       query: '',
-      industry: 'Alle Branchen',
+      role: 'Alle Rollen',
       category: 'Alle Kategorien',
       location: 'Alle Orte',
-      sort: 'priority',
-      topOnly: false,
-      availableOnly: false,
-      warmIntroOnly: false,
+      recommendedOnly: false,
+      freeOnly: false,
       tags: [],
     });
 
@@ -668,26 +433,19 @@
     }
 
     function saveJson(key, value) {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-      } catch {}
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
     }
 
     function buildCsvUrl(sheetBaseId, gid) {
       const base = 'https://docs.google.com/spreadsheets/d/e/' + sheetBaseId + '/pub';
-      const params = new URLSearchParams({
-        gid: String(gid || '0'),
-        single: 'true',
-        output: 'csv',
-        cacheBust: String(Date.now()),
-      });
+      const params = new URLSearchParams({ gid: String(gid || '0'), single: 'true', output: 'csv', cacheBust: String(Date.now()) });
       return base + '?' + params.toString();
     }
 
     async function fetchSheetCsv(sheetBaseId, gid) {
       const url = buildCsvUrl(sheetBaseId, gid);
       const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error('Sheet Request fehlgeschlagen: ' + res.status);
+      if (!res.ok) throw new Error('Request fehlgeschlagen: ' + res.status);
       return res.text();
     }
 
@@ -700,95 +458,92 @@
       for (let i = 0; i < text.length; i += 1) {
         const char = text[i];
         if (char === '"') {
-          if (inQuotes && text[i + 1] === '"') {
-            current += '"';
-            i += 1;
-          } else {
-            inQuotes = !inQuotes;
-          }
+          if (inQuotes && text[i + 1] === '"') { current += '"'; i += 1; } else { inQuotes = !inQuotes; }
         } else if (char === ',' && !inQuotes) {
           row.push(current);
           current = '';
         } else if ((char === '\n' || char === '\r') && !inQuotes) {
-          if (current !== '' || row.length) {
-            row.push(current);
-            rows.push(row);
-            row = [];
-            current = '';
-          }
-        } else {
-          current += char;
-        }
+          if (current !== '' || row.length) { row.push(current); rows.push(row); row = []; current = ''; }
+        } else { current += char; }
       }
 
-      if (current !== '' || row.length) {
-        row.push(current);
-        rows.push(row);
-      }
-
+      if (current !== '' || row.length) { row.push(current); rows.push(row); }
       return rows.map((cols) => cols.map((cell) => (cell || '').trim()));
     }
 
-    function normalizeKey(key) {
-      return (key || '').toLowerCase().replace(/[^a-z0-9äöüß]/gi, '');
-    }
+    function normalizeKey(key) { return (key || '').toLowerCase().replace(/[^a-z0-9äöüß]/gi, ''); }
 
     function parseContactsFromSheet(rows) {
       if (!rows.length) return [];
-      const header = rows[0].map(normalizeKey);
-      const getIndex = (keys) =>
-        header.findIndex((h) =>
-          keys.some((k) => normalizeKey(k) === h || h.includes(normalizeKey(k)))
-        );
-
-      const idx = {
-        name: getIndex(['name', 'vorname']),
-        role: getIndex(['rolle', 'role', 'funktion']),
-        description: getIndex(['beschreibung', 'shortbio', 'kurztext']),
-        industry: getIndex(['branche', 'industry']),
-        category: getIndex(['kategorie', 'category']),
-        location: getIndex(['ort', 'stadt', 'location']),
-        availability: getIndex(['verfugbarkeit', 'availability']),
-        warmIntro: getIndex(['warmeintro', 'warmintro']),
-        tags: getIndex(['tags', 'schlagworte']),
-        priority: getIndex(['prioritat', 'priority', 'score']),
-        avatarUrl: getIndex(['avatar', 'avatarurl', 'bild']),
-        email: getIndex(['email', 'mail']),
-        phone: getIndex(['telefon', 'phone']),
-        link: getIndex(['link', 'termin', 'calendly', 'url']),
-        note: getIndex(['notiz', 'note', 'hinweis']),
-      };
-
-      return rows.slice(1).map((cols, rowIndex) => {
-        const pick = (key) => (idx[key] >= 0 ? cols[idx[key]] || '' : '');
-        const tagsRaw = pick('tags');
-        const tags = tagsRaw
-          ? tagsRaw.split(/[,;]+/).map((t) => t.trim()).filter(Boolean)
-          : [];
-        const warmIntro = String(pick('warmIntro')).toLowerCase() === 'true';
-        const priority = parseFloat(pick('priority')) || 0;
-
-        return {
-          id: 'sheet_' + rowIndex,
-          name: pick('name') || 'Unbenannt',
-          role: pick('role') || 'Kontakt',
-          description: pick('description') || '',
-          industry: pick('industry') || 'Unsortiert',
-          category: pick('category') || 'Kontakt',
-          location: pick('location') || 'Remote',
-          availability: pick('availability') || 'Auf Anfrage',
-          warmIntro,
-          tags,
-          priority,
-          score: 4,
-          highlight: priority >= 8 || warmIntro,
-          avatarUrl: pick('avatarUrl'),
-          email: pick('email'),
-          phone: pick('phone'),
-          link: pick('link'),
-          note: pick('note'),
-        };
+      const fieldIndex = new Map();
+      rows.forEach((r, idx) => {
+        const norm = normalizeKey(r[0]);
+        if (norm) fieldIndex.set(norm, idx);
       });
+
+      const personCount = (rows[0] || []).length - 1;
+      const result = [];
+
+      for (let col = 1; col <= personCount; col += 1) {
+        const name = (rows[0][col] || '').trim();
+        if (!name) continue;
+
+        const contact = { id: 'sheet_' + col, name };
+
+        FIELD_ORDER.forEach((field) => {
+          const norm = normalizeKey(field);
+          const rowIdx = fieldIndex.get(norm);
+          const raw = rowIdx !== undefined ? rows[rowIdx][col] : '';
+          const trimmed = typeof raw === 'string' ? raw.trim() : raw;
+
+          if (BOOLEAN_FIELDS.includes(field)) {
+            if (trimmed === '' || trimmed === null || trimmed === undefined) {
+              contact[field] = null;
+            } else {
+              const val = String(trimmed).toLowerCase();
+              contact[field] = ['true', 'ja', 'yes', '1', 'x'].includes(val);
+            }
+            return;
+          }
+
+          if (NUMBER_FIELDS.includes(field)) {
+            if (trimmed === '' || trimmed === null || trimmed === undefined) {
+              contact[field] = null;
+            } else {
+              const num = parseFloat(trimmed);
+              contact[field] = Number.isFinite(num) ? num : null;
+            }
+            return;
+          }
+
+          contact[field] = trimmed === '' || trimmed === null || trimmed === undefined ? null : trimmed;
+        });
+
+        contact.highlight = contact.Empfohlen === true || (contact.Community_Rating || 0) >= 8;
+        contact.tags = buildTags(contact);
+        contact.score = contact.Community_Rating || 0;
+        result.push(contact);
+      }
+
+      return result;
+    }
+
+    function buildTags(contact) {
+      const tags = [];
+      [contact.Hauptkategorie, contact.Rolle, contact.Standort, contact.Sprache, contact.Kontaktart, contact.Preiskategorie, contact.Regulatorischer_Status]
+        .filter(Boolean)
+        .forEach((t) => tags.push(t));
+
+      if (contact.Zielgruppe) {
+        contact.Zielgruppe.split(/[,;]+/).map((t) => t.trim()).filter(Boolean).forEach((t) => tags.push(t));
+      }
+
+      if (contact.Ausbildung_Zertifikate) {
+        contact.Ausbildung_Zertifikate.split(/[,;]+/).map((t) => t.trim()).filter(Boolean).forEach((t) => tags.push(t));
+      }
+
+      if (contact.Vemo_Vorteil_Titel) tags.push(contact.Vemo_Vorteil_Titel);
+      return tags;
     }
 
     async function syncFromSheet() {
@@ -800,11 +555,13 @@
         contacts = parsed.length ? parsed : [...defaultContacts];
         updateSheetStatus('ok');
         setLastUpdated();
+        rebuildFilters();
         applyFilters();
       } catch (err) {
         contacts = [...defaultContacts];
         updateSheetStatus('error');
-        console.warn('Sheet Sync fehlgeschlagen', err);
+        console.warn('Sync fehlgeschlagen', err);
+        rebuildFilters();
         applyFilters();
       }
     }
@@ -820,44 +577,26 @@
         .filter((contact) => {
           const matchesQuery =
             !query ||
-            [contact.name, contact.role, contact.description, (contact.tags || []).join(' ')]
-              .join(' ')
-              .toLowerCase()
-              .includes(query);
+            [contact.name, contact.Rolle, contact.Hauptkategorie, contact.Kurzbeschreibung, (contact.tags || []).join(' ')].join(' ').toLowerCase().includes(query);
 
-          const matchesIndustry =
-            filterState.industry === 'Alle Branchen' || contact.industry === filterState.industry;
-          const matchesCategory =
-            filterState.category === 'Alle Kategorien' || contact.category === filterState.category;
-          const matchesLocation =
-            filterState.location === 'Alle Orte' || contact.location === filterState.location;
-          const matchesTop = !filterState.topOnly || contact.highlight;
-          const matchesAvailability =
-            !filterState.availableOnly ||
-            (contact.availability || '').toLowerCase().includes('sofort');
-          const matchesWarmIntro = !filterState.warmIntroOnly || contact.warmIntro;
-          const matchesTags =
-            !filterState.tags.length ||
-            filterState.tags.every((tag) => (contact.tags || []).includes(tag));
+          const matchesRole = filterState.role === 'Alle Rollen' || contact.Rolle === filterState.role;
+          const matchesCategory = filterState.category === 'Alle Kategorien' || contact.Hauptkategorie === filterState.category;
+          const matchesLocation = filterState.location === 'Alle Orte' || contact.Standort === filterState.location;
+          const matchesRecommended = !filterState.recommendedOnly || contact.Empfohlen === true;
+          const matchesFree = !filterState.freeOnly || contact.Ersttermin_kostenlos === true;
+          const matchesTags = !filterState.tags.length || filterState.tags.every((tag) => (contact.tags || []).includes(tag));
 
           return (
             matchesQuery &&
-            matchesIndustry &&
+            matchesRole &&
             matchesCategory &&
             matchesLocation &&
-            matchesTop &&
-            matchesAvailability &&
-            matchesWarmIntro &&
+            matchesRecommended &&
+            matchesFree &&
             matchesTags
           );
         })
-        .sort((a, b) => {
-          if (filterState.sort === 'name') return a.name.localeCompare(b.name);
-          if (filterState.sort === 'availability') {
-            return (a.availability || '').localeCompare(b.availability || '');
-          }
-          return (b.priority || 0) - (a.priority || 0);
-        });
+        .sort((a, b) => (b.score || 0) - (a.score || 0));
 
       renderContacts();
       updateResultCounter();
@@ -883,9 +622,7 @@
 
         const avatar = document.createElement('div');
         avatar.className = 'avatar';
-        if (contact.avatarUrl) {
-          avatar.style.backgroundImage = `url('${contact.avatarUrl}')`;
-        }
+        if (contact.AnzeigeBild_URL) avatar.style.backgroundImage = `url('${contact.AnzeigeBild_URL}')`;
 
         const meta = document.createElement('div');
         meta.className = 'contact-meta';
@@ -895,10 +632,10 @@
 
         const roleEl = document.createElement('div');
         roleEl.className = 'role';
-        roleEl.textContent = contact.role;
+        roleEl.textContent = contact.Rolle || 'Rolle';
 
         const descEl = document.createElement('p');
-        descEl.textContent = contact.description || 'Noch keine Kurzbeschreibung hinterlegt.';
+        descEl.textContent = contact.Kurzbeschreibung || 'Noch keine Kurzbeschreibung hinterlegt.';
 
         meta.appendChild(nameEl);
         meta.appendChild(roleEl);
@@ -909,34 +646,22 @@
 
         const badges = document.createElement('div');
         badges.className = 'badges';
-        badges.appendChild(createBadge(contact.industry, true));
-        badges.appendChild(createBadge(contact.category, false));
-        badges.appendChild(createBadge(contact.location, false));
-        if (contact.availability) badges.appendChild(createBadge(contact.availability, true));
-        if (contact.warmIntro) badges.appendChild(createBadge('Warm Intro', true));
+        if (contact.Hauptkategorie) badges.appendChild(createBadge(contact.Hauptkategorie, true));
+        if (contact.Standort) badges.appendChild(createBadge(contact.Standort, false));
+        if (contact.Sprache) badges.appendChild(createBadge(contact.Sprache, false));
+        if (contact.Kontaktart) badges.appendChild(createBadge(contact.Kontaktart, true));
+        if (contact.Preiskategorie) badges.appendChild(createBadge('Preis ' + contact.Preiskategorie, false));
+        if (contact.Regulatorischer_Status) badges.appendChild(createBadge(contact.Regulatorischer_Status, false));
+        if (contact.Ersttermin_kostenlos === true) badges.appendChild(createBadge('Ersttermin kostenlos', true));
 
         (contact.tags || []).forEach((tag) => badges.appendChild(createBadge(tag, false)));
 
         const actions = document.createElement('div');
         actions.className = 'contact-actions';
 
-        if (contact.email) {
-          const email = document.createElement('a');
-          email.href = 'mailto:' + contact.email;
-          email.textContent = 'E-Mail';
-          actions.appendChild(email);
-        }
-
-        if (contact.phone) {
-          const phone = document.createElement('a');
-          phone.href = 'tel:' + contact.phone;
-          phone.textContent = 'Call';
-          actions.appendChild(phone);
-        }
-
-        if (contact.link) {
+        if (contact.TerminLink) {
           const link = document.createElement('a');
-          link.href = contact.link;
+          link.href = contact.TerminLink;
           link.target = '_blank';
           link.rel = 'noreferrer';
           link.textContent = 'Termin / Profil';
@@ -944,13 +669,11 @@
           actions.appendChild(link);
         }
 
-        if (contact.note) {
-          const note = document.createElement('div');
-          note.className = 'badge';
-          note.textContent = contact.note;
-          note.style.marginTop = '6px';
-          actions.appendChild(note);
-        }
+        const noteBlock = document.createElement('div');
+        noteBlock.className = 'badge';
+        noteBlock.style.marginTop = '6px';
+        noteBlock.textContent = contact.Vemo_Vorteil_Titel || contact.Vemo_Vorteil_Beschreibung || contact.Fokus_Angebot || contact.Zielgruppe || contact.Interne_Notizen || 'Mehr Details folgen';
+        actions.appendChild(noteBlock);
 
         card.appendChild(header);
         card.appendChild(badges);
@@ -966,25 +689,25 @@
       return el;
     }
 
-    function updateResultCounter() {
-      resultCounter.textContent = `${filtered.length} Ergebnisse`;
-    }
+    function updateResultCounter() { resultCounter.textContent = `${filtered.length} Ergebnisse`; }
 
     function updateMetrics() {
-      const industries = new Set(contacts.map((c) => c.industry));
-      const categories = new Set(contacts.map((c) => c.category));
-      const available = contacts.filter((c) =>
-        (c.availability || '').toLowerCase().includes('sofort')
-      ).length;
-      const warmIntros = contacts.filter((c) => c.warmIntro).length;
+      const categories = new Set(contacts.map((c) => c.Hauptkategorie).filter(Boolean));
+      const roles = new Set(contacts.map((c) => c.Rolle).filter(Boolean));
+      const recommended = contacts.filter((c) => c.Empfohlen === true).length;
+      const free = contacts.filter((c) => c.Ersttermin_kostenlos === true).length;
+      const avgRating = contacts.length
+        ? (contacts.reduce((sum, c) => sum + (c.Community_Rating || 0), 0) / contacts.length).toFixed(1)
+        : '–';
 
       metricPanel.innerHTML = '';
       [
         { label: 'Kontakte', value: contacts.length },
-        { label: 'Branchen', value: industries.size },
         { label: 'Kategorien', value: categories.size },
-        { label: 'Sofort verfügbar', value: available },
-        { label: 'Warm Intro', value: warmIntros },
+        { label: 'Rollen', value: roles.size },
+        { label: 'Empfohlen', value: recommended },
+        { label: 'Ø Rating', value: avgRating },
+        { label: 'Kostenloser Ersttermin', value: free },
       ].forEach((item) => {
         const box = document.createElement('div');
         box.className = 'metric';
@@ -995,12 +718,8 @@
 
     function renderAvailableTags() {
       const tagCount = {};
-      contacts.forEach((c) => (c.tags || []).forEach((t) => {
-        tagCount[t] = (tagCount[t] || 0) + 1;
-      }));
-      availableTags = Object.entries(tagCount)
-        .sort((a, b) => b[1] - a[1])
-        .map(([tag]) => tag);
+      contacts.forEach((c) => (c.tags || []).forEach((t) => { tagCount[t] = (tagCount[t] || 0) + 1; }));
+      availableTags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).map(([tag]) => tag);
 
       tagChips.innerHTML = '';
       availableTags.slice(0, 12).forEach((tag) => {
@@ -1034,61 +753,53 @@
     }
 
     function rebuildFilters() {
-      const industries = Array.from(new Set(contacts.map((c) => c.industry || 'Unsortiert'))).sort();
-      const categories = Array.from(new Set(contacts.map((c) => c.category || 'Kontakt'))).sort();
-      const locations = Array.from(new Set(contacts.map((c) => c.location || 'Remote'))).sort();
+      const roles = Array.from(new Set(contacts.map((c) => c.Rolle || ''))).filter(Boolean).sort();
+      const categories = Array.from(new Set(contacts.map((c) => c.Hauptkategorie || ''))).filter(Boolean).sort();
+      const locations = Array.from(new Set(contacts.map((c) => c.Standort || ''))).filter(Boolean).sort();
 
-      populateSelect(industrySelect, industries, 'Branchen');
+      populateSelect(roleSelect, roles, 'Rollen');
       populateSelect(categorySelect, categories, 'Kategorien');
       populateSelect(locationSelect, locations, 'Orte');
 
-      industrySelect.value = filterState.industry;
+      roleSelect.value = filterState.role;
       categorySelect.value = filterState.category;
       locationSelect.value = filterState.location;
-      sortSelect.value = filterState.sort;
-      toggleTop.classList.toggle('active', filterState.topOnly);
-      toggleTop.querySelector('input').checked = filterState.topOnly;
-      toggleAvailability.classList.toggle('active', filterState.availableOnly);
-      toggleAvailability.querySelector('input').checked = filterState.availableOnly;
-      toggleWarmIntro.classList.toggle('active', filterState.warmIntroOnly);
-      toggleWarmIntro.querySelector('input').checked = filterState.warmIntroOnly;
+      toggleRecommended.classList.toggle('active', filterState.recommendedOnly);
+      toggleRecommended.querySelector('input').checked = filterState.recommendedOnly;
+      toggleFree.classList.toggle('active', filterState.freeOnly);
+      toggleFree.querySelector('input').checked = filterState.freeOnly;
       searchInput.value = filterState.query;
     }
 
     function updateSheetStatus(state) {
-      const dot = sheetStatus.querySelector('.status-dot');
       if (state === 'syncing') {
-        sheetStatus.innerHTML = '<span class="status-dot"></span> Sync läuft ...';
+        sheetStatus.innerHTML = '<span class="status-dot"></span> Aktualisierung läuft...';
       } else if (state === 'ok') {
-        sheetStatus.innerHTML = '<span class="status-dot ok"></span> Sheet verbunden';
+        sheetStatus.innerHTML = '<span class="status-dot ok"></span> Daten geladen';
       } else if (state === 'error') {
-        sheetStatus.innerHTML = '<span class="status-dot err"></span> Fallback: Default-Daten';
+        sheetStatus.innerHTML = '<span class="status-dot err"></span> Fallback aktiv';
       } else {
-        sheetStatus.innerHTML = '<span class="status-dot"></span> Status: offline';
+        sheetStatus.innerHTML = '<span class="status-dot"></span> Status: bereit';
       }
     }
 
     function handleFilterChange() {
       filterState.query = searchInput.value.trim();
-      filterState.industry = industrySelect.value;
+      filterState.role = roleSelect.value;
       filterState.category = categorySelect.value;
       filterState.location = locationSelect.value;
-      filterState.sort = sortSelect.value;
-      filterState.topOnly = toggleTop.querySelector('input').checked;
-      filterState.availableOnly = toggleAvailability.querySelector('input').checked;
-      filterState.warmIntroOnly = toggleWarmIntro.querySelector('input').checked;
+      filterState.recommendedOnly = toggleRecommended.querySelector('input').checked;
+      filterState.freeOnly = toggleFree.querySelector('input').checked;
       applyFilters();
     }
 
     function resetFilters() {
       filterState.query = '';
-      filterState.industry = 'Alle Branchen';
+      filterState.role = 'Alle Rollen';
       filterState.category = 'Alle Kategorien';
       filterState.location = 'Alle Orte';
-      filterState.sort = 'priority';
-      filterState.topOnly = false;
-      filterState.availableOnly = false;
-      filterState.warmIntroOnly = false;
+      filterState.recommendedOnly = false;
+      filterState.freeOnly = false;
       filterState.tags = [];
       rebuildFilters();
       applyFilters();
@@ -1114,23 +825,17 @@
 
     function bindEvents() {
       searchInput.addEventListener('input', handleFilterChange);
-      industrySelect.addEventListener('change', handleFilterChange);
+      roleSelect.addEventListener('change', handleFilterChange);
       categorySelect.addEventListener('change', handleFilterChange);
       locationSelect.addEventListener('change', handleFilterChange);
-      sortSelect.addEventListener('change', handleFilterChange);
-      toggleTop.addEventListener('click', () => {
-        toggleTop.classList.toggle('active');
-        toggleTop.querySelector('input').checked = !filterState.topOnly;
+      toggleRecommended.addEventListener('click', () => {
+        toggleRecommended.classList.toggle('active');
+        toggleRecommended.querySelector('input').checked = !filterState.recommendedOnly;
         handleFilterChange();
       });
-      toggleAvailability.addEventListener('click', () => {
-        toggleAvailability.classList.toggle('active');
-        toggleAvailability.querySelector('input').checked = !filterState.availableOnly;
-        handleFilterChange();
-      });
-      toggleWarmIntro.addEventListener('click', () => {
-        toggleWarmIntro.classList.toggle('active');
-        toggleWarmIntro.querySelector('input').checked = !filterState.warmIntroOnly;
+      toggleFree.addEventListener('click', () => {
+        toggleFree.classList.toggle('active');
+        toggleFree.querySelector('input').checked = !filterState.freeOnly;
         handleFilterChange();
       });
       refreshFromSheet.addEventListener('click', syncFromSheet);
