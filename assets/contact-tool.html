@@ -520,10 +520,18 @@
     async function syncFromSheet() {
       try {
         const cfg = sheetConfig();
-        const csv = await fetchSheetCsv(cfg.sheetBaseId, cfg.gid);
-        const rows = parseCsv(csv);
-        const parsed = parseContactsFromSheet(rows).filter((c) => c.name);
-        contacts = parsed.length ? parsed : [...defaultContacts];
+        const loadOnce = async (gidToUse) => {
+          const csv = await fetchSheetCsv(cfg.sheetBaseId, gidToUse);
+          const rows = parseCsv(csv);
+          return parseContactsFromSheet(rows).filter((c) => c.name);
+        };
+
+        let parsed = await loadOnce(cfg.gid);
+        if ((!parsed || !parsed.length) && cfg.fallbackGid && cfg.fallbackGid !== cfg.gid) {
+          parsed = await loadOnce(cfg.fallbackGid);
+        }
+
+        contacts = parsed && parsed.length ? parsed : [...defaultContacts];
         setLastUpdated();
         rebuildFilters();
         applyFilters();
