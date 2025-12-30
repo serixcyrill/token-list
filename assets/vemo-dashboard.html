@@ -1418,7 +1418,7 @@
   </style>
 </head>
 <body>
-  <div class="page is-loading">
+  <div class="page">
     <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
       <div class="loading-shell">
         <div class="loading-pill"></div>
@@ -1605,7 +1605,7 @@
     setLoadingState(true);
     loadingFallbackTimer = setTimeout(() => {
       setLoadingState(false);
-    }, 4500);
+    }, 1400);
 
     window.addEventListener('load', () => {
       setLoadingState(false);
