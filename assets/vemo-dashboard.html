@@ -61,84 +61,6 @@
       flex-direction: column;
     }
 
-    .page.is-loading {
-      pointer-events: none;
-    }
-
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(248, 250, 252, 0.82);
-      backdrop-filter: blur(8px);
-      display: none;
-      place-items: center;
-      z-index: 50;
-    }
-
-    .page.is-loading .loading-overlay {
-      display: grid;
-    }
-
-    .loading-shell {
-      width: min(720px, 88vw);
-      background: rgba(255, 255, 255, 0.88);
-      border-radius: 20px;
-      padding: 26px;
-      box-shadow: 0 24px 60px rgba(25, 32, 56, 0.12);
-      display: grid;
-      gap: 16px;
-    }
-
-    .loading-pill,
-    .loading-bar,
-    .loading-card {
-      position: relative;
-      overflow: hidden;
-      background: #eef2f6;
-      border-radius: 999px;
-    }
-
-    .loading-pill {
-      width: 140px;
-      height: 28px;
-    }
-
-    .loading-bar {
-      height: 16px;
-      border-radius: 12px;
-    }
-
-    .loading-bar.short {
-      width: 55%;
-    }
-
-    .loading-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-
-    .loading-card {
-      height: 120px;
-      border-radius: 16px;
-    }
-
-    .loading-pill::after,
-    .loading-bar::after,
-    .loading-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      transform: translateX(-100%);
-      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.65), transparent);
-      animation: shimmer 1.6s infinite;
-    }
-
-    @keyframes shimmer {
-      100% {
-        transform: translateX(100%);
-      }
-    }
 
     .notice {
       background: rgba(114, 210, 122, 0.18);
@@ -1424,18 +1346,6 @@
 </head>
 <body>
   <div class="page">
-    <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
-      <div class="loading-shell">
-        <div class="loading-pill"></div>
-        <div class="loading-bar"></div>
-        <div class="loading-bar short"></div>
-        <div class="loading-grid">
-          <div class="loading-card"></div>
-          <div class="loading-card"></div>
-          <div class="loading-card"></div>
-        </div>
-      </div>
-    </div>
     <main>
       <section class="card" id="vorsorge">
         <div class="section-heading">
@@ -1601,20 +1511,8 @@
     const kryptoToggle = document.getElementById('kryptoToggle');
     const updateTrigger = document.getElementById('lastUpdateTrigger');
     const advisorGrid = document.querySelector('.advisor-grid');
-    const pageShell = document.querySelector('.page');
-    const loadingOverlay = document.getElementById('loadingOverlay');
     let avatarInputs = [];
     let avatarLabels = [];
-    let loadingFallbackTimer;
-
-    setLoadingState(true);
-    loadingFallbackTimer = setTimeout(() => {
-      setLoadingState(false);
-    }, 4000);
-
-    window.addEventListener('load', () => {
-      setLoadingState(false);
-    });
 
     const STORAGE_KEYS = {
       editable: 'vemo-editable-fields',
@@ -2168,15 +2066,6 @@
 
     function getActiveKryptoFund() {
       return getKryptoFundForProduct(activeVorsorgeIndex);
-    }
-
-    function setLoadingState(isLoading) {
-      if (pageShell) {
-        pageShell.classList.toggle('is-loading', isLoading);
-      }
-      if (loadingOverlay) {
-        loadingOverlay.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
-      }
     }
 
     async function fetchSheetCsv(gid) {
@@ -3899,11 +3788,6 @@
         renderAdvisors(advisorData);
         applyUpdatesData();
         queueRefreshEditableState();
-        if (loadingFallbackTimer) {
-          clearTimeout(loadingFallbackTimer);
-          loadingFallbackTimer = null;
-        }
-        setLoadingState(false);
       });
   </script>
 </body>
