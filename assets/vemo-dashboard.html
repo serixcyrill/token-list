@@ -1601,8 +1601,12 @@
     const loadingOverlay = document.getElementById('loadingOverlay');
     let avatarInputs = [];
     let avatarLabels = [];
+    let loadingFallbackTimer;
 
     setLoadingState(true);
+    loadingFallbackTimer = setTimeout(() => {
+      setLoadingState(false);
+    }, 4000);
 
     const STORAGE_KEYS = {
       editable: 'vemo-editable-fields',
@@ -3887,6 +3891,10 @@
         renderAdvisors(advisorData);
         applyUpdatesData();
         queueRefreshEditableState();
+        if (loadingFallbackTimer) {
+          clearTimeout(loadingFallbackTimer);
+          loadingFallbackTimer = null;
+        }
         setLoadingState(false);
       });
   </script>
