@@ -61,6 +61,81 @@
       flex-direction: column;
     }
 
+    .page.is-loading {
+      pointer-events: none;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(248, 250, 252, 0.82);
+      backdrop-filter: blur(8px);
+      display: grid;
+      place-items: center;
+      z-index: 50;
+    }
+
+    .loading-shell {
+      width: min(720px, 88vw);
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: 20px;
+      padding: 26px;
+      box-shadow: 0 24px 60px rgba(25, 32, 56, 0.12);
+      display: grid;
+      gap: 16px;
+    }
+
+    .loading-pill,
+    .loading-bar,
+    .loading-card {
+      position: relative;
+      overflow: hidden;
+      background: #eef2f6;
+      border-radius: 999px;
+    }
+
+    .loading-pill {
+      width: 140px;
+      height: 28px;
+    }
+
+    .loading-bar {
+      height: 16px;
+      border-radius: 12px;
+    }
+
+    .loading-bar.short {
+      width: 55%;
+    }
+
+    .loading-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .loading-card {
+      height: 120px;
+      border-radius: 16px;
+    }
+
+    .loading-pill::after,
+    .loading-bar::after,
+    .loading-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+      animation: shimmer 1.6s infinite;
+    }
+
+    @keyframes shimmer {
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
     .notice {
       background: rgba(114, 210, 122, 0.18);
       color: var(--text);
@@ -174,8 +249,21 @@
     }
 
     .vorsorge-card.is-active {
-      border-color: rgba(90, 150, 255, 0.6);
-      box-shadow: 0 12px 26px rgba(90, 150, 255, 0.18);
+      border-color: rgba(114, 210, 122, 0.75);
+      box-shadow: 0 14px 28px rgba(114, 210, 122, 0.22), 0 0 0 2px rgba(114, 210, 122, 0.18);
+      position: relative;
+    }
+
+    .vorsorge-card.is-active::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 14px;
+      background: radial-gradient(circle at 20% 20%, rgba(126, 217, 87, 0.25), transparent 40%),
+        radial-gradient(circle at 80% 10%, rgba(114, 210, 122, 0.2), transparent 35%);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: -1;
     }
 
     .vorsorge-card:hover {
@@ -183,9 +271,8 @@
       border-color: rgba(114, 210, 122, 0.6);
     }
 
-    .vorsorge-card.rank-1 {
-      border: 2px solid var(--accent);
-      box-shadow: 0 8px 22px rgba(114, 210, 122, 0.18);
+    .pill-hidden {
+      display: none;
     }
 
     .vorsorge-card h3 {
@@ -1332,7 +1419,19 @@
   </style>
 </head>
 <body>
-  <div class="page">
+  <div class="page is-loading">
+    <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+      <div class="loading-shell">
+        <div class="loading-pill"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar short"></div>
+        <div class="loading-grid">
+          <div class="loading-card"></div>
+          <div class="loading-card"></div>
+          <div class="loading-card"></div>
+        </div>
+      </div>
+    </div>
     <div id="adminNotice" class="notice" style="display: none;">
       <span>Admin Modus aktiv.</span>
       <button type="button" class="exit-admin" id="exitAdmin">Modus verlassen</button>
@@ -1341,7 +1440,7 @@
     <main>
       <section class="card" id="vorsorge">
         <div class="section-heading">
-          <h2 data-editable="true">Vorsorgemantel</h2>
+          <h2 data-editable="true">Mantel</h2>
           <p class="section-sub" data-editable="true">Übersicht möglicher Modellstrategien zu Vorsorgeoptionen.</p>
           <span class="section-meta" id="lastUpdateTrigger" data-editable="true">Letztes Update: 12.09.2024</span>
         </div>
@@ -1527,8 +1626,12 @@
     const submitCodeBtn = document.getElementById('submitCode');
     const exitAdminBtn = document.getElementById('exitAdmin');
     const advisorGrid = document.querySelector('.advisor-grid');
+    const pageShell = document.querySelector('.page');
+    const loadingOverlay = document.getElementById('loadingOverlay');
     let avatarInputs = [];
     let avatarLabels = [];
+
+    setLoadingState(true);
 
     const STORAGE_KEYS = {
       editable: 'vemo-editable-fields',
@@ -2085,6 +2188,15 @@
 
     function getActiveKryptoFund() {
       return getKryptoFundForProduct(activeVorsorgeIndex);
+    }
+
+    function setLoadingState(isLoading) {
+      if (pageShell) {
+        pageShell.classList.toggle('is-loading', isLoading);
+      }
+      if (loadingOverlay) {
+        loadingOverlay.style.display = isLoading ? 'grid' : 'none';
+      }
     }
 
     async function fetchSheetCsv(gid) {
@@ -2649,7 +2761,6 @@
       records.forEach((card, index) => {
         const article = document.createElement('article');
         article.className = 'vorsorge-card';
-        if (card.ranking === '1') article.classList.add('rank-1');
         article.classList.toggle('is-active', index === activeVorsorgeIndex);
         article.addEventListener('click', (event) => {
           if (event.target.closest('a, button, input, textarea, select')) return;
@@ -2665,11 +2776,8 @@
         }
 
         const pill = document.createElement('div');
-        pill.className = 'pill';
-        pill.textContent = card.rankingLabel || `Ranking ${card.ranking}`;
-        attachEditable(pill, `vorsorge-${index}-pill`, (value) => {
-          vorsorgeData[index].rankingLabel = value;
-        });
+        pill.className = 'pill pill-hidden';
+        pill.setAttribute('aria-hidden', 'true');
 
         const h3 = document.createElement('h3');
         h3.textContent = card.title;
@@ -3894,6 +4002,7 @@
         renderAdvisors(advisorData);
         applyUpdatesData();
         queueRefreshEditableState();
+        setLoadingState(false);
       });
   </script>
 </body>
