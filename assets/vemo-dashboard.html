@@ -339,7 +339,7 @@
       width: 56px;
       height: 56px;
       object-fit: contain;
-      border-radius: 12px;
+      border-radius: 16px;
       background: rgba(255, 255, 255, 0.78);
       box-shadow: 0 10px 24px rgba(15, 26, 42, 0.12);
       border: 1px solid rgba(0, 0, 0, 0.04);
@@ -2054,6 +2054,7 @@
     let activeVorsorgeIndex = normalizeStoredIndex(loadJson(STORAGE_KEYS.selectedVorsorge, 0));
     let activePortfolioType = 'factor';
     let kryptoFund = deepClone(defaultKryptoFund);
+    let portfolioDataFromSheet = false;
     let advisorData = deepClone(defaultAdvisors);
     let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
     let updatesData = deepClone(defaultUpdatesData);
@@ -2121,7 +2122,9 @@
           portfolioMetaByProduct[i] = deepClone(defaultPortfolioMeta);
         }
         if (!portfolioDataByProduct[i]) {
-          portfolioDataByProduct[i] = deepClone(defaultPortfolioData);
+          portfolioDataByProduct[i] = portfolioDataFromSheet
+            ? { factor: [], marketcap: [], bip: [], obligationen: [] }
+            : deepClone(defaultPortfolioData);
         }
         if (!kryptoFundsByProduct[i]) {
           kryptoFundsByProduct[i] = deepClone(defaultKryptoFund);
@@ -2559,9 +2562,10 @@
         });
 
         const hasAny = nextByProduct.some((data) => Object.values(data).some((arr) => arr.length));
+        portfolioDataByProduct = nextByProduct;
+        kryptoFundsByProduct = nextKryptoByProduct;
+        portfolioDataFromSheet = true;
         if (hasAny) {
-          portfolioDataByProduct = nextByProduct;
-          kryptoFundsByProduct = nextKryptoByProduct;
           persistPortfolioData();
         }
       } catch (error) {
@@ -3896,6 +3900,11 @@
         if (activeVorsorgeIndex >= vorsorgeData.length) {
           activeVorsorgeIndex = 0;
           persistJson(STORAGE_KEYS.selectedVorsorge, activeVorsorgeIndex);
+        }
+        if (portfolioDataFromSheet && portfolioDataByProduct.length < vorsorgeData.length) {
+          for (let i = portfolioDataByProduct.length; i < vorsorgeData.length; i += 1) {
+            portfolioDataByProduct[i] = { factor: [], marketcap: [], bip: [], obligationen: [] };
+          }
         }
         kryptoActive = Boolean(kryptoActiveByProduct[activeVorsorgeIndex]);
         kryptoFund = getActiveKryptoFund();
