@@ -70,9 +70,13 @@
       inset: 0;
       background: rgba(248, 250, 252, 0.82);
       backdrop-filter: blur(8px);
-      display: grid;
+      display: none;
       place-items: center;
       z-index: 50;
+    }
+
+    .page.is-loading .loading-overlay {
+      display: grid;
     }
 
     .loading-shell {
@@ -1419,7 +1423,7 @@
   </style>
 </head>
 <body>
-  <div class="page is-loading">
+  <div class="page">
     <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
       <div class="loading-shell">
         <div class="loading-pill"></div>
@@ -1607,6 +1611,10 @@
     loadingFallbackTimer = setTimeout(() => {
       setLoadingState(false);
     }, 4000);
+
+    window.addEventListener('load', () => {
+      setLoadingState(false);
+    });
 
     const STORAGE_KEYS = {
       editable: 'vemo-editable-fields',
@@ -2167,7 +2175,7 @@
         pageShell.classList.toggle('is-loading', isLoading);
       }
       if (loadingOverlay) {
-        loadingOverlay.style.display = isLoading ? 'grid' : 'none';
+        loadingOverlay.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
       }
     }
 
