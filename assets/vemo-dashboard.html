@@ -173,6 +173,11 @@
       transition: border 0.2s ease, transform 0.2s ease;
     }
 
+    .vorsorge-card.is-active {
+      border-color: rgba(90, 150, 255, 0.6);
+      box-shadow: 0 12px 26px rgba(90, 150, 255, 0.18);
+    }
+
     .vorsorge-card:hover {
       transform: translateY(-2px);
       border-color: rgba(114, 210, 122, 0.6);
@@ -1530,6 +1535,8 @@
       portfolios: 'vemo-portfolio-data',
       ablauf: 'vemo-ablauf-data',
       avatars: 'vemo-avatar-urls',
+      selectedVorsorge: 'vemo-selected-vorsorge',
+      kryptoActive: 'vemo-krypto-active',
     };
 
     const SHIMMER_COLORS = ['#6fd9b5', '#6abef5', '#9fb5ff', '#ffc87c', '#8fd8ff', '#ffb3d6'];
@@ -1611,11 +1618,12 @@
       });
     }
 
-    function bindEditableSync(el, type, index, field, rerender = false) {
+    function bindEditableSync(el, type, index, field, rerender = false, productIndex = activeVorsorgeIndex) {
       if (!el) return;
-      const key = `portfolio-${type}-${index}-${field}`;
+      const key = `portfolio-${productIndex}-${type}-${index}-${field}`;
       attachEditable(el, key, (value) => {
-        portfolioData[type][index][field] = value;
+        const data = getPortfolioDataForProduct(productIndex);
+        data[type][index][field] = value;
         persistPortfolioData();
         if (rerender) {
           renderPortfolios(type);
@@ -1946,8 +1954,27 @@
       },
     ];
 
-    let portfolioMeta = deepClone(defaultPortfolioMeta);
-    let portfolioData = loadJson(STORAGE_KEYS.portfolios, defaultPortfolioData);
+    function normalizePortfolioStorage(raw) {
+      if (Array.isArray(raw)) return raw;
+      if (raw && typeof raw === 'object' && Object.keys(raw).length) return [raw];
+      return [];
+    }
+
+    function normalizeStoredIndex(raw) {
+      const num = Number(raw);
+      return Number.isFinite(num) && num >= 0 ? Math.floor(num) : 0;
+    }
+
+    let portfolioMetaByProduct = [deepClone(defaultPortfolioMeta)];
+    let portfolioDataByProduct = normalizePortfolioStorage(loadJson(STORAGE_KEYS.portfolios, defaultPortfolioData));
+    if (!portfolioDataByProduct.length) {
+      portfolioDataByProduct = [deepClone(defaultPortfolioData)];
+    }
+    let kryptoFundsByProduct = [deepClone(defaultKryptoFund)];
+    let kryptoActiveByProduct = loadJson(STORAGE_KEYS.kryptoActive, []);
+    if (!Array.isArray(kryptoActiveByProduct)) kryptoActiveByProduct = [];
+    let activeVorsorgeIndex = normalizeStoredIndex(loadJson(STORAGE_KEYS.selectedVorsorge, 0));
+    let activePortfolioType = 'factor';
     let kryptoFund = deepClone(defaultKryptoFund);
     let advisorData = deepClone(defaultAdvisors);
     let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
@@ -2007,6 +2034,57 @@
       const g = (bigint >> 8) & 255;
       const b = bigint & 255;
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function ensurePortfolioStructures(count) {
+      const total = Math.max(1, count || 0);
+      for (let i = 0; i < total; i += 1) {
+        if (!portfolioMetaByProduct[i]) {
+          portfolioMetaByProduct[i] = deepClone(defaultPortfolioMeta);
+        }
+        if (!portfolioDataByProduct[i]) {
+          portfolioDataByProduct[i] = deepClone(defaultPortfolioData);
+        }
+        if (!kryptoFundsByProduct[i]) {
+          kryptoFundsByProduct[i] = deepClone(defaultKryptoFund);
+        }
+        if (typeof kryptoActiveByProduct[i] !== 'boolean') {
+          kryptoActiveByProduct[i] = false;
+        }
+      }
+    }
+
+    function getPortfolioMetaForProduct(index) {
+      if (!portfolioMetaByProduct[index]) {
+        portfolioMetaByProduct[index] = deepClone(defaultPortfolioMeta);
+      }
+      return portfolioMetaByProduct[index];
+    }
+
+    function getPortfolioDataForProduct(index) {
+      if (!portfolioDataByProduct[index]) {
+        portfolioDataByProduct[index] = deepClone(defaultPortfolioData);
+      }
+      return portfolioDataByProduct[index];
+    }
+
+    function getKryptoFundForProduct(index) {
+      if (!kryptoFundsByProduct[index]) {
+        kryptoFundsByProduct[index] = deepClone(defaultKryptoFund);
+      }
+      return kryptoFundsByProduct[index];
+    }
+
+    function getActivePortfolioData() {
+      return getPortfolioDataForProduct(activeVorsorgeIndex);
+    }
+
+    function getActivePortfolioMeta() {
+      return getPortfolioMetaForProduct(activeVorsorgeIndex);
+    }
+
+    function getActiveKryptoFund() {
+      return getKryptoFundForProduct(activeVorsorgeIndex);
     }
 
     async function fetchSheetCsv(gid) {
@@ -2131,77 +2209,103 @@
       return normalized;
     }
 
+    function normalizeFieldKey(value) {
+      return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function splitSheetBlocks(rows) {
+      const blocks = [];
+      let current = [];
+      rows.forEach((row) => {
+        const isHeader = normalizeFieldKey(row[0]) === 'feld';
+        if (isHeader && current.length) {
+          blocks.push(current);
+          current = [];
+        }
+        if (row.length) {
+          current.push(row);
+        }
+      });
+      if (current.length) blocks.push(current);
+      return blocks;
+    }
+
     async function loadPortfolioMetaFromSheet() {
       try {
         const csvText = await fetchSheetCsv(SHEET_GIDS.portfolios);
         const rows = parseCsv(csvText).filter((r) => r.length);
         if (!rows.length) return;
 
-        const header = rows[0]
-          .slice(1)
-          .map((v) => normalizePortfolioType(v))
-          .map((key) => (key === 'faktor' ? 'factor' : key));
-        const nextMeta = deepClone(defaultPortfolioMeta);
+        const blocks = splitSheetBlocks(rows);
+        const nextMetaByProduct = blocks.map((block) => {
+          const header = (block[0] || [])
+            .slice(1)
+            .map((v) => normalizePortfolioType(v))
+            .map((key) => (key === 'faktor' ? 'factor' : key));
+          const nextMeta = deepClone(defaultPortfolioMeta);
 
-        rows.forEach((row, rowIdx) => {
-          const [fieldRaw, ...values] = row;
-          const normalized = (fieldRaw || '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, '');
+          block.slice(1).forEach((row, rowIdx) => {
+            const [fieldRaw, ...values] = row;
+            const normalized = normalizeFieldKey(fieldRaw);
 
-          values.forEach((value, idx) => {
-            const typeKey = normalizePortfolioType(header[idx]);
-            if (!typeKey || !nextMeta[typeKey]) return;
+            values.forEach((value, idx) => {
+              const typeKey = normalizePortfolioType(header[idx]);
+              if (!typeKey || !nextMeta[typeKey]) return;
 
-            if (!value) return;
+              if (!value) return;
 
-            switch (normalized) {
-              case 'title':
-              case 'titel':
-              case 'name':
-                nextMeta[typeKey].title = value;
-                break;
-              case 'summary':
-              case 'beschreibung':
-              case 'desc':
-                nextMeta[typeKey].summary = value;
-                break;
-              case 'rendite':
-              case 'renditepa':
-              case 'renditep.a':
-              case 'renditeprojahr':
-                nextMeta[typeKey].renditePa = value;
-                break;
-              case 'seit':
-              case 'seitstart':
-              case 'renditeseit':
-              case 'seitjahr':
-              case 'since':
-                nextMeta[typeKey].seit = value;
-                break;
-              case 'info':
-              case 'infonebentitel':
-              case 'infonebentitle':
-              case 'infonebentittel':
-                nextMeta[typeKey].info = value;
-                break;
-              default:
-                if (normalized.startsWith('info')) {
+              switch (normalized) {
+                case 'title':
+                case 'titel':
+                case 'name':
+                  nextMeta[typeKey].title = value;
+                  break;
+                case 'summary':
+                case 'beschreibung':
+                case 'desc':
+                  nextMeta[typeKey].summary = value;
+                  break;
+                case 'rendite':
+                case 'renditepa':
+                case 'renditep.a':
+                case 'renditeprojahr':
+                  nextMeta[typeKey].renditePa = value;
+                  break;
+                case 'seit':
+                case 'seitstart':
+                case 'renditeseit':
+                case 'seitjahr':
+                case 'since':
+                  nextMeta[typeKey].seit = value;
+                  break;
+                case 'info':
+                case 'infonebentitel':
+                case 'infonebentitle':
+                case 'infonebentittel':
                   nextMeta[typeKey].info = value;
-                }
-                break;
-            }
+                  break;
+                default:
+                  if (normalized.startsWith('info')) {
+                    nextMeta[typeKey].info = value;
+                  }
+                  break;
+              }
 
-            if (!nextMeta[typeKey].info && rowIdx === 4) {
-              nextMeta[typeKey].info = value;
-            }
+              if (!nextMeta[typeKey].info && rowIdx === 3) {
+                nextMeta[typeKey].info = value;
+              }
+            });
           });
+
+          return nextMeta;
         });
 
-        portfolioMeta = nextMeta;
+        if (nextMetaByProduct.length) {
+          portfolioMetaByProduct = nextMetaByProduct;
+        }
       } catch (error) {
         console.warn('Portfolio-Meta Sheet konnte nicht geladen werden, nutze Fallback', error);
-        portfolioMeta = deepClone(defaultPortfolioMeta);
+        portfolioMetaByProduct = [deepClone(defaultPortfolioMeta)];
       }
     }
 
@@ -2241,125 +2345,137 @@
         const rows = parseCsv(csvText).filter((r) => r.length);
         if (rows.length < 2) throw new Error('Zu wenige Fonds-Zeilen');
 
-        const normalizeFieldKey = (name) => String(name || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+        const blocks = splitSheetBlocks(rows);
+        const nextByProduct = [];
+        const nextKryptoByProduct = [];
 
-        const header = rows[0];
-        const fieldRows = rows.slice(1);
-        const rowAt = (index1Based) => fieldRows[index1Based - 2] || [];
-        const findRow = (key, aliases = []) => {
-          const targets = [key, ...aliases].map(normalizeFieldKey);
-          return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0])));
-        };
-
-        const strategyRow = findRow('strategie');
-        const sortRow = findRow('sortierung');
-        const nextData = {
-          factor: [],
-          marketcap: [],
-          bip: [],
-          obligationen: [],
-        };
-        let nextKrypto = null;
-
-        const getFieldRow = (name, aliases = []) => {
-          const targets = [name, ...aliases].map(normalizeFieldKey);
-          return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0]))) || [];
-        };
-
-        const preferRow = (...candidates) => candidates.find((row) => Array.isArray(row) && row.length > 1 && row.some(Boolean)) || [];
-
-        const fondsNameRow = getFieldRow('fondsname');
-        const isKryptoColumn = (strategyValue, titleValue, columnLabel) => {
-          const normalizedStrategy = String(strategyValue || '').toLowerCase();
-          if (normalizedStrategy === 'krypto') return true;
-          const normalizedColumn = String(columnLabel || '').toLowerCase();
-          if (normalizedColumn.includes('krypto')) return true;
-          const normalizedTitle = String(titleValue || '').toLowerCase();
-          return normalizedTitle.includes('krypto') || normalizedTitle.includes('bitcoin');
-        };
-
-        const rendite5Row = preferRow(
-          rowAt(6),
-          getFieldRow('rendite5', [
-            'durchschnittsrendite 5 jahre',
-            'durchschnittsrendite5jahre',
-            'durchschnittsrendite5 jahr',
-          ])
-        );
-
-        const rendite10Row = preferRow(
-          rowAt(7),
-          getFieldRow('rendite10', ['durchschnittsrendite 10 jahre'])
-        );
-
-        const pro1Row = preferRow(rowAt(9), findRow('pro1'), getFieldRow('fondsvolumen'));
-        const pro2Row = preferRow(rowAt(10), findRow('pro2'), getFieldRow('positionen'));
-        const pro3Row = preferRow(rowAt(11), findRow('pro3'), getFieldRow('auflage seit'));
-        const con1Row = preferRow(rowAt(12), findRow('con1'), getFieldRow('beschreibung'));
-
-        header.slice(1).forEach((colLabel, colIdx) => {
-          const col = colIdx + 1;
-          const strategy = (strategyRow?.[col] || '').toLowerCase();
-          const title = fondsNameRow[col] || '';
-          const isKrypto = isKryptoColumn(strategy, title, colLabel);
-
-          if (!nextData[strategy] && !isKrypto) {
-            return;
-          }
-
-          const sortOrder = parseInt(sortRow?.[col] || '', 10) || colIdx + 1;
-
-          if (isKrypto) {
-            const kFund = {
-              ...deepClone(defaultKryptoFund),
-              title: title || defaultKryptoFund.title,
-              desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || defaultKryptoFund.desc,
-              fondsvolumen: normalizeListValue(pro1Row?.[col]) || defaultKryptoFund.fondsvolumen,
-              positionen: normalizeListValue(pro2Row?.[col]) || defaultKryptoFund.positionen,
-              auflageSeit: normalizeListValue(pro3Row?.[col]) || defaultKryptoFund.auflageSeit,
-              returns5: normalizePercentPa(rendite5Row[col] || defaultKryptoFund.returns5),
-              returns10: normalizePercentPa(rendite10Row[col] || defaultKryptoFund.returns10),
-              allocation: 5,
-              since: getFieldRow('since')[col] || defaultKryptoFund.since,
-              factsheet: getFieldRow('factsheet')[col] || defaultKryptoFund.factsheet,
-              sortOrder,
-              isKrypto: true,
-            };
-            nextKrypto = kFund;
-            return;
-          }
-
-          if (!title) return;
-
-          const fund = {
-            title,
-            desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || '',
-            fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
-            positionen: normalizeListValue(pro2Row?.[col]) || '',
-            auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
-            returns5: normalizePercentPa(rendite5Row[col] || ''),
-            returns10: normalizePercentPa(rendite10Row[col] || ''),
-            allocation: Number(getFieldRow('allocation')[col] || 0),
-            since: getFieldRow('since')[col] || '',
-            factsheet: getFieldRow('factsheet')[col] || '',
-            sortOrder,
+        const parseBlock = (block) => {
+          const header = block[0] || [];
+          const fieldRows = block.slice(1);
+          const rowAt = (index1Based) => fieldRows[index1Based - 2] || [];
+          const findRow = (key, aliases = []) => {
+            const targets = [key, ...aliases].map(normalizeFieldKey);
+            return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0])));
           };
 
-          nextData[strategy].push(fund);
+          const strategyRow = findRow('strategie');
+          const sortRow = findRow('sortierung');
+          const nextData = {
+            factor: [],
+            marketcap: [],
+            bip: [],
+            obligationen: [],
+          };
+          let nextKrypto = null;
+
+          const getFieldRow = (name, aliases = []) => {
+            const targets = [name, ...aliases].map(normalizeFieldKey);
+            return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0]))) || [];
+          };
+
+          const preferRow = (...candidates) =>
+            candidates.find((row) => Array.isArray(row) && row.length > 1 && row.some(Boolean)) || [];
+
+          const fondsNameRow = getFieldRow('fondsname');
+          const isKryptoColumn = (strategyValue, titleValue, columnLabel) => {
+            const normalizedStrategy = String(strategyValue || '').toLowerCase();
+            if (normalizedStrategy === 'krypto') return true;
+            const normalizedColumn = String(columnLabel || '').toLowerCase();
+            if (normalizedColumn.includes('krypto')) return true;
+            const normalizedTitle = String(titleValue || '').toLowerCase();
+            return normalizedTitle.includes('krypto') || normalizedTitle.includes('bitcoin');
+          };
+
+          const rendite5Row = preferRow(
+            rowAt(6),
+            getFieldRow('rendite5', [
+              'durchschnittsrendite 5 jahre',
+              'durchschnittsrendite5jahre',
+              'durchschnittsrendite5 jahr',
+            ])
+          );
+
+          const rendite10Row = preferRow(
+            rowAt(7),
+            getFieldRow('rendite10', ['durchschnittsrendite 10 jahre'])
+          );
+
+          const pro1Row = preferRow(rowAt(9), findRow('pro1'), getFieldRow('fondsvolumen'));
+          const pro2Row = preferRow(rowAt(10), findRow('pro2'), getFieldRow('positionen'));
+          const pro3Row = preferRow(rowAt(11), findRow('pro3'), getFieldRow('auflage seit'));
+          const con1Row = preferRow(rowAt(12), findRow('con1'), getFieldRow('beschreibung'));
+
+          header.slice(1).forEach((colLabel, colIdx) => {
+            const col = colIdx + 1;
+            const strategy = (strategyRow?.[col] || '').toLowerCase();
+            const title = fondsNameRow[col] || '';
+            const isKrypto = isKryptoColumn(strategy, title, colLabel);
+
+            if (!nextData[strategy] && !isKrypto) {
+              return;
+            }
+
+            const sortOrder = parseInt(sortRow?.[col] || '', 10) || colIdx + 1;
+
+            if (isKrypto) {
+              const kFund = {
+                ...deepClone(defaultKryptoFund),
+                title: title || defaultKryptoFund.title,
+                desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || defaultKryptoFund.desc,
+                fondsvolumen: normalizeListValue(pro1Row?.[col]) || defaultKryptoFund.fondsvolumen,
+                positionen: normalizeListValue(pro2Row?.[col]) || defaultKryptoFund.positionen,
+                auflageSeit: normalizeListValue(pro3Row?.[col]) || defaultKryptoFund.auflageSeit,
+                returns5: normalizePercentPa(rendite5Row[col] || defaultKryptoFund.returns5),
+                returns10: normalizePercentPa(rendite10Row[col] || defaultKryptoFund.returns10),
+                allocation: 5,
+                since: getFieldRow('since')[col] || defaultKryptoFund.since,
+                factsheet: getFieldRow('factsheet')[col] || defaultKryptoFund.factsheet,
+                sortOrder,
+                isKrypto: true,
+              };
+              nextKrypto = kFund;
+              return;
+            }
+
+            if (!title) return;
+
+            const fund = {
+              title,
+              desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || '',
+              fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
+              positionen: normalizeListValue(pro2Row?.[col]) || '',
+              auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
+              returns5: normalizePercentPa(rendite5Row[col] || ''),
+              returns10: normalizePercentPa(rendite10Row[col] || ''),
+              allocation: Number(getFieldRow('allocation')[col] || 0),
+              since: getFieldRow('since')[col] || '',
+              factsheet: getFieldRow('factsheet')[col] || '',
+              sortOrder,
+            };
+
+            nextData[strategy].push(fund);
+          });
+
+          Object.keys(nextData).forEach((key) => {
+            nextData[key].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+            nextData[key].forEach((item) => delete item.sortOrder);
+          });
+
+          return { data: nextData, krypto: nextKrypto };
+        };
+
+        blocks.forEach((block) => {
+          const parsed = parseBlock(block);
+          if (!parsed) return;
+          nextByProduct.push(parsed.data);
+          nextKryptoByProduct.push(parsed.krypto || deepClone(defaultKryptoFund));
         });
 
-        Object.keys(nextData).forEach((key) => {
-          nextData[key].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-          nextData[key].forEach((item) => delete item.sortOrder);
-        });
-
-        const hasAny = Object.values(nextData).some((arr) => arr.length);
+        const hasAny = nextByProduct.some((data) => Object.values(data).some((arr) => arr.length));
         if (hasAny) {
-          portfolioData = nextData;
+          portfolioDataByProduct = nextByProduct;
+          kryptoFundsByProduct = nextKryptoByProduct;
           persistPortfolioData();
-        }
-        if (nextKrypto) {
-          kryptoFund = nextKrypto;
         }
       } catch (error) {
         console.warn('Fonds Sheet konnte nicht geladen werden, nutze Fallback/LocalStorage', error);
@@ -2534,6 +2650,11 @@
         const article = document.createElement('article');
         article.className = 'vorsorge-card';
         if (card.ranking === '1') article.classList.add('rank-1');
+        article.classList.toggle('is-active', index === activeVorsorgeIndex);
+        article.addEventListener('click', (event) => {
+          if (event.target.closest('a, button, input, textarea, select')) return;
+          setActiveVorsorgeIndex(index);
+        });
 
         if (card.logo) {
           const logoImg = document.createElement('img');
@@ -2811,7 +2932,8 @@
     }
 
     function buildPortfolioView(type) {
-      const baseList = (portfolioData[type] || []).map((item, idx) => ({
+      const activeData = getActivePortfolioData();
+      const baseList = (activeData[type] || []).map((item, idx) => ({
         ...item,
         __idx: idx,
         isKrypto: false,
@@ -2836,7 +2958,7 @@
       }
 
       adjusted.push({
-        ...kryptoFund,
+        ...getActiveKryptoFund(),
         allocation: deductionTotal,
         __idx: -1,
         isKrypto: true,
@@ -2890,7 +3012,7 @@
     }
 
     function persistPortfolioData() {
-      persistJson(STORAGE_KEYS.portfolios, portfolioData);
+      persistJson(STORAGE_KEYS.portfolios, portfolioDataByProduct);
     }
 
     function persistAblaufData() {
@@ -2915,7 +3037,7 @@
     function renderPortfoliosNow(type) {
       const list = document.getElementById('portfolioList');
       list.innerHTML = '';
-      const meta = portfolioMeta[type];
+      const meta = getActivePortfolioMeta()[type];
       syncKryptoToggle(type);
 
       const shell = document.createElement('div');
@@ -2927,14 +3049,16 @@
         : '';
       toggle.innerHTML = `<div class="portfolio-toggle-text"><span class="portfolio-title" data-editable="true">${meta.title}</span>${infoChipHtml}</div>`;
       const titleSpan = toggle.querySelector('.portfolio-title');
-      attachEditable(titleSpan, `${type}-title`, (value) => {
-        portfolioMeta[type].title = value;
+      attachEditable(titleSpan, `${activeVorsorgeIndex}-${type}-title`, (value) => {
+        const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+        productMeta[type].title = value;
         renderPortfolios(type);
       });
       const infoChip = toggle.querySelector('.portfolio-info-chip');
       if (infoChip) {
-        attachEditable(infoChip, `${type}-info`, (value) => {
-          portfolioMeta[type].info = value;
+        attachEditable(infoChip, `${activeVorsorgeIndex}-${type}-info`, (value) => {
+          const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+          productMeta[type].info = value;
           renderPortfolios(type);
         });
       }
@@ -2990,7 +3114,7 @@
         label.textContent = entry.label;
         if (entry.baseIndex >= 0) {
           label.dataset.editable = 'true';
-          bindEditableSync(label, type, entry.baseIndex, 'title', true);
+          bindEditableSync(label, type, entry.baseIndex, 'title', true, activeVorsorgeIndex);
         }
         left.appendChild(dot);
         left.appendChild(label);
@@ -3027,8 +3151,9 @@
       subLabel.className = 'label-sub';
       const seitValue = (meta.seit || '').trim();
       subLabel.textContent = seitValue ? `Seit ${seitValue.replace(/^seit\s*/i, '')}` : '';
-      attachEditable(subLabel, `${type}-seit`, (value) => {
-        portfolioMeta[type].seit = value;
+      attachEditable(subLabel, `${activeVorsorgeIndex}-${type}-seit`, (value) => {
+        const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+        productMeta[type].seit = value;
         renderPortfolios(type);
       });
       centerLabel.appendChild(topLabel);
@@ -3046,8 +3171,9 @@
       if (meta.summary) {
         const p = document.createElement('p');
         p.textContent = meta.summary;
-        attachEditable(p, `${type}-summary`, (value) => {
-          portfolioMeta[type].summary = value;
+        attachEditable(p, `${activeVorsorgeIndex}-${type}-summary`, (value) => {
+          const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+          productMeta[type].summary = value;
         });
         infoStack.appendChild(p);
       }
@@ -3085,10 +3211,10 @@
         const title = document.createElement('h4');
         title.textContent = item.title;
         if (item.__idx >= 0) {
-          bindEditableSync(title, type, item.__idx, 'title', true);
+          bindEditableSync(title, type, item.__idx, 'title', true, activeVorsorgeIndex);
         } else {
-          attachEditable(title, 'krypto-title', (value) => {
-            kryptoFund.title = value;
+          attachEditable(title, `krypto-${activeVorsorgeIndex}-title`, (value) => {
+            getActiveKryptoFund().title = value;
           });
         }
         header.appendChild(title);
@@ -3099,20 +3225,20 @@
         const displayR5 = formatReturnLabel(item.returns5, 5);
         five.textContent = displayR5;
         if (item.__idx >= 0) {
-          bindEditableSync(five, type, item.__idx, 'returns5');
+          bindEditableSync(five, type, item.__idx, 'returns5', false, activeVorsorgeIndex);
         } else {
-          attachEditable(five, 'krypto-returns5', (value) => {
-            kryptoFund.returns5 = value;
+          attachEditable(five, `krypto-${activeVorsorgeIndex}-returns5`, (value) => {
+            getActiveKryptoFund().returns5 = value;
           });
         }
         const ten = document.createElement('span');
         const displayR10 = formatReturnLabel(item.returns10, 10);
         ten.textContent = displayR10;
         if (item.__idx >= 0) {
-          bindEditableSync(ten, type, item.__idx, 'returns10');
+          bindEditableSync(ten, type, item.__idx, 'returns10', false, activeVorsorgeIndex);
         } else {
-          attachEditable(ten, 'krypto-returns10', (value) => {
-            kryptoFund.returns10 = value;
+          attachEditable(ten, `krypto-${activeVorsorgeIndex}-returns10`, (value) => {
+            getActiveKryptoFund().returns10 = value;
           });
         }
         returns.appendChild(five);
@@ -3122,10 +3248,10 @@
         since.className = 'section-sub';
         since.textContent = item.since;
         if (item.__idx >= 0) {
-          bindEditableSync(since, type, item.__idx, 'since');
+          bindEditableSync(since, type, item.__idx, 'since', false, activeVorsorgeIndex);
         } else {
-          attachEditable(since, 'krypto-since', (value) => {
-            kryptoFund.since = value;
+          attachEditable(since, `krypto-${activeVorsorgeIndex}-since`, (value) => {
+            getActiveKryptoFund().since = value;
           });
         }
 
@@ -3144,7 +3270,8 @@
         allocationInput.disabled = kryptoActive;
         allocationInput.addEventListener('input', () => {
           const newVal = Number(allocationInput.value) || 0;
-          portfolioData[type][item.__idx].allocation = newVal;
+          const data = getActivePortfolioData();
+          data[type][item.__idx].allocation = newVal;
           persistPortfolioData();
           renderPortfolios(type);
         });
@@ -3168,10 +3295,10 @@
           const span = document.createElement('span');
           span.textContent = value;
           if (item.__idx >= 0) {
-            bindEditableSync(span, type, item.__idx, entry.key);
+            bindEditableSync(span, type, item.__idx, entry.key, false, activeVorsorgeIndex);
           } else {
-            attachEditable(span, `krypto-${entry.key}`, (val) => {
-              kryptoFund[entry.key] = val;
+            attachEditable(span, `krypto-${activeVorsorgeIndex}-${entry.key}`, (val) => {
+              getActiveKryptoFund()[entry.key] = val;
             });
           }
           stat.appendChild(strong);
@@ -3183,10 +3310,10 @@
         descrBlock.className = 'fund-description';
         descrBlock.textContent = item.desc || '';
         if (item.__idx >= 0) {
-          bindEditableSync(descrBlock, type, item.__idx, 'desc');
+          bindEditableSync(descrBlock, type, item.__idx, 'desc', false, activeVorsorgeIndex);
         } else {
-          attachEditable(descrBlock, 'krypto-desc', (value) => {
-            kryptoFund.desc = value;
+          attachEditable(descrBlock, `krypto-${activeVorsorgeIndex}-desc`, (value) => {
+            getActiveKryptoFund().desc = value;
           });
         }
 
@@ -3242,7 +3369,8 @@
         deleteBtn.style.display = item.__idx >= 0 ? 'inline-flex' : 'none';
         deleteBtn.addEventListener('click', () => {
           if (item.__idx < 0) return;
-          portfolioData[type].splice(item.__idx, 1);
+          const data = getActivePortfolioData();
+          data[type].splice(item.__idx, 1);
           persistPortfolioData();
           renderPortfolios(type);
         });
@@ -3560,8 +3688,42 @@
     }
 
     function getActivePortfolioType() {
-      const activeBtn = document.querySelector('[data-portfolio-tab].active');
-      return activeBtn ? activeBtn.getAttribute('data-portfolio-tab') : 'factor';
+      return activePortfolioType;
+    }
+
+    function getAvailablePortfolioTypes(productIndex = activeVorsorgeIndex) {
+      const data = getPortfolioDataForProduct(productIndex);
+      const types = ['factor', 'marketcap', 'bip', 'obligationen'];
+      return types.filter((type) => Array.isArray(data[type]) && data[type].length);
+    }
+
+    function updatePortfolioTabs(productIndex = activeVorsorgeIndex) {
+      const available = getAvailablePortfolioTypes(productIndex);
+      const fallback = available[0] || 'factor';
+      if (!available.includes(activePortfolioType)) {
+        activePortfolioType = fallback;
+      }
+
+      document.querySelectorAll('[data-portfolio-tab]').forEach((btn) => {
+        const type = btn.getAttribute('data-portfolio-tab');
+        const isVisible = available.includes(type);
+        btn.style.display = isVisible ? 'inline-flex' : 'none';
+        btn.classList.toggle('active', type === activePortfolioType);
+      });
+    }
+
+    function setActiveVorsorgeIndex(index) {
+      const maxIndex = Math.max(0, vorsorgeData.length - 1);
+      const nextIndex = Math.min(Math.max(index, 0), maxIndex);
+      if (nextIndex === activeVorsorgeIndex) return;
+      activeVorsorgeIndex = nextIndex;
+      persistJson(STORAGE_KEYS.selectedVorsorge, activeVorsorgeIndex);
+      ensurePortfolioStructures(vorsorgeData.length);
+      kryptoActive = Boolean(kryptoActiveByProduct[activeVorsorgeIndex]);
+      kryptoFund = getActiveKryptoFund();
+      updatePortfolioTabs(activeVorsorgeIndex);
+      renderVorsorgeCards(vorsorgeData);
+      renderPortfolios(activePortfolioType);
     }
 
     function syncKryptoToggle(type) {
@@ -3570,15 +3732,18 @@
       kryptoToggle.title = blocked ? 'Für Obligationen nicht verfügbar' : '5% Krypto hinzufügen';
       if (blocked && kryptoActive) {
         kryptoActive = false;
-        kryptoToggle.classList.remove('active');
-        kryptoToggle.textContent = '+ 5% Krypto';
+        kryptoActiveByProduct[activeVorsorgeIndex] = false;
+        persistJson(STORAGE_KEYS.kryptoActive, kryptoActiveByProduct);
       }
+      kryptoToggle.classList.toggle('active', kryptoActive);
+      kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
     }
 
     function addNewFund() {
       if (!adminMode) return;
       const current = getActivePortfolioType();
-      portfolioData[current].push({
+      const data = getActivePortfolioData();
+      data[current].push({
         title: 'Neuer Fonds',
         desc: 'Eigene Beschreibung hinzufügen.',
         fondsvolumen: 'Fondsvolumen ergänzen',
@@ -3675,10 +3840,9 @@
 
     document.querySelectorAll('[data-portfolio-tab]').forEach((button) => {
       button.addEventListener('click', () => {
-        document.querySelectorAll('[data-portfolio-tab]').forEach((btn) => btn.classList.remove('active'));
-        button.classList.add('active');
-        const type = button.getAttribute('data-portfolio-tab');
-        renderPortfolios(type);
+        activePortfolioType = button.getAttribute('data-portfolio-tab');
+        updatePortfolioTabs(activeVorsorgeIndex);
+        renderPortfolios(activePortfolioType);
       });
     });
 
@@ -3696,6 +3860,8 @@
       const type = getActivePortfolioType();
       if (type === 'obligationen') return;
       kryptoActive = !kryptoActive;
+      kryptoActiveByProduct[activeVorsorgeIndex] = kryptoActive;
+      persistJson(STORAGE_KEYS.kryptoActive, kryptoActiveByProduct);
       kryptoToggle.classList.toggle('active', kryptoActive);
       kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
       const currentType = getActivePortfolioType();
@@ -3714,8 +3880,16 @@
         console.warn('Fehler beim Laden aus Google Sheet, nutze Fallback-Daten', err);
       })
       .finally(() => {
+        ensurePortfolioStructures(vorsorgeData.length);
+        if (activeVorsorgeIndex >= vorsorgeData.length) {
+          activeVorsorgeIndex = 0;
+          persistJson(STORAGE_KEYS.selectedVorsorge, activeVorsorgeIndex);
+        }
+        kryptoActive = Boolean(kryptoActiveByProduct[activeVorsorgeIndex]);
+        kryptoFund = getActiveKryptoFund();
+        updatePortfolioTabs(activeVorsorgeIndex);
         renderVorsorgeCards(vorsorgeData);
-        renderPortfolios('factor');
+        renderPortfolios(activePortfolioType);
         renderAblauf('konservativ');
         renderAdvisors(advisorData);
         applyUpdatesData();
