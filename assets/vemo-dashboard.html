@@ -1432,11 +1432,6 @@
         </div>
       </div>
     </div>
-    <div id="adminNotice" class="notice" style="display: none;">
-      <span>Admin Modus aktiv.</span>
-      <button type="button" class="exit-admin" id="exitAdmin">Modus verlassen</button>
-    </div>
-
     <main>
       <section class="card" id="vorsorge">
         <div class="section-heading">
@@ -1461,10 +1456,6 @@
           <button type="button" data-portfolio-tab="bip">BIP</button>
           <button type="button" data-portfolio-tab="obligationen">Obligationen</button>
           <button type="button" id="kryptoToggle" class="krypto-toggle">+ 5% Krypto</button>
-        </div>
-        <div class="portfolio-actions" id="portfolioActions">
-          <button type="button" id="addFund" class="secondary-btn">+ Fonds hinzufügen</button>
-          <span class="section-sub" data-editable="true">Eigene Fonds können im Admin-Modus ergänzt werden.</span>
         </div>
         <div class="portfolio-list" id="portfolioList"></div>
       </section>
@@ -1602,29 +1593,9 @@
     </footer>
   </div>
 
-  <div class="modal-backdrop" id="adminModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
-      <h3 id="adminModalTitle">Admin-Zugang</h3>
-      <p style="margin:0;color:var(--muted);font-size:13px;">Bitte Code eingeben, um den Bearbeitungsmodus zu aktivieren oder zu verlassen.</p>
-      <input type="password" id="adminCodeInput" placeholder="Code eingeben" />
-      <div class="actions">
-        <button class="ghost" type="button" id="closeModal">Abbrechen</button>
-        <button class="primary" type="button" id="submitCode">Bestätigen</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    const adminCode = 'Vemokorrektur20954.';
-    const adminNotice = document.getElementById('adminNotice');
-    const addFundBtn = document.getElementById('addFund');
     const kryptoToggle = document.getElementById('kryptoToggle');
     const updateTrigger = document.getElementById('lastUpdateTrigger');
-    const modal = document.getElementById('adminModal');
-    const codeInput = document.getElementById('adminCodeInput');
-    const closeModalBtn = document.getElementById('closeModal');
-    const submitCodeBtn = document.getElementById('submitCode');
-    const exitAdminBtn = document.getElementById('exitAdmin');
     const advisorGrid = document.querySelector('.advisor-grid');
     const pageShell = document.querySelector('.page');
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -1659,9 +1630,6 @@
       updates: '1386323135',
     };
 
-    let adminMode = false;
-    let updateClickCount = 0;
-    let updateTimer;
     let editableIndex = 0;
 
     const savedEdits = loadJson(STORAGE_KEYS.editable, {});
@@ -3374,7 +3342,7 @@
         allocationInput.min = 0;
         allocationInput.max = 100;
         allocationInput.step = 1;
-        allocationInput.style.display = adminMode && item.__idx >= 0 ? 'block' : 'none';
+        allocationInput.style.display = 'none';
         allocationInput.disabled = kryptoActive;
         allocationInput.addEventListener('input', () => {
           const newVal = Number(allocationInput.value) || 0;
@@ -3474,7 +3442,7 @@
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
         deleteBtn.textContent = 'Entfernen';
-        deleteBtn.style.display = item.__idx >= 0 ? 'inline-flex' : 'none';
+        deleteBtn.style.display = 'none';
         deleteBtn.addEventListener('click', () => {
           if (item.__idx < 0) return;
           const data = getActivePortfolioData();
@@ -3512,7 +3480,6 @@
       if (kryptoActive) {
         pulseElement(chartWrap);
       }
-      shell.classList.toggle('admin', adminMode);
       queueRefreshEditableState();
     }
 
@@ -3847,104 +3814,27 @@
       kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
     }
 
-    function addNewFund() {
-      if (!adminMode) return;
-      const current = getActivePortfolioType();
-      const data = getActivePortfolioData();
-      data[current].push({
-        title: 'Neuer Fonds',
-        desc: 'Eigene Beschreibung hinzufügen.',
-        fondsvolumen: 'Fondsvolumen ergänzen',
-        positionen: 'Positionen ergänzen',
-        auflageSeit: 'Auflage seit ergänzen',
-        returns5: 'Ø Rendite 5 Jahre: Wert ergänzen',
-        returns10: 'Ø Rendite 10 Jahre: Wert ergänzen',
-        allocation: 15,
-        since: 'Rendite seit Start: Wert ergänzen',
-        factsheet: '',
-      });
-      persistPortfolioData();
-      renderPortfolios(current);
-    }
-
-    function toggleAdminMode() {
-      adminMode = !adminMode;
-      adminNotice.style.display = adminMode ? 'block' : 'none';
-      exitAdminBtn.style.display = adminMode ? 'inline-flex' : 'none';
-      queueRefreshEditableState();
-    }
-
     function refreshEditableState() {
       const elements = document.querySelectorAll('[data-editable]');
       elements.forEach((el) => {
-        el.contentEditable = adminMode ? 'true' : 'false';
-        el.setAttribute('aria-label', adminMode ? 'Bearbeitbarer Inhalt' : '');
+        el.contentEditable = 'false';
+        el.setAttribute('aria-label', '');
       });
-      addFundBtn.disabled = !adminMode;
-      addFundBtn.style.opacity = adminMode ? '1' : '0.6';
-      addFundBtn.style.cursor = adminMode ? 'pointer' : 'not-allowed';
-      document.getElementById('portfolioActions').style.display = adminMode ? 'flex' : 'none';
       document.querySelectorAll('.allocation-input').forEach((input) => {
-        input.style.display = adminMode ? 'block' : 'none';
+        input.style.display = 'none';
       });
       avatarInputs.forEach((input) => {
-        input.style.display = adminMode ? 'block' : 'none';
+        input.style.display = 'none';
       });
       avatarLabels.forEach((label) => {
-        label.style.display = adminMode ? 'block' : 'none';
+        label.style.display = 'none';
       });
       document.querySelectorAll('.delete-btn').forEach((btn) => {
-        btn.style.display = adminMode ? 'inline-flex' : 'none';
-      });
-      document.querySelectorAll('.portfolio-shell').forEach((shell) => {
-        shell.classList.toggle('admin', adminMode);
-      });
-      if (exitAdminBtn) {
-        exitAdminBtn.style.display = adminMode ? 'inline-flex' : 'none';
+        btn.style.display = 'none';
       }
-    }
-
-    function openModal() {
-      modal.style.display = 'flex';
-      modal.setAttribute('aria-hidden', 'false');
-      codeInput.value = '';
-      codeInput.focus();
-    }
-
-    function closeModal() {
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
     }
 
     hydrateStaticEditables();
-
-    updateTrigger?.addEventListener('click', () => {
-      updateClickCount += 1;
-      clearTimeout(updateTimer);
-      if (updateClickCount >= 5) {
-        updateClickCount = 0;
-        openModal();
-      }
-      updateTimer = setTimeout(() => {
-        updateClickCount = 0;
-      }, 1200);
-    });
-
-    closeModalBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) closeModal();
-    });
-    submitCodeBtn.addEventListener('click', () => {
-      if (codeInput.value.trim() === adminCode) {
-        toggleAdminMode();
-        closeModal();
-      }
-    });
-    codeInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        submitCodeBtn.click();
-      }
-    });
 
     document.querySelectorAll('[data-portfolio-tab]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -3963,7 +3853,6 @@
       });
     });
 
-    addFundBtn.addEventListener('click', addNewFund);
     kryptoToggle.addEventListener('click', () => {
       const type = getActivePortfolioType();
       if (type === 'obligationen') return;
@@ -3977,10 +3866,6 @@
       const chartArea = document.querySelector('.chart-wrap');
       pulseElement(chartArea);
     });
-    exitAdminBtn.addEventListener('click', () => {
-      if (adminMode) toggleAdminMode();
-    });
-
     bindDetailsToggles();
 
     loadFromSheets()
