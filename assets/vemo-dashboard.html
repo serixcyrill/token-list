@@ -339,7 +339,7 @@
       width: 56px;
       height: 56px;
       object-fit: contain;
-      border-radius: 16px;
+      border-radius: 20px;
       background: rgba(255, 255, 255, 0.78);
       box-shadow: 0 10px 24px rgba(15, 26, 42, 0.12);
       border: 1px solid rgba(0, 0, 0, 0.04);
@@ -1418,7 +1418,7 @@
   </style>
 </head>
 <body>
-  <div class="page">
+  <div class="page is-loading">
     <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
       <div class="loading-shell">
         <div class="loading-pill"></div>
@@ -3134,7 +3134,8 @@
       const meta = getActivePortfolioMeta()[type];
       syncKryptoToggle(type);
       const activeData = getActivePortfolioData();
-      if (!activeData[type] || !activeData[type].length) {
+      const hasFunds = (activeData[type] || []).some((item) => String(item?.title || '').trim());
+      if (!hasFunds) {
         queueRefreshEditableState();
         return;
       }
@@ -3792,7 +3793,10 @@
     function getAvailablePortfolioTypes(productIndex = activeVorsorgeIndex) {
       const data = getPortfolioDataForProduct(productIndex);
       const types = ['factor', 'marketcap', 'bip', 'obligationen'];
-      return types.filter((type) => Array.isArray(data[type]) && data[type].length);
+      return types.filter((type) => {
+        const list = Array.isArray(data[type]) ? data[type] : [];
+        return list.some((item) => String(item?.title || '').trim());
+      });
     }
 
     function updatePortfolioTabs(productIndex = activeVorsorgeIndex) {
