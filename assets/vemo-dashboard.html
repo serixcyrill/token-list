@@ -1449,13 +1449,7 @@
           <h2 data-editable="true">Modellübersicht</h2>
           <p class="section-sub" data-editable="true">Modellbasierte Betrachtung verschiedener Gewichtungen.</p>
         </div>
-        <div class="tab-buttons">
-          <button type="button" class="active" data-portfolio-tab="factor">Factor</button>
-          <button type="button" data-portfolio-tab="marketcap">Marketcap</button>
-          <button type="button" data-portfolio-tab="bip">BIP</button>
-          <button type="button" data-portfolio-tab="obligationen">Obligationen</button>
-          <button type="button" id="kryptoToggle" class="krypto-toggle">+ 5% Krypto</button>
-        </div>
+        <div class="tab-buttons" id="portfolioTabs"></div>
         <div class="portfolio-list" id="portfolioList"></div>
       </section>
 
@@ -1593,7 +1587,8 @@
   </div>
 
   <script>
-    const kryptoToggle = document.getElementById('kryptoToggle');
+    const portfolioTabs = document.getElementById('portfolioTabs');
+    let kryptoToggle = null;
     const updateTrigger = document.getElementById('lastUpdateTrigger');
     const advisorGrid = document.querySelector('.advisor-grid');
     const pageShell = document.querySelector('.page');
@@ -3803,13 +3798,50 @@
       if (!available.includes(activePortfolioType)) {
         activePortfolioType = fallback;
       }
+      renderPortfolioTabs(available);
+    }
 
-      document.querySelectorAll('[data-portfolio-tab]').forEach((btn) => {
-        const type = btn.getAttribute('data-portfolio-tab');
-        const isVisible = available.includes(type);
-        btn.style.display = isVisible ? 'inline-flex' : 'none';
+    function renderPortfolioTabs(available) {
+      if (!portfolioTabs) return;
+      const meta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+      portfolioTabs.innerHTML = '';
+
+      available.forEach((type) => {
+        const title = String(meta?.[type]?.title || '').trim();
+        if (!title) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = title;
+        btn.dataset.portfolioTab = type;
         btn.classList.toggle('active', type === activePortfolioType);
+        btn.addEventListener('click', () => {
+          activePortfolioType = type;
+          updatePortfolioTabs(activeVorsorgeIndex);
+          renderPortfolios(activePortfolioType);
+        });
+        portfolioTabs.appendChild(btn);
       });
+
+      kryptoToggle = document.createElement('button');
+      kryptoToggle.type = 'button';
+      kryptoToggle.id = 'kryptoToggle';
+      kryptoToggle.className = 'krypto-toggle';
+      kryptoToggle.textContent = '+ 5% Krypto';
+      kryptoToggle.addEventListener('click', () => {
+        const type = getActivePortfolioType();
+        if (type === 'obligationen') return;
+        kryptoActive = !kryptoActive;
+        kryptoActiveByProduct[activeVorsorgeIndex] = kryptoActive;
+        persistJson(STORAGE_KEYS.kryptoActive, kryptoActiveByProduct);
+        kryptoToggle.classList.toggle('active', kryptoActive);
+        kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
+        const currentType = getActivePortfolioType();
+        renderPortfolios(currentType);
+        const chartArea = document.querySelector('.chart-wrap');
+        pulseElement(chartArea);
+      });
+      portfolioTabs.appendChild(kryptoToggle);
+      syncKryptoToggle(activePortfolioType);
     }
 
     function setActiveVorsorgeIndex(index) {
@@ -3827,6 +3859,7 @@
     }
 
     function syncKryptoToggle(type) {
+      if (!kryptoToggle) return;
       const blocked = type === 'obligationen';
       kryptoToggle.disabled = blocked;
       kryptoToggle.title = blocked ? 'Für Obligationen nicht verfügbar' : '5% Krypto hinzufügen';
@@ -3861,14 +3894,6 @@
 
     hydrateStaticEditables();
 
-    document.querySelectorAll('[data-portfolio-tab]').forEach((button) => {
-      button.addEventListener('click', () => {
-        activePortfolioType = button.getAttribute('data-portfolio-tab');
-        updatePortfolioTabs(activeVorsorgeIndex);
-        renderPortfolios(activePortfolioType);
-      });
-    });
-
     document.querySelectorAll('[data-risk]').forEach((button) => {
       button.addEventListener('click', () => {
         document.querySelectorAll('[data-risk]').forEach((btn) => btn.classList.remove('active'));
@@ -3878,19 +3903,6 @@
       });
     });
 
-    kryptoToggle.addEventListener('click', () => {
-      const type = getActivePortfolioType();
-      if (type === 'obligationen') return;
-      kryptoActive = !kryptoActive;
-      kryptoActiveByProduct[activeVorsorgeIndex] = kryptoActive;
-      persistJson(STORAGE_KEYS.kryptoActive, kryptoActiveByProduct);
-      kryptoToggle.classList.toggle('active', kryptoActive);
-      kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
-      const currentType = getActivePortfolioType();
-      renderPortfolios(currentType);
-      const chartArea = document.querySelector('.chart-wrap');
-      pulseElement(chartArea);
-    });
     bindDetailsToggles();
 
     loadFromSheets()
