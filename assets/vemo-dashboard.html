@@ -2050,6 +2050,16 @@
     let activePortfolioType = 'factor';
     let kryptoFund = deepClone(defaultKryptoFund);
     let portfolioDataFromSheet = false;
+    let portfolioMetaFromSheet = false;
+
+    function emptyPortfolioMeta() {
+      return {
+        factor: { title: '', summary: '', renditePa: '', seit: '', info: '' },
+        marketcap: { title: '', summary: '', renditePa: '', seit: '', info: '' },
+        bip: { title: '', summary: '', renditePa: '', seit: '', info: '' },
+        obligationen: { title: '', summary: '', renditePa: '', seit: '', info: '' },
+      };
+    }
     let advisorData = deepClone(defaultAdvisors);
     let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
     let updatesData = deepClone(defaultUpdatesData);
@@ -2114,7 +2124,9 @@
       const total = Math.max(1, count || 0);
       for (let i = 0; i < total; i += 1) {
         if (!portfolioMetaByProduct[i]) {
-          portfolioMetaByProduct[i] = deepClone(defaultPortfolioMeta);
+          portfolioMetaByProduct[i] = portfolioMetaFromSheet
+            ? emptyPortfolioMeta()
+            : deepClone(defaultPortfolioMeta);
         }
         if (!portfolioDataByProduct[i]) {
           portfolioDataByProduct[i] = portfolioDataFromSheet
@@ -2327,7 +2339,7 @@
             .slice(1)
             .map((v) => normalizePortfolioType(v))
             .map((key) => (key === 'faktor' ? 'factor' : key));
-          const nextMeta = deepClone(defaultPortfolioMeta);
+          const nextMeta = emptyPortfolioMeta();
 
           block.slice(1).forEach((row, rowIdx) => {
             const [fieldRaw, ...values] = row;
@@ -2387,10 +2399,12 @@
 
         if (nextMetaByProduct.length) {
           portfolioMetaByProduct = nextMetaByProduct;
+          portfolioMetaFromSheet = true;
         }
       } catch (error) {
         console.warn('Portfolio-Meta Sheet konnte nicht geladen werden, nutze Fallback', error);
         portfolioMetaByProduct = [deepClone(defaultPortfolioMeta)];
+        portfolioMetaFromSheet = false;
       }
     }
 
@@ -3914,6 +3928,11 @@
         if (activeVorsorgeIndex >= vorsorgeData.length) {
           activeVorsorgeIndex = 0;
           persistJson(STORAGE_KEYS.selectedVorsorge, activeVorsorgeIndex);
+        }
+        if (portfolioMetaFromSheet && portfolioMetaByProduct.length < vorsorgeData.length) {
+          for (let i = portfolioMetaByProduct.length; i < vorsorgeData.length; i += 1) {
+            portfolioMetaByProduct[i] = emptyPortfolioMeta();
+          }
         }
         if (portfolioDataFromSheet && portfolioDataByProduct.length < vorsorgeData.length) {
           for (let i = portfolioDataByProduct.length; i < vorsorgeData.length; i += 1) {
