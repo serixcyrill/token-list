@@ -3792,10 +3792,13 @@
 
     function getAvailablePortfolioTypes(productIndex = activeVorsorgeIndex) {
       const data = getPortfolioDataForProduct(productIndex);
+      const meta = getPortfolioMetaForProduct(productIndex);
       const types = ['factor', 'marketcap', 'bip', 'obligationen'];
       return types.filter((type) => {
         const list = Array.isArray(data[type]) ? data[type] : [];
-        return list.some((item) => String(item?.title || '').trim());
+        const hasFunds = list.some((item) => String(item?.title || '').trim());
+        const hasMeta = Boolean(String(meta?.[type]?.title || '').trim());
+        return hasFunds && hasMeta;
       });
     }
 
