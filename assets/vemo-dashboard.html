@@ -3133,9 +3133,8 @@
       list.innerHTML = '';
       const meta = getActivePortfolioMeta()[type];
       syncKryptoToggle(type);
-      const activeData = getActivePortfolioData();
-      const hasFunds = (activeData[type] || []).some((item) => String(item?.title || '').trim());
-      if (!hasFunds) {
+      const hasMetaTitle = Boolean(String(meta?.title || '').trim());
+      if (!hasMetaTitle) {
         queueRefreshEditableState();
         return;
       }
@@ -3791,14 +3790,10 @@
     }
 
     function getAvailablePortfolioTypes(productIndex = activeVorsorgeIndex) {
-      const data = getPortfolioDataForProduct(productIndex);
       const meta = getPortfolioMetaForProduct(productIndex);
       const types = ['factor', 'marketcap', 'bip', 'obligationen'];
       return types.filter((type) => {
-        const list = Array.isArray(data[type]) ? data[type] : [];
-        const hasFunds = list.some((item) => String(item?.title || '').trim());
-        const hasMeta = Boolean(String(meta?.[type]?.title || '').trim());
-        return hasFunds && hasMeta;
+        return Boolean(String(meta?.[type]?.title || '').trim());
       });
     }
 
