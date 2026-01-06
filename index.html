@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Schweizer Steuerfuss Schätzung (MVP)</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1c1e21;
+      --muted: #5f6368;
+      --accent: #0b5fff;
+      --warning: #b45309;
+      --border: #e3e5ea;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      padding: 2.5rem 1.5rem 1.5rem;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto 2.5rem;
+      padding: 0 1.5rem 3rem;
+      display: grid;
+      gap: 1.5rem;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 30px rgba(18, 24, 40, 0.08);
+    }
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 0.95rem;
+      background: #fff;
+    }
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 600;
+    }
+    .toggle input {
+      width: 18px;
+      height: 18px;
+    }
+    .status {
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      background: #fef3c7;
+      color: var(--warning);
+      border: 1px solid #fde68a;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .status.visible {
+      display: block;
+    }
+    .results {
+      display: grid;
+      gap: 1rem;
+    }
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 0.6rem;
+    }
+    .result-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: #e8f0ff;
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .small {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .source-list {
+      margin: 0;
+      padding-left: 1.2rem;
+      font-size: 0.9rem;
+    }
+    .source-list li {
+      margin-bottom: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Schweizer Steuerfuss Schätzung</h1>
+    <p><span class="badge">MVP</span> Schätzung, keine Steuerberatung.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Auswahl</h2>
+      <div class="grid">
+        <div>
+          <label for="kantonSelect">Kanton</label>
+          <select id="kantonSelect"></select>
+        </div>
+        <div>
+          <label for="gemeindeSelect">Gemeinde</label>
+          <select id="gemeindeSelect"></select>
+        </div>
+        <div>
+          <label for="incomeInput">Beispiel Steuerbetrag (CHF)</label>
+          <input id="incomeInput" type="number" min="0" step="100" value="1000" />
+        </div>
+        <div>
+          <label class="toggle" for="kirchenToggle">
+            <input id="kirchenToggle" type="checkbox" />
+            Kirchensteuer berücksichtigen
+          </label>
+        </div>
+        <div>
+          <label for="konfessionSelect">Konfession</label>
+          <select id="konfessionSelect">
+            <option value="none">Keine / nicht relevant</option>
+            <option value="ref">Reformiert</option>
+            <option value="rk">Römisch-katholisch</option>
+            <option value="ck">Christkatholisch</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Ergebnis</h2>
+      <div id="status" class="status"></div>
+      <div class="results" id="resultBox">
+        <div class="result-item"><span>Gemeindesteuerfuss</span><strong id="gemeindeRate">–</strong></div>
+        <div class="result-item"><span>Kantonssteuerfuss</span><strong id="kantonRate">–</strong></div>
+        <div class="result-item"><span>Kirchensteuerfuss</span><strong id="kirchenRate">–</strong></div>
+        <div class="result-item"><span>Totalsteuerfuss</span><strong id="totalRate">–</strong></div>
+        <div class="result-item"><span>Schätzung (Beispielbetrag)</span><strong id="estimate">–</strong></div>
+      </div>
+      <p class="small">Diese Berechnung ist eine vereinfachte Schätzung (MVP) und ersetzt keine Steuerberatung.</p>
+    </section>
+
+    <section class="card">
+      <h2>Datenquellen</h2>
+      <ul class="source-list">
+        <li>ESTV Steuerrechner Portal (Plausibilisierung)</li>
+        <li>Kanton Zürich: Gemeindesteuerfüsse (HTML Tabelle)</li>
+        <li>Kanton Aargau: Verzeichnis Gemeinde und Kirchensteuerfüsse (PDF)</li>
+        <li>Kanton St. Gallen: Steuerfuss Übersicht je Gemeinde</li>
+      </ul>
+      <p class="small">Die Daten werden clientseitig geladen und im Browser zwischengespeichert.</p>
+    </section>
+
+    <div class="footer">Stand: <span id="lastUpdated">–</span></div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.js" integrity="sha512-vJQp8r2+ufo9aGqQpFQQ2KeUldVfH2cXpcg8vWH0XjF5jfu4kzl9hNe0KXPpZz7WzZgDK4F1KoB1jYxvD1NIlA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+    const CACHE_PREFIX = "steuerfuss_cache_";
+
+    const SOURCES = {
+      estv: {
+        name: "ESTV",
+        url: "https://www.estv.admin.ch/estv/de/home/estv/steuerrechnung.html",
+      },
+      zh: {
+        name: "Kanton Zürich",
+        url: "https://www.zh.ch/de/steuern-finanzen/steuern/steuerfuss-zuerich.html",
+      },
+      ag: {
+        name: "Kanton Aargau",
+        url: "https://www.ag.ch/media/kanton-aargau/dfr/steuern/steuerfuesse/steuerfussliste-gemeinden.pdf",
+      },
+      sg: {
+        name: "Kanton St. Gallen",
+        url: "https://www.sg.ch/finanzen/steuern/steuerfuesse/_jcr_content/Par/downloadlist/downloadItems/steuerfuss-uebersicht.download/steuerfuss-uebersicht.pdf",
+      },
+    };
+
+    const ADAPTERS = {
+      zh: createHtmlTableAdapter("ZH", SOURCES.zh.url, {
+        tableHint: "Gemeinde",
+        mapRow: (row) => ({
+          gemeinde: row[0],
+          gemeindesteuerfuss: parseRate(row[1]),
+          kantonssteuerfuss: null,
+          kirchensteuer_ref: null,
+          kirchensteuer_roem_kath: null,
+          kirchensteuer_chr_kath: null,
+        }),
+      }),
+      ag: createPdfAdapter("AG", SOURCES.ag.url, {
+        rowPattern: /(\d{3})\s+([^\d]+)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/,
+        mapMatch: (match) => ({
+          gemeinde: match[2].trim(),
+          gemeindesteuerfuss: parseFloat(match[3]),
+          kantonssteuerfuss: null,
+          kirchensteuer_ref: parseFloat(match[4]),
+          kirchensteuer_roem_kath: parseFloat(match[5]),
+          kirchensteuer_chr_kath: null,
+        }),
+      }),
+      sg: createPdfAdapter("SG", SOURCES.sg.url, {
+        rowPattern: /([^\d]+)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/,
+        mapMatch: (match) => ({
+          gemeinde: match[1].trim(),
+          gemeindesteuerfuss: parseFloat(match[2]),
+          kantonssteuerfuss: null,
+          kirchensteuer_ref: parseFloat(match[3]),
+          kirchensteuer_roem_kath: parseFloat(match[4]),
+          kirchensteuer_chr_kath: null,
+        }),
+      }),
+    };
+
+    const state = {
+      rows: [],
+      fallbackUsed: false,
+      lastUpdated: null,
+    };
+
+    const ui = {
+      kanton: document.getElementById("kantonSelect"),
+      gemeinde: document.getElementById("gemeindeSelect"),
+      konfession: document.getElementById("konfessionSelect"),
+      toggle: document.getElementById("kirchenToggle"),
+      income: document.getElementById("incomeInput"),
+      gemeindeRate: document.getElementById("gemeindeRate"),
+      kantonRate: document.getElementById("kantonRate"),
+      kirchenRate: document.getElementById("kirchenRate"),
+      totalRate: document.getElementById("totalRate"),
+      estimate: document.getElementById("estimate"),
+      status: document.getElementById("status"),
+      lastUpdated: document.getElementById("lastUpdated"),
+    };
+
+    function createHtmlTableAdapter(kantonCode, url, config) {
+      return {
+        kantonCode,
+        sourceUrl: url,
+        async fetchSource() {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          return response.text();
+        },
+        parseSourceToRows(html) {
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const tables = Array.from(doc.querySelectorAll("table"));
+          const target = tables.find((table) => table.textContent.includes(config.tableHint));
+          if (!target) {
+            throw new Error("Keine passende Tabelle gefunden");
+          }
+          const rows = Array.from(target.querySelectorAll("tr")).map((row) =>
+            Array.from(row.querySelectorAll("th, td")).map((cell) => cell.textContent.trim())
+          );
+          return rows.filter((row) => row.length > 1 && row[0] && row[0] !== config.tableHint);
+        },
+        mapToSchema(rows) {
+          return rows.map((row) => config.mapRow(row)).filter((row) => row.gemeinde);
+        },
+        validate(rows) {
+          if (!rows.length) {
+            throw new Error("Keine Datenzeilen gefunden");
+          }
+          return rows;
+        },
+      };
+    }
+
+    function createPdfAdapter(kantonCode, url, config) {
+      return {
+        kantonCode,
+        sourceUrl: url,
+        async fetchSource() {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const arrayBuffer = await response.arrayBuffer();
+          return arrayBuffer;
+        },
+        async parseSourceToRows(buffer) {
+          const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+          const lines = [];
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+            const page = await pdf.getPage(pageNum);
+            const content = await page.getTextContent();
+            const pageText = content.items.map((item) => item.str).join(" ");
+            lines.push(pageText);
+          }
+          return lines;
+        },
+        mapToSchema(lines) {
+          const rows = [];
+          for (const line of lines) {
+            const matches = line.matchAll(new RegExp(config.rowPattern, "g"));
+            for (const match of matches) {
+              rows.push(config.mapMatch(match));
+            }
+          }
+          return rows;
+        },
+        validate(rows) {
+          if (!rows.length) {
+            throw new Error("Keine Daten aus PDF extrahiert");
+          }
+          const plausible = rows.filter((row) => row.gemeindesteuerfuss && row.gemeindesteuerfuss > 0);
+          if (plausible.length < Math.max(5, rows.length * 0.2)) {
+            throw new Error("Plausibilitätscheck fehlgeschlagen");
+          }
+          return rows;
+        },
+      };
+    }
+
+    function parseRate(value) {
+      if (!value) return null;
+      const normalized = value.replace(/[^\d.,]/g, "").replace(",", ".");
+      const number = parseFloat(normalized);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function formatRate(value) {
+      if (value === null || value === undefined) return "–";
+      return `${value.toFixed(2)} %`;
+    }
+
+    function getCache(key) {
+      const raw = localStorage.getItem(CACHE_PREFIX + key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (Date.now() > parsed.expiresAt) {
+        localStorage.removeItem(CACHE_PREFIX + key);
+        return null;
+      }
+      return parsed;
+    }
+
+    function setCache(key, data) {
+      localStorage.setItem(
+        CACHE_PREFIX + key,
+        JSON.stringify({
+          data,
+          expiresAt: Date.now() + CACHE_TTL_MS,
+          storedAt: new Date().toISOString(),
+        })
+      );
+    }
+
+    function buildRow(kantonCode, row, sourceUrl) {
+      return {
+        steuerjahr: new Date().getFullYear(),
+        kanton: kantonCode,
+        gemeinde: row.gemeinde,
+        gemeindesteuerfuss: row.gemeindesteuerfuss,
+        kantonssteuerfuss: row.kantonssteuerfuss,
+        kirchensteuer_ref: row.kirchensteuer_ref,
+        kirchensteuer_roem_kath: row.kirchensteuer_roem_kath,
+        kirchensteuer_chr_kath: row.kirchensteuer_chr_kath,
+        quelle_url: sourceUrl,
+        import_datum: new Date().toISOString(),
+      };
+    }
+
+    async function loadAdapter(adapter) {
+      const cache = getCache(adapter.kantonCode);
+      if (cache) {
+        return { rows: cache.data, fallbackUsed: false, storedAt: cache.storedAt };
+      }
+      const source = await adapter.fetchSource();
+      const parsedRows = await adapter.parseSourceToRows(source);
+      const mapped = adapter.mapToSchema(parsedRows);
+      const validated = adapter.validate(mapped);
+      const rows = validated.map((row) => buildRow(adapter.kantonCode, row, adapter.sourceUrl));
+      setCache(adapter.kantonCode, rows);
+      return { rows, fallbackUsed: false, storedAt: new Date().toISOString() };
+    }
+
+    async function loadAllSources() {
+      const results = [];
+      let fallbackUsed = false;
+      let latestDate = null;
+
+      for (const adapterKey of Object.keys(ADAPTERS)) {
+        const adapter = ADAPTERS[adapterKey];
+        try {
+          const { rows, storedAt } = await loadAdapter(adapter);
+          results.push(...rows);
+          latestDate = latestDate || storedAt;
+        } catch (error) {
+          const cache = getCache(adapter.kantonCode);
+          if (cache) {
+            results.push(...cache.data);
+            fallbackUsed = true;
+            latestDate = latestDate || cache.storedAt;
+          } else {
+            console.warn("Quelle nicht erreichbar und kein Cache", adapter.kantonCode, error);
+          }
+        }
+      }
+
+      state.rows = results;
+      state.fallbackUsed = fallbackUsed;
+      state.lastUpdated = latestDate;
+
+      ui.status.textContent = fallbackUsed
+        ? "Quelle aktuell nicht erreichbar. Es werden zuletzt gespeicherte Daten verwendet."
+        : "";
+      ui.status.classList.toggle("visible", fallbackUsed);
+
+      ui.lastUpdated.textContent = latestDate ? new Date(latestDate).toLocaleString("de-CH") : "–";
+
+      populateKantone();
+      updateGemeinden();
+      updateResults();
+    }
+
+    function populateKantone() {
+      const kantone = Array.from(new Set(state.rows.map((row) => row.kanton))).sort();
+      ui.kanton.innerHTML = kantone.map((k) => `<option value="${k}">${k}</option>`).join("");
+    }
+
+    function updateGemeinden() {
+      const kanton = ui.kanton.value;
+      const gemeinden = state.rows
+        .filter((row) => row.kanton === kanton)
+        .map((row) => row.gemeinde)
+        .sort();
+      ui.gemeinde.innerHTML = gemeinden.map((g) => `<option value="${g}">${g}</option>`).join("");
+    }
+
+    function getSelectedRow() {
+      return state.rows.find(
+        (row) => row.kanton === ui.kanton.value && row.gemeinde === ui.gemeinde.value
+      );
+    }
+
+    function getKirchenRate(row) {
+      if (!row || !ui.toggle.checked) return null;
+      const konfession = ui.konfession.value;
+      if (konfession === "ref") return row.kirchensteuer_ref;
+      if (konfession === "rk") return row.kirchensteuer_roem_kath;
+      if (konfession === "ck") return row.kirchensteuer_chr_kath;
+      return null;
+    }
+
+    function updateResults() {
+      const row = getSelectedRow();
+      if (!row) return;
+
+      const gemeindeRate = row.gemeindesteuerfuss || 0;
+      const kantonRate = row.kantonssteuerfuss || 0;
+      const kirchenRate = getKirchenRate(row) || 0;
+      const totalRate = gemeindeRate + kantonRate + kirchenRate;
+      const amount = parseFloat(ui.income.value) || 0;
+      const estimate = amount * (totalRate / 100);
+
+      ui.gemeindeRate.textContent = formatRate(row.gemeindesteuerfuss);
+      ui.kantonRate.textContent = formatRate(row.kantonssteuerfuss);
+      ui.kirchenRate.textContent = formatRate(getKirchenRate(row));
+      ui.totalRate.textContent = formatRate(totalRate);
+      ui.estimate.textContent = `${estimate.toFixed(2)} CHF`;
+    }
+
+    ui.kanton.addEventListener("change", () => {
+      updateGemeinden();
+      updateResults();
+    });
+    ui.gemeinde.addEventListener("change", updateResults);
+    ui.konfession.addEventListener("change", updateResults);
+    ui.toggle.addEventListener("change", updateResults);
+    ui.income.addEventListener("input", updateResults);
+
+    loadAllSources().catch((error) => {
+      ui.status.textContent = "Daten konnten nicht geladen werden.";
+      ui.status.classList.add("visible");
+      console.error(error);
+    });
+  </script>
+</body>
+</html>
