@@ -314,10 +314,14 @@
 
     .vorsorge-actions {
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
       gap: 10px;
       margin-top: 4px;
+    }
+
+    .vorsorge-actions .cta-secondary {
+      min-width: 120px;
     }
 
     .vorsorge-actions .cta-btn {
@@ -382,8 +386,14 @@
     }
 
     .is-new {
-      border-color: rgba(251, 146, 60, 0.55);
-      box-shadow: 0 12px 26px rgba(251, 146, 60, 0.18);
+      border-color: rgba(251, 146, 60, 0.7);
+      box-shadow: 0 12px 26px rgba(251, 146, 60, 0.22);
+    }
+
+    .portfolio-shell.is-new,
+    .portfolio-item.is-new {
+      border-color: rgba(251, 146, 60, 0.7);
+      box-shadow: 0 18px 34px rgba(251, 146, 60, 0.22);
     }
 
     .vorsorge-card.is-active.is-new {
