@@ -3,136 +3,227 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kostenvergleich Zinsrechner</title>
+  <title>Vemo Kostenvergleich</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
     :root {
-      --bg: #f2f6fb;
-      --text: #0f2d5c;
-      --muted: #5c6b80;
-      --blue: #0a4cc4;
-      --green: #18a957;
-      --gray: #9aa5b4;
-      --red: #e03a3a;
-      --card: #ffffff;
-      --shadow: 0 18px 40px rgba(16, 35, 72, 0.08);
+      --vemo-green: #76D062;
+      --vemo-green-soft: #E9F9E4;
+      --vemo-text: #0f172a;
+      --vemo-ring: #d0d7e4;
+      --vemo-muted: #64748b;
+      --vemo-blue: #7DD3FC;
+      --vemo-gray: #9ca3af;
+      --vemo-red: #ef4444;
+
+      --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.10);
+      --shadow-strong: 0 30px 60px rgba(15, 23, 42, 0.18);
+
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --blur-glass: 14px;
     }
 
     * {
       box-sizing: border-box;
-      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(118, 208, 98, 0.12), transparent 32%),
+        radial-gradient(circle at 85% 10%, rgba(125, 211, 252, 0.14), transparent 28%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--vemo-text);
+      overflow-x: hidden;
     }
 
-    .wrap {
-      max-width: 1100px;
-      margin: 48px auto;
-      padding: 0 24px 64px;
-    }
-
-    header {
+    .vemo-tool-wrapper {
+      padding: 32px 24px 72px;
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 32px;
+      align-items: flex-start;
+      justify-content: center;
     }
 
-    h1 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      margin: 0;
-      color: var(--blue);
-    }
-
-    .sub {
-      color: var(--muted);
-      font-size: 1rem;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-      gap: 28px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      padding: 28px;
-    }
-
-    .results {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .result-row {
-      display: grid;
-      grid-template-columns: 160px 1fr 140px;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .label {
-      font-weight: 600;
-    }
-
-    .bar {
-      height: 18px;
-      border-radius: 999px;
-      background: rgba(10, 76, 196, 0.08);
+    .vemo-tool-card {
+      width: 100%;
+      max-width: 1180px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(208, 215, 228, 0.65);
+      box-shadow: var(--shadow-strong);
+      padding: 26px 28px 24px;
+      backdrop-filter: blur(var(--blur-glass));
       position: relative;
       overflow: hidden;
     }
 
-    .bar > span {
+    .vemo-tool-card::before {
+      content: '';
       position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(118, 208, 98, 0.08), transparent 35%),
+        radial-gradient(circle at 90% 5%, rgba(125, 211, 252, 0.12), transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .vemo-tool-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .vemo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .vemo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--vemo-green-soft);
+      font-weight: 600;
+      color: #1f6b36;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .vemo-meta {
+      color: var(--vemo-muted);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .vemo-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    .vemo-panel {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(208, 215, 228, 0.6);
+      box-shadow: var(--shadow-soft);
+      padding: 22px;
+    }
+
+    .vemo-title {
+      margin: 8px 0 8px;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+    }
+
+    .vemo-subtitle {
+      color: var(--vemo-muted);
+      margin-bottom: 18px;
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(208, 215, 228, 0.7);
+      padding: 14px 16px;
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+    }
+
+    .summary-card span {
+      display: block;
+      color: var(--vemo-muted);
+      font-size: 0.85rem;
+    }
+
+    .summary-card strong {
+      font-size: 1.2rem;
+    }
+
+    .cost-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .cost-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 160px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .cost-label {
+      font-weight: 600;
+    }
+
+    .cost-bar {
+      height: 16px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cost-bar span {
+      position: absolute;
+      inset: 0;
       border-radius: 999px;
     }
 
-    .amount {
+    .cost-value {
       text-align: right;
-      font-weight: 700;
+      font-weight: 600;
     }
 
     .legend {
       display: flex;
-      gap: 16px;
-      font-size: 0.9rem;
-      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 16px;
+      color: var(--vemo-muted);
+      font-size: 0.85rem;
     }
 
     .legend-item {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
-    .dot {
+    .legend-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
     }
 
-    .settings h2 {
-      margin: 0 0 20px;
-      color: var(--blue);
-      font-size: 1.5rem;
+    .settings-title {
+      font-size: 1.4rem;
+      margin: 0 0 18px;
     }
 
     .slider-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
     .slider-header {
@@ -143,91 +234,204 @@
 
     input[type="range"] {
       width: 100%;
-      accent-color: var(--blue);
+      accent-color: var(--vemo-green);
     }
 
-    .summary {
-      background: rgba(10, 76, 196, 0.06);
-      border-radius: 16px;
-      padding: 16px;
-      font-size: 0.95rem;
-      color: var(--muted);
+    .vemo-note {
+      background: rgba(118, 208, 98, 0.12);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      color: var(--vemo-muted);
+      font-size: 0.9rem;
       line-height: 1.5;
     }
 
-    @media (max-width: 900px) {
-      .layout {
+    .chart-card {
+      margin-top: 24px;
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(208, 215, 228, 0.6);
+      box-shadow: var(--shadow-soft);
+      padding: 20px 22px 24px;
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .chart-title {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      color: var(--vemo-muted);
+      font-size: 0.85rem;
+    }
+
+    .chart-wrap {
+      background: #f8fafc;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-axis {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      bottom: 12px;
+      width: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: var(--vemo-muted);
+      font-size: 0.7rem;
+    }
+
+    .chart-years {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--vemo-muted);
+      font-size: 0.7rem;
+      padding: 0 8px;
+    }
+
+    svg {
+      width: 100%;
+      height: 230px;
+    }
+
+    @media (max-width: 980px) {
+      .vemo-grid {
         grid-template-columns: 1fr;
       }
 
-      .result-row {
+      .cost-row {
         grid-template-columns: 1fr;
-        gap: 8px;
-      }
-
-      .amount {
         text-align: left;
+      }
+
+      .cost-value {
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .vemo-tool-wrapper {
+        padding: 12px;
+      }
+
+      .vemo-tool-card {
+        padding: 18px 16px 20px;
+        border-radius: 18px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Kostenvergleich über 25 Jahre</h1>
-      <div class="sub">
-        Standardzins: <strong>7.3&nbsp;%</strong> p.a. &nbsp;|&nbsp; Gebühren: günstig 0.2&nbsp;%, durchschnittlich 1.1&nbsp;%, teuer 2.0&nbsp;%.
-      </div>
-    </header>
-
-    <section class="layout">
-      <div class="card">
-        <div class="results" id="results">
-          <div class="result-row">
-            <div class="label">Günstigstes Produkt</div>
-            <div class="bar"><span id="bar-cheap"></span></div>
-            <div class="amount" id="amount-cheap">CHF 0</div>
-          </div>
-          <div class="result-row">
-            <div class="label">Durchschnitt</div>
-            <div class="bar"><span id="bar-average"></span></div>
-            <div class="amount" id="amount-average">CHF 0</div>
-          </div>
-          <div class="result-row">
-            <div class="label">Teuer</div>
-            <div class="bar"><span id="bar-expensive"></span></div>
-            <div class="amount" id="amount-expensive">CHF 0</div>
-          </div>
-        </div>
-
-        <div class="legend" style="margin-top: 24px;">
-          <div class="legend-item"><span class="dot" style="background: var(--green);"></span>Günstig (grün)</div>
-          <div class="legend-item"><span class="dot" style="background: var(--gray);"></span>Durchschnitt (grau)</div>
-          <div class="legend-item"><span class="dot" style="background: var(--red);"></span>Teuer (rot)</div>
+  <div class="vemo-tool-wrapper">
+    <div class="vemo-tool-card">
+      <div class="vemo-header">
+        <div class="vemo-badge">Kostenvergleich</div>
+        <div class="vemo-meta">
+          Standardzins: <strong>7.3&nbsp;%</strong> p.a. · Laufzeit: <strong>25 Jahre</strong> · Gebühren: 0.2&nbsp;% | 1.1&nbsp;% | 2.0&nbsp;%
         </div>
       </div>
 
-      <div class="card settings">
-        <h2>Deine Angaben</h2>
-        <div class="slider-group">
-          <div class="slider-header">
-            <span>Monatlicher Sparanteil</span>
-            <span id="monthly-display">CHF 200</span>
+      <div class="vemo-grid">
+        <div class="vemo-panel">
+          <h1 class="vemo-title">Gebührenkosten im Vergleich</h1>
+          <p class="vemo-subtitle">Die Balken zeigen die gesamten Gebührenkosten (inkl. entgangener Rendite) über 25 Jahre.</p>
+
+          <div class="summary-cards">
+            <div class="summary-card">
+              <span>Gesamteinzahlungen</span>
+              <strong id="total-contributions">CHF 0</strong>
+            </div>
+            <div class="summary-card">
+              <span>Endvermögen ohne Gebühren</span>
+              <strong id="gross-end">CHF 0</strong>
+            </div>
           </div>
-          <input
-            id="monthly"
-            type="range"
-            min="0"
-            max="604"
-            step="1"
-            value="200"
-          />
+
+          <div class="cost-rows">
+            <div class="cost-row">
+              <div class="cost-label">Günstig (Vemo-Standard)</div>
+              <div class="cost-bar"><span id="bar-cheap"></span></div>
+              <div class="cost-value" id="cost-cheap">CHF 0</div>
+            </div>
+            <div class="cost-row">
+              <div class="cost-label">Durchschnitt (Markt)</div>
+              <div class="cost-bar"><span id="bar-average"></span></div>
+              <div class="cost-value" id="cost-average">CHF 0</div>
+            </div>
+            <div class="cost-row">
+              <div class="cost-label">Teuer (schlecht)</div>
+              <div class="cost-bar"><span id="bar-expensive"></span></div>
+              <div class="cost-value" id="cost-expensive">CHF 0</div>
+            </div>
+          </div>
+
+          <div class="legend">
+            <div class="legend-item"><span class="legend-dot" style="background: var(--vemo-green);"></span>Günstig</div>
+            <div class="legend-item"><span class="legend-dot" style="background: var(--vemo-gray);"></span>Durchschnitt</div>
+            <div class="legend-item"><span class="legend-dot" style="background: var(--vemo-red);"></span>Teuer</div>
+          </div>
         </div>
-        <div class="summary" id="summary">
-          Du kannst den monatlichen Sparanteil zwischen CHF 0 und CHF 604 wählen. Die Balken zeigen das voraussichtliche Endvermögen nach 25 Jahren.
+
+        <div class="vemo-panel">
+          <h2 class="settings-title">Deine Angaben</h2>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Monatlicher Sparanteil</span>
+              <span id="monthly-display">CHF 200</span>
+            </div>
+            <input id="monthly" type="range" min="0" max="604" step="1" value="200" />
+          </div>
+          <div class="vemo-note">
+            Wähle nur deinen monatlichen Sparanteil (CHF 0–604). Der Rechner berücksichtigt automatisch den Standardzins von 7.3&nbsp;% und vergleicht die Gebührenmodelle.
+          </div>
         </div>
       </div>
-    </section>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Kostenverlauf über 25 Jahre</h3>
+          <div class="chart-legend">
+            <span style="color: var(--vemo-green);">Günstig</span>
+            <span style="color: var(--vemo-gray);">Durchschnitt</span>
+            <span style="color: var(--vemo-red);">Teuer</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-axis" id="chart-axis"></div>
+          <svg viewBox="0 0 1000 240" role="img" aria-label="Kostenverlauf">
+            <defs>
+              <linearGradient id="gridLine" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#e2e8f0" />
+                <stop offset="100%" stop-color="#eef2f7" />
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="1000" height="240" fill="transparent" />
+            <g id="chart-grid"></g>
+            <path id="line-cheap" fill="none" stroke="var(--vemo-green)" stroke-width="4" stroke-linecap="round" />
+            <path id="line-average" fill="none" stroke="var(--vemo-gray)" stroke-width="4" stroke-linecap="round" />
+            <path id="line-expensive" fill="none" stroke="var(--vemo-red)" stroke-width="4" stroke-linecap="round" />
+          </svg>
+          <div class="chart-years" id="chart-years"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -242,12 +446,20 @@
     const elements = {
       monthly: document.getElementById("monthly"),
       monthlyDisplay: document.getElementById("monthly-display"),
-      amountCheap: document.getElementById("amount-cheap"),
-      amountAverage: document.getElementById("amount-average"),
-      amountExpensive: document.getElementById("amount-expensive"),
+      totalContributions: document.getElementById("total-contributions"),
+      grossEnd: document.getElementById("gross-end"),
+      costCheap: document.getElementById("cost-cheap"),
+      costAverage: document.getElementById("cost-average"),
+      costExpensive: document.getElementById("cost-expensive"),
       barCheap: document.getElementById("bar-cheap"),
       barAverage: document.getElementById("bar-average"),
       barExpensive: document.getElementById("bar-expensive"),
+      lineCheap: document.getElementById("line-cheap"),
+      lineAverage: document.getElementById("line-average"),
+      lineExpensive: document.getElementById("line-expensive"),
+      chartGrid: document.getElementById("chart-grid"),
+      chartAxis: document.getElementById("chart-axis"),
+      chartYears: document.getElementById("chart-years"),
     };
 
     const formatter = new Intl.NumberFormat("de-CH", {
@@ -266,29 +478,127 @@
       return monthlyContribution * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
     };
 
+    const calcYearlyCosts = (monthlyContribution, fee) => {
+      const grossAnnual = annualReturn / 100;
+      const netAnnual = (annualReturn - fee) / 100;
+      const grossMonthly = Math.pow(1 + grossAnnual, 1 / 12) - 1;
+      const netMonthly = Math.pow(1 + netAnnual, 1 / 12) - 1;
+
+      let grossBalance = 0;
+      let netBalance = 0;
+      const yearlyCosts = [];
+
+      for (let month = 1; month <= years * 12; month += 1) {
+        grossBalance = (grossBalance + monthlyContribution) * (1 + grossMonthly);
+        netBalance = (netBalance + monthlyContribution) * (1 + netMonthly);
+        if (month % 12 === 0) {
+          yearlyCosts.push(Math.max(grossBalance - netBalance, 0));
+        }
+      }
+
+      return yearlyCosts;
+    };
+
+    const buildLinePath = (values, maxValue) => {
+      const width = 1000;
+      const height = 240;
+      const padding = { top: 18, right: 20, bottom: 32, left: 60 };
+      const innerWidth = width - padding.left - padding.right;
+      const innerHeight = height - padding.top - padding.bottom;
+
+      return values
+        .map((value, index) => {
+          const x = padding.left + (innerWidth * index) / (values.length - 1);
+          const y = padding.top + innerHeight * (1 - value / maxValue);
+          return `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+        })
+        .join(" ");
+    };
+
+    const updateChart = (series, maxValue) => {
+      elements.lineCheap.setAttribute("d", buildLinePath(series.cheap, maxValue));
+      elements.lineAverage.setAttribute("d", buildLinePath(series.average, maxValue));
+      elements.lineExpensive.setAttribute("d", buildLinePath(series.expensive, maxValue));
+
+      elements.chartGrid.innerHTML = "";
+      const gridLines = 4;
+      for (let i = 0; i <= gridLines; i += 1) {
+        const y = 18 + ((240 - 50) * i) / gridLines;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", "60");
+        line.setAttribute("x2", "980");
+        line.setAttribute("y1", y.toString());
+        line.setAttribute("y2", y.toString());
+        line.setAttribute("stroke", "#e2e8f0");
+        line.setAttribute("stroke-width", "1");
+        elements.chartGrid.appendChild(line);
+      }
+
+      elements.chartAxis.innerHTML = "";
+      for (let i = 0; i <= gridLines; i += 1) {
+        const value = maxValue * (1 - i / gridLines);
+        const label = document.createElement("span");
+        label.textContent = formatter.format(value);
+        elements.chartAxis.appendChild(label);
+      }
+
+      elements.chartYears.innerHTML = "";
+      const yearMarks = [1, 5, 10, 15, 20, 25];
+      yearMarks.forEach((year) => {
+        const span = document.createElement("span");
+        span.textContent = `Jahr ${year}`;
+        elements.chartYears.appendChild(span);
+      });
+    };
+
     const update = () => {
       const monthlyContribution = Number(elements.monthly.value);
       elements.monthlyDisplay.textContent = formatter.format(monthlyContribution);
 
-      const values = {
+      const grossValue = calcFutureValue(monthlyContribution, 0);
+      const netValues = {
         cheap: calcFutureValue(monthlyContribution, fees.cheap),
         average: calcFutureValue(monthlyContribution, fees.average),
         expensive: calcFutureValue(monthlyContribution, fees.expensive),
       };
 
-      const maxValue = Math.max(values.cheap, values.average, values.expensive, 1);
+      const costs = {
+        cheap: Math.max(grossValue - netValues.cheap, 0),
+        average: Math.max(grossValue - netValues.average, 0),
+        expensive: Math.max(grossValue - netValues.expensive, 0),
+      };
 
-      elements.amountCheap.textContent = formatter.format(values.cheap);
-      elements.amountAverage.textContent = formatter.format(values.average);
-      elements.amountExpensive.textContent = formatter.format(values.expensive);
+      const maxCost = Math.max(costs.cheap, costs.average, costs.expensive, 1);
 
-      elements.barCheap.style.width = `${(values.cheap / maxValue) * 100}%`;
-      elements.barAverage.style.width = `${(values.average / maxValue) * 100}%`;
-      elements.barExpensive.style.width = `${(values.expensive / maxValue) * 100}%`;
+      elements.totalContributions.textContent = formatter.format(monthlyContribution * years * 12);
+      elements.grossEnd.textContent = formatter.format(grossValue);
 
-      elements.barCheap.style.background = "var(--green)";
-      elements.barAverage.style.background = "var(--gray)";
-      elements.barExpensive.style.background = "var(--red)";
+      elements.costCheap.textContent = formatter.format(costs.cheap);
+      elements.costAverage.textContent = formatter.format(costs.average);
+      elements.costExpensive.textContent = formatter.format(costs.expensive);
+
+      elements.barCheap.style.width = `${(costs.cheap / maxCost) * 100}%`;
+      elements.barAverage.style.width = `${(costs.average / maxCost) * 100}%`;
+      elements.barExpensive.style.width = `${(costs.expensive / maxCost) * 100}%`;
+
+      elements.barCheap.style.background = "var(--vemo-green)";
+      elements.barAverage.style.background = "var(--vemo-gray)";
+      elements.barExpensive.style.background = "var(--vemo-red)";
+
+      const series = {
+        cheap: calcYearlyCosts(monthlyContribution, fees.cheap),
+        average: calcYearlyCosts(monthlyContribution, fees.average),
+        expensive: calcYearlyCosts(monthlyContribution, fees.expensive),
+      };
+
+      const maxSeriesValue = Math.max(
+        ...series.cheap,
+        ...series.average,
+        ...series.expensive,
+        1
+      );
+
+      updateChart(series, maxSeriesValue);
     };
 
     elements.monthly.addEventListener("input", update);
