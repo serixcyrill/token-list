@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kostenvergleich Zinsrechner</title>
+  <style>
+    :root {
+      --bg: #f2f6fb;
+      --text: #0f2d5c;
+      --muted: #5c6b80;
+      --blue: #0a4cc4;
+      --green: #18a957;
+      --gray: #9aa5b4;
+      --red: #e03a3a;
+      --card: #ffffff;
+      --shadow: 0 18px 40px rgba(16, 35, 72, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 48px auto;
+      padding: 0 24px 64px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin: 0;
+      color: var(--blue);
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .results {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .result-row {
+      display: grid;
+      grid-template-columns: 160px 1fr 140px;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .label {
+      font-weight: 600;
+    }
+
+    .bar {
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(10, 76, 196, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bar > span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      border-radius: 999px;
+    }
+
+    .amount {
+      text-align: right;
+      font-weight: 700;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .settings h2 {
+      margin: 0 0 20px;
+      color: var(--blue);
+      font-size: 1.5rem;
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    .summary {
+      background: rgba(10, 76, 196, 0.06);
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .result-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .amount {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Kostenvergleich über 25 Jahre</h1>
+      <div class="sub">
+        Standardzins: <strong>7.3&nbsp;%</strong> p.a. &nbsp;|&nbsp; Gebühren: günstig 0.2&nbsp;%, durchschnittlich 1.1&nbsp;%, teuer 2.0&nbsp;%.
+      </div>
+    </header>
+
+    <section class="layout">
+      <div class="card">
+        <div class="results" id="results">
+          <div class="result-row">
+            <div class="label">Günstigstes Produkt</div>
+            <div class="bar"><span id="bar-cheap"></span></div>
+            <div class="amount" id="amount-cheap">CHF 0</div>
+          </div>
+          <div class="result-row">
+            <div class="label">Durchschnitt</div>
+            <div class="bar"><span id="bar-average"></span></div>
+            <div class="amount" id="amount-average">CHF 0</div>
+          </div>
+          <div class="result-row">
+            <div class="label">Teuer</div>
+            <div class="bar"><span id="bar-expensive"></span></div>
+            <div class="amount" id="amount-expensive">CHF 0</div>
+          </div>
+        </div>
+
+        <div class="legend" style="margin-top: 24px;">
+          <div class="legend-item"><span class="dot" style="background: var(--green);"></span>Günstig (grün)</div>
+          <div class="legend-item"><span class="dot" style="background: var(--gray);"></span>Durchschnitt (grau)</div>
+          <div class="legend-item"><span class="dot" style="background: var(--red);"></span>Teuer (rot)</div>
+        </div>
+      </div>
+
+      <div class="card settings">
+        <h2>Deine Angaben</h2>
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Monatlicher Sparanteil</span>
+            <span id="monthly-display">CHF 200</span>
+          </div>
+          <input
+            id="monthly"
+            type="range"
+            min="0"
+            max="604"
+            step="1"
+            value="200"
+          />
+        </div>
+        <div class="summary" id="summary">
+          Du kannst den monatlichen Sparanteil zwischen CHF 0 und CHF 604 wählen. Die Balken zeigen das voraussichtliche Endvermögen nach 25 Jahren.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const annualReturn = 7.3;
+    const years = 25;
+    const fees = {
+      cheap: 0.2,
+      average: 1.1,
+      expensive: 2.0,
+    };
+
+    const elements = {
+      monthly: document.getElementById("monthly"),
+      monthlyDisplay: document.getElementById("monthly-display"),
+      amountCheap: document.getElementById("amount-cheap"),
+      amountAverage: document.getElementById("amount-average"),
+      amountExpensive: document.getElementById("amount-expensive"),
+      barCheap: document.getElementById("bar-cheap"),
+      barAverage: document.getElementById("bar-average"),
+      barExpensive: document.getElementById("bar-expensive"),
+    };
+
+    const formatter = new Intl.NumberFormat("de-CH", {
+      style: "currency",
+      currency: "CHF",
+      maximumFractionDigits: 0,
+    });
+
+    const calcFutureValue = (monthlyContribution, fee) => {
+      const netAnnual = (annualReturn - fee) / 100;
+      if (netAnnual <= 0) {
+        return monthlyContribution * years * 12;
+      }
+      const monthlyRate = Math.pow(1 + netAnnual, 1 / 12) - 1;
+      const months = years * 12;
+      return monthlyContribution * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+    };
+
+    const update = () => {
+      const monthlyContribution = Number(elements.monthly.value);
+      elements.monthlyDisplay.textContent = formatter.format(monthlyContribution);
+
+      const values = {
+        cheap: calcFutureValue(monthlyContribution, fees.cheap),
+        average: calcFutureValue(monthlyContribution, fees.average),
+        expensive: calcFutureValue(monthlyContribution, fees.expensive),
+      };
+
+      const maxValue = Math.max(values.cheap, values.average, values.expensive, 1);
+
+      elements.amountCheap.textContent = formatter.format(values.cheap);
+      elements.amountAverage.textContent = formatter.format(values.average);
+      elements.amountExpensive.textContent = formatter.format(values.expensive);
+
+      elements.barCheap.style.width = `${(values.cheap / maxValue) * 100}%`;
+      elements.barAverage.style.width = `${(values.average / maxValue) * 100}%`;
+      elements.barExpensive.style.width = `${(values.expensive / maxValue) * 100}%`;
+
+      elements.barCheap.style.background = "var(--green)";
+      elements.barAverage.style.background = "var(--gray)";
+      elements.barExpensive.style.background = "var(--red)";
+    };
+
+    elements.monthly.addEventListener("input", update);
+    update();
+  </script>
+</body>
+</html>
