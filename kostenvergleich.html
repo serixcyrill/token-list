@@ -159,6 +159,13 @@
       min-height: 360px;
     }
 
+    #kostenvergleich .bar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: 100%;
+    }
+
     #kostenvergleich .bar-card {
       background: rgba(248, 250, 252, 0.8);
       border: 1px solid var(--ring);
@@ -172,7 +179,7 @@
       height: 100%;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     #kostenvergleich .bar-card.featured {
@@ -232,14 +239,14 @@
 
     #kostenvergleich .details {
       width: 100%;
-      margin-top: 8px;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px dashed rgba(148, 163, 184, 0.4);
-      background: rgba(255, 255, 255, 0.7);
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
       display: none;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
       font-size: 12px;
       color: var(--muted);
     }
@@ -256,19 +263,29 @@
       align-items: baseline;
     }
 
-    #kostenvergleich .bar-card.is-open .details {
-      display: flex;
+    #kostenvergleich .details-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.25);
+      overflow: hidden;
     }
 
-    #kostenvergleich .details-toggle {
-      margin-top: auto;
-      background: rgba(15, 23, 42, 0.05);
-      border: 1px solid rgba(148, 163, 184, 0.4);
+    #kostenvergleich .details-bar span {
+      display: block;
+      height: 100%;
       border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #1e293b;
+      background: linear-gradient(90deg, rgba(91, 124, 250, 0.3), rgba(126, 217, 87, 0.7));
+    }
+
+    #kostenvergleich .bar-item:hover .bar-card,
+    #kostenvergleich .bar-item:focus-within .bar-card {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.16);
+    }
+
+    #kostenvergleich .bar-item:hover .details,
+    #kostenvergleich .bar-item:focus-within .details {
+      display: flex;
     }
 
     #kostenvergleich .slider-group {
@@ -402,50 +419,68 @@
               <p style="margin:0; color:var(--muted);">Visualisiert werden ausschliesslich die Gebührenkosten inklusive entgangener Rendite.</p>
 
               <div class="bars" aria-live="polite">
-                <div class="bar-card featured" data-tier="cheap">
-                  <div class="bar-title"><strong>Vemo Standard</strong>Günstig</div>
-                  <div class="bar-stack">
-                    <div class="bar-column" id="bar-cheap"></div>
+                <div class="bar-item" tabindex="0">
+                  <div class="bar-card featured" data-tier="cheap">
+                    <div class="bar-title"><strong>Vemo Standard</strong></div>
+                    <div class="bar-stack">
+                      <div class="bar-column" id="bar-cheap"></div>
+                    </div>
+                    <div class="bar-value" id="cost-cheap">CHF 0</div>
                   </div>
-                  <div class="bar-value" id="cost-cheap">CHF 0</div>
                   <div class="details" id="details-cheap">
                     <div class="details-row"><span>Eingezahlt</span><strong id="paid-cheap">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-paid-cheap"></span></div>
                     <div class="details-row"><span>Gebühren</span><strong id="fees-cheap">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-fees-cheap"></span></div>
                     <div class="details-row"><span>Verlorene Zinsen</span><strong id="lost-cheap">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-lost-cheap"></span></div>
                     <div class="details-row"><span>Verlorene Opportunität</span><strong id="opportunity-cheap">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-opportunity-cheap"></span></div>
                     <div class="details-row"><span>Endkapital</span><strong id="end-cheap">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-end-cheap"></span></div>
                   </div>
-                  <div class="details-toggle">Details anzeigen</div>
                 </div>
-                <div class="bar-card" data-tier="average">
-                  <div class="bar-title">Durchschnitt</div>
-                  <div class="bar-stack">
-                    <div class="bar-column" id="bar-average"></div>
+                <div class="bar-item" tabindex="0">
+                  <div class="bar-card" data-tier="average">
+                    <div class="bar-title">Durchschnitt</div>
+                    <div class="bar-stack">
+                      <div class="bar-column" id="bar-average"></div>
+                    </div>
+                    <div class="bar-value" id="cost-average">CHF 0</div>
                   </div>
-                  <div class="bar-value" id="cost-average">CHF 0</div>
                   <div class="details" id="details-average">
                     <div class="details-row"><span>Eingezahlt</span><strong id="paid-average">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-paid-average"></span></div>
                     <div class="details-row"><span>Mehrkosten ggü. Vemo</span><strong id="fees-average">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-fees-average"></span></div>
                     <div class="details-row"><span>Verlorene Zinsen ggü. Vemo</span><strong id="lost-average">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-lost-average"></span></div>
                     <div class="details-row"><span>Verlorene Opportunität</span><strong id="opportunity-average">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-opportunity-average"></span></div>
                     <div class="details-row"><span>Endkapital ggü. Vemo</span><strong id="end-average">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-end-average"></span></div>
                   </div>
-                  <div class="details-toggle">Details anzeigen</div>
                 </div>
-                <div class="bar-card" data-tier="expensive">
-                  <div class="bar-title">Schlecht</div>
-                  <div class="bar-stack">
-                    <div class="bar-column" id="bar-expensive"></div>
+                <div class="bar-item" tabindex="0">
+                  <div class="bar-card" data-tier="expensive">
+                    <div class="bar-title">Schlecht</div>
+                    <div class="bar-stack">
+                      <div class="bar-column" id="bar-expensive"></div>
+                    </div>
+                    <div class="bar-value" id="cost-expensive">CHF 0</div>
                   </div>
-                  <div class="bar-value" id="cost-expensive">CHF 0</div>
                   <div class="details" id="details-expensive">
                     <div class="details-row"><span>Eingezahlt</span><strong id="paid-expensive">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-paid-expensive"></span></div>
                     <div class="details-row"><span>Mehrkosten ggü. Vemo</span><strong id="fees-expensive">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-fees-expensive"></span></div>
                     <div class="details-row"><span>Verlorene Zinsen ggü. Vemo</span><strong id="lost-expensive">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-lost-expensive"></span></div>
                     <div class="details-row"><span>Verlorene Opportunität</span><strong id="opportunity-expensive">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-opportunity-expensive"></span></div>
                     <div class="details-row"><span>Endkapital ggü. Vemo</span><strong id="end-expensive">CHF 0</strong></div>
+                    <div class="details-bar"><span id="bar-end-expensive"></span></div>
                   </div>
-                  <div class="details-toggle">Details anzeigen</div>
                 </div>
               </div>
             </section>
@@ -511,7 +546,23 @@
         endCheap: document.getElementById("end-cheap"),
         endAverage: document.getElementById("end-average"),
         endExpensive: document.getElementById("end-expensive"),
-        cards: document.querySelectorAll(".bar-card"),
+        detailBars: {
+          paidCheap: document.getElementById("bar-paid-cheap"),
+          paidAverage: document.getElementById("bar-paid-average"),
+          paidExpensive: document.getElementById("bar-paid-expensive"),
+          feesCheap: document.getElementById("bar-fees-cheap"),
+          feesAverage: document.getElementById("bar-fees-average"),
+          feesExpensive: document.getElementById("bar-fees-expensive"),
+          lostCheap: document.getElementById("bar-lost-cheap"),
+          lostAverage: document.getElementById("bar-lost-average"),
+          lostExpensive: document.getElementById("bar-lost-expensive"),
+          opportunityCheap: document.getElementById("bar-opportunity-cheap"),
+          opportunityAverage: document.getElementById("bar-opportunity-average"),
+          opportunityExpensive: document.getElementById("bar-opportunity-expensive"),
+          endCheap: document.getElementById("bar-end-cheap"),
+          endAverage: document.getElementById("bar-end-average"),
+          endExpensive: document.getElementById("bar-end-expensive"),
+        },
       };
 
       const formatter = new Intl.NumberFormat("de-CH", {
@@ -599,26 +650,44 @@
         elements.lostExpensive.textContent = formatter.format(Math.max(expensiveScenario.lostInterest - cheapScenario.lostInterest, 0));
         elements.opportunityExpensive.textContent = formatter.format(Math.max(expensiveScenario.lostOpportunity - cheapScenario.lostOpportunity, 0));
         elements.endExpensive.textContent = formatter.format(Math.max(cheapScenario.netBalance - expensiveScenario.netBalance, 0));
+
+        const maxDetail = Math.max(
+          cheapScenario.totalContributions,
+          cheapScenario.totalFees,
+          cheapScenario.lostInterest,
+          cheapScenario.lostOpportunity,
+          cheapScenario.netBalance,
+          averageScenario.totalFees - cheapScenario.totalFees,
+          averageScenario.lostInterest - cheapScenario.lostInterest,
+          averageScenario.lostOpportunity - cheapScenario.lostOpportunity,
+          cheapScenario.netBalance - averageScenario.netBalance,
+          expensiveScenario.totalFees - cheapScenario.totalFees,
+          expensiveScenario.lostInterest - cheapScenario.lostInterest,
+          expensiveScenario.lostOpportunity - cheapScenario.lostOpportunity,
+          cheapScenario.netBalance - expensiveScenario.netBalance,
+          1
+        );
+        const detailScale = (value) => `${Math.max(0, value / maxDetail) * 100}%`;
+
+        elements.detailBars.paidCheap.style.width = detailScale(cheapScenario.totalContributions);
+        elements.detailBars.paidAverage.style.width = detailScale(cheapScenario.totalContributions);
+        elements.detailBars.paidExpensive.style.width = detailScale(cheapScenario.totalContributions);
+        elements.detailBars.feesCheap.style.width = detailScale(cheapScenario.totalFees);
+        elements.detailBars.lostCheap.style.width = detailScale(cheapScenario.lostInterest);
+        elements.detailBars.opportunityCheap.style.width = detailScale(cheapScenario.lostOpportunity);
+        elements.detailBars.endCheap.style.width = detailScale(cheapScenario.netBalance);
+        elements.detailBars.feesAverage.style.width = detailScale(Math.max(averageScenario.totalFees - cheapScenario.totalFees, 0));
+        elements.detailBars.lostAverage.style.width = detailScale(Math.max(averageScenario.lostInterest - cheapScenario.lostInterest, 0));
+        elements.detailBars.opportunityAverage.style.width = detailScale(Math.max(averageScenario.lostOpportunity - cheapScenario.lostOpportunity, 0));
+        elements.detailBars.endAverage.style.width = detailScale(Math.max(cheapScenario.netBalance - averageScenario.netBalance, 0));
+        elements.detailBars.feesExpensive.style.width = detailScale(Math.max(expensiveScenario.totalFees - cheapScenario.totalFees, 0));
+        elements.detailBars.lostExpensive.style.width = detailScale(Math.max(expensiveScenario.lostInterest - cheapScenario.lostInterest, 0));
+        elements.detailBars.opportunityExpensive.style.width = detailScale(Math.max(expensiveScenario.lostOpportunity - cheapScenario.lostOpportunity, 0));
+        elements.detailBars.endExpensive.style.width = detailScale(Math.max(cheapScenario.netBalance - expensiveScenario.netBalance, 0));
       };
 
       elements.monthly.addEventListener("input", update);
       elements.years.addEventListener("input", update);
-
-      elements.cards.forEach((card) => {
-        card.addEventListener("click", () => {
-          const isOpen = card.classList.contains("is-open");
-          elements.cards.forEach((item) => {
-            item.classList.remove("is-open");
-            const toggle = item.querySelector(".details-toggle");
-            if (toggle) toggle.textContent = "Details anzeigen";
-          });
-          if (!isOpen) {
-            card.classList.add("is-open");
-            const toggle = card.querySelector(".details-toggle");
-            if (toggle) toggle.textContent = "Details ausblenden";
-          }
-        });
-      });
       update();
     })();
   </script>
