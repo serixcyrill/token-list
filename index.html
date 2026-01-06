@@ -164,6 +164,10 @@
       background: #fee2e2;
       color: #b91c1c;
     }
+    .status-pill.info {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
   </style>
 </head>
 <body>
@@ -237,25 +241,65 @@
     const FETCH_TIMEOUT_MS = 15000;
 
     const SOURCE_DEFS = {
-      estv: {
-        name: "ESTV Steuerrechner Portal (Plausibilisierung)",
-        url: "https://www.estv.admin.ch/estv/de/home/estv/steuerrechnung.html",
+      estv_meta: {
+        name: "ESTV Grunddaten Steuerfüsse, Abzüge, Tarife",
+        url: "https://www.estv.admin.ch/estv/de/home/die-estv/steuerstatistiken-estv/steuerfuesse.html",
+        type: "meta",
+      },
+      estv_calc: {
+        name: "ESTV Steuerrechner (Swisstaxcalculator)",
+        url: "https://swisstaxcalculator.estv.admin.ch/",
         type: "plausibility",
       },
       zh: {
-        name: "Kanton Zürich: Gemeindesteuerfüsse",
-        url: "https://www.zh.ch/de/steuern-finanzen/steuern/steuerfuss-zuerich.html",
+        name: "Kanton Zürich: Aktuelle Gemeindesteuerfüsse (HTML)",
+        url: "https://www.zh.ch/de/steuern-finanzen/steuern/steuerstatistiken/aktuelle-gemeinde-steuerfuesse.html",
         type: "data",
       },
       ag: {
-        name: "Kanton Aargau: Verzeichnis Gemeinde und Kirchensteuerfüsse",
-        url: "https://www.ag.ch/media/kanton-aargau/dfr/steuern/steuerfuesse/steuerfussliste-gemeinden.pdf",
+        name: "Kanton Aargau: Gemeinde- und Kirchensteuerfüsse 2025 (PDF)",
+        url: "https://www.ag.ch/media/kanton-aargau/dfr/dokumente/steuern/natuerliche-personen/steuerberechnung-tarife-natuerliche-personen/gemeinde-und-kirchensteuerf-sse-2025-v5a.pdf",
         type: "data",
       },
+      ag_meta: {
+        name: "Kanton Aargau: Tarife und Steuerfüsse (Übersicht)",
+        url: "https://www.ag.ch/de/themen/steuern-finanzen/steuern/natuerliche-personen/steuerberechnung-tarife-steuerfuesse/tarife-und-steuerfuesse",
+        type: "meta",
+      },
       sg: {
-        name: "Kanton St. Gallen: Steuerfuss Übersicht je Gemeinde",
-        url: "https://www.sg.ch/finanzen/steuern/steuerfuesse/_jcr_content/Par/downloadlist/downloadItems/steuerfuss-uebersicht.download/steuerfuss-uebersicht.pdf",
+        name: "Kanton St. Gallen: Steuerfuss Übersicht Gemeinden (HTML)",
+        url: "https://www.sg.ch/steuern-finanzen/steuern/steuerkalkulator/steuerfuss-uebersicht-aller-sg-gemeinden.html",
         type: "data",
+      },
+      ar: {
+        name: "Kanton Appenzell Ausserrhoden: Steuerfüsse 2026 (PDF)",
+        url: "https://ar.ch/fileadmin/user_upload/Departement_Finanzen/Steuerverwaltung/Bibliothek/2026/Steuerfuesse_2026.pdf",
+        type: "data",
+      },
+      lu_meta: {
+        name: "Kanton Luzern: Steuereinheiten Gemeinden (Übersicht)",
+        url: "https://steuern.lu.ch/publikationen/nav_einheiten_tarife",
+        type: "meta",
+      },
+      be_meta: {
+        name: "Kanton Bern: Steueranlagen (Einstiegsseite)",
+        url: "https://www.sv.fin.be.ch/de/start/themen/steuern-berechnen/steueranlagen.html",
+        type: "meta",
+      },
+      be: {
+        name: "Kanton Bern: Steueranlagen Gemeinden/Kirchgemeinden 2024 (PDF)",
+        url: "https://www.fin.be.ch/content/dam/fin/dokumente/de/finanzverwaltung/finanzausgleich/publikationen/fv-stat-steueranlage_2024.pdf",
+        type: "data",
+      },
+      bfs_meta: {
+        name: "BFS Gemeindeverzeichnis (amtlicher Kontext)",
+        url: "https://www.agvchapp.bfs.admin.ch/",
+        type: "meta",
+      },
+      topo_meta: {
+        name: "swisstopo Gemeindegrenzen (BFS-Bezug)",
+        url: "https://www.swisstopo.admin.ch/de/kantons-bezirks-gemeindegrenzen",
+        type: "meta",
       },
     };
 
@@ -272,7 +316,7 @@
         }),
       }),
       ag: createPdfAdapter("AG", SOURCE_DEFS.ag.url, {
-        rowPattern: /(\d{3})\s+([^\d]+)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/,
+        rowPattern: /(\d{3})\s+([^\d]+?)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/g,
         mapMatch: (match) => ({
           gemeinde: match[2].trim(),
           gemeindesteuerfuss: parseFloat(match[3]),
@@ -282,8 +326,30 @@
           kirchensteuer_chr_kath: null,
         }),
       }),
-      sg: createPdfAdapter("SG", SOURCE_DEFS.sg.url, {
-        rowPattern: /([^\d]+)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/,
+      sg: createHtmlTableAdapter("SG", SOURCE_DEFS.sg.url, {
+        tableHint: "Gemeinde",
+        mapRow: (row) => ({
+          gemeinde: row[0],
+          gemeindesteuerfuss: parseRate(row[1]),
+          kantonssteuerfuss: null,
+          kirchensteuer_ref: parseRate(row[2]),
+          kirchensteuer_roem_kath: parseRate(row[3]),
+          kirchensteuer_chr_kath: parseRate(row[4]),
+        }),
+      }),
+      ar: createPdfAdapter("AR", SOURCE_DEFS.ar.url, {
+        rowPattern: /([^\d]+?)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/g,
+        mapMatch: (match) => ({
+          gemeinde: match[1].trim(),
+          gemeindesteuerfuss: parseFloat(match[2]),
+          kantonssteuerfuss: null,
+          kirchensteuer_ref: parseFloat(match[3]),
+          kirchensteuer_roem_kath: parseFloat(match[4]),
+          kirchensteuer_chr_kath: null,
+        }),
+      }),
+      be: createPdfAdapter("BE", SOURCE_DEFS.be.url, {
+        rowPattern: /([^\d]+?)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/g,
         mapMatch: (match) => ({
           gemeinde: match[1].trim(),
           gemeindesteuerfuss: parseFloat(match[2]),
@@ -406,7 +472,7 @@
         mapToSchema(lines) {
           const rows = [];
           for (const line of lines) {
-            const matches = line.matchAll(new RegExp(config.rowPattern, "g"));
+            const matches = line.matchAll(config.rowPattern);
             for (const match of matches) {
               rows.push(config.mapMatch(match));
             }
@@ -590,8 +656,17 @@
 
     function renderSourceStatus() {
       const items = Object.entries(SOURCE_DEFS).map(([key, source]) => {
-        const status = state.sourceStatus[key] || { status: "warn", count: 0 };
-        const pillClass = status.status === "ok" ? "ok" : status.status === "error" ? "error" : "warn";
+        const status =
+          state.sourceStatus[key] ||
+          (source.type === "meta" ? { status: "info", count: 0 } : { status: "warn", count: 0 });
+        const pillClass =
+          status.status === "ok"
+            ? "ok"
+            : status.status === "error"
+              ? "error"
+              : status.status === "info"
+                ? "info"
+                : "warn";
         const countLabel = source.type === "data" ? `(${status.count} Gemeinden)` : "";
         const dateLabel = status.storedAt ? `Stand ${new Date(status.storedAt).toLocaleDateString("de-CH")}` : "";
         const extra = status.message ? ` – ${status.message}` : "";
@@ -661,28 +736,34 @@
     ui.income.addEventListener("input", updateResults);
 
     async function checkPlausibilitySources() {
-      const key = "estv";
-      const source = SOURCE_DEFS[key];
-      try {
-        const response = await fetchWithTimeout(source.url, { method: "HEAD" });
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        state.sourceStatus[key] = {
-          status: "ok",
-          count: 0,
-          storedAt: new Date().toISOString(),
-          url: source.url,
-        };
-      } catch (error) {
-        state.sourceStatus[key] = {
-          status: "warn",
-          count: 0,
-          storedAt: null,
-          url: source.url,
-          message: "Plausibilisierung nicht erreichbar",
-        };
-      }
+      const keys = Object.keys(SOURCE_DEFS).filter(
+        (key) => SOURCE_DEFS[key].type === "plausibility"
+      );
+      await Promise.all(
+        keys.map(async (key) => {
+          const source = SOURCE_DEFS[key];
+          try {
+            const response = await fetchWithTimeout(source.url, { method: "HEAD" });
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            state.sourceStatus[key] = {
+              status: "ok",
+              count: 0,
+              storedAt: new Date().toISOString(),
+              url: source.url,
+            };
+          } catch (error) {
+            state.sourceStatus[key] = {
+              status: "warn",
+              count: 0,
+              storedAt: null,
+              url: source.url,
+              message: "Plausibilisierung nicht erreichbar",
+            };
+          }
+        })
+      );
       renderSourceList();
       renderSourceStatus();
     }
