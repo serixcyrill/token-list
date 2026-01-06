@@ -179,7 +179,6 @@
       border-radius: var(--radius);
       padding: 20px;
       box-shadow: var(--shadow);
-      overflow: hidden;
     }
 
     .section-heading {
@@ -333,9 +332,11 @@
       cursor: pointer;
       justify-content: center;
       white-space: nowrap;
+      overflow: visible;
       min-width: 0;
       width: 100%;
       min-height: 44px;
+      line-height: 1.1;
       background: var(--accent-strong);
       color: #ffffff;
       border: 1px solid rgba(114, 210, 122, 0.5);
@@ -481,7 +482,13 @@
     }
 
     .label-animating {
-      overflow: hidden;
+      overflow: visible;
+    }
+
+    @media (max-width: 520px) {
+      .vorsorge-actions {
+        grid-template-columns: 1fr;
+      }
     }
 
     .btn-label {
