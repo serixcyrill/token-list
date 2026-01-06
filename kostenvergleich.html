@@ -377,8 +377,8 @@
         <main>
           <div class="grid cols-2">
             <section class="panel">
-              <h2 style="margin:0 0 8px;">Gesamtkosten durch Gebühren</h2>
-              <p style="margin:0; color:var(--muted);">Visualisiert werden ausschliesslich die Gebührenkosten inklusive entgangener Rendite.</p>
+              <h2 style="margin:0 0 8px;">Gesamtkosten</h2>
+              <p style="margin:0; color:var(--muted);">Visualisiert werden ausschliesslich die Gebührenkosten inklusive entgangener Rendite (Skala 0–100’000 CHF).</p>
 
               <div class="bars" aria-live="polite">
                 <div class="bar-card featured">
@@ -484,15 +484,16 @@
           expensive: Math.max(grossValue - netValues.expensive, 0),
         };
 
-        const maxCost = Math.max(costs.cheap, costs.average, costs.expensive, 1);
+        const maxCost = 100000;
+        const scale = (value) => Math.min(value / maxCost, 1);
 
         elements.costCheap.textContent = formatter.format(costs.cheap);
         elements.costAverage.textContent = formatter.format(costs.average);
         elements.costExpensive.textContent = formatter.format(costs.expensive);
 
-        elements.barCheap.style.height = `${(costs.cheap / maxCost) * 100}%`;
-        elements.barAverage.style.height = `${(costs.average / maxCost) * 100}%`;
-        elements.barExpensive.style.height = `${(costs.expensive / maxCost) * 100}%`;
+        elements.barCheap.style.height = `${scale(costs.cheap) * 100}%`;
+        elements.barAverage.style.height = `${scale(costs.average) * 100}%`;
+        elements.barExpensive.style.height = `${scale(costs.expensive) * 100}%`;
 
         elements.barCheap.style.background = "linear-gradient(180deg, #a2f1a6 0%, #7ed957 100%)";
         elements.barAverage.style.background = "linear-gradient(180deg, #d1d5db 0%, #9ca3af 100%)";
