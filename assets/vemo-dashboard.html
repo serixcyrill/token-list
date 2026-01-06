@@ -317,8 +317,8 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
-      gap: 10px;
-      margin-top: 4px;
+      gap: 14px;
+      margin-top: 10px;
     }
 
     .vorsorge-actions .cta-btn {
@@ -336,7 +336,17 @@
       min-width: 0;
       width: 100%;
       min-height: 44px;
+      background: var(--accent-strong);
+      color: #ffffff;
+      border: 1px solid rgba(114, 210, 122, 0.5);
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
       transition: background 0.2s ease, border 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    }
+
+    .vorsorge-actions .cta-btn:hover {
+      background: var(--accent-hover);
+      border-color: rgba(114, 210, 122, 0.6);
+      transform: translateY(-1px);
     }
 
     .vorsorge-logo {
