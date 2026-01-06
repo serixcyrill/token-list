@@ -155,21 +155,36 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
-      align-items: end;
-      min-height: 260px;
+      align-items: stretch;
+      min-height: 300px;
     }
 
     #kostenvergleich .bar-card {
       background: rgba(248, 250, 252, 0.8);
       border: 1px solid var(--ring);
       border-radius: 16px;
-      padding: 14px 12px;
+      padding: 16px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
       box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
       height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #kostenvergleich .bar-card.featured {
+      border-color: rgba(126, 217, 87, 0.5);
+      box-shadow: 0 18px 36px rgba(126, 217, 87, 0.18);
+    }
+
+    #kostenvergleich .bar-card.featured::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(126, 217, 87, 0.12) 0%, transparent 55%);
+      pointer-events: none;
     }
 
     #kostenvergleich .bar-stack {
@@ -178,13 +193,15 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      padding: 8px 0 6px;
+      padding: 12px 0 6px;
+      position: relative;
+      z-index: 1;
     }
 
     #kostenvergleich .bar-column {
-      width: 70%;
-      min-height: 8px;
-      border-radius: 14px 14px 10px 10px;
+      width: 68%;
+      min-height: 10px;
+      border-radius: 16px 16px 10px 10px;
       transition: height 0.35s ease;
       box-shadow: 0 12px 22px rgba(15, 23, 42, 0.12);
     }
@@ -193,12 +210,23 @@
       font-weight: 600;
       font-size: 14px;
       text-align: center;
+      color: #0f172a;
+    }
+
+    #kostenvergleich .bar-title strong {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 0.08em;
     }
 
     #kostenvergleich .bar-value {
       font-weight: 700;
       font-size: 18px;
       color: #0f172a;
+      z-index: 1;
     }
 
     #kostenvergleich .legend {
@@ -225,19 +253,64 @@
     #kostenvergleich .slider-group {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 18px;
     }
 
     #kostenvergleich .slider-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-weight: 600;
+    }
+
+    #kostenvergleich .slider-value {
+      background: rgba(91, 124, 250, 0.12);
+      border: 1px solid rgba(91, 124, 250, 0.25);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
     }
 
     #kostenvergleich input[type="range"] {
       width: 100%;
-      accent-color: var(--accent);
+      -webkit-appearance: none;
+      appearance: none;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(126, 217, 87, 0.4), rgba(91, 124, 250, 0.25));
+      outline: none;
+      position: relative;
+    }
+
+    #kostenvergleich input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid rgba(91, 124, 250, 0.6);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.16);
+      cursor: pointer;
+    }
+
+    #kostenvergleich input[type="range"]::-moz-range-thumb {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid rgba(91, 124, 250, 0.6);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.16);
+      cursor: pointer;
+    }
+
+    #kostenvergleich input[type="range"]::-moz-range-track {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(126, 217, 87, 0.4), rgba(91, 124, 250, 0.25));
     }
 
     #kostenvergleich .note {
@@ -308,22 +381,22 @@
               <p style="margin:0; color:var(--muted);">Visualisiert werden ausschliesslich die Gebührenkosten inklusive entgangener Rendite.</p>
 
               <div class="bars" aria-live="polite">
-                <div class="bar-card">
-                  <div class="bar-title">Günstig (Vemo)</div>
+                <div class="bar-card featured">
+                  <div class="bar-title"><strong>Vemo Standard</strong>Günstig</div>
                   <div class="bar-stack">
                     <div class="bar-column" id="bar-cheap"></div>
                   </div>
                   <div class="bar-value" id="cost-cheap">CHF 0</div>
                 </div>
                 <div class="bar-card">
-                  <div class="bar-title">Durchschnitt (Markt)</div>
+                  <div class="bar-title">Durchschnitt</div>
                   <div class="bar-stack">
                     <div class="bar-column" id="bar-average"></div>
                   </div>
                   <div class="bar-value" id="cost-average">CHF 0</div>
                 </div>
                 <div class="bar-card">
-                  <div class="bar-title">Teuer (schlecht)</div>
+                  <div class="bar-title">Schlecht</div>
                   <div class="bar-stack">
                     <div class="bar-column" id="bar-expensive"></div>
                   </div>
@@ -332,9 +405,9 @@
               </div>
 
               <div class="legend">
-                <div class="legend-item"><span class="legend-dot" style="background:var(--accent);"></span>Günstig</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--accent);"></span>Vemo Standard</div>
                 <div class="legend-item"><span class="legend-dot" style="background:var(--gray);"></span>Durchschnitt</div>
-                <div class="legend-item"><span class="legend-dot" style="background:var(--red);"></span>Teuer</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--red);"></span>Schlecht</div>
               </div>
             </section>
 
@@ -343,7 +416,7 @@
               <div class="slider-group">
                 <div class="slider-header">
                   <span>Monatlicher Sparanteil</span>
-                  <span id="monthly-display">CHF 200</span>
+                  <span class="slider-value" id="monthly-display">CHF 200</span>
                 </div>
                 <input id="monthly" type="range" min="0" max="604" step="1" value="200" />
               </div>
@@ -421,9 +494,9 @@
         elements.barAverage.style.height = `${(costs.average / maxCost) * 100}%`;
         elements.barExpensive.style.height = `${(costs.expensive / maxCost) * 100}%`;
 
-        elements.barCheap.style.background = "var(--accent)";
-        elements.barAverage.style.background = "var(--gray)";
-        elements.barExpensive.style.background = "var(--red)";
+        elements.barCheap.style.background = "linear-gradient(180deg, #a2f1a6 0%, #7ed957 100%)";
+        elements.barAverage.style.background = "linear-gradient(180deg, #d1d5db 0%, #9ca3af 100%)";
+        elements.barExpensive.style.background = "linear-gradient(180deg, #fca5a5 0%, #ef4444 100%)";
       };
 
       elements.monthly.addEventListener("input", update);
