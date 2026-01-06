@@ -331,12 +331,13 @@
       text-decoration: none;
       cursor: pointer;
       justify-content: center;
-      white-space: nowrap;
+      white-space: normal;
+      text-align: center;
       overflow: visible;
       min-width: 0;
       width: 100%;
       min-height: 44px;
-      line-height: 1.1;
+      line-height: 1.2;
       background: var(--accent-strong);
       color: #ffffff;
       border: 1px solid rgba(114, 210, 122, 0.5);
@@ -475,7 +476,7 @@
       color: #0f1a2a;
     }
 
-    .toggle-details {
+    .toggle-details:not(.cta-btn) {
       white-space: nowrap;
       transition: width 0.28s ease, padding 0.28s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
         box-shadow 0.2s ease;
