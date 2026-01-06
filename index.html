@@ -132,6 +132,38 @@
     .source-list li {
       margin-bottom: 0.4rem;
     }
+    .source-status {
+      margin: 0.6rem 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .source-status li {
+      margin-bottom: 0.35rem;
+    }
+    .status-pill {
+      display: inline-block;
+      margin-left: 0.5rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .status-pill.ok {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .status-pill.warn {
+      background: #fef9c3;
+      color: #a16207;
+    }
+    .status-pill.error {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
   </style>
 </head>
 <body>
@@ -188,13 +220,10 @@
     </section>
 
     <section class="card">
-      <h2>Datenquellen</h2>
-      <ul class="source-list">
-        <li>ESTV Steuerrechner Portal (Plausibilisierung)</li>
-        <li>Kanton Zürich: Gemeindesteuerfüsse (HTML Tabelle)</li>
-        <li>Kanton Aargau: Verzeichnis Gemeinde und Kirchensteuerfüsse (PDF)</li>
-        <li>Kanton St. Gallen: Steuerfuss Übersicht je Gemeinde</li>
-      </ul>
+      <h2>Datenquellen (offiziell)</h2>
+      <ul class="source-list" id="sourceList"></ul>
+      <div class="small">Status je Quelle:</div>
+      <div class="small" id="sourceStatus"></div>
       <p class="small">Die Daten werden clientseitig geladen und im Browser zwischengespeichert.</p>
     </section>
 
@@ -205,28 +234,33 @@
   <script>
     const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
     const CACHE_PREFIX = "steuerfuss_cache_";
+    const FETCH_TIMEOUT_MS = 15000;
 
-    const SOURCES = {
+    const SOURCE_DEFS = {
       estv: {
-        name: "ESTV",
+        name: "ESTV Steuerrechner Portal (Plausibilisierung)",
         url: "https://www.estv.admin.ch/estv/de/home/estv/steuerrechnung.html",
+        type: "plausibility",
       },
       zh: {
-        name: "Kanton Zürich",
+        name: "Kanton Zürich: Gemeindesteuerfüsse",
         url: "https://www.zh.ch/de/steuern-finanzen/steuern/steuerfuss-zuerich.html",
+        type: "data",
       },
       ag: {
-        name: "Kanton Aargau",
+        name: "Kanton Aargau: Verzeichnis Gemeinde und Kirchensteuerfüsse",
         url: "https://www.ag.ch/media/kanton-aargau/dfr/steuern/steuerfuesse/steuerfussliste-gemeinden.pdf",
+        type: "data",
       },
       sg: {
-        name: "Kanton St. Gallen",
+        name: "Kanton St. Gallen: Steuerfuss Übersicht je Gemeinde",
         url: "https://www.sg.ch/finanzen/steuern/steuerfuesse/_jcr_content/Par/downloadlist/downloadItems/steuerfuss-uebersicht.download/steuerfuss-uebersicht.pdf",
+        type: "data",
       },
     };
 
     const ADAPTERS = {
-      zh: createHtmlTableAdapter("ZH", SOURCES.zh.url, {
+      zh: createHtmlTableAdapter("ZH", SOURCE_DEFS.zh.url, {
         tableHint: "Gemeinde",
         mapRow: (row) => ({
           gemeinde: row[0],
@@ -237,7 +271,7 @@
           kirchensteuer_chr_kath: null,
         }),
       }),
-      ag: createPdfAdapter("AG", SOURCES.ag.url, {
+      ag: createPdfAdapter("AG", SOURCE_DEFS.ag.url, {
         rowPattern: /(\d{3})\s+([^\d]+)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/,
         mapMatch: (match) => ({
           gemeinde: match[2].trim(),
@@ -248,7 +282,7 @@
           kirchensteuer_chr_kath: null,
         }),
       }),
-      sg: createPdfAdapter("SG", SOURCES.sg.url, {
+      sg: createPdfAdapter("SG", SOURCE_DEFS.sg.url, {
         rowPattern: /([^\d]+)\s+(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+\.?\d*)/,
         mapMatch: (match) => ({
           gemeinde: match[1].trim(),
@@ -265,6 +299,7 @@
       rows: [],
       fallbackUsed: false,
       lastUpdated: null,
+      sourceStatus: {},
     };
 
     const ui = {
@@ -280,14 +315,32 @@
       estimate: document.getElementById("estimate"),
       status: document.getElementById("status"),
       lastUpdated: document.getElementById("lastUpdated"),
+      sourceList: document.getElementById("sourceList"),
+      sourceStatus: document.getElementById("sourceStatus"),
     };
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js";
+    }
+
+    async function fetchWithTimeout(url, options = {}) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        return response;
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
 
     function createHtmlTableAdapter(kantonCode, url, config) {
       return {
         kantonCode,
         sourceUrl: url,
         async fetchSource() {
-          const response = await fetch(url);
+          const response = await fetchWithTimeout(url);
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
           }
@@ -300,17 +353,27 @@
           if (!target) {
             throw new Error("Keine passende Tabelle gefunden");
           }
-          const rows = Array.from(target.querySelectorAll("tr")).map((row) =>
-            Array.from(row.querySelectorAll("th, td")).map((cell) => cell.textContent.trim())
-          );
-          return rows.filter((row) => row.length > 1 && row[0] && row[0] !== config.tableHint);
+          const rows = Array.from(target.querySelectorAll("tr")).map((row) => {
+            const cells = Array.from(row.querySelectorAll("th, td")).map((cell) =>
+              cell.textContent.trim()
+            );
+            return cells;
+          });
+          return rows.filter((row) => row.length > 1 && row[0] && !looksLikeHeader(row));
         },
         mapToSchema(rows) {
-          return rows.map((row) => config.mapRow(row)).filter((row) => row.gemeinde);
+          return rows
+            .map((row) => config.mapRow(row))
+            .filter((row) => row.gemeinde)
+            .map((row) => ({ ...row, gemeinde: normalizeGemeindeName(row.gemeinde) }));
         },
         validate(rows) {
           if (!rows.length) {
             throw new Error("Keine Datenzeilen gefunden");
+          }
+          const valid = rows.filter((row) => Number.isFinite(row.gemeindesteuerfuss));
+          if (valid.length < Math.max(5, rows.length * 0.5)) {
+            throw new Error("Validierungscheck: zu wenig numerische Steuerfüsse");
           }
           return rows;
         },
@@ -322,7 +385,7 @@
         kantonCode,
         sourceUrl: url,
         async fetchSource() {
-          const response = await fetch(url);
+          const response = await fetchWithTimeout(url);
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
           }
@@ -348,7 +411,7 @@
               rows.push(config.mapMatch(match));
             }
           }
-          return rows;
+          return rows.map((row) => ({ ...row, gemeinde: normalizeGemeindeName(row.gemeinde) }));
         },
         validate(rows) {
           if (!rows.length) {
@@ -370,16 +433,32 @@
       return Number.isFinite(number) ? number : null;
     }
 
+    function sanitizeRate(value) {
+      return Number.isFinite(value) ? value : null;
+    }
+
+    function normalizeGemeindeName(name) {
+      return name
+        .replace(/\s+/g, " ")
+        .replace(/\u00a0/g, " ")
+        .trim();
+    }
+
+    function looksLikeHeader(row) {
+      const joined = row.join(" ").toLowerCase();
+      return joined.includes("gemeinde") || joined.includes("steuerfuss") || joined.includes("steuerfuß");
+    }
+
     function formatRate(value) {
       if (value === null || value === undefined) return "–";
       return `${value.toFixed(2)} %`;
     }
 
-    function getCache(key) {
+    function getCache(key, options = {}) {
       const raw = localStorage.getItem(CACHE_PREFIX + key);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
-      if (Date.now() > parsed.expiresAt) {
+      if (!options.allowExpired && Date.now() > parsed.expiresAt) {
         localStorage.removeItem(CACHE_PREFIX + key);
         return null;
       }
@@ -402,11 +481,11 @@
         steuerjahr: new Date().getFullYear(),
         kanton: kantonCode,
         gemeinde: row.gemeinde,
-        gemeindesteuerfuss: row.gemeindesteuerfuss,
-        kantonssteuerfuss: row.kantonssteuerfuss,
-        kirchensteuer_ref: row.kirchensteuer_ref,
-        kirchensteuer_roem_kath: row.kirchensteuer_roem_kath,
-        kirchensteuer_chr_kath: row.kirchensteuer_chr_kath,
+        gemeindesteuerfuss: sanitizeRate(row.gemeindesteuerfuss),
+        kantonssteuerfuss: sanitizeRate(row.kantonssteuerfuss),
+        kirchensteuer_ref: sanitizeRate(row.kirchensteuer_ref),
+        kirchensteuer_roem_kath: sanitizeRate(row.kirchensteuer_roem_kath),
+        kirchensteuer_chr_kath: sanitizeRate(row.kirchensteuer_chr_kath),
         quelle_url: sourceUrl,
         import_datum: new Date().toISOString(),
       };
@@ -430,6 +509,7 @@
       const results = [];
       let fallbackUsed = false;
       let latestDate = null;
+      const sourceStatus = {};
 
       for (const adapterKey of Object.keys(ADAPTERS)) {
         const adapter = ADAPTERS[adapterKey];
@@ -437,14 +517,34 @@
           const { rows, storedAt } = await loadAdapter(adapter);
           results.push(...rows);
           latestDate = latestDate || storedAt;
+          sourceStatus[adapterKey] = {
+            status: "ok",
+            count: rows.length,
+            storedAt,
+            url: adapter.sourceUrl,
+          };
         } catch (error) {
-          const cache = getCache(adapter.kantonCode);
+          const cache = getCache(adapter.kantonCode, { allowExpired: true });
           if (cache) {
             results.push(...cache.data);
             fallbackUsed = true;
             latestDate = latestDate || cache.storedAt;
+            sourceStatus[adapterKey] = {
+              status: "warn",
+              count: cache.data.length,
+              storedAt: cache.storedAt,
+              url: adapter.sourceUrl,
+              message: "Fallback aus lokalem Cache",
+            };
           } else {
             console.warn("Quelle nicht erreichbar und kein Cache", adapter.kantonCode, error);
+            sourceStatus[adapterKey] = {
+              status: "error",
+              count: 0,
+              storedAt: null,
+              url: adapter.sourceUrl,
+              message: "Nicht erreichbar",
+            };
           }
         }
       }
@@ -452,6 +552,7 @@
       state.rows = results;
       state.fallbackUsed = fallbackUsed;
       state.lastUpdated = latestDate;
+      state.sourceStatus = sourceStatus;
 
       ui.status.textContent = fallbackUsed
         ? "Quelle aktuell nicht erreichbar. Es werden zuletzt gespeicherte Daten verwendet."
@@ -460,6 +561,8 @@
 
       ui.lastUpdated.textContent = latestDate ? new Date(latestDate).toLocaleString("de-CH") : "–";
 
+      renderSourceList();
+      renderSourceStatus();
       populateKantone();
       updateGemeinden();
       updateResults();
@@ -467,7 +570,34 @@
 
     function populateKantone() {
       const kantone = Array.from(new Set(state.rows.map((row) => row.kanton))).sort();
+      if (!kantone.length) {
+        ui.kanton.innerHTML = `<option value="">Keine Daten</option>`;
+        ui.gemeinde.innerHTML = `<option value="">Keine Daten</option>`;
+        ui.kanton.disabled = true;
+        ui.gemeinde.disabled = true;
+        return;
+      }
+      ui.kanton.disabled = false;
+      ui.gemeinde.disabled = false;
       ui.kanton.innerHTML = kantone.map((k) => `<option value="${k}">${k}</option>`).join("");
+    }
+
+    function renderSourceList() {
+      ui.sourceList.innerHTML = Object.values(SOURCE_DEFS)
+        .map((source) => `<li><a href="${source.url}" target="_blank" rel="noopener">${source.name}</a></li>`)
+        .join("");
+    }
+
+    function renderSourceStatus() {
+      const items = Object.entries(SOURCE_DEFS).map(([key, source]) => {
+        const status = state.sourceStatus[key] || { status: "warn", count: 0 };
+        const pillClass = status.status === "ok" ? "ok" : status.status === "error" ? "error" : "warn";
+        const countLabel = source.type === "data" ? `(${status.count} Gemeinden)` : "";
+        const dateLabel = status.storedAt ? `Stand ${new Date(status.storedAt).toLocaleDateString("de-CH")}` : "";
+        const extra = status.message ? ` – ${status.message}` : "";
+        return `<li>${source.name} ${countLabel} ${dateLabel}${extra}<span class="status-pill ${pillClass}">${status.status}</span></li>`;
+      });
+      ui.sourceStatus.innerHTML = `<ul class="source-status">${items.join("")}</ul>`;
     }
 
     function updateGemeinden() {
@@ -476,7 +606,9 @@
         .filter((row) => row.kanton === kanton)
         .map((row) => row.gemeinde)
         .sort();
-      ui.gemeinde.innerHTML = gemeinden.map((g) => `<option value="${g}">${g}</option>`).join("");
+      ui.gemeinde.innerHTML = gemeinden.length
+        ? gemeinden.map((g) => `<option value="${g}">${g}</option>`).join("")
+        : `<option value="">Keine Gemeinden</option>`;
     }
 
     function getSelectedRow() {
@@ -496,7 +628,14 @@
 
     function updateResults() {
       const row = getSelectedRow();
-      if (!row) return;
+      if (!row) {
+        ui.gemeindeRate.textContent = "–";
+        ui.kantonRate.textContent = "–";
+        ui.kirchenRate.textContent = "–";
+        ui.totalRate.textContent = "–";
+        ui.estimate.textContent = "–";
+        return;
+      }
 
       const gemeindeRate = row.gemeindesteuerfuss || 0;
       const kantonRate = row.kantonssteuerfuss || 0;
@@ -521,7 +660,36 @@
     ui.toggle.addEventListener("change", updateResults);
     ui.income.addEventListener("input", updateResults);
 
-    loadAllSources().catch((error) => {
+    async function checkPlausibilitySources() {
+      const key = "estv";
+      const source = SOURCE_DEFS[key];
+      try {
+        const response = await fetchWithTimeout(source.url, { method: "HEAD" });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        state.sourceStatus[key] = {
+          status: "ok",
+          count: 0,
+          storedAt: new Date().toISOString(),
+          url: source.url,
+        };
+      } catch (error) {
+        state.sourceStatus[key] = {
+          status: "warn",
+          count: 0,
+          storedAt: null,
+          url: source.url,
+          message: "Plausibilisierung nicht erreichbar",
+        };
+      }
+      renderSourceList();
+      renderSourceStatus();
+    }
+
+    loadAllSources()
+      .then(checkPlausibilitySources)
+      .catch((error) => {
       ui.status.textContent = "Daten konnten nicht geladen werden.";
       ui.status.classList.add("visible");
       console.error(error);
