@@ -316,8 +316,8 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
-      gap: 12px;
-      margin-top: 6px;
+      gap: 10px;
+      margin-top: 4px;
     }
 
     .vorsorge-actions .cta-btn {
@@ -327,7 +327,7 @@
       padding: 10px 14px;
       border-radius: 10px;
       font-weight: 700;
-      font-size: 13.5px;
+      font-size: 13px;
       text-decoration: none;
       cursor: pointer;
       justify-content: center;
@@ -379,6 +379,11 @@
     .portfolio-item,
     .vorsorge-card {
       position: relative;
+    }
+
+    .is-new {
+      border-color: rgba(251, 146, 60, 0.55);
+      box-shadow: 0 12px 26px rgba(251, 146, 60, 0.18);
     }
 
     .cta-primary {
@@ -3078,6 +3083,7 @@
 
     function applyNewBadge(container, value, options = {}) {
       if (!container || !hasNewTag(value)) return;
+      container.classList.add('is-new');
       const badge = document.createElement('span');
       badge.className = 'new-badge';
       badge.textContent = 'Neu';
