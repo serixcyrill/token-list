@@ -321,16 +321,14 @@
     }
 
     .vorsorge-actions .cta-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      display: grid;
+      place-items: center;
       padding: 10px 14px;
       border-radius: 10px;
       font-weight: 700;
       font-size: 13px;
       text-decoration: none;
       cursor: pointer;
-      justify-content: center;
       white-space: normal;
       text-align: center;
       overflow: visible;
@@ -338,6 +336,7 @@
       width: 100%;
       min-height: 44px;
       line-height: 1.2;
+      word-break: normal;
       background: var(--accent-strong);
       color: #ffffff;
       border: 1px solid rgba(114, 210, 122, 0.5);
@@ -531,11 +530,11 @@
       box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
     }
 
-    .vorsorge-card a:hover {
+    .vorsorge-card a:not(.cta-btn):hover {
       background: var(--accent-hover);
     }
 
-    .vorsorge-card a:active {
+    .vorsorge-card a:not(.cta-btn):active {
       transform: translateY(1px);
     }
 
