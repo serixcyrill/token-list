@@ -357,16 +357,21 @@
     .new-badge {
       position: absolute;
       top: 12px;
-      left: 12px;
-      background: rgba(114, 210, 122, 0.2);
-      color: #1a7340;
+      right: 12px;
+      background: rgba(251, 146, 60, 0.18);
+      color: #9a3412;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.2px;
       padding: 4px 8px;
       border-radius: 999px;
       text-transform: uppercase;
-      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
+      box-shadow: inset 0 0 0 1px rgba(251, 146, 60, 0.35);
+      z-index: 2;
+    }
+
+    .new-badge.offset-logo {
+      right: 80px;
     }
 
     .portfolio-shell,
@@ -2789,7 +2794,7 @@
         if (card.accent) {
           article.style.setProperty('--card-accent', card.accent);
         }
-        applyNewBadge(article, card.title);
+        applyNewBadge(article, card.title, { offsetLogo: Boolean(card.logo) });
         article.addEventListener('click', (event) => {
           if (event.target.closest('a, button, input, textarea, select')) return;
           setActiveVorsorgeIndex(index);
@@ -2804,7 +2809,7 @@
         }
 
         const h3 = document.createElement('h3');
-        h3.textContent = card.title;
+        h3.textContent = stripNewTag(card.title);
         attachEditable(h3, `vorsorge-${index}-title`, (value) => {
           vorsorgeData[index].title = value;
         });
@@ -3066,11 +3071,18 @@
       return /\(neu\)/i.test(String(value || ''));
     }
 
-    function applyNewBadge(container, value) {
+    function stripNewTag(value) {
+      return String(value || '').replace(/\s*\(neu\)\s*/gi, ' ').replace(/\s{2,}/g, ' ').trim();
+    }
+
+    function applyNewBadge(container, value, options = {}) {
       if (!container || !hasNewTag(value)) return;
       const badge = document.createElement('span');
       badge.className = 'new-badge';
       badge.textContent = 'Neu';
+      if (options.offsetLogo) {
+        badge.classList.add('offset-logo');
+      }
       container.appendChild(badge);
     }
 
@@ -3196,7 +3208,7 @@
       const infoChipHtml = meta.info
         ? `<span class="portfolio-info-chip" data-editable="true">${meta.info}</span>`
         : '';
-      toggle.innerHTML = `<div class="portfolio-toggle-text"><span class="portfolio-title" data-editable="true">${meta.title}</span>${infoChipHtml}</div>`;
+      toggle.innerHTML = `<div class="portfolio-toggle-text"><span class="portfolio-title" data-editable="true">${stripNewTag(meta.title)}</span>${infoChipHtml}</div>`;
       const titleSpan = toggle.querySelector('.portfolio-title');
       attachEditable(titleSpan, `${activeVorsorgeIndex}-${type}-title`, (value) => {
         const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
@@ -3260,7 +3272,7 @@
         dot.className = 'legend-dot';
         dot.style.background = entry.color;
         const label = document.createElement('span');
-        label.textContent = entry.label;
+        label.textContent = stripNewTag(entry.label);
         if (entry.baseIndex >= 0) {
           label.dataset.editable = 'true';
           bindEditableSync(label, type, entry.baseIndex, 'title', true, activeVorsorgeIndex);
@@ -3359,7 +3371,7 @@
         header.className = 'fund-header';
 
         const title = document.createElement('h4');
-        title.textContent = item.title;
+        title.textContent = stripNewTag(item.title);
         if (item.__idx >= 0) {
           bindEditableSync(title, type, item.__idx, 'title', true, activeVorsorgeIndex);
         } else {
@@ -3863,11 +3875,11 @@
       portfolioTabs.innerHTML = '';
 
       available.forEach((type) => {
-        const title = String(meta?.[type]?.title || '').trim();
-        if (!title) return;
+        const rawTitle = String(meta?.[type]?.title || '').trim();
+        if (!rawTitle) return;
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.textContent = title;
+        btn.textContent = stripNewTag(rawTitle);
         btn.dataset.portfolioTab = type;
         btn.classList.toggle('active', type === activePortfolioType);
         btn.addEventListener('click', () => {
