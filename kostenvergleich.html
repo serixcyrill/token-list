@@ -263,12 +263,21 @@
     }
 
     #kostenvergleich .details-row {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 12px;
       align-items: baseline;
       font-size: 12px;
       line-height: 1.4;
+    }
+
+    #kostenvergleich .details-row span {
+      word-break: break-word;
+    }
+
+    #kostenvergleich .details-row strong {
+      white-space: nowrap;
+      text-align: right;
     }
 
     #kostenvergleich .details-bar {
@@ -615,8 +624,6 @@
         };
       };
 
-      const maxCost = calcScenario(604, 45, fees.expensive).lostOpportunity || 1;
-
       const update = () => {
         const monthlyContribution = Number(elements.monthly.value);
         const selectedYears = Number(elements.years.value);
@@ -627,6 +634,7 @@
         const averageScenario = calcScenario(monthlyContribution, selectedYears, fees.average);
         const expensiveScenario = calcScenario(monthlyContribution, selectedYears, fees.expensive);
 
+        const maxCost = calcScenario(604, selectedYears, fees.expensive).lostOpportunity || 1;
         const scale = (value) => Math.min(value / maxCost, 1);
 
         elements.costCheap.textContent = formatter.format(cheapScenario.lostOpportunity);
