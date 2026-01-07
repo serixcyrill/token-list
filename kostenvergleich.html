@@ -458,7 +458,7 @@
                   <div class="details-bar"><span id="bar-fees-average"></span></div>
                   <div class="details-row"><span>Verlorene Zinsen ggü. Vemo</span><strong id="lost-average">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-lost-average"></span></div>
-                  <div class="details-row"><span>Verlorene Opportunität ggü. Vemo</span><strong id="opportunity-average">CHF 0</strong></div>
+              <div class="details-row"><span>Verlorene Opportunität ggü. Vemo</span><strong id="opportunity-average">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-opportunity-average"></span></div>
                 </div>
                 <div class="details" id="details-expensive">
@@ -468,7 +468,7 @@
                   <div class="details-bar"><span id="bar-fees-expensive"></span></div>
                   <div class="details-row"><span>Verlorene Zinsen ggü. Vemo</span><strong id="lost-expensive">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-lost-expensive"></span></div>
-                  <div class="details-row"><span>Verlorene Opportunität ggü. Vemo</span><strong id="opportunity-expensive">CHF 0</strong></div>
+              <div class="details-row"><span>Verlorene Opportunität ggü. Vemo</span><strong id="opportunity-expensive">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-opportunity-expensive"></span></div>
                 </div>
               </div>
@@ -483,17 +483,10 @@
                 </div>
                 <input id="monthly" type="range" min="0" max="604" step="1" value="200" />
               </div>
-              <div class="slider-group">
-                <div class="slider-header">
-                  <span>Laufzeit</span>
-                  <span class="slider-value" id="years-display">25 Jahre</span>
-                </div>
-                <input id="years" type="range" min="1" max="45" step="1" value="25" />
-              </div>
             </div>
             <div class="info-row">
               <div class="info-pill">Die Balkenhöhe richtet sich nach dem Sparanteil (max. Sparrate = volle Höhe).</div>
-              <div class="info-pill">Details zeigen die Verluste gegenüber Vemo Standard.</div>
+              <div class="info-pill">Alle Berechnungen basieren auf 30 Jahren Laufzeit.</div>
             </div>
             <div class="info-note">Das ist nur eine Darstellung und nicht verbindlich. Als Ausgangswerte haben wir Standardzins 7.3&nbsp;% · Gebühren 0.2&nbsp;% | 1.1&nbsp;% | 2.0&nbsp;% genommen.</div>
           </section>
@@ -513,9 +506,7 @@
 
       const elements = {
         monthly: document.getElementById("monthly"),
-        years: document.getElementById("years"),
         monthlyDisplay: document.getElementById("monthly-display"),
-        yearsDisplay: document.getElementById("years-display"),
         costCheap: document.getElementById("cost-cheap"),
         costAverage: document.getElementById("cost-average"),
         costExpensive: document.getElementById("cost-expensive"),
@@ -600,11 +591,10 @@
 
       const update = () => {
         const monthlyContribution = Number(elements.monthly.value);
-        const selectedYears = Number(elements.years.value);
+        const selectedYears = 30;
         elements.monthlyDisplay.textContent = formatter.format(monthlyContribution);
-        elements.yearsDisplay.textContent = `${selectedYears} Jahre`;
 
-        const barYears = 25;
+        const barYears = 30;
         const cheapScenario = calcScenario(monthlyContribution, selectedYears, fees.cheap);
         const averageScenario = calcScenario(monthlyContribution, selectedYears, fees.average);
         const expensiveScenario = calcScenario(monthlyContribution, selectedYears, fees.expensive);
@@ -672,7 +662,6 @@
       };
 
       elements.monthly.addEventListener("input", update);
-      elements.years.addEventListener("input", update);
       elements.bars.forEach((bar) => {
         const tier = bar.getAttribute("data-tier");
         bar.addEventListener("click", () => {
