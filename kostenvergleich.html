@@ -27,10 +27,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        radial-gradient(circle at 16% 24%, rgba(126, 217, 87, 0.10), transparent 26%),
-        radial-gradient(circle at 86% 16%, rgba(91, 124, 250, 0.10), transparent 24%),
-        linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
+      background: transparent;
     }
 
     #kostenvergleich *,
@@ -49,7 +46,7 @@
     }
 
     #kostenvergleich .app {
-      max-width: 1120px;
+      max-width: 920px;
       margin: 0 auto;
       position: relative;
     }
@@ -59,52 +56,16 @@
       z-index: 1;
     }
 
-    #kostenvergleich .hero {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    #kostenvergleich .hero-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: rgba(248, 250, 252, 0.9);
-      border: 1px solid var(--ring);
-      border-radius: 999px;
-      color: #0f172a;
-      font-weight: 700;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      width: fit-content;
-    }
-
-    #kostenvergleich .hero-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 99px;
-      background: var(--accent);
-    }
-
     #kostenvergleich h1 {
       margin: 0;
-      font-size: 30px;
+      font-size: 24px;
       font-weight: 700;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.2px;
       color: #0f172a;
-    }
-
-    #kostenvergleich .hero-sub {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
     }
 
     #kostenvergleich main {
-      padding: 12px 0 24px;
+      padding: 6px 0 18px;
     }
 
     #kostenvergleich .grid {
@@ -120,11 +81,11 @@
     }
 
     #kostenvergleich .panel {
-      background: var(--panel);
-      border: 1px solid var(--ring);
-      border-radius: 22px;
-      padding: 22px;
-      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+      background: transparent;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: none;
       display: flex;
       flex-direction: column;
       height: 100%;
@@ -145,15 +106,15 @@
     }
 
     #kostenvergleich .bar-card {
-      background: rgba(248, 250, 252, 0.8);
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid var(--ring);
       border-radius: 16px;
-      padding: 20px 16px;
+      padding: 18px 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 14px;
-      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
       height: 100%;
       position: relative;
       overflow: hidden;
@@ -219,11 +180,11 @@
 
     #kostenvergleich .details {
       width: 100%;
-      padding: 18px;
+      padding: 16px;
       border-radius: 16px;
       border: 1px solid rgba(148, 163, 184, 0.3);
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -281,16 +242,16 @@
     }
 
     #kostenvergleich .details-panel {
-      margin-top: 20px;
+      margin-top: 16px;
     }
 
     #kostenvergleich .info-panel {
-      margin-top: 20px;
-      background: rgba(255, 255, 255, 0.9);
+      margin-top: 16px;
+      background: transparent;
       border: 1px solid rgba(148, 163, 184, 0.3);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: none;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -303,11 +264,11 @@
     }
 
     #kostenvergleich .info-pill {
-      background: rgba(91, 124, 250, 0.08);
+      background: rgba(91, 124, 250, 0.05);
       border: 1px solid rgba(91, 124, 250, 0.2);
       border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 13px;
+      padding: 10px 12px;
+      font-size: 12px;
       color: #1f2937;
       font-weight: 600;
     }
@@ -323,7 +284,7 @@
     }
 
     #kostenvergleich .details-panel.is-open .details.is-active {
-      max-height: 360px;
+      max-height: 320px;
       opacity: 1;
       transform: translateY(0);
     }
@@ -405,13 +366,8 @@
         padding: 26px 12px 46px;
       }
 
-      #kostenvergleich h1 {
-        font-size: 24px;
-        letter-spacing: -0.2px;
-      }
-
       #kostenvergleich main {
-        padding: 10px 0 20px;
+        padding: 6px 0 18px;
       }
 
       #kostenvergleich .grid {
@@ -419,9 +375,8 @@
       }
 
       #kostenvergleich .panel {
-        padding: 16px;
-        border-radius: 18px;
-        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+        padding: 14px;
+        border-radius: 16px;
       }
 
       #kostenvergleich .bars {
@@ -430,7 +385,7 @@
       }
 
       #kostenvergleich .bar-card {
-        min-height: 220px;
+        min-height: 200px;
       }
 
       #kostenvergleich .info-row {
@@ -443,12 +398,6 @@
   <div id="kostenvergleich">
     <div class="app">
       <div class="shell">
-        <div class="hero">
-          <div class="hero-tag"><span class="hero-dot"></span>Kostenvergleich</div>
-          <h1>Gebühren im Vergleich</h1>
-          <div class="hero-sub">Standardzins 7.3&nbsp;% · Gebühren 0.2&nbsp;% | 1.1&nbsp;% | 2.0&nbsp;%</div>
-        </div>
-
         <main>
           <div class="grid">
             <section class="panel">
@@ -533,7 +482,7 @@
               <div class="info-pill">Die Balkenhöhe richtet sich nach dem Sparanteil (max. Sparrate = volle Höhe).</div>
               <div class="info-pill">Details zeigen die Verluste gegenüber Vemo Standard.</div>
             </div>
-            <div class="info-note">Hinweis: Diese Berechnung dient zur Veranschaulichung und ist ein Beispiel. Keine Anlageberatung.</div>
+            <div class="info-note">Das ist nur eine Darstellung und nicht verbindlich. Als Ausgangswerte haben wir Standardzins 7.3&nbsp;% · Gebühren 0.2&nbsp;% | 1.1&nbsp;% | 2.0&nbsp;% genommen.</div>
           </section>
         </main>
       </div>
