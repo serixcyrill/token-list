@@ -147,7 +147,7 @@
     }
 
     #kostenvergleich .bar-column {
-      width: 68%;
+      width: 56%;
       min-height: 10px;
       border-radius: 16px 16px 10px 10px;
       transition: height 0.35s ease;
@@ -243,6 +243,8 @@
 
     #kostenvergleich .details-panel {
       margin-top: 16px;
+      position: relative;
+      min-height: 0;
     }
 
     #kostenvergleich .info-panel {
@@ -287,6 +289,17 @@
       max-height: 320px;
       opacity: 1;
       transform: translateY(0);
+    }
+
+    #kostenvergleich .details-panel.is-open {
+      min-height: 240px;
+    }
+
+    #kostenvergleich .details {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
     }
 
     #kostenvergleich .slider-group {
