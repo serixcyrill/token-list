@@ -304,7 +304,7 @@
     }
 
     #kostenvergleich .details-panel.is-open .details.is-active {
-      max-height: 520px;
+      max-height: 360px;
       opacity: 1;
       transform: translateY(0);
     }
@@ -437,7 +437,7 @@
           <div class="grid cols-2">
             <section class="panel">
               <h2 style="margin:0 0 8px;">Gesamtkosten</h2>
-              <p style="margin:0; color:var(--muted);">Visualisiert werden ausschliesslich die Gebührenkosten inklusive entgangener Rendite.</p>
+              <p style="margin:0; color:var(--muted);">Visualisiert werden ausschliesslich die Gebührenkosten inklusive entgangener Rendite. Klicke auf eine Säule für Details.</p>
 
               <div class="bars" aria-live="polite">
                 <div class="bar-card featured" data-tier="cheap" tabindex="0">
@@ -472,8 +472,6 @@
                   <div class="details-bar"><span id="bar-lost-cheap"></span></div>
                   <div class="details-row"><span>Verlorene Opportunität</span><strong id="opportunity-cheap">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-opportunity-cheap"></span></div>
-                  <div class="details-row"><span>Endkapital</span><strong id="end-cheap">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-end-cheap"></span></div>
                 </div>
                 <div class="details" id="details-average">
                   <div class="details-row"><span>Eingezahlt</span><strong id="paid-average">CHF 0</strong></div>
@@ -482,10 +480,8 @@
                   <div class="details-bar"><span id="bar-fees-average"></span></div>
                   <div class="details-row"><span>Verlorene Zinsen ggü. Vemo</span><strong id="lost-average">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-lost-average"></span></div>
-                  <div class="details-row"><span>Verlorene Opportunität</span><strong id="opportunity-average">CHF 0</strong></div>
+                  <div class="details-row"><span>Verlorene Opportunität ggü. Vemo</span><strong id="opportunity-average">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-opportunity-average"></span></div>
-                  <div class="details-row"><span>Endkapital ggü. Vemo</span><strong id="end-average">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-end-average"></span></div>
                 </div>
                 <div class="details" id="details-expensive">
                   <div class="details-row"><span>Eingezahlt</span><strong id="paid-expensive">CHF 0</strong></div>
@@ -494,10 +490,8 @@
                   <div class="details-bar"><span id="bar-fees-expensive"></span></div>
                   <div class="details-row"><span>Verlorene Zinsen ggü. Vemo</span><strong id="lost-expensive">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-lost-expensive"></span></div>
-                  <div class="details-row"><span>Verlorene Opportunität</span><strong id="opportunity-expensive">CHF 0</strong></div>
+                  <div class="details-row"><span>Verlorene Opportunität ggü. Vemo</span><strong id="opportunity-expensive">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-opportunity-expensive"></span></div>
-                  <div class="details-row"><span>Endkapital ggü. Vemo</span><strong id="end-expensive">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-end-expensive"></span></div>
                 </div>
               </div>
             </section>
@@ -560,9 +554,6 @@
         opportunityCheap: document.getElementById("opportunity-cheap"),
         opportunityAverage: document.getElementById("opportunity-average"),
         opportunityExpensive: document.getElementById("opportunity-expensive"),
-        endCheap: document.getElementById("end-cheap"),
-        endAverage: document.getElementById("end-average"),
-        endExpensive: document.getElementById("end-expensive"),
         detailBars: {
           paidCheap: document.getElementById("bar-paid-cheap"),
           paidAverage: document.getElementById("bar-paid-average"),
@@ -576,9 +567,6 @@
           opportunityCheap: document.getElementById("bar-opportunity-cheap"),
           opportunityAverage: document.getElementById("bar-opportunity-average"),
           opportunityExpensive: document.getElementById("bar-opportunity-expensive"),
-          endCheap: document.getElementById("bar-end-cheap"),
-          endAverage: document.getElementById("bar-end-average"),
-          endExpensive: document.getElementById("bar-end-expensive"),
         },
         detailsPanel: document.getElementById("details-panel"),
         detailsSections: {
@@ -666,32 +654,24 @@
         elements.feesCheap.textContent = formatter.format(cheapScenario.totalFees);
         elements.lostCheap.textContent = formatter.format(cheapScenario.lostInterest);
         elements.opportunityCheap.textContent = formatter.format(cheapScenario.lostOpportunity);
-        elements.endCheap.textContent = formatter.format(cheapScenario.netBalance);
-
         elements.feesAverage.textContent = formatter.format(Math.max(averageScenario.totalFees - cheapScenario.totalFees, 0));
         elements.lostAverage.textContent = formatter.format(Math.max(averageScenario.lostInterest - cheapScenario.lostInterest, 0));
         elements.opportunityAverage.textContent = formatter.format(Math.max(averageScenario.lostOpportunity - cheapScenario.lostOpportunity, 0));
-        elements.endAverage.textContent = formatter.format(Math.max(cheapScenario.netBalance - averageScenario.netBalance, 0));
-
         elements.feesExpensive.textContent = formatter.format(Math.max(expensiveScenario.totalFees - cheapScenario.totalFees, 0));
         elements.lostExpensive.textContent = formatter.format(Math.max(expensiveScenario.lostInterest - cheapScenario.lostInterest, 0));
         elements.opportunityExpensive.textContent = formatter.format(Math.max(expensiveScenario.lostOpportunity - cheapScenario.lostOpportunity, 0));
-        elements.endExpensive.textContent = formatter.format(Math.max(cheapScenario.netBalance - expensiveScenario.netBalance, 0));
 
         const maxDetail = Math.max(
           cheapScenario.totalContributions,
           cheapScenario.totalFees,
           cheapScenario.lostInterest,
           cheapScenario.lostOpportunity,
-          cheapScenario.netBalance,
           averageScenario.totalFees - cheapScenario.totalFees,
           averageScenario.lostInterest - cheapScenario.lostInterest,
           averageScenario.lostOpportunity - cheapScenario.lostOpportunity,
-          cheapScenario.netBalance - averageScenario.netBalance,
           expensiveScenario.totalFees - cheapScenario.totalFees,
           expensiveScenario.lostInterest - cheapScenario.lostInterest,
           expensiveScenario.lostOpportunity - cheapScenario.lostOpportunity,
-          cheapScenario.netBalance - expensiveScenario.netBalance,
           1
         );
         const detailScale = (value) => `${Math.max(0, value / maxDetail) * 100}%`;
@@ -702,15 +682,12 @@
         elements.detailBars.feesCheap.style.width = detailScale(cheapScenario.totalFees);
         elements.detailBars.lostCheap.style.width = detailScale(cheapScenario.lostInterest);
         elements.detailBars.opportunityCheap.style.width = detailScale(cheapScenario.lostOpportunity);
-        elements.detailBars.endCheap.style.width = detailScale(cheapScenario.netBalance);
         elements.detailBars.feesAverage.style.width = detailScale(Math.max(averageScenario.totalFees - cheapScenario.totalFees, 0));
         elements.detailBars.lostAverage.style.width = detailScale(Math.max(averageScenario.lostInterest - cheapScenario.lostInterest, 0));
         elements.detailBars.opportunityAverage.style.width = detailScale(Math.max(averageScenario.lostOpportunity - cheapScenario.lostOpportunity, 0));
-        elements.detailBars.endAverage.style.width = detailScale(Math.max(cheapScenario.netBalance - averageScenario.netBalance, 0));
         elements.detailBars.feesExpensive.style.width = detailScale(Math.max(expensiveScenario.totalFees - cheapScenario.totalFees, 0));
         elements.detailBars.lostExpensive.style.width = detailScale(Math.max(expensiveScenario.lostInterest - cheapScenario.lostInterest, 0));
         elements.detailBars.opportunityExpensive.style.width = detailScale(Math.max(expensiveScenario.lostOpportunity - cheapScenario.lostOpportunity, 0));
-        elements.detailBars.endExpensive.style.width = detailScale(Math.max(cheapScenario.netBalance - expensiveScenario.netBalance, 0));
       };
 
       elements.monthly.addEventListener("input", update);
@@ -718,14 +695,20 @@
       elements.bars.forEach((bar) => {
         const tier = bar.getAttribute("data-tier");
         bar.addEventListener("click", () => {
-          elements.detailsPanel.classList.add("is-open");
+          const isOpen = elements.detailsPanel.classList.contains("is-open");
+          const activeSection = elements.detailsSections[tier];
+          const wasActive = activeSection.classList.contains("is-active");
           Object.entries(elements.detailsSections).forEach(([key, section]) => {
             section.classList.toggle("is-active", key === tier);
           });
+          if (isOpen && wasActive) {
+            elements.detailsPanel.classList.remove("is-open");
+            activeSection.classList.remove("is-active");
+            return;
+          }
+          elements.detailsPanel.classList.add("is-open");
         });
       });
-      elements.detailsPanel.classList.add("is-open");
-      elements.detailsSections.cheap.classList.add("is-active");
       update();
     })();
   </script>
