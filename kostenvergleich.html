@@ -248,7 +248,7 @@
     }
 
     #kostenvergleich .info-panel {
-      margin-top: 16px;
+      margin-top: 8px;
       background: transparent;
       border: 1px solid rgba(148, 163, 184, 0.3);
       border-radius: 16px;
@@ -262,7 +262,7 @@
     #kostenvergleich .info-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
+      gap: 12px;
     }
 
     #kostenvergleich .info-pill {
@@ -304,16 +304,18 @@
 
     #kostenvergleich .slider-group {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      align-items: center;
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 0;
     }
 
     #kostenvergleich .slider-header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 6px;
       font-weight: 600;
+      min-width: 190px;
     }
 
     #kostenvergleich .slider-value {
@@ -328,6 +330,7 @@
 
     #kostenvergleich input[type="range"] {
       width: 100%;
+      flex: 1;
       -webkit-appearance: none;
       appearance: none;
       height: 10px;
@@ -404,6 +407,16 @@
       #kostenvergleich .info-row {
         grid-template-columns: 1fr;
       }
+
+      #kostenvergleich .slider-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      #kostenvergleich .slider-header {
+        min-width: 0;
+      }
     }
   </style>
 </head>
@@ -414,7 +427,7 @@
         <main>
           <div class="grid">
             <section class="panel">
-              <h2 style="margin:0 0 8px;">Gesamtkosten</h2>
+              <h2 style="margin:0 0 8px; font-weight: 700;">Gesamtkosten</h2>
               <p style="margin:0; color:var(--muted);">Visualisiert werden ausschliesslich die Gebührenkosten inklusive entgangener Rendite. Klicke auf eine Säule für Details.</p>
 
               <div class="bars" aria-live="polite">
