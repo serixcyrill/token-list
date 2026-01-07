@@ -57,37 +57,21 @@
     #kostenvergleich .shell {
       position: relative;
       z-index: 1;
-      background: var(--glass);
-      border: 1px solid var(--ring);
-      border-radius: 26px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      backdrop-filter: blur(10px);
     }
 
-    #kostenvergleich header {
-      padding: 16px 22px 12px;
-      border-bottom: 1px solid var(--ring);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 12px;
-      align-items: flex-start;
-      justify-content: space-between;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.22) 70%);
-    }
-
-    #kostenvergleich .head-left {
+    #kostenvergleich .hero {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
-    #kostenvergleich .eyebrow {
+    #kostenvergleich .hero-tag {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 11px;
-      background: rgba(248, 250, 252, 0.85);
+      padding: 8px 12px;
+      background: rgba(248, 250, 252, 0.9);
       border: 1px solid var(--ring);
       border-radius: 999px;
       color: #0f172a;
@@ -95,9 +79,10 @@
       font-size: 11px;
       letter-spacing: 1px;
       text-transform: uppercase;
+      width: fit-content;
     }
 
-    #kostenvergleich .dot {
+    #kostenvergleich .hero-dot {
       width: 8px;
       height: 8px;
       border-radius: 99px;
@@ -106,25 +91,20 @@
 
     #kostenvergleich h1 {
       margin: 0;
-      font-size: 26px;
+      font-size: 30px;
       font-weight: 700;
-      letter-spacing: -0.2px;
+      letter-spacing: -0.3px;
       color: #0f172a;
     }
 
-    #kostenvergleich .meta {
-      color: #475569;
-      font-weight: 500;
-      font-size: 12px;
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid var(--ring);
-      padding: 8px 10px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    #kostenvergleich .hero-sub {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     #kostenvergleich main {
-      padding: 30px 28px 38px;
+      padding: 12px 0 24px;
     }
 
     #kostenvergleich .grid {
@@ -157,6 +137,11 @@
       gap: 20px;
       align-items: stretch;
       min-height: 380px;
+      transition: min-height 0.35s ease;
+    }
+
+    #kostenvergleich .bars.is-collapsed {
+      min-height: 300px;
     }
 
     #kostenvergleich .bar-card {
@@ -299,6 +284,40 @@
       margin-top: 20px;
     }
 
+    #kostenvergleich .info-panel {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #kostenvergleich .info-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    #kostenvergleich .info-pill {
+      background: rgba(91, 124, 250, 0.08);
+      border: 1px solid rgba(91, 124, 250, 0.2);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    #kostenvergleich .info-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     #kostenvergleich .details.is-active {
       pointer-events: auto;
     }
@@ -386,18 +405,13 @@
         padding: 26px 12px 46px;
       }
 
-      #kostenvergleich header {
-        padding: 14px 16px 10px;
-        gap: 6px 8px;
-      }
-
       #kostenvergleich h1 {
-        font-size: 22px;
-        letter-spacing: -0.15px;
+        font-size: 24px;
+        letter-spacing: -0.2px;
       }
 
       #kostenvergleich main {
-        padding: 22px 18px 30px;
+        padding: 10px 0 20px;
       }
 
       #kostenvergleich .grid {
@@ -416,7 +430,11 @@
       }
 
       #kostenvergleich .bar-card {
-        min-height: 240px;
+        min-height: 220px;
+      }
+
+      #kostenvergleich .info-row {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -425,16 +443,14 @@
   <div id="kostenvergleich">
     <div class="app">
       <div class="shell">
-        <header>
-          <div class="head-left">
-            <div class="eyebrow"><span class="dot"></span>Kostenvergleich</div>
-            <h1>Gebühren im Vergleich</h1>
-          </div>
-          <div class="meta">Standardzins 7.3&nbsp;% · Gebühren 0.2&nbsp;% | 1.1&nbsp;% | 2.0&nbsp;%</div>
-        </header>
+        <div class="hero">
+          <div class="hero-tag"><span class="hero-dot"></span>Kostenvergleich</div>
+          <h1>Gebühren im Vergleich</h1>
+          <div class="hero-sub">Standardzins 7.3&nbsp;% · Gebühren 0.2&nbsp;% | 1.1&nbsp;% | 2.0&nbsp;%</div>
+        </div>
 
         <main>
-          <div class="grid cols-2">
+          <div class="grid">
             <section class="panel">
               <h2 style="margin:0 0 8px;">Gesamtkosten</h2>
               <p style="margin:0; color:var(--muted);">Visualisiert werden ausschliesslich die Gebührenkosten inklusive entgangener Rendite. Klicke auf eine Säule für Details.</p>
@@ -495,9 +511,9 @@
                 </div>
               </div>
             </section>
-
-            <section class="panel">
-              <h2 style="margin:0 0 16px;">Deine Angaben</h2>
+          </div>
+          <section class="info-panel">
+            <div class="info-row">
               <div class="slider-group">
                 <div class="slider-header">
                   <span>Monatlicher Sparanteil</span>
@@ -512,11 +528,13 @@
                 </div>
                 <input id="years" type="range" min="1" max="45" step="1" value="25" />
               </div>
-              <div class="note">
-                Du kannst den monatlichen Sparanteil und die Laufzeit einstellen. Der Rechner nutzt automatisch 7.3&nbsp;% Rendite und vergleicht die Gebührenmodelle.
-              </div>
-            </section>
-          </div>
+            </div>
+            <div class="info-row">
+              <div class="info-pill">Die Balkenhöhe richtet sich nach dem Sparanteil (max. Sparrate = volle Höhe).</div>
+              <div class="info-pill">Details zeigen die Verluste gegenüber Vemo Standard.</div>
+            </div>
+            <div class="info-note">Hinweis: Diese Berechnung dient zur Veranschaulichung und ist ein Beispiel. Keine Anlageberatung.</div>
+          </section>
         </main>
       </div>
     </div>
@@ -575,6 +593,7 @@
           expensive: document.getElementById("details-expensive"),
         },
         bars: document.querySelectorAll(".bar-card[data-tier]"),
+        barsContainer: document.querySelector(".bars"),
       };
 
       const formatter = new Intl.NumberFormat("de-CH", {
@@ -704,9 +723,11 @@
           if (isOpen && wasActive) {
             elements.detailsPanel.classList.remove("is-open");
             activeSection.classList.remove("is-active");
+            elements.barsContainer.classList.remove("is-collapsed");
             return;
           }
           elements.detailsPanel.classList.add("is-open");
+          elements.barsContainer.classList.add("is-collapsed");
         });
       });
       update();
