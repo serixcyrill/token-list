@@ -248,36 +248,40 @@
     }
 
     #kostenvergleich .control-card {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid rgba(148, 163, 184, 0.3);
       border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+      padding: 18px;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+      justify-content: space-between;
     }
 
     #kostenvergleich .info-row {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 12px;
+      gap: 10px;
     }
 
     #kostenvergleich .info-pill {
-      background: rgba(91, 124, 250, 0.05);
+      background: rgba(91, 124, 250, 0.06);
       border: 1px solid rgba(91, 124, 250, 0.2);
-      border-radius: 14px;
+      border-radius: 12px;
       padding: 10px 12px;
       font-size: 12px;
       color: #1f2937;
       font-weight: 600;
+      line-height: 1.4;
     }
 
     #kostenvergleich .info-note {
       font-size: 12px;
       color: var(--muted);
       line-height: 1.5;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.35);
     }
 
     #kostenvergleich .details.is-active {
@@ -305,35 +309,35 @@
       display: grid;
       grid-template-columns: 1fr auto;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
       margin-bottom: 0;
     }
 
     #kostenvergleich .slider-header {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       font-weight: 600;
     }
 
     #kostenvergleich .slider-value {
       background: rgba(91, 124, 250, 0.12);
       border: 1px solid rgba(91, 124, 250, 0.25);
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 14px;
       font-weight: 700;
       color: #1e293b;
       align-self: flex-start;
     }
 
     #kostenvergleich input[type="range"] {
-      width: 10px;
+      width: 12px;
       -webkit-appearance: none;
       appearance: none;
-      height: 140px;
+      height: 220px;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(126, 217, 87, 0.4), rgba(91, 124, 250, 0.25));
+      background: linear-gradient(180deg, rgba(126, 217, 87, 0.5), rgba(91, 124, 250, 0.25));
       outline: none;
       position: relative;
       writing-mode: bt-lr;
@@ -342,8 +346,8 @@
     #kostenvergleich input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: #ffffff;
       border: 2px solid rgba(91, 124, 250, 0.6);
@@ -352,8 +356,8 @@
     }
 
     #kostenvergleich input[type="range"]::-moz-range-thumb {
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: #ffffff;
       border: 2px solid rgba(91, 124, 250, 0.6);
@@ -362,9 +366,9 @@
     }
 
     #kostenvergleich input[type="range"]::-moz-range-track {
-      width: 10px;
+      width: 12px;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(126, 217, 87, 0.4), rgba(91, 124, 250, 0.25));
+      background: linear-gradient(180deg, rgba(126, 217, 87, 0.5), rgba(91, 124, 250, 0.25));
     }
 
     #kostenvergleich .note {
