@@ -235,6 +235,10 @@
       background: linear-gradient(90deg, rgba(91, 124, 250, 0.3), rgba(126, 217, 87, 0.7));
     }
 
+    #kostenvergleich .details-bar span.is-loss {
+      background: linear-gradient(90deg, rgba(148, 163, 184, 0.5), rgba(239, 68, 68, 0.85));
+    }
+
     #kostenvergleich .bar-card:hover,
     #kostenvergleich .bar-card:focus {
       transform: translateY(-6px) scale(1.02);
@@ -463,22 +467,22 @@
                 <div class="details" id="details-average">
                   <div class="details-row"><span>Eingezahlt</span><strong id="paid-average">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-paid-average"></span></div>
-                  <div class="details-row"><span>Mehrkosten ggü. Vemo</span><strong id="fees-average">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-fees-average"></span></div>
-                  <div class="details-row"><span>Verlorene Zinsen ggü. Vemo</span><strong id="lost-average">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-lost-average"></span></div>
-              <div class="details-row"><span>Verlorene Opportunität ggü. Vemo</span><strong id="opportunity-average">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-opportunity-average"></span></div>
+                  <div class="details-row"><span>Mehrkosten gegenüber Vemo</span><strong id="fees-average">CHF 0</strong></div>
+                  <div class="details-bar"><span class="is-loss" id="bar-fees-average"></span></div>
+                  <div class="details-row"><span>Verlorene Zinsen gegenüber Vemo</span><strong id="lost-average">CHF 0</strong></div>
+                  <div class="details-bar"><span class="is-loss" id="bar-lost-average"></span></div>
+                  <div class="details-row"><span>Verlorene Opportunität gegenüber Vemo</span><strong id="opportunity-average">CHF 0</strong></div>
+                  <div class="details-bar"><span class="is-loss" id="bar-opportunity-average"></span></div>
                 </div>
                 <div class="details" id="details-expensive">
                   <div class="details-row"><span>Eingezahlt</span><strong id="paid-expensive">CHF 0</strong></div>
                   <div class="details-bar"><span id="bar-paid-expensive"></span></div>
-                  <div class="details-row"><span>Mehrkosten ggü. Vemo</span><strong id="fees-expensive">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-fees-expensive"></span></div>
-                  <div class="details-row"><span>Verlorene Zinsen ggü. Vemo</span><strong id="lost-expensive">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-lost-expensive"></span></div>
-              <div class="details-row"><span>Verlorene Opportunität ggü. Vemo</span><strong id="opportunity-expensive">CHF 0</strong></div>
-                  <div class="details-bar"><span id="bar-opportunity-expensive"></span></div>
+                  <div class="details-row"><span>Mehrkosten gegenüber Vemo</span><strong id="fees-expensive">CHF 0</strong></div>
+                  <div class="details-bar"><span class="is-loss" id="bar-fees-expensive"></span></div>
+                  <div class="details-row"><span>Verlorene Zinsen gegenüber Vemo</span><strong id="lost-expensive">CHF 0</strong></div>
+                  <div class="details-bar"><span class="is-loss" id="bar-lost-expensive"></span></div>
+                  <div class="details-row"><span>Verlorene Opportunität gegenüber Vemo</span><strong id="opportunity-expensive">CHF 0</strong></div>
+                  <div class="details-bar"><span class="is-loss" id="bar-opportunity-expensive"></span></div>
                 </div>
               </div>
             </section>
