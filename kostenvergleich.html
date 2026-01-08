@@ -94,7 +94,7 @@
     #kostenvergleich .bars {
       margin-top: 18px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 20px;
       align-items: stretch;
       min-height: 380px;
@@ -247,21 +247,20 @@
       min-height: 0;
     }
 
-    #kostenvergleich .info-panel {
-      margin-top: 8px;
-      background: transparent;
+    #kostenvergleich .control-card {
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.3);
       border-radius: 16px;
       padding: 16px;
-      box-shadow: none;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     #kostenvergleich .info-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: 1fr;
       gap: 12px;
     }
 
@@ -460,6 +459,20 @@
                   </div>
                   <div class="bar-value" id="cost-expensive">CHF 0</div>
                 </div>
+                <div class="control-card">
+                  <div class="slider-group">
+                    <div class="slider-header">
+                      <span>Monatlicher Sparanteil</span>
+                      <span class="slider-value" id="monthly-display">CHF 200</span>
+                    </div>
+                    <input id="monthly" type="range" min="0" max="604" step="1" value="200" />
+                  </div>
+                  <div class="info-row">
+                    <div class="info-pill">Die Balkenhöhe richtet sich nach dem Sparanteil (max. Sparrate = volle Höhe).</div>
+                    <div class="info-pill">Alle Berechnungen basieren auf 30 Jahren Laufzeit.</div>
+                  </div>
+                  <div class="info-note">Das ist nur eine Darstellung und nicht verbindlich. Als Ausgangswerte haben wir Standardzins 7.3&nbsp;% · Gebühren 0.2&nbsp;% | 1.1&nbsp;% | 2.0&nbsp;% genommen.</div>
+                </div>
               </div>
               <div class="details-panel" id="details-panel">
                 <div class="details" id="details-cheap">
@@ -495,22 +508,6 @@
               </div>
             </section>
           </div>
-          <section class="info-panel">
-            <div class="info-row">
-              <div class="slider-group">
-                <div class="slider-header">
-                  <span>Monatlicher Sparanteil</span>
-                  <span class="slider-value" id="monthly-display">CHF 200</span>
-                </div>
-                <input id="monthly" type="range" min="0" max="604" step="1" value="200" />
-              </div>
-            </div>
-            <div class="info-row">
-              <div class="info-pill">Die Balkenhöhe richtet sich nach dem Sparanteil (max. Sparrate = volle Höhe).</div>
-              <div class="info-pill">Alle Berechnungen basieren auf 30 Jahren Laufzeit.</div>
-            </div>
-            <div class="info-note">Das ist nur eine Darstellung und nicht verbindlich. Als Ausgangswerte haben wir Standardzins 7.3&nbsp;% · Gebühren 0.2&nbsp;% | 1.1&nbsp;% | 2.0&nbsp;% genommen.</div>
-          </section>
         </main>
       </div>
     </div>
