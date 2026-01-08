@@ -39,18 +39,27 @@
     #kostenvergleich {
       color: #0f172a;
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, sans-serif;
-      padding: 20px 12px 28px;
+      padding: 16px 12px 24px;
+      position: relative;
+      isolation: isolate;
+    }
+
+    #kostenvergleich::before {
+      content: '';
+      position: absolute;
+      inset: 0;
       background:
         radial-gradient(circle at 10% 15%, rgba(118, 208, 98, 0.08), transparent 35%),
         radial-gradient(circle at 85% 20%, rgba(118, 208, 98, 0.06), transparent 40%);
-      position: relative;
-      isolation: isolate;
+      pointer-events: none;
+      z-index: 0;
     }
 
     #kostenvergleich .app {
       max-width: 760px;
       margin: 0 auto;
       position: relative;
+      z-index: 1;
     }
 
     #kostenvergleich .shell {
@@ -67,7 +76,7 @@
     }
 
     #kostenvergleich main {
-      padding: 4px 0 8px;
+      padding: 4px 0 6px;
     }
 
     #kostenvergleich .grid {
@@ -101,12 +110,12 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 20px;
       align-items: stretch;
-      min-height: 280px;
+      min-height: 250px;
       transition: min-height 0.35s ease;
     }
 
     #kostenvergleich .bars.is-collapsed {
-      min-height: 220px;
+      min-height: 190px;
     }
 
     #kostenvergleich .bar-card {
@@ -305,7 +314,7 @@
     }
 
     #kostenvergleich .details-panel.is-open {
-      min-height: 180px;
+      min-height: 160px;
     }
 
     #kostenvergleich .details {
@@ -433,8 +442,8 @@
         <main>
           <div class="grid">
             <section class="panel">
-              <h2 style="margin:0 0 8px; font-weight: 700;">Gesamtkosten</h2>
-              <p style="margin:0; color:var(--muted);">Visualisiert werden die Gebühren inklusive entgangener Rendite. Klicke auf eine Säule für Details.</p>
+              <h2 style="margin:0 0 4px; font-weight: 700;">Säule 3a Gebühren</h2>
+              <p style="margin:0; color:var(--muted);">Gebühren inklusive entgangener Rendite.</p>
 
               <div class="bars" aria-live="polite">
                 <div class="bar-card featured" data-tier="cheap" tabindex="0">
