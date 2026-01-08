@@ -39,14 +39,16 @@
     #kostenvergleich {
       color: #0f172a;
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, sans-serif;
-      padding: 24px 16px 36px;
-      background: transparent;
+      padding: 20px 12px 28px;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(118, 208, 98, 0.08), transparent 35%),
+        radial-gradient(circle at 85% 20%, rgba(118, 208, 98, 0.06), transparent 40%);
       position: relative;
       isolation: isolate;
     }
 
     #kostenvergleich .app {
-      max-width: 690px;
+      max-width: 760px;
       margin: 0 auto;
       position: relative;
     }
@@ -65,7 +67,7 @@
     }
 
     #kostenvergleich main {
-      padding: 4px 0 12px;
+      padding: 4px 0 8px;
     }
 
     #kostenvergleich .grid {
@@ -99,12 +101,12 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 20px;
       align-items: stretch;
-      min-height: 320px;
+      min-height: 280px;
       transition: min-height 0.35s ease;
     }
 
     #kostenvergleich .bars.is-collapsed {
-      min-height: 250px;
+      min-height: 220px;
     }
 
     #kostenvergleich .bar-card {
@@ -303,7 +305,7 @@
     }
 
     #kostenvergleich .details-panel.is-open {
-      min-height: 200px;
+      min-height: 180px;
     }
 
     #kostenvergleich .details {
