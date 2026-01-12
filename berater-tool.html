@@ -86,7 +86,7 @@
     input, select{
       width:100%;
       height:44px;
-      border-radius:12px;
+      border-radius:16px;
       border:1px solid #d1d5db;
       padding:0 14px;
       font-size:14px;
@@ -114,7 +114,7 @@
     }
     .btn{
       border:0;
-      border-radius:12px;
+      border-radius:16px;
       height:44px;
       padding:0 16px;
       font-weight:700;
@@ -219,9 +219,6 @@
           E-Mail kopieren
         </button>
 
-        <button class="btn danger" id="btnReset">
-          Zurücksetzen
-        </button>
       </div>
 
       <div class="status" id="statusBox"></div>
@@ -245,7 +242,6 @@
 
       const btnCreate     = $("btnCreate");
       const btnCopyEmail  = $("btnCopyEmail");
-      const btnReset      = $("btnReset");
 
       const statusBox     = $("statusBox");
       const btnCreateIcon = $("btnCreateIcon");
@@ -387,18 +383,8 @@
         }
       }
 
-      function reset(){
-        customerName.value = "";
-        customerEmail.value = "";
-        btnCopyEmail.disabled = true;
-        lastCreatedEmail = "";
-        clearStatus();
-        beraterSelect.value = "";
-      }
-
       btnCreate.addEventListener("click", createUser);
       btnCopyEmail.addEventListener("click", copyEmail);
-      btnReset.addEventListener("click", reset);
 
       loadBerater();
     })();
