@@ -217,10 +217,6 @@
           Kunden anlegen
         </button>
 
-        <button class="btn soft" id="btnCopyEmail" disabled>
-          E-Mail kopieren
-        </button>
-
       </div>
 
       <div class="status" id="statusBox"></div>
@@ -243,7 +239,6 @@
       const customerEmail = $("customerEmail");
 
       const btnCreate     = $("btnCreate");
-      const btnCopyEmail  = $("btnCopyEmail");
 
       const statusBox     = $("statusBox");
       const btnCreateIcon = $("btnCreateIcon");
@@ -338,7 +333,6 @@
 
         setLoading(true);
         clearStatus();
-        btnCopyEmail.disabled = true;
         lastCreatedEmail = "";
 
         try{
@@ -364,8 +358,6 @@
           }
 
           lastCreatedEmail = v.email;
-          btnCopyEmail.disabled = false;
-
           setStatus("ok", `Kunde ${v.customerName} wurde erfolgreich angelegt.\nLogin: ${v.email}`);
 
         }catch(err){
@@ -375,18 +367,7 @@
         }
       }
 
-      async function copyEmail(){
-        if(!lastCreatedEmail) return;
-        try{
-          await navigator.clipboard.writeText(lastCreatedEmail);
-          setStatus("ok", "E-Mail kopiert: " + lastCreatedEmail);
-        }catch(e){
-          setStatus("err", "Kopieren nicht möglich. Bitte manuell kopieren: " + lastCreatedEmail);
-        }
-      }
-
       btnCreate.addEventListener("click", createUser);
-      btnCopyEmail.addEventListener("click", copyEmail);
 
       loadBerater();
     })();
