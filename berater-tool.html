@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kunde Registrieren</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+
+      --green:#7ed957;
+      --greenHover:#6ecb48;
+
+      --dangerBg:#fff1f2;
+      --dangerText:#9f1239;
+      --dangerLine:#fecdd3;
+
+      --shadow:0 20px 50px rgba(15,23,42,.12);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(700px 420px at 12% 10%, rgba(118,208,98,.2), rgba(118,208,98,0) 60%),
+        radial-gradient(780px 460px at 88% 12%, rgba(129,140,248,.18), rgba(129,140,248,0) 62%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      padding:40px 18px;
+    }
+
+    .wrap{
+      max-width:860px;
+      margin:0 auto;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:26px;
+    }
+
+    .title{
+      font-size:22px;
+      font-weight:700;
+      margin:0 0 6px 0;
+      letter-spacing:-.2px;
+    }
+    .sub{
+      margin:0 0 22px 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width:760px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    label{
+      display:block;
+      font-size:13px;
+      font-weight:600;
+      margin:0 0 8px 0;
+      color:var(--text);
+    }
+
+    input, select{
+      appearance:none;
+      -webkit-appearance:none;
+      border-radius:16px !important;
+      width:100%;
+      height:44px;
+      border:1px solid #d1d5db;
+      padding:0 14px;
+      font-size:14px;
+      font-family:inherit;
+      outline:none;
+      background:#fff;
+    }
+    input:focus, select:focus{
+      border-color: rgba(114,210,122,.8);
+      box-shadow:0 0 0 3px rgba(114,210,122,.18);
+    }
+
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:6px;
+      line-height:1.3;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+    .btn{
+      border:0;
+      border-radius:16px;
+      height:44px;
+      padding:0 16px;
+      font-weight:700;
+      font-family:inherit;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn.primary{
+      background:var(--green);
+      color:white;
+    }
+    .btn.primary:hover{background:var(--greenHover)}
+    .btn.soft{
+      background:#f3f4f6;
+      color:var(--text);
+    }
+    .btn.soft:hover{background:#e5e7eb}
+    .btn.danger{
+      background:#fee2e2;
+      color:#991b1b;
+    }
+    .btn.danger:hover{background:#fecaca}
+
+    .status{
+      margin-top:16px;
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:14px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      color:var(--muted);
+      display:none;
+      line-height:1.35;
+      white-space:pre-wrap;
+    }
+    .status.ok{
+      display:block;
+      border-color: rgba(114,210,122,.35);
+      background: rgba(114,210,122,.12);
+      color: #14532d;
+    }
+    .status.err{
+      display:block;
+      border-color: var(--dangerLine);
+      background: var(--dangerBg);
+      color: var(--dangerText);
+    }
+
+    .spin{
+      width:14px;height:14px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.5);
+      border-top-color:#fff;
+      display:inline-block;
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1 class="title">Kunde Registrieren</h1>
+      <p class="sub">
+        Lege schnell einen neuen Kunden an. Die E-Mail ist später der Login in den Kundentools.
+      </p>
+
+      <div class="grid">
+        <div>
+          <label for="beraterSelect">Berater auswählen</label>
+          <select id="beraterSelect">
+            <option value="">Lade Beraterliste…</option>
+          </select>
+          <div class="hint">Wähle deinen Namen aus der Liste.</div>
+        </div>
+
+        <div>
+          <label for="customerName">Kundenname</label>
+          <input id="customerName" type="text" placeholder="z.B. Markus" />
+          <div class="hint">Vorname oder gewünschte Anrede.</div>
+        </div>
+
+        <div style="grid-column: 1 / -1;">
+          <label for="customerEmail">Kunden E-Mail</label>
+          <input id="customerEmail" type="email" placeholder="z.B. markus@gmail.com" />
+          <div class="hint">Diese E-Mail wird als Login genutzt.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="btnCreate">
+          <span id="btnCreateIcon"></span>
+          Kunden anlegen
+        </button>
+
+      </div>
+
+      <div class="status" id="statusBox"></div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      /** =========================
+       *  CONFIG (NUR HIER ÄNDERN)
+       *  ========================= */
+      const API_URL = "https://script.google.com/macros/s/AKfycbxE8DmrlUafW_EkFi5DahYAdzyyonkAuJo4w-t57Oj0w2yebrdvbrJ-M8y7Up8O7mU12Q/exec";
+      const BERATER_KEY = "hk_berater_2026";
+
+      /** ========================= */
+      const $ = (id) => document.getElementById(id);
+
+      const beraterSelect = $("beraterSelect");
+      const customerName  = $("customerName");
+      const customerEmail = $("customerEmail");
+
+      const btnCreate     = $("btnCreate");
+
+      const statusBox     = $("statusBox");
+      const btnCreateIcon = $("btnCreateIcon");
+
+      let lastCreatedEmail = "";
+
+      function setStatus(type, msg){
+        statusBox.className = "status " + (type === "ok" ? "ok" : "err");
+        statusBox.textContent = msg;
+      }
+      function clearStatus(){
+        statusBox.className = "status";
+        statusBox.textContent = "";
+      }
+
+      function setLoading(isLoading){
+        if(isLoading){
+          btnCreate.disabled = true;
+          btnCreateIcon.innerHTML = '<span class="spin"></span>';
+        }else{
+          btnCreate.disabled = false;
+          btnCreateIcon.innerHTML = "";
+        }
+      }
+
+      async function safeJson(res){
+        const txt = await res.text();
+        try { return JSON.parse(txt); }
+        catch(e){ return { ok:false, error:"invalid_json" }; }
+      }
+
+      async function loadBerater(){
+        try{
+          clearStatus();
+          beraterSelect.innerHTML = '<option value="">Lade Beraterliste…</option>';
+
+          const url = API_URL + "?action=listBerater&_ts=" + Date.now();
+          const res = await fetch(url, { method:"GET" });
+          const data = await safeJson(res);
+
+          if(!data || data.ok !== true){
+            throw new Error((data && data.error) ? data.error : "unknown_error");
+          }
+
+          const list = Array.isArray(data.berater) ? data.berater : [];
+          if(list.length === 0){
+            beraterSelect.innerHTML = '<option value="">(Keine Berater gefunden)</option>';
+            setStatus("err","Es wurde keine Beraterliste gefunden. Bitte später erneut versuchen.");
+            return;
+          }
+
+          beraterSelect.innerHTML = '<option value="">Bitte auswählen…</option>' +
+            list.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
+
+        }catch(err){
+          beraterSelect.innerHTML = '<option value="">(Fehler beim Laden)</option>';
+          setStatus("err","Beraterliste konnte nicht geladen werden.");
+        }
+      }
+
+      function escapeHtml(str){
+        return String(str || "")
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll('"',"&quot;")
+          .replaceAll("'","&#039;");
+      }
+
+      function validate(){
+        const b = (beraterSelect.value || "").trim();
+        const n = (customerName.value || "").trim();
+        const e = (customerEmail.value || "").trim().toLowerCase();
+
+        if(!b) return { ok:false, msg:"Bitte Berater auswählen." };
+        if(!n) return { ok:false, msg:"Bitte Kundenname eintragen." };
+        if(!e) return { ok:false, msg:"Bitte Kunden E-Mail eintragen." };
+
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){
+          return { ok:false, msg:"Bitte eine gültige E-Mail eingeben." };
+        }
+
+        return { ok:true, berater:b, customerName:n, email:e };
+      }
+
+      async function createUser(){
+        const v = validate();
+        if(!v.ok){
+          setStatus("err", v.msg);
+          return;
+        }
+
+        setLoading(true);
+        clearStatus();
+        lastCreatedEmail = "";
+
+        try{
+          const payload = {
+            action: "createUser",
+            key: BERATER_KEY,
+            berater: v.berater,
+            customerName: v.customerName,
+            email: v.email
+          };
+
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type":"text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await safeJson(res);
+
+          if(!data || data.ok !== true){
+            const errMsg = (data && data.error) ? data.error : "unknown_error";
+            throw new Error(errMsg);
+          }
+
+          lastCreatedEmail = v.email;
+          setStatus("ok", `Kunde ${v.customerName} wurde erfolgreich angelegt.\nLogin: ${v.email}`);
+
+        }catch(err){
+          setStatus("err", "Anfrage fehlgeschlagen. Bitte später erneut versuchen.");
+        }finally{
+          setLoading(false);
+        }
+      }
+
+      btnCreate.addEventListener("click", createUser);
+
+      loadBerater();
+    })();
+  </script>
+</body>
+</html>
