@@ -2886,7 +2886,7 @@
         const baseTitle = stripNewTag(card.title);
         h3.textContent = baseTitle;
         if (hasNewTag(card.title)) {
-          h3.append(' ');
+          h3.append('  ');
           const newText = document.createElement('span');
           newText.className = 'new-text';
           newText.textContent = 'Neu';
