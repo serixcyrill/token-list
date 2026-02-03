@@ -391,17 +391,9 @@
       right: 80px;
     }
 
-    .vorsorge-title-row {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      flex-wrap: wrap;
-    }
-
     .new-text {
       color: #f97316;
       font-weight: 700;
-      margin-left: 0;
     }
 
     .portfolio-shell,
@@ -2890,22 +2882,19 @@
           article.appendChild(logoImg);
         }
 
-        const titleRow = document.createElement('div');
-        titleRow.className = 'vorsorge-title-row';
-
         const h3 = document.createElement('h3');
-        h3.textContent = stripNewTag(card.title);
-        attachEditable(h3, `vorsorge-${index}-title`, (value) => {
-          vorsorgeData[index].title = value;
-        });
-        titleRow.appendChild(h3);
-
+        const baseTitle = stripNewTag(card.title);
+        h3.textContent = baseTitle;
         if (hasNewTag(card.title)) {
+          h3.append(' ');
           const newText = document.createElement('span');
           newText.className = 'new-text';
           newText.textContent = 'Neu';
-          titleRow.appendChild(newText);
+          h3.appendChild(newText);
         }
+        attachEditable(h3, `vorsorge-${index}-title`, (value) => {
+          vorsorgeData[index].title = value;
+        });
 
         const desc = document.createElement('p');
         desc.textContent = card.description;
@@ -2995,7 +2984,7 @@
         details.appendChild(nTitle);
         details.appendChild(nList);
 
-        article.appendChild(titleRow);
+        article.appendChild(h3);
         article.appendChild(desc);
         article.appendChild(metaDiv);
         article.appendChild(actionWrap);
