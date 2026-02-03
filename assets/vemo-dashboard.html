@@ -390,6 +390,21 @@
       right: 80px;
     }
 
+    .new-badge.inline {
+      position: static;
+      margin-left: 8px;
+      padding: 3px 8px;
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .vorsorge-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .portfolio-shell,
     .portfolio-item,
     .vorsorge-card {
@@ -2860,7 +2875,9 @@
         if (card.accent) {
           article.style.setProperty('--card-accent', card.accent);
         }
-        applyNewBadge(article, card.title, { offsetLogo: Boolean(card.logo) });
+        if (hasNewTag(card.title)) {
+          article.classList.add('is-new');
+        }
         article.addEventListener('click', (event) => {
           if (event.target.closest('a, button, input, textarea, select')) return;
           setActiveVorsorgeIndex(index);
@@ -2874,11 +2891,22 @@
           article.appendChild(logoImg);
         }
 
+        const titleRow = document.createElement('div');
+        titleRow.className = 'vorsorge-title-row';
+
         const h3 = document.createElement('h3');
         h3.textContent = stripNewTag(card.title);
         attachEditable(h3, `vorsorge-${index}-title`, (value) => {
           vorsorgeData[index].title = value;
         });
+        titleRow.appendChild(h3);
+
+        if (hasNewTag(card.title)) {
+          const inlineBadge = document.createElement('span');
+          inlineBadge.className = 'new-badge inline';
+          inlineBadge.textContent = 'Neu';
+          titleRow.appendChild(inlineBadge);
+        }
 
         const desc = document.createElement('p');
         desc.textContent = card.description;
@@ -2968,7 +2996,7 @@
         details.appendChild(nTitle);
         details.appendChild(nList);
 
-        article.appendChild(h3);
+        article.appendChild(titleRow);
         article.appendChild(desc);
         article.appendChild(metaDiv);
         article.appendChild(actionWrap);
