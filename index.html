@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vemo Risiko Slider Welt Aktien</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text: #282f47;
+      --accent: #72d27a;
+      --danger: #dc4f5f;
+      --success: #33a857;
+      --card: #ffffff;
+      --muted: #60708f;
+      --border: #dfe5f1;
+      --shadow: 0 14px 34px rgba(40, 47, 71, 0.12);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(114, 210, 122, 0.22), transparent 30%),
+        radial-gradient(circle at 92% 6%, rgba(119, 187, 255, 0.2), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(166, 127, 255, 0.14), transparent 34%),
+        linear-gradient(180deg, #f5f9ff 0%, #edf2ff 100%);
+      min-height: 100vh;
+      padding: 28px 14px 40px;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(223, 229, 241, 0.9);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 { margin: 0 0 6px; font-size: 30px; }
+    .subtitle { margin: 0; color: var(--muted); }
+
+    .top {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .kpi, .info, .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(40, 47, 71, 0.08);
+      padding: 16px;
+    }
+
+    .kpi small, .info small { color: var(--muted); display: block; }
+    .kpi .value { font-size: 36px; font-weight: 700; line-height: 1.1; margin-top: 8px; }
+    .kpi.loss .value { color: var(--danger); }
+    .kpi.gain .value { color: var(--success); }
+
+    .info ul { margin: 10px 0 0; padding-left: 18px; }
+    .info li { margin-bottom: 7px; color: #3f4b66; }
+
+    .panel { margin-top: 14px; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .upload {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #14301d;
+      font-weight: 600;
+      padding: 9px 14px;
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      max-width: 290px;
+      font: inherit;
+    }
+
+    .hint, .error {
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .hint { background: #edf8ee; color: #23522d; border: 1px solid #caebcf; }
+    .error { background: #fff3f5; color: #8d2737; border: 1px solid #ffd6dd; display: none; }
+
+    canvas {
+      width: 100%;
+      height: 350px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: block;
+    }
+
+    .controls {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .sliderline {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+    .example {
+      margin-top: 12px;
+      background: #f6f8ff;
+      border: 1px solid #dce3f3;
+      border-radius: 12px;
+      padding: 12px;
+      color: #34405b;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: #51607f;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .top { grid-template-columns: 1fr; }
+      h1 { font-size: 25px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Risiko Slider für Welt Aktien</h1>
+    <p class="subtitle">MSCI World Total Return Daten als Grundlage für Wahrscheinlichkeiten und Verteilung möglicher Gesamtrenditen.</p>
+
+    <section class="top">
+      <article class="kpi loss">
+        <small>Verlustwahrscheinlichkeit</small>
+        <div class="value" id="lossProb">-</div>
+      </article>
+      <article class="kpi gain">
+        <small>Gewinnwahrscheinlichkeit</small>
+        <div class="value" id="gainProb">-</div>
+      </article>
+      <aside class="info">
+        <small>Info</small>
+        <ul>
+          <li>Anlagedauer: <strong id="yearsInfo">10 Jahre</strong></li>
+          <li>Median Rolling Rendite: <strong id="medianInfo">-</strong></li>
+          <li>Volatilität Jahresrenditen: <strong id="volInfo">-</strong></li>
+          <li>Quelle: MSCI. Index ist nicht direkt investierbar.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <div class="upload">
+          <input type="file" id="csvInput" accept=".csv,text/csv" />
+          <button class="btn" id="demoBtn" type="button">Demo Werte laden</button>
+        </div>
+        <div id="statusText">Demo Modus aktiv</div>
+      </div>
+
+      <div class="hint" id="demoHint">Demo Modus: Für die finale Berechnung bitte echte Jahresdaten aus dem MSCI Export laden.</div>
+      <div class="error" id="errorBox"></div>
+
+      <canvas id="histogram" width="1024" height="420"></canvas>
+
+      <div class="controls">
+        <div class="sliderline">
+          <label for="yearSlider">Anlagedauer in Jahren: <strong id="yearValue">10</strong></label>
+          <span id="sampleInfo">Rolling Perioden: -</span>
+        </div>
+        <input id="yearSlider" type="range" min="1" max="20" step="1" value="10" />
+      </div>
+
+      <div class="example" id="exampleText"></div>
+
+      <p class="footer-note">
+        Historische Daten sind keine Garantie. Grossverluste sind möglich. Modell basiert auf geladenen Indexdaten. Gebühren, Steuern und individuelle Währungsrisiken sind nicht enthalten.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const demoAnnualReturns = [
+        0.173, -0.128, 0.242, 0.066, 0.119, -0.085, 0.031, 0.224, 0.104, -0.214,
+        0.285, 0.098, 0.154, -0.061, 0.042, 0.191, -0.173, 0.263, 0.078, 0.136,
+        0.052, -0.097, 0.216, 0.141, -0.039, 0.188, 0.083, 0.127, -0.156, 0.231
+      ];
+
+      let annualReturns = demoAnnualReturns.slice();
+      let inDemoMode = true;
+
+      const csvInput = document.getElementById("csvInput");
+      const demoBtn = document.getElementById("demoBtn");
+      const slider = document.getElementById("yearSlider");
+      const yearValue = document.getElementById("yearValue");
+      const yearsInfo = document.getElementById("yearsInfo");
+      const lossProb = document.getElementById("lossProb");
+      const gainProb = document.getElementById("gainProb");
+      const medianInfo = document.getElementById("medianInfo");
+      const volInfo = document.getElementById("volInfo");
+      const sampleInfo = document.getElementById("sampleInfo");
+      const exampleText = document.getElementById("exampleText");
+      const errorBox = document.getElementById("errorBox");
+      const statusText = document.getElementById("statusText");
+      const demoHint = document.getElementById("demoHint");
+      const canvas = document.getElementById("histogram");
+      const ctx = canvas.getContext("2d");
+
+      function showError(msg) {
+        errorBox.style.display = "block";
+        errorBox.textContent = msg;
+      }
+
+      function clearError() {
+        errorBox.style.display = "none";
+        errorBox.textContent = "";
+      }
+
+      function formatPct(value, digits = 1) {
+        return (value * 100).toFixed(digits) + " %";
+      }
+
+      function percentile(sorted, p) {
+        if (!sorted.length) return NaN;
+        const idx = (sorted.length - 1) * p;
+        const low = Math.floor(idx);
+        const high = Math.ceil(idx);
+        if (low === high) return sorted[low];
+        const w = idx - low;
+        return sorted[low] * (1 - w) + sorted[high] * w;
+      }
+
+      function median(values) {
+        if (!values.length) return NaN;
+        const s = values.slice().sort((a, b) => a - b);
+        const m = Math.floor(s.length / 2);
+        return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+      }
+
+      function stdev(values) {
+        if (values.length < 2) return NaN;
+        const mean = values.reduce((a, b) => a + b, 0) / values.length;
+        const varSum = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1);
+        return Math.sqrt(varSum);
+      }
+
+      function rollingCompounded(returns, years) {
+        const arr = [];
+        for (let i = 0; i <= returns.length - years; i += 1) {
+          let end = 1;
+          for (let j = 0; j < years; j += 1) {
+            end *= (1 + returns[i + j]);
+          }
+          arr.push(end - 1);
+        }
+        return arr;
+      }
+
+      function annualized(totalReturn, years) {
+        if (years <= 0 || totalReturn <= -1) return NaN;
+        return Math.pow(1 + totalReturn, 1 / years) - 1;
+      }
+
+      function drawHistogram(values) {
+        const edges = [];
+        for (let x = -1; x <= 5.5 + 1e-9; x += 0.5) edges.push(Number(x.toFixed(2)));
+        const bins = new Array(edges.length - 1).fill(0);
+
+        values.forEach(v => {
+          if (v < edges[0]) {
+            bins[0] += 1;
+            return;
+          }
+          if (v >= edges[edges.length - 1]) {
+            bins[bins.length - 1] += 1;
+            return;
+          }
+          for (let i = 0; i < bins.length; i += 1) {
+            const left = edges[i];
+            const right = edges[i + 1];
+            if ((v >= left && v < right) || (i === bins.length - 1 && v === right)) {
+              bins[i] += 1;
+              break;
+            }
+          }
+        });
+
+        const probs = bins.map(c => (values.length ? c / values.length : 0));
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const pad = { top: 18, right: 20, bottom: 62, left: 74 };
+        const innerW = w - pad.left - pad.right;
+        const innerH = h - pad.top - pad.bottom;
+        const maxProb = Math.max(0.01, ...probs);
+
+        ctx.strokeStyle = "#9ca9c5";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top);
+        ctx.lineTo(pad.left, h - pad.bottom);
+        ctx.lineTo(w - pad.right, h - pad.bottom);
+        ctx.stroke();
+
+        ctx.fillStyle = "#526181";
+        ctx.font = "13px Poppins";
+        for (let g = 0; g <= 5; g += 1) {
+          const p = (g / 5) * maxProb;
+          const y = h - pad.bottom - (p / maxProb) * innerH;
+          ctx.strokeStyle = "rgba(156, 169, 197, 0.3)";
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y);
+          ctx.lineTo(w - pad.right, y);
+          ctx.stroke();
+          ctx.fillText((p * 100).toFixed(1) + " %", 20, y + 4);
+        }
+
+        const barW = innerW / bins.length;
+        for (let i = 0; i < bins.length; i += 1) {
+          const leftEdge = edges[i];
+          const p = probs[i];
+          const bh = (p / maxProb) * innerH;
+          const x = pad.left + i * barW + 1;
+          const y = h - pad.bottom - bh;
+          ctx.fillStyle = leftEdge < 0 ? "#dc4f5f" : "#33a857";
+          ctx.fillRect(x, y, Math.max(1, barW - 2), bh);
+        }
+
+        ctx.fillStyle = "#526181";
+        const tickVals = [-1, -0.5, 0, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5];
+        tickVals.forEach(v => {
+          const idx = (v - edges[0]) / 0.5;
+          const x = pad.left + idx * barW;
+          ctx.beginPath();
+          ctx.moveTo(x, h - pad.bottom);
+          ctx.lineTo(x, h - pad.bottom + 6);
+          ctx.strokeStyle = "#8795b1";
+          ctx.stroke();
+          ctx.fillText((v * 100).toFixed(0) + "%", x - 14, h - pad.bottom + 22);
+        });
+
+        ctx.save();
+        ctx.translate(20, pad.top + innerH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = "#42506f";
+        ctx.font = "14px Poppins";
+        ctx.fillText("Wahrscheinlichkeit", 0, 0);
+        ctx.restore();
+
+        ctx.fillStyle = "#42506f";
+        ctx.fillText("Portfoliorendite", w / 2 - 54, h - 16);
+      }
+
+      function recompute() {
+        clearError();
+        const years = Number(slider.value);
+        yearValue.textContent = years;
+        yearsInfo.textContent = years + " Jahre";
+
+        if (annualReturns.length < years + 1) {
+          showError("Zu wenige Jahresrenditen für diese Anlagedauer. Bitte längere MSCI Historie laden oder Jahre reduzieren.");
+          lossProb.textContent = "-";
+          gainProb.textContent = "-";
+          medianInfo.textContent = "-";
+          volInfo.textContent = "-";
+          sampleInfo.textContent = "Rolling Perioden: 0";
+          exampleText.textContent = "Keine Berechnung möglich.";
+          drawHistogram([]);
+          return;
+        }
+
+        const rolling = rollingCompounded(annualReturns, years);
+        const losses = rolling.filter(v => v < 0).length;
+        const loss = losses / rolling.length;
+        const gain = 1 - loss;
+
+        const sorted = rolling.slice().sort((a, b) => a - b);
+        const p10 = percentile(sorted, 0.1);
+        const p90 = percentile(sorted, 0.9);
+        const annP10 = annualized(p10, years);
+        const annP90 = annualized(p90, years);
+        const med = median(rolling);
+        const vol = stdev(annualReturns);
+
+        lossProb.textContent = formatPct(loss, 1);
+        gainProb.textContent = formatPct(gain, 1);
+        medianInfo.textContent = formatPct(med, 1);
+        volInfo.textContent = Number.isFinite(vol) ? formatPct(vol, 1) + " p.a." : "-";
+        sampleInfo.textContent = "Rolling Perioden: " + rolling.length;
+
+        exampleText.textContent =
+          "Mit einer Wahrscheinlichkeit von " + formatPct(0.8, 0) +
+          " liegt das Ergebnis zwischen P10 " + formatPct(p10, 1) +
+          " (annualisiert " + formatPct(annP10, 1) + " pro Jahr) und P90 " +
+          formatPct(p90, 1) + " (annualisiert " + formatPct(annP90, 1) + " pro Jahr).";
+
+        drawHistogram(rolling);
+      }
+
+      function parseDate(dateText) {
+        const raw = dateText.trim();
+        if (!raw) return null;
+        let d;
+        if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+          d = new Date(raw.slice(0, 10));
+        } else if (/^\d{2}\.\d{2}\.\d{4}$/.test(raw)) {
+          const [day, month, year] = raw.split(".").map(Number);
+          d = new Date(year, month - 1, day);
+        } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+          const [day, month, year] = raw.split("/").map(Number);
+          d = new Date(year, month - 1, day);
+        } else {
+          d = new Date(raw);
+        }
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      function parseNumber(valueText) {
+        const cleaned = valueText.replace(/\s/g, "").replace(".", "").replace(",", ".");
+        const n = Number(cleaned);
+        return Number.isFinite(n) ? n : NaN;
+      }
+
+      function parseCsvToAnnualReturns(text) {
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+        if (lines.length < 3) {
+          throw new Error("CSV enthält zu wenige Zeilen.");
+        }
+
+        const first = lines[0];
+        const delimiter = first.includes(";") ? ";" : ",";
+        const headers = first.split(delimiter).map(h => h.trim().toLowerCase());
+
+        let dateIdx = headers.findIndex(h => h.includes("date") || h.includes("datum"));
+        let valueIdx = headers.findIndex(h => h.includes("close") || h.includes("index") || h.includes("level") || h.includes("stand"));
+
+        if (dateIdx === -1 || valueIdx === -1) {
+          if (headers.length >= 2) {
+            dateIdx = 0;
+            valueIdx = 1;
+          } else {
+            throw new Error("CSV Format unklar. Erwartet werden Datum und Indexstand.");
+          }
+        }
+
+        const yearLast = new Map();
+
+        for (let i = 1; i < lines.length; i += 1) {
+          const parts = lines[i].split(delimiter);
+          if (parts.length <= Math.max(dateIdx, valueIdx)) continue;
+
+          const d = parseDate(parts[dateIdx]);
+          const v = parseNumber(parts[valueIdx]);
+          if (!d || !Number.isFinite(v) || v <= 0) continue;
+
+          const y = d.getFullYear();
+          const prev = yearLast.get(y);
+          if (!prev || d > prev.date) {
+            yearLast.set(y, { date: d, value: v });
+          }
+        }
+
+        const years = Array.from(yearLast.keys()).sort((a, b) => a - b);
+        if (years.length < 3) {
+          throw new Error("Zu wenige Jahre gefunden. Mindestens drei Jahresendwerte sind nötig.");
+        }
+
+        const annual = [];
+        for (let i = 1; i < years.length; i += 1) {
+          const curr = yearLast.get(years[i]).value;
+          const prev = yearLast.get(years[i - 1]).value;
+          annual.push(curr / prev - 1);
+        }
+
+        if (!annual.length) {
+          throw new Error("Keine gültigen Jahresrenditen berechnet.");
+        }
+        return annual;
+      }
+
+      csvInput.addEventListener("change", async (e) => {
+        clearError();
+        const file = e.target.files && e.target.files[0];
+        if (!file) {
+          showError("Keine CSV Datei ausgewählt.");
+          return;
+        }
+
+        try {
+          const text = await file.text();
+          const parsed = parseCsvToAnnualReturns(text);
+          annualReturns = parsed;
+          inDemoMode = false;
+          statusText.textContent = "MSCI CSV geladen";
+          demoHint.style.display = "none";
+          recompute();
+        } catch (err) {
+          inDemoMode = true;
+          annualReturns = demoAnnualReturns.slice();
+          statusText.textContent = "Demo Modus aktiv";
+          demoHint.style.display = "block";
+          showError("CSV konnte nicht verarbeitet werden: " + (err && err.message ? err.message : "Unbekannter Fehler"));
+          recompute();
+        }
+      });
+
+      demoBtn.addEventListener("click", () => {
+        annualReturns = demoAnnualReturns.slice();
+        inDemoMode = true;
+        statusText.textContent = "Demo Modus aktiv";
+        demoHint.style.display = "block";
+        clearError();
+        recompute();
+      });
+
+      slider.addEventListener("input", recompute);
+      recompute();
+    })();
+  </script>
+</body>
+</html>
