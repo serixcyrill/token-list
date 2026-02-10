@@ -1,0 +1,4120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vemo Übersicht</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: #f4f7fb;
+      --card-bg: #ffffff;
+      --text: #282f47;
+      --accent: #72d27a;
+      --accent-strong: #7ed957;
+      --accent-hover: #6ac66e;
+      --muted: #6b7080;
+      --shadow: 0 10px 30px rgba(40, 47, 71, 0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+      /* Vemo Background Shimmer */
+      background:
+        radial-gradient(circle at 15% 20%, rgba(118, 208, 98, 0.12), transparent 32%),
+        radial-gradient(circle at 85% 10%, rgba(125, 211, 252, 0.14), transparent 28%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--text);
+    }
+
+    a:hover {
+      color: var(--text);
+    }
+
+    .pill,
+    .section-meta,
+    .portfolio-actions .secondary-btn,
+    .notice {
+      color: #0f1a2a !important;
+    }
+
+    .tab-buttons button:not(.active):hover,
+    .mode-tabs button:not(.active):hover,
+    .secondary-btn:hover,
+    .advisor-actions a:hover {
+      background: #eef6ef !important;
+      border-color: rgba(114, 210, 122, 0.45) !important;
+      color: #0f1a2a !important;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(248, 250, 252, 0.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      place-items: center;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .page.is-loading .loading-overlay {
+      display: grid;
+    }
+
+    .loading-shell {
+      width: min(720px, 88vw);
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: 20px;
+      padding: 26px;
+      box-shadow: 0 24px 60px rgba(25, 32, 56, 0.12);
+      display: grid;
+      gap: 16px;
+    }
+
+    .loading-pill,
+    .loading-bar,
+    .loading-card {
+      position: relative;
+      overflow: hidden;
+      background: #eef2f6;
+      border-radius: 999px;
+    }
+
+    .loading-pill {
+      width: 140px;
+      height: 28px;
+    }
+
+    .loading-bar {
+      height: 16px;
+      border-radius: 12px;
+    }
+
+    .loading-bar.short {
+      width: 55%;
+    }
+
+    .loading-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .loading-card {
+      height: 120px;
+      border-radius: 16px;
+    }
+
+    .loading-pill::after,
+    .loading-bar::after,
+    .loading-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+      animation: shimmer 1.6s infinite;
+    }
+
+    @keyframes shimmer {
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+
+    .notice {
+      background: rgba(114, 210, 122, 0.18);
+      color: var(--text);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(114, 210, 122, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .notice .exit-admin {
+      border: 1px solid rgba(114, 210, 122, 0.6);
+      background: #f7fbf9;
+      color: #1c3a2c;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(114, 210, 122, 0.15);
+      display: none;
+    }
+
+    main {
+      flex: 1;
+      width: min(1200px, 92vw);
+      margin: 28px auto 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .section-sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legal-note {
+      margin: 14px 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .legal-note.compact {
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+
+    .performance-note {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .section-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #eef6ef;
+      border-radius: 999px;
+      color: #1c3a2c;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
+    }
+
+    .vorsorge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .vorsorge-card {
+      position: relative;
+      padding: 16px;
+      padding-right: 16px;
+      border-radius: 12px;
+      border: 1px solid #e6e8ef;
+      --card-accent: var(--accent);
+      transition: border 0.2s ease, transform 0.2s ease;
+    }
+
+    .vorsorge-card.is-active {
+      border-color: color-mix(in srgb, var(--card-accent) 85%, transparent);
+      box-shadow:
+        0 18px 34px color-mix(in srgb, var(--card-accent) 35%, transparent),
+        0 0 0 3px color-mix(in srgb, var(--card-accent) 24%, transparent);
+      transform: translateY(-2px);
+      position: relative;
+    }
+
+    .vorsorge-card.is-active::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--card-accent) 55%, transparent), transparent 45%),
+        radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--card-accent) 45%, transparent), transparent 40%);
+      opacity: 0.55;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .vorsorge-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(114, 210, 122, 0.6);
+    }
+
+
+    .vorsorge-card h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 700;
+      padding-right: 72px;
+      line-height: 1.2;
+    }
+
+    .vorsorge-card p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      padding-right: 72px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--text);
+      align-items: start;
+    }
+
+    .meta span {
+      background: #f7f9fb;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #edf0f5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .vorsorge-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .vorsorge-actions .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: normal;
+      text-align: center;
+      overflow: visible;
+      min-width: 0;
+      width: 100%;
+      min-height: 44px;
+      line-height: 1.2;
+      word-break: normal;
+      background: var(--accent-strong);
+      color: #ffffff;
+      border: 1px solid rgba(114, 210, 122, 0.5);
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+      transition: background 0.2s ease, border 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    }
+
+    .vorsorge-actions .cta-btn:hover {
+      background: var(--accent-hover);
+      border-color: rgba(114, 210, 122, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .vorsorge-logo {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 56px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 16px;
+      background: #ffffff;
+      clip-path: inset(0 round 16px);
+      box-shadow: 0 10px 24px rgba(15, 26, 42, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      padding: 6px;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .new-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(251, 146, 60, 0.18);
+      color: #9a3412;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      box-shadow: inset 0 0 0 1px rgba(251, 146, 60, 0.35);
+      z-index: 2;
+    }
+
+    .new-badge.offset-logo {
+      right: 80px;
+    }
+
+    .new-badge.inline {
+      position: static;
+      margin-left: 0;
+      margin-top: 0;
+      padding: 3px 8px;
+      font-size: 10px;
+      line-height: 1;
+      align-self: center;
+    }
+
+    .vorsorge-title-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .portfolio-shell,
+    .portfolio-item,
+    .vorsorge-card {
+      position: relative;
+    }
+
+    .is-new {
+      border-color: rgba(251, 146, 60, 0.75) !important;
+      box-shadow: 0 12px 26px rgba(251, 146, 60, 0.22) !important;
+    }
+
+    .portfolio-shell.is-new,
+    .portfolio-item.is-new {
+      border-color: rgba(251, 146, 60, 0.75) !important;
+      box-shadow: 0 18px 34px rgba(251, 146, 60, 0.22) !important;
+    }
+
+    .vorsorge-card.is-active.is-new {
+      border-color: rgba(251, 146, 60, 0.8) !important;
+      box-shadow:
+        0 18px 34px rgba(251, 146, 60, 0.28),
+        0 0 0 3px rgba(251, 146, 60, 0.22) !important;
+    }
+
+    .vorsorge-card.is-active.is-new {
+      border-color: rgba(251, 146, 60, 0.7);
+      box-shadow:
+        0 18px 34px rgba(251, 146, 60, 0.28),
+        0 0 0 3px rgba(251, 146, 60, 0.22);
+    }
+
+    .cta-primary {
+      color: #ffffff;
+      background: var(--accent-strong);
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+      border: 1px solid rgba(114, 210, 122, 0.5);
+    }
+
+    .cta-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .toggle-details.cta-primary:hover {
+      background: var(--accent-hover) !important;
+      border-color: rgba(114, 210, 122, 0.6) !important;
+      color: #ffffff !important;
+    }
+
+    .cta-secondary {
+      color: #0f1a2a;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #dfe3ec;
+      box-shadow: 0 6px 12px rgba(15, 26, 42, 0.06);
+    }
+
+    .cta-secondary:hover {
+      background: #f1f5fb;
+      border-color: #cdd4e0;
+      transform: translateY(-1px);
+    }
+
+    .cta-btn.is-disabled {
+      opacity: 0.55;
+      pointer-events: none;
+      border-style: dashed;
+    }
+
+    .cta-btn:focus,
+    .cta-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(114, 210, 122, 0.28), 0 8px 18px rgba(126, 217, 87, 0.22);
+    }
+
+    .toggle-details.cta-primary:focus,
+    .toggle-details.cta-primary:focus-visible {
+      background: var(--accent-strong);
+      border-color: rgba(114, 210, 122, 0.5);
+      color: #ffffff;
+    }
+
+    .toggle-details.cta-secondary:focus,
+    .toggle-details.cta-secondary:focus-visible {
+      background: #f1f5fb;
+      border-color: #cdd4e0;
+      color: #0f1a2a;
+    }
+
+    .toggle-details:not(.cta-btn) {
+      white-space: nowrap;
+      transition: width 0.28s ease, padding 0.28s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .label-animating {
+      overflow: visible;
+    }
+
+    @media (max-width: 520px) {
+      .vorsorge-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .vorsorge-actions .cta-btn {
+        font-size: 12px;
+        padding: 10px 12px;
+      }
+    }
+
+    .btn-label {
+      display: inline-flex;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .btn-label.is-fading {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(114, 210, 122, 0.15);
+      color: #1c3a2c;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      margin-bottom: 8px;
+    }
+
+    .vorsorge-card a:not(.cta-btn) {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffffff;
+      background: var(--accent-strong);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .vorsorge-card a:not(.cta-btn):hover {
+      background: var(--accent-hover);
+    }
+
+    .vorsorge-card a:not(.cta-btn):active {
+      transform: translateY(1px);
+    }
+
+    .details {
+      margin-top: 12px;
+      background: #f7fbf9;
+      border: 1px solid #e3e9f2;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: none;
+      box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.1);
+    }
+
+    .details h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .details ul {
+      padding-left: 0;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .details li.benefit,
+    .fund-details li.benefit {
+      list-style: disc;
+      background: linear-gradient(135deg, rgba(111, 217, 181, 0.18), rgba(111, 217, 181, 0.08));
+      border: 1px solid rgba(111, 217, 181, 0.35);
+      color: #0f2a24;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-left: 0;
+      list-style-position: inside;
+      width: 100%;
+    }
+
+    .details li.drawback,
+    .fund-details li.drawback {
+      list-style: disc;
+      background: linear-gradient(135deg, rgba(255, 179, 214, 0.18), rgba(255, 179, 214, 0.08));
+      border: 1px solid rgba(255, 179, 214, 0.36);
+      color: #4a1c25;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-left: 0;
+      list-style-position: inside;
+      width: 100%;
+    }
+
+    .tab-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @keyframes fade-slide-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.995);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes pulse-highlight {
+      from {
+        box-shadow: 0 0 0 0 rgba(114, 210, 122, 0.28);
+      }
+
+      to {
+        box-shadow: 0 0 0 12px rgba(114, 210, 122, 0);
+      }
+    }
+
+    .collapsible {
+      overflow: hidden;
+      height: 0;
+      opacity: 0;
+      transition: height 0.32s ease, opacity 0.24s ease;
+      will-change: height, opacity;
+    }
+
+    .collapsible.is-open {
+      opacity: 1;
+    }
+
+    .animate-in {
+      animation: fade-slide-in 0.35s ease;
+    }
+
+    .pulse-once {
+      animation: pulse-highlight 0.6s ease;
+    }
+
+    .krypto-toggle {
+      margin-left: auto;
+      margin-right: 2px;
+      background: transparent;
+      color: #f97316;
+      border-color: rgba(249, 115, 22, 0.55);
+      box-shadow: none;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .krypto-toggle:hover,
+    .krypto-toggle:focus-visible {
+      background: rgba(249, 115, 22, 0.12);
+      border-color: rgba(249, 115, 22, 0.78);
+      color: #c85a0f;
+    }
+
+    .krypto-toggle.active {
+      background: rgba(249, 115, 22, 0.18);
+      border-color: rgba(249, 115, 22, 0.9);
+      color: #c85a0f;
+      box-shadow: none;
+    }
+
+    .krypto-toggle:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .portfolio-actions {
+      display: none;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .secondary-btn {
+      border: 1px dashed var(--accent);
+      background: #f7fbf9;
+      color: #0f1a2a;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease, border 0.2s ease;
+    }
+
+    .secondary-btn:hover {
+      background: #eef6ef;
+      border-style: solid;
+    }
+
+    .tab-buttons button {
+      border: 1px solid #dfe3ec;
+      background: #f8fafc;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: border 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .tab-buttons button.active {
+      background: var(--accent-strong);
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .portfolio-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .portfolio-shell {
+      background: #f8fafc;
+      border: 1px solid #edf0f5;
+      padding: 14px;
+      border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.08);
+    }
+
+    .portfolio-toggle {
+      width: 100%;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      font-weight: 700;
+      color: var(--text);
+      padding: 4px 0 6px;
+    }
+
+    .portfolio-toggle-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      text-align: left;
+    }
+
+    .portfolio-info-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(125, 211, 252, 0.24), rgba(118, 208, 98, 0.18));
+      color: #0f1a2a;
+      font-weight: 700;
+      font-size: 12px;
+      border: 1px solid rgba(15, 26, 42, 0.08);
+      box-shadow: 0 6px 16px rgba(15, 26, 42, 0.06);
+    }
+
+    .portfolio-shell.open {
+      border-color: rgba(114, 210, 122, 0.6);
+      box-shadow: 0 10px 26px rgba(114, 210, 122, 0.12);
+    }
+
+    .portfolio-shell .chevron {
+      display: none;
+    }
+
+    .portfolio-summary {
+      display: block;
+      margin-top: 10px;
+      padding: 0;
+    }
+
+    .chart-wrap {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) 1fr;
+      gap: 28px;
+      align-items: center;
+      padding: 22px 24px;
+      background: linear-gradient(180deg, #fdfefe, #f6f8ff);
+      border: 1px solid #e5ebf5;
+      border-radius: 16px;
+      box-shadow: 0 14px 28px rgba(21, 45, 58, 0.08);
+    }
+
+    .chart-visual {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto;
+    }
+
+    .chart-visual canvas {
+      width: 220px;
+      height: 220px;
+    }
+
+    .chart-legend-col {
+      display: grid;
+      gap: 14px;
+    }
+
+    .chart-legend {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      font-size: 12.5px;
+      color: #1c2436;
+      padding-right: 6px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 1px solid #e6eaf3;
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(26, 50, 64, 0.06);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+    }
+
+    .portfolio-meta-copy {
+      display: grid;
+      gap: 6px;
+    }
+
+    .portfolio-meta-copy p {
+      margin: 0;
+      color: #41495c;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .chart-center-label {
+      position: absolute;
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 112px;
+      height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-weight: 700;
+      color: #0f1a2a;
+      font-size: 13px;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.98), rgba(245, 248, 255, 0.96));
+      border-radius: 50%;
+      box-shadow: 0 12px 26px rgba(21, 49, 58, 0.08), inset 0 0 0 1px rgba(114, 210, 122, 0.16);
+    }
+
+    .chart-center-label .label-top {
+      font-size: 11px;
+      letter-spacing: 0.2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .chart-center-label .label-value {
+      font-size: 17px;
+      color: #0f1a2a;
+    }
+
+    .chart-center-label .label-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .funds-wrapper {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 22px;
+    }
+
+    .allocation-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .allocation-input {
+      width: 90px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #dfe3ec;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .delete-btn {
+      border: none;
+      background: #ffe8e6;
+      color: #b04137;
+      padding: 6px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      display: none;
+    }
+
+    .portfolio-shell.admin .delete-btn {
+      display: inline-flex;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 16px;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 18px;
+      width: min(360px, 100%);
+      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e3e9f2;
+      display: grid;
+      gap: 12px;
+    }
+
+    .modal h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .modal input {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dfe3ec;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .modal .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .modal .primary {
+      background: var(--accent-strong);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+      color: #ffffff;
+    }
+
+    .modal .ghost {
+      background: #f1f3f8;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .mode-tabs button {
+      border: 1px solid #dfe3ec;
+      background: #f8fafc;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: border 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .mode-tabs button.active {
+      background: var(--accent-strong);
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(126, 217, 87, 0.28);
+    }
+
+    .portfolio-item {
+      padding: 14px;
+      border-radius: 14px;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      color: #0f1a2a;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      box-shadow: 0 12px 22px rgba(32, 42, 68, 0.08);
+      margin: 6px 0;
+      backdrop-filter: blur(6px);
+      scroll-margin-top: 80px;
+    }
+
+    .portfolio-item.fund-highlight {
+      animation: fundPulse 0.9s ease;
+    }
+
+    @keyframes fundPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(86, 165, 255, 0.32);
+      }
+      70% {
+        box-shadow: 0 0 0 12px rgba(86, 165, 255, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(86, 165, 255, 0);
+      }
+    }
+
+    .portfolio-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.12));
+      pointer-events: none;
+    }
+
+    .portfolio-item:hover {
+      transform: translateY(-1px);
+    }
+
+    .portfolio-item h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f1a2a;
+    }
+
+    .fund-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 2px;
+    }
+
+    .fund-desc {
+      margin: 0;
+      color: #2f3747;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 520px;
+    }
+
+    .portfolio-item .meta span {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(17, 24, 39, 0.1);
+      color: #0f1a2a;
+    }
+
+    .portfolio-item .allocation-row,
+    .portfolio-item strong,
+    .portfolio-item .allocation-value,
+    .portfolio-item .section-sub {
+      color: #0f1a2a;
+    }
+
+    .fund-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      background: rgba(17, 24, 39, 0.04);
+      color: #0f1a2a;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: width 0.28s ease, padding 0.28s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .fund-toggle:hover {
+      background: rgba(17, 24, 39, 0.08);
+    }
+
+    .fund-toggle:focus,
+    .fund-toggle:focus-visible {
+      outline: none;
+      background: rgba(17, 24, 39, 0.08);
+      border-color: rgba(17, 24, 39, 0.16);
+      box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1), 0 8px 18px rgba(15, 26, 42, 0.08);
+      color: #0f1a2a;
+    }
+
+    .fund-action-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .fund-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(17, 24, 39, 0.12);
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.04), rgba(17, 24, 39, 0.02));
+      color: #0f1a2a;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 6px 14px rgba(15, 26, 42, 0.08);
+    }
+
+    .fund-link:hover {
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.08), rgba(17, 24, 39, 0.04));
+    }
+
+    .fund-details {
+      margin-top: 10px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid rgba(28, 35, 58, 0.08);
+      padding: 12px 14px;
+      box-shadow: 0 8px 18px rgba(33, 41, 68, 0.06);
+      color: #1f2a44;
+    }
+
+    .fund-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .fund-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.06), rgba(17, 24, 39, 0.03));
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      color: #0f1a2a;
+    }
+
+    .fund-stat strong {
+      font-size: 12px;
+      color: #1f2a44;
+    }
+
+    .fund-description {
+      color: #1f2a44;
+      font-size: 13px;
+      line-height: 1.5;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(241, 244, 250, 0.9));
+      border: 1px solid rgba(17, 24, 39, 0.06);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .fund-details .sublist {
+      margin-top: 6px;
+    }
+
+    .fund-details .sublist h5 {
+      color: #1f2a44;
+    }
+
+    .fund-details .sublist ul {
+      color: #1f2a44;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .fund-disclaimer {
+      border-top: 1px solid rgba(17, 24, 39, 0.08);
+      padding-top: 10px;
+    }
+
+    .ablauf-shell {
+      margin-top: 6px;
+      background: linear-gradient(180deg, #ffffff, #f7f9fd);
+      border: 1px solid #e6eaf3;
+      border-radius: 16px;
+      box-shadow: 0 14px 34px rgba(27, 38, 64, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      padding: 14px;
+    }
+
+    .ablauf-scroll {
+      overflow-x: auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .ablauf-head-row,
+    .ablauf-row {
+      display: grid;
+      align-items: stretch;
+      gap: 8px;
+      min-width: 720px;
+    }
+
+    .ablauf-head-row {
+      background: linear-gradient(180deg, #f9fbff, #eef3fb);
+      border: 1px solid #e7ebf5;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      color: #0f1f33;
+      font-weight: 700;
+      font-size: 12.5px;
+      letter-spacing: 0.2px;
+    }
+
+    .ablauf-body {
+      display: grid;
+      gap: 12px;
+    }
+
+    .ablauf-row {
+      background: linear-gradient(180deg, #ffffff, #f9fbff);
+      border: 1px solid #e8ecf4;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(17, 38, 62, 0.06);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .ablauf-row:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 38px rgba(17, 38, 62, 0.08);
+    }
+
+    .ablauf-cell {
+      padding: 12px 14px;
+      text-align: center;
+      font-size: 13px;
+      color: #1e2a3c;
+    }
+
+    .ablauf-label {
+      text-align: left;
+      font-weight: 700;
+      color: #0f213c;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ablauf-value span {
+      display: block;
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #e8ecf5;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-variant-numeric: tabular-nums;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .ablauf-cell[data-editable="true"] {
+      cursor: text;
+    }
+
+    .ablauf-cell:focus-within span {
+      outline: 2px solid rgba(126, 217, 87, 0.25);
+      outline-offset: 2px;
+    }
+
+    footer {
+      margin: 10px auto 36px;
+      width: min(1200px, 92vw);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .footer-card {
+      background: linear-gradient(145deg, #f7fbf9, #ffffff);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid #e3e9f2;
+    }
+
+    .info-panel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border: 1px solid #e8ecf4;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 0 rgba(114, 210, 122, 0.08);
+    }
+
+    .info-panel strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .advisor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .advisor-card {
+      border: 1px solid #e3e9f2;
+      border-radius: 14px;
+      padding: 16px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+    }
+
+    .advisor-header {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #e8f8ec, #dfe9ff);
+      border: 1px solid #dbe5f0;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.35);
+      border-radius: 16px;
+      pointer-events: none;
+    }
+
+    .avatar-input-wrap {
+      display: grid;
+      gap: 4px;
+    }
+
+    .avatar-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      display: none;
+    }
+
+    .avatar-input {
+      display: none;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d6dce7;
+      background: #f8fbff;
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .advisor-meta h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .advisor-meta .role {
+      display: inline-flex;
+      padding: 5px 10px;
+      background: #eef6ef;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1c3a2c;
+      box-shadow: inset 0 0 0 1px rgba(114, 210, 122, 0.4);
+      margin-top: 4px;
+    }
+
+    .advisor-meta p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .advisor-qualifications h5 {
+      margin: 0 0 6px 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--text);
+    }
+
+    .advisor-qualifications ul {
+      margin: 0 0 10px 16px;
+      padding: 0;
+      color: var(--muted);
+      font-size: 13px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .advisor-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .advisor-actions a {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      background: var(--accent-strong);
+      color: #ffffff;
+      font-weight: 700;
+      border-radius: 12px;
+      box-shadow: 0 12px 24px rgba(114, 210, 122, 0.25);
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .advisor-actions a:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(114, 210, 122, 0.35);
+    }
+
+    .advisor-actions .note {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .info-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--text);
+      background: #eef2f8;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid #dfe3ec;
+    }
+
+    @media (max-width: 720px) {
+      .chart-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      table,
+      th,
+      td {
+        font-size: 12px;
+      }
+
+      /* Krypto-Button mobil linksbündig anzeigen */
+      .tab-buttons .krypto-toggle {
+        margin-left: 0;
+      }
+
+      /* Abschnitt-Badge im Ablaufmanagement auf Handy ausblenden */
+      #ablaufmanagement .section-meta {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+      <div class="loading-shell">
+        <div class="loading-pill"></div>
+        <div class="loading-bar"></div>
+        <div class="loading-bar short"></div>
+        <div class="loading-grid">
+          <div class="loading-card"></div>
+          <div class="loading-card"></div>
+          <div class="loading-card"></div>
+        </div>
+      </div>
+    </div>
+    <main>
+      <section class="card" id="vorsorge">
+        <div class="section-heading">
+          <h2 data-editable="true">Mantel</h2>
+          <p class="section-sub" data-editable="true">Übersicht möglicher Modellstrategien zu Vorsorgeoptionen.</p>
+          <span class="section-meta" id="lastUpdateTrigger" data-editable="true">Letztes Update: 12.09.2024</span>
+        </div>
+        <div class="vorsorge-grid" id="vorsorgeGrid">
+          <!-- Wird über Google Sheet befüllt; Fallback-Daten im JS -->
+        </div>
+        <p class="legal-note compact" data-editable="true">Diese Darstellung ist rein informativ und stellt keine Empfehlung im Sinne des FIDLEG dar.</p>
+      </section>
+
+      <section class="card" id="portfolios">
+        <div class="section-heading">
+          <h2 data-editable="true">Modellübersicht</h2>
+          <p class="section-sub" data-editable="true">Modellbasierte Betrachtung verschiedener Gewichtungen.</p>
+        </div>
+        <div class="tab-buttons" id="portfolioTabs"></div>
+        <div class="portfolio-list" id="portfolioList"></div>
+      </section>
+
+      <section class="card" id="ablaufmanagement">
+        <div class="section-heading">
+          <h2 data-editable="true">Ablaufmanagement</h2>
+          <p class="section-sub" data-editable="true">Modellbasierte Betrachtung verschiedener Gewichtungen über die kommenden Altersjahre.</p>
+          <span class="section-meta" data-editable="true">Modellübersicht: konservativ / mittel / aggressiv</span>
+        </div>
+        <div class="mode-tabs" aria-label="Risikoprofil wählen">
+          <button type="button" class="active" data-risk="konservativ">Konservativ</button>
+          <button type="button" data-risk="mittel">Mittel</button>
+          <button type="button" data-risk="aggressiv">Aggressiv</button>
+        </div>
+        <div class="ablauf-shell">
+          <div class="ablauf-scroll">
+            <div class="ablauf-head-row" id="ablaufHead"></div>
+            <div class="ablauf-body" id="ablaufBody"></div>
+          </div>
+        </div>
+      </section>
+      <section class="card" id="advisorSection">
+        <div class="section-heading">
+          <h2 data-editable="true">Telefontermin mit Honorarberater:in</h2>
+          <p class="section-sub" data-editable="true">Terminvereinbarung mit der zuständigen Honorarberatung für Rückfragen zur Altersvorsorge oder Unterstützung. Bitte den Berater wählen, mit dem der Anlageberatungsvertrag abgeschlossen wurde.</p>
+          <span class="section-meta" data-editable="true">Direkt buchbar</span>
+        </div>
+        <div class="advisor-grid">
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-diego" aria-label="Profilbild Diego Berchtold"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label"></span>
+                <input class="avatar-input" type="url" data-target="avatar-diego" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Diego Berchtold</h4>
+                <span class="role" data-editable="true">Honorarberater</span>
+                <p data-editable="true">Berät rund um Vorsorgemantel, Modellübersichten und Ablaufmanagement.</p>
+              </div>
+            </div>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Professional/academic degree(s)</li>
+                <li data-editable="true">Bachelor-Abschluss: Betriebsökonomie</li>
+                <li data-editable="true">Professional knowledge</li>
+                <li data-editable="true">Other Certificate(s) / Diploma(s): VBV - Versicherung &amp; Vorsorge</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">Code of conduct trainings: Mendo – FIDLEG Kompakt – Kenntnisnachweis Verhaltensregeln</li>
+              </ul>
+            </div>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchung: https://calendly.com/diego-vemo/telefontermin</span>
+            </div>
+          </div>
+
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-lara" aria-label="Profilbild Lara Steiner"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label"></span>
+                <input class="avatar-input" type="url" data-target="avatar-lara" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Lara Steiner</h4>
+                <span class="role" data-editable="true">Senior Honorarberaterin</span>
+                <p data-editable="true">Spezialisiert auf nachhaltige Modellübersichten und steueroptimierte Auszahlungspfade.</p>
+              </div>
+            </div>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Master: Finance &amp; Risk Management</li>
+                <li data-editable="true">CAS Sustainable Finance</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">MIFID &amp; FIDLEG Refresh 2024</li>
+              </ul>
+            </div>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchungslink bitte im Admin-Modus anpassen.</span>
+            </div>
+          </div>
+
+          <div class="advisor-card">
+            <div class="advisor-header">
+              <div class="avatar" id="avatar-marco" aria-label="Profilbild Marco Keller"></div>
+              <div class="avatar-input-wrap">
+                <span class="avatar-label"></span>
+                <input class="avatar-input" type="url" data-target="avatar-marco" placeholder="https://..." />
+              </div>
+              <div class="advisor-meta">
+                <h4 data-editable="true">Marco Keller</h4>
+                <span class="role" data-editable="true">Honorarberater</span>
+                <p data-editable="true">Fokus auf Auszahlungsszenarien, Risikoabsicherung und Liquiditätsplanung.</p>
+              </div>
+            </div>
+            <div class="advisor-qualifications">
+              <h5 data-editable="true">EDUCATION AND PROFESSIONAL TRAINING</h5>
+              <ul>
+                <li data-editable="true">Bachelor: Banking &amp; Finance</li>
+                <li data-editable="true">Dipl. Finanzplanungsexperte</li>
+              </ul>
+              <h5 data-editable="true">Code of conduct training</h5>
+              <ul>
+                <li data-editable="true">Compliance &amp; Ethik Update 2024</li>
+              </ul>
+            </div>
+            <div class="advisor-actions">
+              <a href="https://calendly.com/diego-vemo/telefontermin" target="_blank" rel="noreferrer">Termin buchen</a>
+              <span class="note" data-editable="true">Terminbuchungslink bitte im Admin-Modus anpassen.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="footer-card">
+        <p data-editable="true"><strong>Haftungsausschluss:</strong> Diese Übersicht stellt keine Anlageberatung dar und dient ausschließlich Informationszwecken. Diese Modelle ersetzen keine persönliche Beratung. Entscheide basieren nicht auf individuellen Profilen.</p>
+        <p data-editable="true">Die Inhalte richten sich nur an berechtigte Personen und dürfen ohne Zustimmung nicht weitergegeben werden.</p>
+        <div class="info-panel">
+          <div>
+            <strong data-editable="true">Hinweis:</strong> <span data-editable="true">Aktuelle Informationen und Produktupdates sind für alle Kundinnen und Kunden sichtbar.</span>
+          </div>
+          <div class="info-time"><span aria-hidden="true">🕒</span><span data-editable="true">Stand: 12.09.2024, 10:18</span></div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const portfolioTabs = document.getElementById('portfolioTabs');
+    let kryptoToggle = null;
+    const updateTrigger = document.getElementById('lastUpdateTrigger');
+    const advisorGrid = document.querySelector('.advisor-grid');
+    const pageShell = document.querySelector('.page');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    let avatarInputs = [];
+    let avatarLabels = [];
+    let loadingFallbackTimer;
+
+    setLoadingState(true);
+    loadingFallbackTimer = setTimeout(() => {
+      setLoadingState(false);
+    }, 1400);
+
+    window.addEventListener('load', () => {
+      setLoadingState(false);
+    });
+
+    const STORAGE_KEYS = {
+      editable: 'vemo-editable-fields',
+      portfolios: 'vemo-portfolio-data',
+      ablauf: 'vemo-ablauf-data',
+      avatars: 'vemo-avatar-urls',
+      selectedVorsorge: 'vemo-selected-vorsorge',
+      kryptoActive: 'vemo-krypto-active',
+    };
+
+    const SHIMMER_COLORS = ['#6fd9b5', '#6abef5', '#9fb5ff', '#ffc87c', '#8fd8ff', '#ffb3d6'];
+    const KRYPT0_COLOR = '#f97316';
+
+    // *** Google Sheet Konfiguration ***
+    // Basis-ID aus deinem Link:
+    // https://docs.google.com/spreadsheets/d/e/2PACX-1vQg29x92Do82OV6r7f19UCrbTBZURRu305Nu-GMH9UlnqvcBhe44-8oqMJBTLFaRUNhKXeG8JKDBDYc/pubhtml
+    const SHEET_BASE_ID = '2PACX-1vQg29x92Do82OV6r7f19UCrbTBZURRu305Nu-GMH9UlnqvcBhe44-8oqMJBTLFaRUNhKXeG8JKDBDYc';
+    const SHEET_CSV_BASE = `https://docs.google.com/spreadsheets/d/e/${SHEET_BASE_ID}/pub`;
+    const SHEET_GIDS = {
+      vorsorge: '0',
+      portfolios: '1655243596',
+      fonds: '1811690173',
+      berater: '832064159',
+      ablauf: '370234565',
+      updates: '1386323135',
+    };
+
+    let editableIndex = 0;
+
+    const savedEdits = loadJson(STORAGE_KEYS.editable, {});
+    const savedAvatars = loadJson(STORAGE_KEYS.avatars, {});
+
+    function deepClone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function loadJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : deepClone(fallback);
+      } catch (error) {
+        console.warn('Konnte gespeicherte Daten nicht laden', error);
+        return deepClone(fallback);
+      }
+    }
+
+    function persistJson(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.warn('Konnte Daten nicht speichern', error);
+      }
+    }
+
+    function attachEditable(el, key, onChange) {
+      if (!el) return;
+      const storageKey = key || el.dataset.storageKey || `editable-${editableIndex++}`;
+      el.dataset.storageKey = storageKey;
+      el.dataset.editable = 'true';
+      if (savedEdits[storageKey]) {
+        el.textContent = savedEdits[storageKey];
+      }
+      const apply = () => {
+        const value = el.textContent.trim();
+        savedEdits[storageKey] = value;
+        persistJson(STORAGE_KEYS.editable, savedEdits);
+        if (typeof onChange === 'function') onChange(value);
+      };
+      el.addEventListener('blur', apply);
+      el.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          el.blur();
+        }
+      });
+    }
+
+    function hydrateStaticEditables() {
+      document.querySelectorAll('[data-editable]').forEach((el) => {
+        if (!el.dataset.storageKey) {
+          el.dataset.storageKey = `static-${editableIndex++}`;
+        }
+        attachEditable(el, el.dataset.storageKey);
+      });
+    }
+
+    function bindEditableSync(el, type, index, field, rerender = false, productIndex = activeVorsorgeIndex) {
+      if (!el) return;
+      const key = `portfolio-${productIndex}-${type}-${index}-${field}`;
+      attachEditable(el, key, (value) => {
+        const data = getPortfolioDataForProduct(productIndex);
+        data[type][index][field] = value;
+        persistPortfolioData();
+        if (rerender) {
+          renderPortfolios(type);
+        }
+      });
+    }
+
+    const defaultVorsorgeCards = [
+      {
+        ranking: '1',
+        rankingLabel: 'Ranking 1',
+        title: 'Nachhaltige Zukunft Plus',
+        description: 'Ausgewogene Strategie mit Fokus auf nachhaltige Investments für langfristigen Vermögensaufbau.',
+        produktkosten: '0,48% p.a.',
+        weitereGebuehren: '0,10% p.a.',
+        link: '',
+        website: '',
+        logo: '',
+        vorteile: [
+          'Starker ESG-Fokus mit klaren Ausschlusskriterien.',
+          'Breite Diversifikation über Regionen und Branchen.',
+        ],
+        nachteile: [
+          'Kurzfristig höhere Volatilität möglich.',
+          'Performance abhängig von nachhaltigen Sektoren.',
+        ],
+      },
+      {
+        ranking: '2',
+        rankingLabel: 'Ranking 2',
+        title: 'Stabilität & Balance',
+        description: 'Klassische Ausrichtung mit Schwerpunkt auf stabilen Erträgen und moderater Risikosteuerung.',
+        produktkosten: '0,38% p.a.',
+        weitereGebuehren: '0,08% p.a.',
+        link: '',
+        website: '',
+        logo: '',
+        vorteile: [
+          'Konstante Ausschüttungen für planbare Erträge.',
+          'Ausgewogener Mix aus defensiven und Wachstumswerten.',
+        ],
+        nachteile: [
+          'Geringere Chance auf Überrenditen in Hausse-Phasen.',
+          'Begrenztes Exposure zu alternativen Anlagen.',
+        ],
+      },
+      {
+        ranking: '3',
+        rankingLabel: 'Ranking 3',
+        title: 'Wachstum Dynamik',
+        description: 'Chancenorientierter Ansatz für Anlegerinnen und Anleger mit höherer Renditeerwartung.',
+        produktkosten: '0,54% p.a.',
+        weitereGebuehren: '0,12% p.a.',
+        link: '',
+        website: '',
+        logo: '',
+        vorteile: [
+          'Höhere Aktienquote für langfristige Wachstumschancen.',
+          'Fokus auf Innovations- und Zukunftsthemen.',
+        ],
+        nachteile: [
+          'Deutlich erhöhte Schwankungen möglich.',
+          'Erfordert längeren Anlagehorizont.',
+        ],
+      },
+    ];
+
+    let vorsorgeData = deepClone(defaultVorsorgeCards);
+
+    const defaultPortfolioMeta = {
+      factor: {
+        title: 'Faktor-Modellübersicht',
+        summary: '',
+        renditePa: '',
+        seit: '',
+        info: '',
+      },
+      marketcap: {
+        title: 'Marketcap-Modellübersicht',
+        summary: '',
+        renditePa: '',
+        seit: '',
+        info: '',
+      },
+      bip: {
+        title: 'BIP-Modellübersicht',
+        summary: '',
+        renditePa: '',
+        seit: '',
+        info: '',
+      },
+      obligationen: {
+        title: 'Obligationen-Modellübersicht',
+        summary: '',
+        renditePa: '',
+        seit: '',
+        info: '',
+      },
+    };
+
+    const defaultPortfolioData = {
+      factor: [
+        {
+          title: 'Faktor Plus Global',
+          desc: 'Stark diversifizierter Faktoransatz mit Fokus auf Qualität und niedrige Volatilität.',
+          fondsvolumen: 'CHF 1.2 Mrd.',
+          positionen: '120 Positionen',
+          auflageSeit: 'Auflage seit 2015',
+          returns5: 'Ø Rendite 5 Jahre: 5,2% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,1% p.a.',
+          allocation: 32,
+          since: 'Rendite seit Start: +24,1%',
+          factsheet: '',
+        },
+        {
+          title: 'Smart Beta Europa',
+          desc: 'Betont Value- und Size-Prämien in europäischen Kernmärkten.',
+          fondsvolumen: 'CHF 930 Mio.',
+          positionen: '85 Positionen',
+          auflageSeit: 'Auflage seit 2014',
+          returns5: 'Ø Rendite 5 Jahre: 4,4% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 5,8% p.a.',
+          allocation: 28,
+          since: 'Rendite seit Start: +18,6%',
+          factsheet: '',
+        },
+        {
+          title: 'Quality Momentum Blend',
+          desc: 'Gezielter Mix aus Qualitätsunternehmen mit Momentum-Overlay.',
+          fondsvolumen: 'CHF 760 Mio.',
+          positionen: '95 Positionen',
+          auflageSeit: 'Auflage seit 2016',
+          returns5: 'Ø Rendite 5 Jahre: 5,6% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,5% p.a.',
+          allocation: 40,
+          since: 'Rendite seit Start: +27,4%',
+          factsheet: '',
+        },
+      ],
+      marketcap: [
+        {
+          title: 'Global Market Leaders',
+          desc: 'Breit gestreute Großkonzerne mit robuster Bilanzstruktur.',
+          fondsvolumen: 'CHF 2.1 Mrd.',
+          positionen: '140 Positionen',
+          auflageSeit: 'Auflage seit 2013',
+          returns5: 'Ø Rendite 5 Jahre: 5,9% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 7,2% p.a.',
+          allocation: 45,
+          since: 'Rendite seit Start: +29,3%',
+          factsheet: '',
+        },
+        {
+          title: 'MidCap Chancen',
+          desc: 'Wachstumsstarke Unternehmen mit solidem Track Record.',
+          fondsvolumen: 'CHF 880 Mio.',
+          positionen: '110 Positionen',
+          auflageSeit: 'Auflage seit 2012',
+          returns5: 'Ø Rendite 5 Jahre: 6,4% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 8,0% p.a.',
+          allocation: 35,
+          since: 'Rendite seit Start: +33,0%',
+          factsheet: '',
+        },
+        {
+          title: 'SmallCap Satellit',
+          desc: 'Selektive Beimischung innovativer Small Caps.',
+          fondsvolumen: 'CHF 420 Mio.',
+          positionen: '70 Positionen',
+          auflageSeit: 'Auflage seit 2017',
+          returns5: 'Ø Rendite 5 Jahre: 7,1% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 8,6% p.a.',
+          allocation: 20,
+          since: 'Rendite seit Start: +22,8%',
+          factsheet: '',
+        },
+      ],
+      bip: [
+        {
+          title: 'GDP Balanced',
+          desc: 'Regionale Gewichtung entsprechend Wirtschaftsleistung für stabile Allokation.',
+          fondsvolumen: 'CHF 1.0 Mrd.',
+          positionen: '105 Positionen',
+          auflageSeit: 'Auflage seit 2011',
+          returns5: 'Ø Rendite 5 Jahre: 4,8% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 6,0% p.a.',
+          allocation: 42,
+          since: 'Rendite seit Start: +21,3%',
+          factsheet: '',
+        },
+        {
+          title: 'Emerging Focus',
+          desc: 'Zusatzschwerpunkt auf aufstrebenden Volkswirtschaften.',
+          fondsvolumen: 'CHF 640 Mio.',
+          positionen: '90 Positionen',
+          auflageSeit: 'Auflage seit 2013',
+          returns5: 'Ø Rendite 5 Jahre: 6,9% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 7,7% p.a.',
+          allocation: 33,
+          since: 'Rendite seit Start: +25,0%',
+          factsheet: '',
+        },
+        {
+          title: 'Developed Core',
+          desc: 'Kernmärkte nach Wirtschaftskraft, stabilisiert durch taktische Korridore.',
+          fondsvolumen: 'CHF 780 Mio.',
+          positionen: '100 Positionen',
+          auflageSeit: 'Auflage seit 2010',
+          returns5: 'Ø Rendite 5 Jahre: 4,5% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 5,9% p.a.',
+          allocation: 25,
+          since: 'Rendite seit Start: +19,8%',
+          factsheet: '',
+        },
+      ],
+      obligationen: [
+        {
+          title: 'Euro Bonds Core',
+          desc: 'Staats- und Unternehmensanleihen mit Investment-Grade-Rating.',
+          fondsvolumen: 'CHF 2.4 Mrd.',
+          positionen: '160 Positionen',
+          auflageSeit: 'Auflage seit 2009',
+          returns5: 'Ø Rendite 5 Jahre: 2,3% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 3,1% p.a.',
+          allocation: 50,
+          since: 'Rendite seit Start: +11,4%',
+          factsheet: '',
+        },
+        {
+          title: 'Green Bonds Select',
+          desc: 'Nachhaltigkeitsorientierte Anleihen mit zertifizierten Projekten.',
+          fondsvolumen: 'CHF 1.1 Mrd.',
+          positionen: '130 Positionen',
+          auflageSeit: 'Auflage seit 2018',
+          returns5: 'Ø Rendite 5 Jahre: 2,7% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 3,4% p.a.',
+          allocation: 30,
+          since: 'Rendite seit Start: +12,1%',
+          factsheet: '',
+        },
+        {
+          title: 'Inflation Linkers',
+          desc: 'Anleihen mit Inflationsschutz zur Stabilisierung der Kaufkraft.',
+          fondsvolumen: 'CHF 540 Mio.',
+          positionen: '75 Positionen',
+          auflageSeit: 'Auflage seit 2019',
+          returns5: 'Ø Rendite 5 Jahre: 2,1% p.a.',
+          returns10: 'Ø Rendite 10 Jahre: 2,9% p.a.',
+          allocation: 20,
+          since: 'Rendite seit Start: +9,7%',
+          factsheet: '',
+        },
+      ],
+    };
+
+    const defaultKryptoFund = {
+      title: 'Krypto (Bitcoin)',
+      desc: 'Digitaler Baustein mit begrenztem Angebot.',
+      fondsvolumen: 'USD 20+ Mrd. Marktwert',
+      positionen: '1 Position',
+      auflageSeit: 'Seit 2015',
+      returns5: 'Ø Rendite 5 Jahre: 45% p.a.',
+      returns10: 'Ø Rendite 10 Jahre: 70% p.a.',
+      allocation: 5,
+      since: 'Seit 2015',
+      factsheet: '',
+    };
+
+    const defaultAblaufData = {
+      konservativ: [
+        ['Aktien', '25%', '24%', '23%', '22%', '21%', '20%', '19%', '18%', '17%', '16%'],
+        ['Obligationen', '55%', '56%', '57%', '58%', '59%', '60%', '61%', '62%', '63%', '64%'],
+        ['Liquidität', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%'],
+      ],
+      mittel: [
+        ['Aktien', '40%', '39%', '38%', '37%', '36%', '35%', '34%', '33%', '32%', '31%'],
+        ['Obligationen', '40%', '41%', '42%', '43%', '44%', '45%', '46%', '47%', '48%', '49%'],
+        ['Liquidität', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%', '20%'],
+      ],
+      aggressiv: [
+        ['Aktien', '60%', '59%', '58%', '57%', '56%', '55%', '54%', '53%', '52%', '51%'],
+        ['Obligationen', '25%', '26%', '27%', '28%', '29%', '30%', '31%', '32%', '33%', '34%'],
+        ['Liquidität', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%', '15%'],
+      ],
+    };
+
+    const defaultUpdatesData = {
+      disclaimerPrimary:
+        'Haftungsausschluss: Diese Übersicht stellt keine Anlageberatung dar und dient ausschließlich Informationszwecken.',
+      disclaimerSecondary:
+        'Die Inhalte richten sich nur an berechtigte Personen und dürfen ohne Zustimmung nicht weitergegeben werden.',
+      infoNotice: 'Hinweis: Aktuelle Informationen und Produktupdates sind für alle Kundinnen und Kunden sichtbar.',
+      infoTimestamp: 'Stand: 12.09.2024, 10:18',
+    };
+    const defaultAdvisors = [
+      {
+        key: 'diego',
+        name: 'Diego Berchtold',
+        role: 'Honorarberater',
+      description: 'Berät zu Vorsorgemantel, Modellübersichten und Ablaufmanagement.',
+        educationText: 'Professional/academic degree(s); Bachelor-Abschluss: Betriebsökonomie; VBV - Versicherung & Vorsorge',
+        codeOfConductText: 'Mendo – FIDLEG Kompakt – Kenntnisnachweis Verhaltensregeln',
+        terminLink: 'https://calendly.com/diego-vemo/telefontermin',
+        terminHinweis: 'Terminbuchung: https://calendly.com/diego-vemo/telefontermin',
+        avatarUrl: '',
+      },
+      {
+        key: 'lara',
+        name: 'Lara Steiner',
+        role: 'Senior Honorarberaterin',
+      description: 'Spezialisiert auf nachhaltige Modellübersichten und steueroptimierte Auszahlungspfade.',
+        educationText: 'Master: Finance & Risk Management; CAS Sustainable Finance',
+        codeOfConductText: 'MIFID & FIDLEG Refresh 2024',
+        terminLink: 'https://calendly.com/diego-vemo/telefontermin',
+        terminHinweis: 'Terminbuchungslink bitte im Admin-Modus anpassen.',
+        avatarUrl: '',
+      },
+      {
+        key: 'marco',
+        name: 'Marco Keller',
+        role: 'Honorarberater',
+        description: 'Fokus auf Auszahlungsszenarien, Risikoabsicherung und Liquiditätsplanung.',
+        educationText: 'Bachelor: Banking & Finance; Dipl. Finanzplanungsexperte',
+        codeOfConductText: 'Compliance & Ethik Update 2024',
+        terminLink: 'https://calendly.com/diego-vemo/telefontermin',
+        terminHinweis: 'Terminbuchungslink bitte im Admin-Modus anpassen.',
+        avatarUrl: '',
+      },
+    ];
+
+    function normalizePortfolioStorage(raw) {
+      if (Array.isArray(raw)) return raw;
+      if (raw && typeof raw === 'object' && Object.keys(raw).length) return [raw];
+      return [];
+    }
+
+    function normalizeStoredIndex(raw) {
+      const num = Number(raw);
+      return Number.isFinite(num) && num >= 0 ? Math.floor(num) : 0;
+    }
+
+    let portfolioMetaByProduct = [deepClone(defaultPortfolioMeta)];
+    let portfolioDataByProduct = normalizePortfolioStorage(loadJson(STORAGE_KEYS.portfolios, defaultPortfolioData));
+    if (!portfolioDataByProduct.length) {
+      portfolioDataByProduct = [deepClone(defaultPortfolioData)];
+    }
+    let kryptoFundsByProduct = [deepClone(defaultKryptoFund)];
+    let kryptoActiveByProduct = loadJson(STORAGE_KEYS.kryptoActive, []);
+    if (!Array.isArray(kryptoActiveByProduct)) kryptoActiveByProduct = [];
+    let activeVorsorgeIndex = normalizeStoredIndex(loadJson(STORAGE_KEYS.selectedVorsorge, 0));
+    let activePortfolioType = 'factor';
+    let kryptoFund = deepClone(defaultKryptoFund);
+    let portfolioDataFromSheet = false;
+    let portfolioMetaFromSheet = false;
+
+    function emptyPortfolioMeta() {
+      return {
+        factor: { title: '', summary: '', renditePa: '', seit: '', info: '' },
+        marketcap: { title: '', summary: '', renditePa: '', seit: '', info: '' },
+        bip: { title: '', summary: '', renditePa: '', seit: '', info: '' },
+        obligationen: { title: '', summary: '', renditePa: '', seit: '', info: '' },
+      };
+    }
+    let advisorData = deepClone(defaultAdvisors);
+    let ablaufData = loadJson(STORAGE_KEYS.ablauf, defaultAblaufData);
+    let updatesData = deepClone(defaultUpdatesData);
+    let vorsorgeLastUpdate = '';
+    let kryptoActive = false;
+
+    function buildCsvUrl(gid) {
+      const params = new URLSearchParams({
+        gid,
+        single: 'true',
+        output: 'csv',
+        cacheBust: Date.now().toString(),
+      });
+      return `${SHEET_CSV_BASE}?${params.toString()}`;
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let current = '';
+      let inQuotes = false;
+      let row = [];
+      for (let i = 0; i < text.length; i += 1) {
+        const char = text[i];
+        if (char === '"') {
+          if (inQuotes && text[i + 1] === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(current);
+          current = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (current !== '' || row.length) {
+            row.push(current);
+            rows.push(row);
+            row = [];
+            current = '';
+          }
+        } else {
+          current += char;
+        }
+      }
+      if (current !== '' || row.length) {
+        row.push(current);
+        rows.push(row);
+      }
+      return rows.map((cols) => cols.map((cell) => cell.trim()));
+    }
+
+    function hexToRgba(hex, alpha = 0.12) {
+      const normalized = hex.replace('#', '');
+      const bigint = parseInt(normalized, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function ensurePortfolioStructures(count) {
+      const total = Math.max(1, count || 0);
+      for (let i = 0; i < total; i += 1) {
+        if (!portfolioMetaByProduct[i]) {
+          portfolioMetaByProduct[i] = portfolioMetaFromSheet
+            ? emptyPortfolioMeta()
+            : deepClone(defaultPortfolioMeta);
+        }
+        if (!portfolioDataByProduct[i]) {
+          portfolioDataByProduct[i] = portfolioDataFromSheet
+            ? { factor: [], marketcap: [], bip: [], obligationen: [] }
+            : deepClone(defaultPortfolioData);
+        }
+        if (!kryptoFundsByProduct[i]) {
+          kryptoFundsByProduct[i] = deepClone(defaultKryptoFund);
+        }
+        if (typeof kryptoActiveByProduct[i] !== 'boolean') {
+          kryptoActiveByProduct[i] = false;
+        }
+      }
+    }
+
+    function getPortfolioMetaForProduct(index) {
+      if (!portfolioMetaByProduct[index]) {
+        portfolioMetaByProduct[index] = deepClone(defaultPortfolioMeta);
+      }
+      return portfolioMetaByProduct[index];
+    }
+
+    function getPortfolioDataForProduct(index) {
+      if (!portfolioDataByProduct[index]) {
+        portfolioDataByProduct[index] = deepClone(defaultPortfolioData);
+      }
+      return portfolioDataByProduct[index];
+    }
+
+    function getKryptoFundForProduct(index) {
+      if (!kryptoFundsByProduct[index]) {
+        kryptoFundsByProduct[index] = deepClone(defaultKryptoFund);
+      }
+      return kryptoFundsByProduct[index];
+    }
+
+    function getActivePortfolioData() {
+      return getPortfolioDataForProduct(activeVorsorgeIndex);
+    }
+
+    function getActivePortfolioMeta() {
+      return getPortfolioMetaForProduct(activeVorsorgeIndex);
+    }
+
+    function getActiveKryptoFund() {
+      return getKryptoFundForProduct(activeVorsorgeIndex);
+    }
+
+    function setLoadingState(isLoading) {
+      if (pageShell) {
+        pageShell.classList.toggle('is-loading', isLoading);
+      }
+      if (loadingOverlay) {
+        loadingOverlay.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
+      }
+    }
+
+    async function fetchSheetCsv(gid) {
+      const url = buildCsvUrl(gid);
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`Sheet Request fehlgeschlagen: ${res.status}`);
+      return res.text();
+    }
+
+    async function loadVorsorgeFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.vorsorge);
+        const rows = parseCsv(csvText).filter((r) => r.length);
+        if (!rows.length) throw new Error('Keine Vorsorge-Zeilen');
+
+        const columns = rows[0].slice(1).filter((value) => value !== '');
+        if (!columns.length) throw new Error('Keine Vorsorge-Spalten');
+
+        const cards = columns.map((_, idx) => ({
+          ranking: String(idx + 1),
+          rankingLabel: `Ranking ${idx + 1}`,
+          title: '',
+          description: '',
+          produktkosten: '',
+          weitereGebuehren: '',
+          link: '',
+          website: '',
+          logo: '',
+          accent: '',
+          vorteile: [],
+          nachteile: [],
+        }));
+
+        let updateCandidate = '';
+
+        rows.forEach((row) => {
+          const [field, ...values] = row;
+          const keyRaw = (field || '').trim();
+          const key = keyRaw.toLowerCase();
+
+          if (key.includes('letztes') && key.includes('update')) {
+            updateCandidate = values[0] || updateCandidate;
+            return;
+          }
+
+          values.forEach((value, idx) => {
+            const card = cards[idx];
+            if (!card || !value) return;
+            switch (key) {
+              case 'ranking':
+                card.ranking = value;
+                card.rankingLabel = `Ranking ${value}`;
+                break;
+              case 'titel':
+                card.title = value;
+                break;
+              case 'beschreibung':
+                card.description = value;
+                break;
+              case 'produktkosten':
+                card.produktkosten = value;
+                break;
+              case 'weiteregebuehren':
+                card.weitereGebuehren = value;
+                break;
+              case 'link':
+                card.link = value;
+                card.website = value;
+                break;
+              case 'website':
+                card.website = value;
+                break;
+              case 'logo':
+              case 'anzeigebild':
+              case 'anzeige bild':
+                card.logo = value;
+                break;
+              case 'farbe':
+              case 'akzent':
+              case 'accent':
+              case 'accentfarbe':
+                card.accent = value;
+                break;
+              default:
+                if (key.startsWith('vorteil')) {
+                  card.vorteile.push(value);
+                }
+                if (key.startsWith('nachteil')) {
+                  card.nachteile.push(value);
+                }
+                break;
+            }
+          });
+        });
+
+        cards.forEach((card) => {
+          if (!card.website && card.link) {
+            card.website = card.link;
+          }
+        });
+
+        if (!updateCandidate && rows[17] && rows[17][1]) {
+          updateCandidate = rows[17][1];
+        }
+
+        if (updateCandidate) {
+          vorsorgeLastUpdate = updateCandidate;
+        }
+
+        const filtered = cards.filter((card) => card.title);
+        if (filtered.length) {
+          vorsorgeData = filtered;
+        }
+      } catch (error) {
+        console.warn('Vorsorge Sheet konnte nicht geladen werden, nutze Fallback', error);
+        vorsorgeData = deepClone(defaultVorsorgeCards);
+      }
+    }
+
+    function normalizePortfolioType(value) {
+      const normalized = (value || '')
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/[^a-z0-9]/g, '');
+      if (normalized.includes('faktor')) return 'factor';
+      if (normalized.includes('marketcap') || normalized.includes('marktkap')) return 'marketcap';
+      if (normalized.includes('bip')) return 'bip';
+      if (normalized.includes('obligation')) return 'obligationen';
+      return normalized;
+    }
+
+    function normalizeFieldKey(value) {
+      return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function splitSheetBlocks(rows) {
+      const blocks = [];
+      let current = [];
+      rows.forEach((row) => {
+        const isHeader = normalizeFieldKey(row[0]) === 'feld';
+        if (isHeader && current.length) {
+          blocks.push(current);
+          current = [];
+        }
+        if (row.length) {
+          current.push(row);
+        }
+      });
+      if (current.length) blocks.push(current);
+      return blocks;
+    }
+
+    async function loadPortfolioMetaFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.portfolios);
+        const rows = parseCsv(csvText).filter((r) => r.length);
+        if (!rows.length) return;
+
+        const blocks = splitSheetBlocks(rows);
+        const nextMetaByProduct = blocks.map((block) => {
+          const header = (block[0] || [])
+            .slice(1)
+            .map((v) => normalizePortfolioType(v))
+            .map((key) => (key === 'faktor' ? 'factor' : key));
+          const nextMeta = emptyPortfolioMeta();
+
+          block.slice(1).forEach((row, rowIdx) => {
+            const [fieldRaw, ...values] = row;
+            const normalized = normalizeFieldKey(fieldRaw);
+
+            values.forEach((value, idx) => {
+              const typeKey = normalizePortfolioType(header[idx]);
+              if (!typeKey || !nextMeta[typeKey]) return;
+
+              if (!value) return;
+
+              switch (normalized) {
+                case 'title':
+                case 'titel':
+                case 'name':
+                  nextMeta[typeKey].title = value;
+                  break;
+                case 'summary':
+                case 'beschreibung':
+                case 'desc':
+                  nextMeta[typeKey].summary = value;
+                  break;
+                case 'rendite':
+                case 'renditepa':
+                case 'renditep.a':
+                case 'renditeprojahr':
+                  nextMeta[typeKey].renditePa = value;
+                  break;
+                case 'seit':
+                case 'seitstart':
+                case 'renditeseit':
+                case 'seitjahr':
+                case 'since':
+                  nextMeta[typeKey].seit = value;
+                  break;
+                case 'info':
+                case 'infonebentitel':
+                case 'infonebentitle':
+                case 'infonebentittel':
+                  nextMeta[typeKey].info = value;
+                  break;
+                default:
+                  if (normalized.startsWith('info')) {
+                    nextMeta[typeKey].info = value;
+                  }
+                  break;
+              }
+
+              if (!nextMeta[typeKey].info && rowIdx === 3) {
+                nextMeta[typeKey].info = value;
+              }
+            });
+          });
+
+          return nextMeta;
+        });
+
+        if (nextMetaByProduct.length) {
+          portfolioMetaByProduct = nextMetaByProduct;
+          portfolioMetaFromSheet = true;
+        }
+      } catch (error) {
+        console.warn('Portfolio-Meta Sheet konnte nicht geladen werden, nutze Fallback', error);
+        portfolioMetaByProduct = [deepClone(defaultPortfolioMeta)];
+        portfolioMetaFromSheet = false;
+      }
+    }
+
+    function normalizeListValue(value) {
+      if (!value) return '';
+      const trimmed = String(value).trim();
+      if (!trimmed || trimmed === '—' || trimmed === '-') return '';
+      return trimmed;
+    }
+
+    function normalizePercentText(raw) {
+      const num = parseReturnNumber(raw);
+      const hasNumeric = Number.isFinite(num) && (num !== 0 || /0/.test(String(raw)));
+      if (hasNumeric) {
+        const precision = Math.abs(num) >= 1 && Number.isInteger(num) ? 0 : 2;
+        return `${num.toFixed(precision)}%`;
+      }
+      const cleaned = String(raw || '').trim();
+      return cleaned || '';
+    }
+
+    function normalizePercentPa(raw) {
+      const percent = normalizePercentText(raw);
+      if (!percent) return '';
+      return /p\.?a\.?$/i.test(percent.trim()) ? percent.trim() : `${percent.trim()} p.a.`;
+    }
+
+    function formatReturnLabel(raw, yearsLabel) {
+      const percentText = normalizePercentPa(raw);
+      const suffix = percentText || '—';
+      return `Ø Rendite ${yearsLabel} Jahre: ${suffix}`;
+    }
+
+    async function loadFondsFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.fonds);
+        const rows = parseCsv(csvText).filter((r) => r.length);
+        if (rows.length < 2) throw new Error('Zu wenige Fonds-Zeilen');
+
+        const blocks = splitSheetBlocks(rows);
+        const nextByProduct = [];
+        const nextKryptoByProduct = [];
+
+        const parseBlock = (block) => {
+          const header = block[0] || [];
+          const fieldRows = block.slice(1);
+          const rowAt = (index1Based) => fieldRows[index1Based - 2] || [];
+          const findRow = (key, aliases = []) => {
+            const targets = [key, ...aliases].map(normalizeFieldKey);
+            return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0])));
+          };
+
+          const strategyRow = findRow('strategie');
+          const sortRow = findRow('sortierung');
+          const nextData = {
+            factor: [],
+            marketcap: [],
+            bip: [],
+            obligationen: [],
+          };
+          let nextKrypto = null;
+
+          const getFieldRow = (name, aliases = []) => {
+            const targets = [name, ...aliases].map(normalizeFieldKey);
+            return fieldRows.find((r) => targets.includes(normalizeFieldKey(r[0]))) || [];
+          };
+
+          const preferRow = (...candidates) =>
+            candidates.find((row) => Array.isArray(row) && row.length > 1 && row.some(Boolean)) || [];
+
+          const fondsNameRow = getFieldRow('fondsname');
+          const isKryptoColumn = (strategyValue, titleValue, columnLabel) => {
+            const normalizedStrategy = String(strategyValue || '').toLowerCase();
+            if (normalizedStrategy === 'krypto') return true;
+            const normalizedColumn = String(columnLabel || '').toLowerCase();
+            if (normalizedColumn.includes('krypto')) return true;
+            const normalizedTitle = String(titleValue || '').toLowerCase();
+            return normalizedTitle.includes('krypto') || normalizedTitle.includes('bitcoin');
+          };
+
+          const rendite5Row = preferRow(
+            rowAt(6),
+            getFieldRow('rendite5', [
+              'durchschnittsrendite 5 jahre',
+              'durchschnittsrendite5jahre',
+              'durchschnittsrendite5 jahr',
+            ])
+          );
+
+          const rendite10Row = preferRow(
+            rowAt(7),
+            getFieldRow('rendite10', ['durchschnittsrendite 10 jahre'])
+          );
+
+          const pro1Row = preferRow(rowAt(9), findRow('pro1'), getFieldRow('fondsvolumen'));
+          const pro2Row = preferRow(rowAt(10), findRow('pro2'), getFieldRow('positionen'));
+          const pro3Row = preferRow(rowAt(11), findRow('pro3'), getFieldRow('auflage seit'));
+          const con1Row = preferRow(rowAt(12), findRow('con1'), getFieldRow('beschreibung'));
+
+          header.slice(1).forEach((colLabel, colIdx) => {
+            const col = colIdx + 1;
+            const strategy = (strategyRow?.[col] || '').toLowerCase();
+            const title = fondsNameRow[col] || '';
+            const isKrypto = isKryptoColumn(strategy, title, colLabel);
+
+            if (!nextData[strategy] && !isKrypto) {
+              return;
+            }
+
+            const sortOrder = parseInt(sortRow?.[col] || '', 10) || colIdx + 1;
+
+            if (isKrypto) {
+              const kFund = {
+                ...deepClone(defaultKryptoFund),
+                title: title || defaultKryptoFund.title,
+                desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || defaultKryptoFund.desc,
+                fondsvolumen: normalizeListValue(pro1Row?.[col]) || defaultKryptoFund.fondsvolumen,
+                positionen: normalizeListValue(pro2Row?.[col]) || defaultKryptoFund.positionen,
+                auflageSeit: normalizeListValue(pro3Row?.[col]) || defaultKryptoFund.auflageSeit,
+                returns5: normalizePercentPa(rendite5Row[col] || defaultKryptoFund.returns5),
+                returns10: normalizePercentPa(rendite10Row[col] || defaultKryptoFund.returns10),
+                allocation: 5,
+                since: getFieldRow('since')[col] || defaultKryptoFund.since,
+                factsheet: getFieldRow('factsheet')[col] || defaultKryptoFund.factsheet,
+                sortOrder,
+                isKrypto: true,
+              };
+              nextKrypto = kFund;
+              return;
+            }
+
+            if (!title) return;
+
+            const fund = {
+              title,
+              desc: normalizeListValue(con1Row?.[col]) || getFieldRow('beschreibung')[col] || '',
+              fondsvolumen: normalizeListValue(pro1Row?.[col]) || '',
+              positionen: normalizeListValue(pro2Row?.[col]) || '',
+              auflageSeit: normalizeListValue(pro3Row?.[col]) || '',
+              returns5: normalizePercentPa(rendite5Row[col] || ''),
+              returns10: normalizePercentPa(rendite10Row[col] || ''),
+              allocation: Number(getFieldRow('allocation')[col] || 0),
+              since: getFieldRow('since')[col] || '',
+              factsheet: getFieldRow('factsheet')[col] || '',
+              sortOrder,
+            };
+
+            nextData[strategy].push(fund);
+          });
+
+          Object.keys(nextData).forEach((key) => {
+            nextData[key].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+            nextData[key].forEach((item) => delete item.sortOrder);
+          });
+
+          return { data: nextData, krypto: nextKrypto };
+        };
+
+        blocks.forEach((block) => {
+          const parsed = parseBlock(block);
+          if (!parsed) return;
+          nextByProduct.push(parsed.data);
+          nextKryptoByProduct.push(parsed.krypto || deepClone(defaultKryptoFund));
+        });
+
+        const hasAny = nextByProduct.some((data) => Object.values(data).some((arr) => arr.length));
+        portfolioDataByProduct = nextByProduct;
+        kryptoFundsByProduct = nextKryptoByProduct;
+        portfolioDataFromSheet = true;
+        if (hasAny) {
+          persistPortfolioData();
+        }
+      } catch (error) {
+        console.warn('Fonds Sheet konnte nicht geladen werden, nutze Fallback/LocalStorage', error);
+      }
+    }
+
+    async function loadBeraterFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.berater);
+        const rows = parseCsv(csvText).filter((r) => r.length);
+        if (rows.length < 2) throw new Error('Keine Berater-Zeilen');
+
+        const header = rows[0].slice(1).map((key) => key.trim());
+        const fieldRows = rows.slice(1);
+        const advisors = header.map((key) => ({ key: key.toLowerCase().trim() }));
+
+        const normalizeKey = (key) => String(key || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+        const fieldMap = {};
+        fieldRows.forEach(([field, ...values]) => {
+          fieldMap[normalizeKey(field)] = values;
+        });
+
+        const getFieldValues = (name, aliases = []) => {
+          const keys = [name, ...aliases].map(normalizeKey);
+          for (const key of keys) {
+            if (fieldMap[key]) return fieldMap[key];
+          }
+          return [];
+        };
+
+        const nameRow = getFieldValues('name');
+        const roleRow = getFieldValues('rolle', ['funktion', 'role']);
+        const descRow = getFieldValues('kurzbeschreibung', ['beschreibung']);
+        const eduRow = getFieldValues('educationtext', ['education', 'ausbildung']);
+        const codeRow = getFieldValues('codeofconducttext', ['codeofconduct', 'conduct']);
+        const terminLinkRow = getFieldValues('terminlink', ['calendly', 'termin']);
+        const terminHinweisRow = getFieldValues('terminhinweis', ['hinweis']);
+
+        // Primär: feste Zeile 9 (Index 8) Spalten B–D für Avatar-URLs
+        const avatarRowFromRow9 = rows[8] ? rows[8].slice(1).map((cell) => (cell || '').trim()) : [];
+        let avatarRow = avatarRowFromRow9;
+
+        // Fallback: explizite "Avatar URL"-Zeile falls Zeile 9 leer ist
+        const avatarRowFallback = getFieldValues('avatarurl', ['avatar', 'profilbild', 'bildurl']);
+        const avatarRowFallbackTrimmed = avatarRowFallback.map((cell) => (cell || '').trim());
+        const row9HasData = avatarRowFromRow9.some((val) => val);
+        if (!row9HasData && avatarRowFallbackTrimmed.length) {
+          avatarRow = avatarRowFallbackTrimmed;
+        }
+
+        advisors.forEach((advisor, idx) => {
+          advisor.name = (nameRow[idx] || '').trim();
+          advisor.role = (roleRow[idx] || '').trim();
+          advisor.description = (descRow[idx] || '').trim();
+          advisor.educationText = (eduRow[idx] || '').trim();
+          advisor.codeOfConductText = (codeRow[idx] || '').trim();
+          advisor.terminLink = (terminLinkRow[idx] || '').trim();
+          advisor.terminHinweis = (terminHinweisRow[idx] || '').trim();
+          advisor.avatarUrl = (avatarRow[idx] || '').trim();
+        });
+
+        const filtered = advisors.filter((a) => a.name);
+        if (filtered.length) {
+          advisorData = filtered;
+        }
+      } catch (error) {
+        console.warn('Berater Sheet konnte nicht geladen werden, nutze Fallback', error);
+        advisorData = deepClone(defaultAdvisors);
+      }
+    }
+
+    async function loadAblaufFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.ablauf);
+        const rows = parseCsv(csvText).filter((r) => r.some((cell) => cell !== ''));
+        if (!rows.length) return;
+
+        const next = { konservativ: [], mittel: [], aggressiv: [] };
+        let currentRisk = null;
+
+        rows.forEach((row) => {
+          const header = (row[0] || '').toLowerCase();
+          if (header === 'assetklasse') {
+            const riskCell = (row.findLast((cell) => cell !== '') || '').toLowerCase();
+            const normalized = riskCell.replace(/[^a-z]/g, '');
+            currentRisk = normalized || null;
+            return;
+          }
+
+          if (!currentRisk || !next[currentRisk]) return;
+          const asset = row[0];
+          if (!asset) return;
+
+          const years = row.slice(1, 11).map((val) => val || '');
+          next[currentRisk].push([asset, ...years]);
+        });
+
+        if (Object.values(next).some((arr) => arr.length)) {
+          ablaufData = next;
+          persistAblaufData();
+        }
+      } catch (error) {
+        console.warn('Ablaufmanagement Sheet konnte nicht geladen werden, nutze Fallback/LocalStorage', error);
+      }
+    }
+
+    async function loadUpdatesFromSheet() {
+      try {
+        const csvText = await fetchSheetCsv(SHEET_GIDS.updates);
+        const rows = parseCsv(csvText)
+          .map((row) => row.join(' ').trim())
+          .filter(Boolean);
+
+        const next = deepClone(defaultUpdatesData);
+        if (rows[0]) next.disclaimerPrimary = rows[0];
+        if (rows[1]) next.disclaimerSecondary = rows[1];
+        if (rows[2]) next.infoNotice = rows[2];
+        if (rows[3]) next.infoTimestamp = rows[3];
+        updatesData = next;
+      } catch (error) {
+        console.warn('Updates Sheet konnte nicht geladen werden, nutze Fallback', error);
+        updatesData = deepClone(defaultUpdatesData);
+      }
+    }
+
+    function setDisclaimerText(el, text) {
+      if (!el || !text) return;
+      const [label, ...rest] = text.split(':');
+      if (rest.length) {
+        el.innerHTML = '';
+        const strong = document.createElement('strong');
+        strong.textContent = `${label.trim()}:`;
+        el.appendChild(strong);
+        const tail = rest.join(':').trim();
+        if (tail) el.appendChild(document.createTextNode(` ${tail}`));
+      } else {
+        el.textContent = text;
+      }
+    }
+
+    function applyUpdatesData() {
+      const disclaimer1 = document.querySelector('footer p:nth-of-type(1)');
+      const disclaimer2 = document.querySelector('footer p:nth-of-type(2)');
+      const infoNotice = document.querySelector('.info-panel span[data-editable]');
+      const infoTimeText = document.querySelector('.info-time span[data-editable]');
+
+      setDisclaimerText(disclaimer1, updatesData.disclaimerPrimary);
+      if (disclaimer2) {
+        disclaimer2.textContent = updatesData.disclaimerSecondary;
+      }
+      if (infoNotice) {
+        infoNotice.textContent = updatesData.infoNotice;
+      }
+      const chosenTimestamp = (vorsorgeLastUpdate || updatesData.infoTimestamp || '').replace(/^🕒\s*/, '').trim();
+
+      if (infoTimeText && chosenTimestamp) {
+        infoTimeText.textContent = chosenTimestamp;
+      }
+
+      if (updateTrigger && chosenTimestamp) {
+        const lastUpdate = chosenTimestamp.replace(/^Stand:\s*/i, '').trim();
+        updateTrigger.textContent = `Letztes Update: ${lastUpdate}`;
+      }
+    }
+
+    function renderVorsorgeCards(records) {
+      const grid = document.getElementById('vorsorgeGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      records.forEach((card, index) => {
+        const article = document.createElement('article');
+        article.className = 'vorsorge-card';
+        article.classList.toggle('is-active', index === activeVorsorgeIndex);
+        if (card.accent) {
+          article.style.setProperty('--card-accent', card.accent);
+        }
+        if (hasNewTag(card.title)) {
+          article.classList.add('is-new');
+        }
+        article.addEventListener('click', (event) => {
+          if (event.target.closest('a, button, input, textarea, select')) return;
+          setActiveVorsorgeIndex(index);
+        });
+
+        if (card.logo) {
+          const logoImg = document.createElement('img');
+          logoImg.src = card.logo;
+          logoImg.alt = `${card.title} Logo`;
+          logoImg.className = 'vorsorge-logo';
+          article.appendChild(logoImg);
+        }
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'vorsorge-title-row';
+
+        const h3 = document.createElement('h3');
+        h3.textContent = stripNewTag(card.title);
+        attachEditable(h3, `vorsorge-${index}-title`, (value) => {
+          vorsorgeData[index].title = value;
+        });
+        titleRow.appendChild(h3);
+
+        if (hasNewTag(card.title)) {
+          const inlineBadge = document.createElement('span');
+          inlineBadge.className = 'new-badge inline';
+          inlineBadge.textContent = 'Neu';
+          titleRow.appendChild(inlineBadge);
+        }
+
+        const desc = document.createElement('p');
+        desc.textContent = card.description;
+        attachEditable(desc, `vorsorge-${index}-desc`, (value) => {
+          vorsorgeData[index].description = value;
+        });
+
+        const metaDiv = document.createElement('div');
+        metaDiv.className = 'meta';
+        const spanProd = document.createElement('span');
+        spanProd.innerHTML = `<strong>Produktkosten:</strong> ${card.produktkosten || ''}`;
+        attachEditable(spanProd, `vorsorge-${index}-produkt`, (value) => {
+          vorsorgeData[index].produktkosten = value.replace(/^Produktkosten:\s*/i, '');
+        });
+        const spanGeb = document.createElement('span');
+        spanGeb.innerHTML = `<strong>Weitere Gebühren:</strong> ${card.weitereGebuehren || ''}`;
+        attachEditable(spanGeb, `vorsorge-${index}-gebuehren`, (value) => {
+          vorsorgeData[index].weitereGebuehren = value.replace(/^Weitere Gebühren:\s*/i, '');
+        });
+        metaDiv.appendChild(spanProd);
+        metaDiv.appendChild(spanGeb);
+
+        const details = document.createElement('div');
+        details.className = 'details collapsible';
+        details.hidden = true;
+        const detailsId = `vorsorge-details-${index}`;
+        details.id = detailsId;
+
+        const link = document.createElement('a');
+        link.href = '#';
+        link.className = 'toggle-details cta-btn cta-primary';
+        link.dataset.targetId = detailsId;
+        link.setAttribute('aria-expanded', 'false');
+        link.setAttribute('aria-label', `Mehr erfahren zu ${card.title}`);
+        const linkLabel = document.createElement('span');
+        linkLabel.className = 'btn-label';
+        linkLabel.textContent = 'Mehr erfahren';
+        link.appendChild(linkLabel);
+
+        const websiteBtn = document.createElement('a');
+        websiteBtn.className = 'cta-btn cta-secondary';
+        websiteBtn.textContent = 'Website';
+        const websiteHref = card.website || card.link;
+        websiteBtn.href = websiteHref || '#';
+        websiteBtn.target = '_blank';
+        websiteBtn.rel = 'noreferrer';
+        websiteBtn.setAttribute('aria-label', `Website von ${card.title} öffnen`);
+        if (!websiteHref) {
+          websiteBtn.classList.add('is-disabled');
+        }
+
+        const actionWrap = document.createElement('div');
+        actionWrap.className = 'vorsorge-actions';
+        actionWrap.appendChild(link);
+        actionWrap.appendChild(websiteBtn);
+
+        const vTitle = document.createElement('h4');
+        vTitle.textContent = 'Vorteile';
+        attachEditable(vTitle, `vorsorge-${index}-v-title`);
+        const vList = document.createElement('ul');
+        (card.vorteile || []).forEach((vText, vIdx) => {
+          const li = document.createElement('li');
+          li.className = 'benefit';
+          li.textContent = vText;
+          attachEditable(li, `vorsorge-${index}-vorteil-${vIdx}`, (value) => {
+            vorsorgeData[index].vorteile[vIdx] = value;
+          });
+          vList.appendChild(li);
+        });
+
+        const nTitle = document.createElement('h4');
+        nTitle.textContent = 'Nachteile';
+        attachEditable(nTitle, `vorsorge-${index}-n-title`);
+        const nList = document.createElement('ul');
+        (card.nachteile || []).forEach((nText, nIdx) => {
+          const li = document.createElement('li');
+          li.className = 'drawback';
+          li.textContent = nText;
+          attachEditable(li, `vorsorge-${index}-nachteil-${nIdx}`, (value) => {
+            vorsorgeData[index].nachteile[nIdx] = value;
+          });
+          nList.appendChild(li);
+        });
+
+        details.appendChild(vTitle);
+        details.appendChild(vList);
+        details.appendChild(nTitle);
+        details.appendChild(nList);
+
+        article.appendChild(titleRow);
+        article.appendChild(desc);
+        article.appendChild(metaDiv);
+        article.appendChild(actionWrap);
+        article.appendChild(details);
+
+        grid.appendChild(article);
+      });
+
+      bindDetailsToggles();
+    }
+
+    async function loadFromSheets() {
+      await Promise.all([
+        loadVorsorgeFromSheet(),
+        loadPortfolioMetaFromSheet(),
+        loadFondsFromSheet(),
+        loadBeraterFromSheet(),
+        loadAblaufFromSheet(),
+        loadUpdatesFromSheet(),
+      ]);
+    }
+
+    function parseReturnNumber(text) {
+      if (!text) return 0;
+      const matches = String(text).match(/-?\d[\d.,]*/g);
+      if (!matches || !matches.length) return 0;
+      const normalized = matches[matches.length - 1].replace(/[^\d.,-]/g, '').replace(',', '.');
+      const value = Number(normalized);
+      return Number.isFinite(value) ? value : 0;
+    }
+
+    function computeWeightedReturn(funds) {
+      const totals = funds.reduce(
+        (acc, item) => {
+          const val = parseReturnNumber(item.returns5);
+          acc.weighted += val * (item.allocation || 0);
+          acc.total += item.allocation || 0;
+          return acc;
+        },
+        { weighted: 0, total: 0 }
+      );
+      if (!totals.total) return 0;
+      return totals.weighted / totals.total;
+    }
+
+    let editableRefreshQueued = false;
+    function queueRefreshEditableState() {
+      if (editableRefreshQueued) return;
+      editableRefreshQueued = true;
+      requestAnimationFrame(() => {
+        editableRefreshQueued = false;
+        refreshEditableState();
+      });
+    }
+
+    function playAnimation(el, className = 'animate-in') {
+      if (!el) return;
+      el.classList.remove(className);
+      // force reflow so successive animations retrigger
+      void el.offsetWidth;
+      el.classList.add(className);
+      el.addEventListener(
+        'animationend',
+        () => {
+          el.classList.remove(className);
+        },
+        { once: true }
+      );
+    }
+
+    function pulseElement(el) {
+      playAnimation(el, 'pulse-once');
+    }
+
+    function animateLabelSwap(button, nextText) {
+      if (!button) return;
+      const label = button.querySelector('.btn-label') || button;
+      const currentText = label.textContent;
+      if (currentText === nextText) return;
+
+      if (button.classList.contains('cta-btn')) {
+        label.classList.add('is-fading');
+        requestAnimationFrame(() => {
+          label.textContent = nextText;
+          label.classList.remove('is-fading');
+        });
+        return;
+      }
+
+      const ghost = button.cloneNode(true);
+      ghost.style.visibility = 'hidden';
+      ghost.style.position = 'absolute';
+      ghost.style.width = 'auto';
+      ghost.style.whiteSpace = 'nowrap';
+      const ghostLabel = ghost.querySelector('.btn-label') || ghost;
+      ghostLabel.textContent = currentText;
+      document.body.appendChild(ghost);
+      const currentWidth = ghost.getBoundingClientRect().width;
+      ghostLabel.textContent = nextText;
+      const targetWidth = ghost.getBoundingClientRect().width;
+      document.body.removeChild(ghost);
+
+      button.classList.add('label-animating');
+      button.style.width = `${currentWidth}px`;
+
+      requestAnimationFrame(() => {
+        label.textContent = nextText;
+        button.style.width = `${targetWidth}px`;
+      });
+
+      const cleanup = (event) => {
+        if (event && event.propertyName !== 'width') return;
+        button.style.width = '';
+        button.classList.remove('label-animating');
+        button.removeEventListener('transitionend', cleanup);
+      };
+
+      button.addEventListener('transitionend', cleanup);
+    }
+
+    function animateCollapsible(panel, open, onDone) {
+      if (!panel) return;
+      panel.classList.add('collapsible');
+      const alreadyOpen = !panel.hasAttribute('hidden');
+      if (open === alreadyOpen) {
+        if (open) panel.classList.add('is-open');
+        if (typeof onDone === 'function') onDone();
+        return;
+      }
+
+      const startHeight = panel.getBoundingClientRect().height || 0;
+      let targetHeight = panel.scrollHeight;
+
+      const finish = (event) => {
+        if (event && event.propertyName !== 'height') return;
+        if (open) {
+          panel.style.height = 'auto';
+          panel.classList.add('is-open');
+        } else {
+          panel.setAttribute('hidden', '');
+          panel.style.display = 'none';
+          panel.style.height = '';
+          panel.classList.remove('is-open');
+        }
+        panel.removeEventListener('transitionend', finish);
+        if (typeof onDone === 'function') onDone();
+      };
+
+      if (open) {
+        panel.removeAttribute('hidden');
+        panel.style.display = 'block';
+        targetHeight = panel.scrollHeight;
+        panel.style.height = '0px';
+        panel.style.opacity = '0';
+        requestAnimationFrame(() => {
+          panel.style.height = `${targetHeight}px`;
+          panel.style.opacity = '1';
+          panel.classList.add('is-open');
+        });
+      } else {
+        const fromHeight = startHeight || targetHeight;
+        panel.style.height = `${fromHeight}px`;
+        panel.style.opacity = '1';
+        requestAnimationFrame(() => {
+          panel.style.height = '0px';
+          panel.style.opacity = '0';
+          panel.classList.remove('is-open');
+        });
+      }
+
+      panel.addEventListener('transitionend', finish);
+    }
+
+    function hasNewTag(value) {
+      return /\(neu\)/i.test(String(value || ''));
+    }
+
+    function stripNewTag(value) {
+      return String(value || '').replace(/\s*\(neu\)\s*/gi, ' ').replace(/\s{2,}/g, ' ').trim();
+    }
+
+    function applyNewBadge(container, value, options = {}) {
+      if (!container || !hasNewTag(value)) return;
+      container.classList.add('is-new');
+      const badge = document.createElement('span');
+      badge.className = 'new-badge';
+      badge.textContent = 'Neu';
+      if (options.offsetLogo) {
+        badge.classList.add('offset-logo');
+      }
+      container.appendChild(badge);
+    }
+
+    function buildPortfolioView(type) {
+      const activeData = getActivePortfolioData();
+      const baseList = (activeData[type] || []).map((item, idx) => ({
+        ...item,
+        __idx: idx,
+        isKrypto: false,
+      }));
+
+      if (!kryptoActive) return baseList;
+
+      const deductionTotal = 5;
+      const adjusted = baseList.map((item) => ({ ...item }));
+      let remaining = deductionTotal;
+
+      // verteile Abzug nur auf Fonds mit mehr als 1 % Allokation, ohne sie unter 1 % zu drücken
+      const eligible = adjusted.filter((item) => item.allocation > 1);
+      while (remaining > 0 && eligible.some((f) => f.allocation > 1)) {
+        eligible.forEach((fund) => {
+          if (remaining <= 0) return;
+          if (fund.allocation > 1) {
+            fund.allocation = Math.max(1, fund.allocation - 1);
+            remaining -= 1;
+          }
+        });
+      }
+
+      adjusted.push({
+        ...getActiveKryptoFund(),
+        allocation: deductionTotal,
+        __idx: -1,
+        isKrypto: true,
+      });
+
+      return adjusted;
+    }
+
+    function drawDonut(canvas, allocations, highlightIndex = null, progress = 1) {
+      const ctx = canvas.getContext('2d');
+      const total = allocations.reduce((sum, item) => sum + item.value, 0) || 1;
+      const baseRadius = Math.min(canvas.width, canvas.height) / 2 - 8;
+      const radius = baseRadius * Math.max(0.12, progress);
+      const innerRadius = Math.max(6, baseRadius * 0.65 * Math.max(0.12, progress));
+      let startAngle = -Math.PI / 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      allocations.forEach((slice, idx) => {
+        const angle = (slice.value / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height / 2);
+        ctx.arc(canvas.width / 2, canvas.height / 2, radius, startAngle, startAngle + angle);
+        ctx.closePath();
+        ctx.fillStyle = slice.color;
+        ctx.fill();
+        if (highlightIndex === idx) {
+          ctx.save();
+          ctx.lineWidth = 8 * Math.max(0.45, progress);
+          ctx.strokeStyle = hexToRgba(slice.color, 0.9);
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, canvas.height / 2, Math.max(2, radius - 2), startAngle, startAngle + angle);
+          ctx.stroke();
+          ctx.restore();
+        }
+        startAngle += angle;
+      });
+      ctx.beginPath();
+      ctx.fillStyle = '#ffffff';
+      ctx.arc(canvas.width / 2, canvas.height / 2, innerRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function animateDonut(canvas, allocations, duration = 720) {
+      const start = performance.now();
+      const animate = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        drawDonut(canvas, allocations, null, eased);
+        if (t < 1) requestAnimationFrame(animate);
+      };
+      requestAnimationFrame(animate);
+    }
+
+    function persistPortfolioData() {
+      persistJson(STORAGE_KEYS.portfolios, portfolioDataByProduct);
+    }
+
+    function persistAblaufData() {
+      persistJson(STORAGE_KEYS.ablauf, ablaufData);
+    }
+
+    let pendingPortfolioType = null;
+    let portfolioRenderScheduled = false;
+
+    function renderPortfolios(type) {
+      pendingPortfolioType = type;
+      if (portfolioRenderScheduled) return;
+      portfolioRenderScheduled = true;
+      requestAnimationFrame(() => {
+        portfolioRenderScheduled = false;
+        const nextType = pendingPortfolioType || type;
+        pendingPortfolioType = null;
+        renderPortfoliosNow(nextType);
+      });
+    }
+
+    function renderPortfoliosNow(type) {
+      const list = document.getElementById('portfolioList');
+      list.innerHTML = '';
+      const meta = getActivePortfolioMeta()[type];
+      syncKryptoToggle(type);
+      const hasMetaTitle = Boolean(String(meta?.title || '').trim());
+      if (!hasMetaTitle) {
+        queueRefreshEditableState();
+        return;
+      }
+
+      const shell = document.createElement('div');
+      shell.className = 'portfolio-shell';
+      applyNewBadge(shell, meta.title);
+      const toggle = document.createElement('div');
+      toggle.className = 'portfolio-toggle';
+      const infoChipHtml = meta.info
+        ? `<span class="portfolio-info-chip" data-editable="true">${meta.info}</span>`
+        : '';
+      toggle.innerHTML = `<div class="portfolio-toggle-text"><span class="portfolio-title" data-editable="true">${stripNewTag(meta.title)}</span>${infoChipHtml}</div>`;
+      const titleSpan = toggle.querySelector('.portfolio-title');
+      attachEditable(titleSpan, `${activeVorsorgeIndex}-${type}-title`, (value) => {
+        const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+        productMeta[type].title = value;
+        renderPortfolios(type);
+      });
+      const infoChip = toggle.querySelector('.portfolio-info-chip');
+      if (infoChip) {
+        attachEditable(infoChip, `${activeVorsorgeIndex}-${type}-info`, (value) => {
+          const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+          productMeta[type].info = value;
+          renderPortfolios(type);
+        });
+      }
+      const content = document.createElement('div');
+      content.style.display = 'block';
+      shell.classList.add('open');
+
+      const summary = document.createElement('div');
+      summary.className = 'portfolio-summary';
+      const chartWrap = document.createElement('div');
+      chartWrap.className = 'chart-wrap';
+      const chartVisual = document.createElement('div');
+      chartVisual.className = 'chart-visual';
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 200;
+      const legend = document.createElement('div');
+      legend.className = 'chart-legend';
+
+      const viewFunds = buildPortfolioView(type);
+      let paletteIndex = 0;
+      const allocations = viewFunds.map((item, index) => {
+        const color = item.isKrypto ? KRYPT0_COLOR : SHIMMER_COLORS[paletteIndex % SHIMMER_COLORS.length];
+        if (!item.isKrypto) paletteIndex += 1;
+        return {
+          label: item.title,
+          value: item.allocation,
+          color,
+          index,
+          baseIndex: item.__idx,
+          isKrypto: item.isKrypto,
+        };
+      });
+
+      const weightedReturn = computeWeightedReturn(viewFunds);
+
+      const flashSlice = (idx) => {
+        drawDonut(canvas, allocations, idx);
+        setTimeout(() => drawDonut(canvas, allocations), 900);
+      };
+
+      allocations.forEach((entry) => {
+        const li = document.createElement('div');
+        li.className = 'legend-item';
+        const left = document.createElement('div');
+        left.style.display = 'flex';
+        left.style.alignItems = 'center';
+        left.style.gap = '8px';
+        const dot = document.createElement('span');
+        dot.className = 'legend-dot';
+        dot.style.background = entry.color;
+        const label = document.createElement('span');
+        label.textContent = stripNewTag(entry.label);
+        if (entry.baseIndex >= 0) {
+          label.dataset.editable = 'true';
+          bindEditableSync(label, type, entry.baseIndex, 'title', true, activeVorsorgeIndex);
+        }
+        left.appendChild(dot);
+        left.appendChild(label);
+        const value = document.createElement('span');
+        value.textContent = `${entry.value}%`;
+        li.style.cursor = 'pointer';
+        li.addEventListener('click', () => {
+          flashSlice(entry.index);
+          const target = document.getElementById(`fund-${type}-${entry.baseIndex >= 0 ? entry.baseIndex : 'krypto'}`);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('fund-highlight');
+            setTimeout(() => target.classList.remove('fund-highlight'), 900);
+          }
+        });
+        li.appendChild(left);
+        li.appendChild(value);
+        legend.appendChild(li);
+      });
+
+      const centerLabel = document.createElement('div');
+      centerLabel.className = 'chart-center-label';
+      const topLabel = document.createElement('div');
+      topLabel.className = 'label-top';
+      topLabel.textContent = 'Rendite';
+      const mainLabel = document.createElement('div');
+      mainLabel.className = 'label-value';
+      const hasReturn = viewFunds.some((fund) => parseReturnNumber(fund.returns5));
+      const computedLabel = hasReturn && Number.isFinite(weightedReturn)
+        ? `${weightedReturn.toFixed(2)}% p.a.`
+        : '—';
+      mainLabel.textContent = computedLabel;
+      const subLabel = document.createElement('div');
+      subLabel.className = 'label-sub';
+      const seitValue = (meta.seit || '').trim();
+      subLabel.textContent = seitValue ? `Seit ${seitValue.replace(/^seit\s*/i, '')}` : '';
+      attachEditable(subLabel, `${activeVorsorgeIndex}-${type}-seit`, (value) => {
+        const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+        productMeta[type].seit = value;
+        renderPortfolios(type);
+      });
+      centerLabel.appendChild(topLabel);
+      centerLabel.appendChild(mainLabel);
+      centerLabel.appendChild(subLabel);
+
+      chartVisual.appendChild(canvas);
+      chartVisual.appendChild(centerLabel);
+      chartWrap.appendChild(chartVisual);
+      const legendColumn = document.createElement('div');
+      legendColumn.className = 'chart-legend-col';
+      legendColumn.appendChild(legend);
+      const infoStack = document.createElement('div');
+      infoStack.className = 'portfolio-meta-copy';
+      if (meta.summary) {
+        const p = document.createElement('p');
+        p.textContent = meta.summary;
+        attachEditable(p, `${activeVorsorgeIndex}-${type}-summary`, (value) => {
+          const productMeta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+          productMeta[type].summary = value;
+        });
+        infoStack.appendChild(p);
+      }
+      legendColumn.appendChild(infoStack);
+      chartWrap.appendChild(legendColumn);
+
+      summary.appendChild(chartWrap);
+
+      const fundsWrapper = document.createElement('div');
+      fundsWrapper.className = 'funds-wrapper';
+
+      viewFunds.forEach((item, index) => {
+        const fund = document.createElement('div');
+        fund.className = 'portfolio-item';
+        applyNewBadge(fund, item.title);
+        const fundId = item.__idx >= 0 ? `fund-${type}-${item.__idx}` : `fund-${type}-krypto`;
+        fund.id = fundId;
+
+        const colorEntry = allocations[index];
+        const tintColor = colorEntry ? colorEntry.color : '#eef2f8';
+        fund.style.background = `linear-gradient(145deg, ${hexToRgba(tintColor, 0.24)}, ${hexToRgba(tintColor, 0.12)}), rgba(255, 255, 255, 0.9)`;
+        fund.style.border = `1px solid ${hexToRgba(tintColor, 0.32)}`;
+        fund.style.boxShadow = `0 12px 24px ${hexToRgba(tintColor, 0.18)}`;
+        fund.style.color = '#0f1a2a';
+
+        fund.addEventListener('click', (event) => {
+          if (event.target.closest('button, a, input, textarea, select')) return;
+          flashSlice(index);
+          fund.classList.add('fund-highlight');
+          setTimeout(() => fund.classList.remove('fund-highlight'), 900);
+        });
+
+        const header = document.createElement('div');
+        header.className = 'fund-header';
+
+        const title = document.createElement('h4');
+        title.textContent = stripNewTag(item.title);
+        if (item.__idx >= 0) {
+          bindEditableSync(title, type, item.__idx, 'title', true, activeVorsorgeIndex);
+        } else {
+          attachEditable(title, `krypto-${activeVorsorgeIndex}-title`, (value) => {
+            getActiveKryptoFund().title = value;
+          });
+        }
+        header.appendChild(title);
+
+        const returns = document.createElement('div');
+        returns.className = 'meta';
+        const five = document.createElement('span');
+        const displayR5 = formatReturnLabel(item.returns5, 5);
+        five.textContent = displayR5;
+        if (item.__idx >= 0) {
+          bindEditableSync(five, type, item.__idx, 'returns5', false, activeVorsorgeIndex);
+        } else {
+          attachEditable(five, `krypto-${activeVorsorgeIndex}-returns5`, (value) => {
+            getActiveKryptoFund().returns5 = value;
+          });
+        }
+        const ten = document.createElement('span');
+        const displayR10 = formatReturnLabel(item.returns10, 10);
+        ten.textContent = displayR10;
+        if (item.__idx >= 0) {
+          bindEditableSync(ten, type, item.__idx, 'returns10', false, activeVorsorgeIndex);
+        } else {
+          attachEditable(ten, `krypto-${activeVorsorgeIndex}-returns10`, (value) => {
+            getActiveKryptoFund().returns10 = value;
+          });
+        }
+        returns.appendChild(five);
+        returns.appendChild(ten);
+
+        const since = document.createElement('span');
+        since.className = 'section-sub';
+        since.textContent = item.since;
+        if (item.__idx >= 0) {
+          bindEditableSync(since, type, item.__idx, 'since', false, activeVorsorgeIndex);
+        } else {
+          attachEditable(since, `krypto-${activeVorsorgeIndex}-since`, (value) => {
+            getActiveKryptoFund().since = value;
+          });
+        }
+
+        const allocationRow = document.createElement('div');
+        allocationRow.className = 'allocation-row';
+        const allocationLabel = document.createElement('div');
+        allocationLabel.innerHTML = `<strong>Allokation:</strong> <span class="allocation-value">${item.allocation}%</span>`;
+        const allocationInput = document.createElement('input');
+        allocationInput.type = 'number';
+        allocationInput.className = 'allocation-input';
+        allocationInput.value = item.allocation;
+        allocationInput.min = 0;
+        allocationInput.max = 100;
+        allocationInput.step = 1;
+        allocationInput.style.display = 'none';
+        allocationInput.disabled = kryptoActive;
+        allocationInput.addEventListener('input', () => {
+          const newVal = Number(allocationInput.value) || 0;
+          const data = getActivePortfolioData();
+          data[type][item.__idx].allocation = newVal;
+          persistPortfolioData();
+          renderPortfolios(type);
+        });
+        allocationRow.appendChild(allocationLabel);
+        allocationRow.appendChild(allocationInput);
+
+        const stats = document.createElement('div');
+        stats.className = 'fund-stats';
+        const statEntries = [
+          { label: 'Fondsvolumen', key: 'fondsvolumen' },
+          { label: 'Positionen', key: 'positionen' },
+          { label: 'Auflage seit', key: 'auflageSeit' },
+        ];
+        statEntries.forEach((entry) => {
+          const value = item[entry.key] || '';
+          if (!value) return;
+          const stat = document.createElement('div');
+          stat.className = 'fund-stat';
+          const strong = document.createElement('strong');
+          strong.textContent = `${entry.label}:`;
+          const span = document.createElement('span');
+          span.textContent = value;
+          if (item.__idx >= 0) {
+            bindEditableSync(span, type, item.__idx, entry.key, false, activeVorsorgeIndex);
+          } else {
+            attachEditable(span, `krypto-${activeVorsorgeIndex}-${entry.key}`, (val) => {
+              getActiveKryptoFund()[entry.key] = val;
+            });
+          }
+          stat.appendChild(strong);
+          stat.appendChild(span);
+          stats.appendChild(stat);
+        });
+
+        const descrBlock = document.createElement('div');
+        descrBlock.className = 'fund-description';
+        descrBlock.textContent = item.desc || '';
+        if (item.__idx >= 0) {
+          bindEditableSync(descrBlock, type, item.__idx, 'desc', false, activeVorsorgeIndex);
+        } else {
+          attachEditable(descrBlock, `krypto-${activeVorsorgeIndex}-desc`, (value) => {
+            getActiveKryptoFund().desc = value;
+          });
+        }
+
+        const detailsWrapper = document.createElement('div');
+        detailsWrapper.className = 'fund-details collapsible';
+        detailsWrapper.hidden = true;
+        detailsWrapper.appendChild(stats);
+        detailsWrapper.appendChild(descrBlock);
+
+        const toggleDetails = document.createElement('button');
+        toggleDetails.type = 'button';
+        toggleDetails.className = 'fund-toggle';
+        toggleDetails.setAttribute('aria-expanded', 'false');
+        const toggleLabel = document.createElement('span');
+        toggleLabel.className = 'btn-label';
+        toggleLabel.textContent = 'Details anzeigen';
+        toggleDetails.appendChild(toggleLabel);
+        toggleDetails.addEventListener('click', () => {
+          const open = !detailsWrapper.hasAttribute('hidden');
+          const nextText = open ? 'Details anzeigen' : 'Schliessen';
+          animateLabelSwap(toggleDetails, nextText);
+          animateCollapsible(detailsWrapper, !open);
+          toggleDetails.setAttribute('aria-expanded', String(!open));
+        });
+
+        const fundActionRow = document.createElement('div');
+        fundActionRow.className = 'fund-action-row';
+        fundActionRow.appendChild(toggleDetails);
+
+        const factsheetLink = (item.factsheet || '').trim();
+        if (factsheetLink) {
+          const factsheetBtn = document.createElement('a');
+          factsheetBtn.className = 'fund-link';
+          factsheetBtn.href = factsheetLink;
+          factsheetBtn.target = '_blank';
+          factsheetBtn.rel = 'noreferrer';
+          factsheetBtn.textContent = 'Factsheet';
+          fundActionRow.appendChild(factsheetBtn);
+        }
+
+        const fundDisclaimer = document.createElement('p');
+        fundDisclaimer.className = 'fund-disclaimer legal-note';
+        fundDisclaimer.textContent =
+          'Hinweis: Diese Fondsbeschreibung dient ausschliesslich Informationszwecken und ist keine Empfehlung zum Kauf oder Verkauf. Keine Anlageberatung nach FIDLEG. Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.';
+
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.justifyContent = 'space-between';
+        actions.style.alignItems = 'center';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = 'Entfernen';
+        deleteBtn.style.display = 'none';
+        deleteBtn.addEventListener('click', () => {
+          if (item.__idx < 0) return;
+          const data = getActivePortfolioData();
+          data[type].splice(item.__idx, 1);
+          persistPortfolioData();
+          renderPortfolios(type);
+        });
+        actions.appendChild(deleteBtn);
+
+        fund.appendChild(header);
+        fund.appendChild(returns);
+        fund.appendChild(since);
+        fund.appendChild(allocationRow);
+        fund.appendChild(fundActionRow);
+        fund.appendChild(detailsWrapper);
+        fund.appendChild(fundDisclaimer);
+        fund.appendChild(actions);
+        fundsWrapper.appendChild(fund);
+      });
+
+      const portfolioLegal = document.createElement('p');
+      portfolioLegal.className = 'legal-note';
+      portfolioLegal.textContent =
+        'Modellhafte Strategieübersicht. Keine Empfehlung, keine Beratung, keine persönliche Eignungsprüfung. Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse.';
+
+      content.appendChild(summary);
+      content.appendChild(fundsWrapper);
+      content.appendChild(portfolioLegal);
+      shell.appendChild(toggle);
+      shell.appendChild(content);
+      list.appendChild(shell);
+
+      animateDonut(canvas, allocations);
+      playAnimation(shell);
+      if (kryptoActive) {
+        pulseElement(chartWrap);
+      }
+      queueRefreshEditableState();
+    }
+
+    let pendingAblaufRisk = null;
+    let ablaufRenderScheduled = false;
+
+    function renderAblauf(risk) {
+      pendingAblaufRisk = risk;
+      if (ablaufRenderScheduled) return;
+      ablaufRenderScheduled = true;
+      requestAnimationFrame(() => {
+        ablaufRenderScheduled = false;
+        const nextRisk = pendingAblaufRisk || risk;
+        pendingAblaufRisk = null;
+        renderAblaufNow(nextRisk);
+      });
+    }
+
+    function renderAblaufNow(risk) {
+      const body = document.getElementById('ablaufBody');
+      const head = document.getElementById('ablaufHead');
+      if (!body || !head) return;
+
+      body.innerHTML = '';
+      head.innerHTML = '';
+
+      const rows = ablaufData[risk] || [];
+      const yearCount = Math.max(10, ...rows.map((row) => Math.max(0, row.length - 1)));
+      const gridTemplate = `160px repeat(${yearCount}, minmax(72px, 1fr))`;
+      const startAge = 55;
+
+      head.style.gridTemplateColumns = gridTemplate;
+      const labelHead = document.createElement('div');
+      labelHead.className = 'ablauf-cell ablauf-label';
+      labelHead.textContent = 'Assetklasse';
+      head.appendChild(labelHead);
+      for (let i = 1; i <= yearCount; i++) {
+        const yearCell = document.createElement('div');
+        yearCell.className = 'ablauf-cell';
+        yearCell.textContent = `Alter ${startAge + i - 1}`;
+        head.appendChild(yearCell);
+      }
+
+      rows.forEach((row, rowIndex) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'ablauf-row';
+        rowEl.style.gridTemplateColumns = gridTemplate;
+
+        const label = document.createElement('div');
+        label.className = 'ablauf-cell ablauf-label';
+        label.textContent = row[0] || '';
+        attachEditable(label, `ablauf-${risk}-${rowIndex}-label`, (value) => {
+          ablaufData[risk][rowIndex][0] = value;
+          persistAblaufData();
+        });
+        rowEl.appendChild(label);
+
+        for (let i = 1; i <= yearCount; i++) {
+          const valueCell = document.createElement('div');
+          valueCell.className = 'ablauf-cell ablauf-value';
+          const span = document.createElement('span');
+          span.textContent = row[i] || '';
+          attachEditable(span, `ablauf-${risk}-${rowIndex}-${i}`, (value) => {
+            ablaufData[risk][rowIndex][i] = value;
+            persistAblaufData();
+          });
+          valueCell.appendChild(span);
+          rowEl.appendChild(valueCell);
+        }
+
+        body.appendChild(rowEl);
+      });
+
+      queueRefreshEditableState();
+      const shell = document.querySelector('.ablauf-shell');
+      playAnimation(shell);
+    }
+
+    function bindAvatarInputs() {
+      avatarInputs.forEach((input) => {
+        const target = document.getElementById(input.dataset.target);
+        const stored = savedAvatars[input.dataset.target];
+        if (stored) {
+          input.value = stored;
+        } else if (input.dataset.defaultUrl) {
+          input.value = input.dataset.defaultUrl;
+        }
+
+        const applyImage = () => {
+          if (!target) return;
+          const url = input.value.trim();
+          if (url) {
+            target.style.backgroundImage = `url('${url}')`;
+            target.classList.add('has-image');
+            savedAvatars[input.dataset.target] = url;
+          } else {
+            target.style.backgroundImage = '';
+            target.classList.remove('has-image');
+            delete savedAvatars[input.dataset.target];
+          }
+          persistJson(STORAGE_KEYS.avatars, savedAvatars);
+        };
+
+        input.removeEventListener('change', applyImage);
+        input.removeEventListener('blur', applyImage);
+        input.addEventListener('change', applyImage);
+        input.addEventListener('blur', applyImage);
+        applyImage();
+      });
+    }
+
+    function renderAdvisors(list) {
+      if (!advisorGrid) return;
+      advisorGrid.innerHTML = '';
+      let avatarsPatched = false;
+
+      list.forEach((advisor, idx) => {
+        const card = document.createElement('div');
+        card.className = 'advisor-card';
+
+        const header = document.createElement('div');
+        header.className = 'advisor-header';
+
+        const avatar = document.createElement('div');
+        const avatarId = `avatar-${advisor.key || idx}`;
+        avatar.id = avatarId;
+        avatar.className = 'avatar';
+        header.appendChild(avatar);
+
+        const avatarWrap = document.createElement('div');
+        avatarWrap.className = 'avatar-input-wrap';
+        const avatarLabel = document.createElement('span');
+        avatarLabel.className = 'avatar-label';
+        avatarLabel.textContent = '';
+        const avatarInput = document.createElement('input');
+        avatarInput.className = 'avatar-input';
+        avatarInput.type = 'url';
+        avatarInput.dataset.target = avatarId;
+        avatarInput.dataset.defaultUrl = advisor.avatarUrl || '';
+        avatarInput.placeholder = 'https://...';
+
+        if (advisor.avatarUrl) {
+          savedAvatars[avatarId] = advisor.avatarUrl.trim();
+          avatarsPatched = true;
+        }
+        avatarWrap.appendChild(avatarLabel);
+        avatarWrap.appendChild(avatarInput);
+
+        const meta = document.createElement('div');
+        meta.className = 'advisor-meta';
+        const nameEl = document.createElement('h4');
+        nameEl.textContent = advisor.name;
+        attachEditable(nameEl, `advisor-${advisor.key}-name`, (value) => {
+          advisorData[idx].name = value;
+        });
+        const roleEl = document.createElement('span');
+        roleEl.className = 'role';
+        roleEl.textContent = advisor.role;
+        attachEditable(roleEl, `advisor-${advisor.key}-role`, (value) => {
+          advisorData[idx].role = value;
+        });
+        const descEl = document.createElement('p');
+        descEl.textContent = advisor.description;
+        attachEditable(descEl, `advisor-${advisor.key}-desc`, (value) => {
+          advisorData[idx].description = value;
+        });
+        meta.appendChild(nameEl);
+        meta.appendChild(roleEl);
+        meta.appendChild(descEl);
+
+        header.appendChild(avatarWrap);
+        header.appendChild(meta);
+
+        const qual = document.createElement('div');
+        qual.className = 'advisor-qualifications';
+        const eduTitle = document.createElement('h5');
+        eduTitle.textContent = 'EDUCATION AND PROFESSIONAL TRAINING';
+        attachEditable(eduTitle, `advisor-${advisor.key}-edu-title`);
+        const eduList = document.createElement('ul');
+        (advisor.educationText || '')
+          .split(';')
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .forEach((text, eduIdx) => {
+            const li = document.createElement('li');
+            li.textContent = text;
+            attachEditable(li, `advisor-${advisor.key}-edu-${eduIdx}`, (value) => {
+              const parts = advisorData[idx].educationText
+                ? advisorData[idx].educationText.split(';').map((s) => s.trim()).filter(Boolean)
+                : [];
+              parts[eduIdx] = value;
+              advisorData[idx].educationText = parts.join('; ');
+            });
+            eduList.appendChild(li);
+          });
+        qual.appendChild(eduTitle);
+        qual.appendChild(eduList);
+
+        const codeTitle = document.createElement('h5');
+        codeTitle.textContent = 'Code of conduct training';
+        attachEditable(codeTitle, `advisor-${advisor.key}-code-title`);
+        const codeList = document.createElement('ul');
+        (advisor.codeOfConductText || '')
+          .split(';')
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .forEach((text, codeIdx) => {
+            const li = document.createElement('li');
+            li.textContent = text;
+            attachEditable(li, `advisor-${advisor.key}-code-${codeIdx}`, (value) => {
+              const parts = advisorData[idx].codeOfConductText
+                ? advisorData[idx].codeOfConductText.split(';').map((s) => s.trim()).filter(Boolean)
+                : [];
+              parts[codeIdx] = value;
+              advisorData[idx].codeOfConductText = parts.join('; ');
+            });
+            codeList.appendChild(li);
+          });
+        qual.appendChild(codeTitle);
+        qual.appendChild(codeList);
+
+        const actions = document.createElement('div');
+        actions.className = 'advisor-actions';
+        const link = document.createElement('a');
+        link.href = advisor.terminLink || '#';
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        link.textContent = 'Termin buchen';
+        const note = document.createElement('span');
+        note.className = 'note';
+        note.textContent = advisor.terminHinweis || advisor.terminLink || '';
+        attachEditable(note, `advisor-${advisor.key}-note`, (value) => {
+          advisorData[idx].terminHinweis = value;
+        });
+        actions.appendChild(link);
+        actions.appendChild(note);
+
+        card.appendChild(header);
+        card.appendChild(qual);
+        card.appendChild(actions);
+
+        advisorGrid.appendChild(card);
+      });
+
+      avatarInputs = advisorGrid.querySelectorAll('.avatar-input');
+      avatarLabels = advisorGrid.querySelectorAll('.avatar-label');
+      if (avatarsPatched) {
+        persistJson(STORAGE_KEYS.avatars, savedAvatars);
+      }
+      bindAvatarInputs();
+      queueRefreshEditableState();
+    }
+
+    function bindDetailsToggles() {
+      document.querySelectorAll('.toggle-details').forEach((link) => {
+        if (link.dataset.bound === 'true') return;
+        link.dataset.bound = 'true';
+
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          const targetId = link.dataset.targetId;
+          const details = targetId ? document.getElementById(targetId) : link.nextElementSibling;
+          if (!details) return;
+          const isOpen = !details.hasAttribute('hidden');
+
+          document.querySelectorAll('.details').forEach((panel) => {
+            if (panel === details) return;
+            animateCollapsible(panel, false);
+            const trigger = document.querySelector(`.toggle-details[data-target-id="${panel.id}"]`);
+            if (trigger) {
+              trigger.setAttribute('aria-expanded', 'false');
+              animateLabelSwap(trigger, 'Mehr erfahren');
+            }
+          });
+
+          animateLabelSwap(link, isOpen ? 'Mehr erfahren' : 'Schliessen');
+          animateCollapsible(details, !isOpen);
+          link.setAttribute('aria-expanded', String(!isOpen));
+        });
+      });
+    }
+
+    function getActivePortfolioType() {
+      return activePortfolioType;
+    }
+
+    function getAvailablePortfolioTypes(productIndex = activeVorsorgeIndex) {
+      const meta = getPortfolioMetaForProduct(productIndex);
+      const types = ['factor', 'marketcap', 'bip', 'obligationen'];
+      return types.filter((type) => {
+        return Boolean(String(meta?.[type]?.title || '').trim());
+      });
+    }
+
+    function updatePortfolioTabs(productIndex = activeVorsorgeIndex) {
+      const available = getAvailablePortfolioTypes(productIndex);
+      const fallback = available[0] || 'factor';
+      if (!available.includes(activePortfolioType)) {
+        activePortfolioType = fallback;
+      }
+      renderPortfolioTabs(available);
+    }
+
+    function renderPortfolioTabs(available) {
+      if (!portfolioTabs) return;
+      const meta = getPortfolioMetaForProduct(activeVorsorgeIndex);
+      portfolioTabs.innerHTML = '';
+
+      available.forEach((type) => {
+        const rawTitle = String(meta?.[type]?.title || '').trim();
+        if (!rawTitle) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = stripNewTag(rawTitle);
+        btn.dataset.portfolioTab = type;
+        btn.classList.toggle('active', type === activePortfolioType);
+        btn.addEventListener('click', () => {
+          activePortfolioType = type;
+          updatePortfolioTabs(activeVorsorgeIndex);
+          renderPortfolios(activePortfolioType);
+        });
+        portfolioTabs.appendChild(btn);
+      });
+
+      kryptoToggle = document.createElement('button');
+      kryptoToggle.type = 'button';
+      kryptoToggle.id = 'kryptoToggle';
+      kryptoToggle.className = 'krypto-toggle';
+      kryptoToggle.textContent = '+ 5% Krypto';
+      kryptoToggle.addEventListener('click', () => {
+        const type = getActivePortfolioType();
+        if (type === 'obligationen') return;
+        kryptoActive = !kryptoActive;
+        kryptoActiveByProduct[activeVorsorgeIndex] = kryptoActive;
+        persistJson(STORAGE_KEYS.kryptoActive, kryptoActiveByProduct);
+        kryptoToggle.classList.toggle('active', kryptoActive);
+        kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
+        const currentType = getActivePortfolioType();
+        renderPortfolios(currentType);
+        const chartArea = document.querySelector('.chart-wrap');
+        pulseElement(chartArea);
+      });
+      portfolioTabs.appendChild(kryptoToggle);
+      syncKryptoToggle(activePortfolioType);
+    }
+
+    function setActiveVorsorgeIndex(index) {
+      const maxIndex = Math.max(0, vorsorgeData.length - 1);
+      const nextIndex = Math.min(Math.max(index, 0), maxIndex);
+      if (nextIndex === activeVorsorgeIndex) return;
+      activeVorsorgeIndex = nextIndex;
+      persistJson(STORAGE_KEYS.selectedVorsorge, activeVorsorgeIndex);
+      ensurePortfolioStructures(vorsorgeData.length);
+      kryptoActive = Boolean(kryptoActiveByProduct[activeVorsorgeIndex]);
+      kryptoFund = getActiveKryptoFund();
+      updatePortfolioTabs(activeVorsorgeIndex);
+      renderVorsorgeCards(vorsorgeData);
+      renderPortfolios(activePortfolioType);
+    }
+
+    function syncKryptoToggle(type) {
+      if (!kryptoToggle) return;
+      const blocked = type === 'obligationen';
+      kryptoToggle.disabled = blocked;
+      kryptoToggle.title = blocked ? 'Für Obligationen nicht verfügbar' : '5% Krypto hinzufügen';
+      if (blocked && kryptoActive) {
+        kryptoActive = false;
+        kryptoActiveByProduct[activeVorsorgeIndex] = false;
+        persistJson(STORAGE_KEYS.kryptoActive, kryptoActiveByProduct);
+      }
+      kryptoToggle.classList.toggle('active', kryptoActive);
+      kryptoToggle.textContent = kryptoActive ? 'Krypto aktiv (5%)' : '+ 5% Krypto';
+    }
+
+    function refreshEditableState() {
+      const elements = document.querySelectorAll('[data-editable]');
+      elements.forEach((el) => {
+        el.contentEditable = 'false';
+        el.setAttribute('aria-label', '');
+      });
+      document.querySelectorAll('.allocation-input').forEach((input) => {
+        input.style.display = 'none';
+      });
+      avatarInputs.forEach((input) => {
+        input.style.display = 'none';
+      });
+      avatarLabels.forEach((label) => {
+        label.style.display = 'none';
+      });
+      document.querySelectorAll('.delete-btn').forEach((btn) => {
+        btn.style.display = 'none';
+      });
+    }
+
+    hydrateStaticEditables();
+
+    document.querySelectorAll('[data-risk]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-risk]').forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        const risk = button.getAttribute('data-risk');
+        renderAblauf(risk);
+      });
+    });
+
+    bindDetailsToggles();
+
+    loadFromSheets()
+      .catch((err) => {
+        console.warn('Fehler beim Laden aus Google Sheet, nutze Fallback-Daten', err);
+      })
+      .finally(() => {
+        ensurePortfolioStructures(vorsorgeData.length);
+        if (activeVorsorgeIndex >= vorsorgeData.length) {
+          activeVorsorgeIndex = 0;
+          persistJson(STORAGE_KEYS.selectedVorsorge, activeVorsorgeIndex);
+        }
+        if (portfolioMetaFromSheet && portfolioMetaByProduct.length < vorsorgeData.length) {
+          for (let i = portfolioMetaByProduct.length; i < vorsorgeData.length; i += 1) {
+            portfolioMetaByProduct[i] = emptyPortfolioMeta();
+          }
+        }
+        if (portfolioDataFromSheet && portfolioDataByProduct.length < vorsorgeData.length) {
+          for (let i = portfolioDataByProduct.length; i < vorsorgeData.length; i += 1) {
+            portfolioDataByProduct[i] = { factor: [], marketcap: [], bip: [], obligationen: [] };
+          }
+        }
+        kryptoActive = Boolean(kryptoActiveByProduct[activeVorsorgeIndex]);
+        kryptoFund = getActiveKryptoFund();
+        updatePortfolioTabs(activeVorsorgeIndex);
+        renderVorsorgeCards(vorsorgeData);
+        renderPortfolios(activePortfolioType);
+        renderAblauf('konservativ');
+        renderAdvisors(advisorData);
+        applyUpdatesData();
+        queueRefreshEditableState();
+        if (loadingFallbackTimer) {
+          clearTimeout(loadingFallbackTimer);
+          loadingFallbackTimer = null;
+        }
+        setLoadingState(false);
+      });
+  </script>
+</body>
+</html>
